@@ -1,0 +1,45 @@
+JWNL Properties File Configuration
+
+A JWNL Properties file is an XML file that can be validated using the included DTD or XSD.
+
+Basically, the properties file allows you to specify three properties:
+
+- Dictionary class: This defines the class used to interface with the dictionary. JWNL comes with two dictionary classes - MapBackedDictionary and FileBackedDictionary. Exactly 1 dictionary tag is required in a properties file. If there are more than one, the first one will be used.
+
+<dictionary class="[dictionary class name]">
+    ..parameters
+</dictionary>
+
+- Version: Gives information on the version of WordNet being interfaced with. Excactly 1 version tag is required in a properties file.
+
+<version publisher="[publisher]" number="[version number]" language="[language]" country="[country]"/>
+
+where [language] and [country] are used to specify the locale whose language is covered by the dictionary. If these tags are not included, the default locale is assumed. See the Java documentation for java.util.Locale for information on locales.
+
+- Resources: A resource file contains mapping between keys and text used in the program. Typically, this text is error or status messages. Resource files are used so that a program can be used with different (spoken) languages without having to modify the code. See the Java documentation for java.util.ResourceBundle on how to name your resource files. You can specify as many resources as you want.
+
+<resource class="[resource file path]"/>
+
+In the top-level tag, you can specify the language and country to use for resolving resources. For example:
+
+<jwnl_properties language="en" country="us">
+    ..properties
+</jwnl_properties>
+
+tells the program to print all messages in American English (a resource file containing these messages has to be present, of course).
+
+You'll notice that <dictionary> and <dictionary_element_factory> allow you to provide parameters. Parameters are of the form:
+
+<param name="[param name]" value="[param value]">
+    ..nested parameters
+</param>
+
+Parameters are provided to the install method of the class. Parameters can be nested. For example:
+
+<param name="data_class" value="net.didion.stuff.Money">
+    <param name="currency" value="USD"/>
+</param>
+
+A set of params like this most likely means that an instance of net.didion.stuff.Money is going to be created, and that its constructor will be passed "USD" as a parameter.
+
+The valid parameters for each class are specified in that class's documentation. I would encourage you to follow this convention of documenting valid parameters in the class documentation of any classes you write that take parameters.
