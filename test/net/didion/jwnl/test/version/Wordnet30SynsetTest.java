@@ -68,7 +68,7 @@ public class Wordnet30SynsetTest extends TestCase {
             assertTrue(word.getSenseCount() == 6); 
             
             word = Dictionary.getInstance().getIndexWord(POS.ADJECTIVE, "big");
-            assertTrue(word.getSenseCount() == 12); 
+            assertTrue(word.getSenseCount() == 13); 
             
         } catch(JWNLException e) {
             fail("Exception in testGetSenses caught");

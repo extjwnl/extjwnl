@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import net.didion.jwnl.JWNL;
 import net.didion.jwnl.JWNLException;
 import net.didion.jwnl.JWNLRuntimeException;
 import net.didion.jwnl.data.POS;
@@ -68,7 +69,12 @@ public class FileManagerImpl implements FileManager {
 		checkFileType(dictionaryFileType);
 		_files = new DictionaryCatalogSet(searchDir, dictionaryFileType);
 		_files.open();
-		senseFile = new File(searchDir + "\\index.sense");
+        String sense = "\\index.sense";
+        if (JWNL.getVersion().getNumber() < 2.1) {
+            sense = "\\sense.idx";
+		}
+        senseFile = new File(searchDir + sense);
+        
 		Grep.setFile(senseFile);
 	}
 

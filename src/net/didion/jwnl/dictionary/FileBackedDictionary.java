@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import net.didion.jwnl.JWNL;
 import net.didion.jwnl.JWNLException;
 import net.didion.jwnl.data.DictionaryElementType;
 import net.didion.jwnl.data.Exc;
@@ -438,13 +439,19 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
 			long ofs = tokenizer.nextLong();
 			long number = tokenizer.nextInt();
 			String senseCount = tokenizer.nextToken();
-			String[] sc = senseCount.split("\\n");
-			int count = Integer.parseInt(sc[0]);
-			String le = senseKey.split("%")[0];
-            senseCount.trim();
-          
-            word = new Word(lemma, senseKey, count);
-			senseMap.put(offset + lemma, word);
+            String[] sc = null;
+            if (JWNL.getVersion().getNumber() < 2.1 && JWNL.getOS().equals(JWNL.WINDOWS)) {
+                sc = senseCount.split("\\r\\n");
+            } else { 
+                sc = senseCount.split("\\n");
+            }
+            if (sc != null) {
+                int count = Integer.parseInt(sc[0]);
+    		    senseCount.trim();
+              
+                word = new Word(lemma, senseKey, count);
+    			senseMap.put(offset + lemma, word);
+            }
         } catch(IOException ioe) {
             ioe.printStackTrace();
         }

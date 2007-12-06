@@ -48,7 +48,7 @@ public abstract class AbstractPrincetonDictionaryFile extends AbstractDictionary
 
 	protected String makeFilename() {
 		String posString = getExtension(getPOS());
-		if (getFileType() == DictionaryFileType.EXCEPTION)
+		if (getFileType() == DictionaryFileType.EXCEPTION || (JWNL.getOS().equals(JWNL.WINDOWS) && JWNL.getVersion().getNumber() < 2.1))
 			return makeWindowsFilename(posString, getFileNames(getFileType())._windowsFileTypeName);
 		else
 			return makeNonWindowsFilename(posString, getFileNames(getFileType())._nonWindowsFileTypeName);

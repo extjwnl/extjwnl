@@ -22,7 +22,7 @@ public class SenseKeyTest extends TestCase {
 	@Test
 	public void testSimpleSenseKey() {
 		try {
-			JWNL.initialize(new FileInputStream("C:\\21csi\\workspaces\\hicin-data-translator\\com.p21csi.lib.net.didion.jwnl\\config\\file_properties.xml"));
+			JWNL.initialize(new FileInputStream("C:\\21csi\\workspaces\\hicin-data-translator\\jwnl\\config\\file_properties.xml"));
 			IndexWord word = Dictionary.getInstance().getIndexWord(POS.NOUN, "tank");
 			Synset[] syns = word.getSenses();
 			for (Synset syn : syns) {
@@ -34,8 +34,9 @@ public class SenseKeyTest extends TestCase {
 			
 			
 		} catch(Exception e) {
+            e.printStackTrace();
             fail("Exception in Sense Key test caught");
-			e.printStackTrace();
+			
 		}
 		
 		System.out.println("Sense key test passed.");
