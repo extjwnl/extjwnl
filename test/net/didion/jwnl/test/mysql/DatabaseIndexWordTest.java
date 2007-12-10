@@ -8,14 +8,15 @@ import net.didion.jwnl.data.IndexWord;
 import net.didion.jwnl.data.POS;
 import net.didion.jwnl.data.Synset;
 import net.didion.jwnl.dictionary.Dictionary;
+import net.didion.jwnl.test.generic.TestDefaults;
 
 public class DatabaseIndexWordTest extends TestCase {
     
     public void testMySQLAccess() {
     try {
         
-    JWNL.initialize(new FileInputStream("C:\\21csi\\workspaces\\hicin-data-translator\\jwnl\\config\\database_properties.xml"));
-    
+    JWNL.initialize(TestDefaults.getInputStream());
+         
     IndexWord iw = Dictionary.getInstance().getIndexWord(POS.NOUN, "tank");
     
     Synset[] senses = iw.getSenses();

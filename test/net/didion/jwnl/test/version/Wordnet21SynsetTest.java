@@ -9,6 +9,7 @@ import net.didion.jwnl.data.POS;
 import net.didion.jwnl.data.Synset;
 import net.didion.jwnl.data.Word;
 import net.didion.jwnl.dictionary.Dictionary;
+import net.didion.jwnl.test.generic.TestDefaults;
 
 import org.junit.Test;
 
@@ -17,7 +18,7 @@ public class Wordnet21SynsetTest extends TestCase {
     @Test
     public void testGetBySynset() {
         try {
-            JWNL.initialize(new FileInputStream("C:\\21csi\\workspaces\\hicin-data-translator\\com.p21csi.lib.net.didion.jwnl\\config\\file_properties.xml"));
+            JWNL.initialize(TestDefaults.getInputStream());
             IndexWord word = Dictionary.getInstance().getIndexWord(POS.NOUN, "tank");
            
             /**

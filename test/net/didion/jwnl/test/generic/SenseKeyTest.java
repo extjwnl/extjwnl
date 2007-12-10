@@ -22,8 +22,8 @@ public class SenseKeyTest extends TestCase {
 	@Test
 	public void testSimpleSenseKey() {
 		try {
-			JWNL.initialize(new FileInputStream("C:\\21csi\\workspaces\\hicin-data-translator\\jwnl\\config\\file_properties.xml"));
-			IndexWord word = Dictionary.getInstance().getIndexWord(POS.NOUN, "tank");
+            JWNL.initialize(TestDefaults.getInputStream());
+            IndexWord word = Dictionary.getInstance().getIndexWord(POS.NOUN, "tank");
 			Synset[] syns = word.getSenses();
 			for (Synset syn : syns) {
 				for (Word w: syn.getWords()) {

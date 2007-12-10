@@ -1,6 +1,5 @@
 package net.didion.jwnl.test.generic;
 
-import java.io.FileInputStream;
 import java.util.Iterator;
 
 import junit.framework.TestCase;
@@ -21,7 +20,7 @@ public class AntonymRelationshipTest extends TestCase {
     @Test
     public void testSimpleSenseKey() {
         try {
-            JWNL.initialize(new FileInputStream("C:\\21csi\\workspaces\\hicin-data-translator\\com.p21csi.lib.net.didion.jwnl\\config\\file_properties.xml"));
+            JWNL.initialize(TestDefaults.getInputStream());
             IndexWord beautiful = Dictionary.getInstance().getIndexWord(POS.ADJECTIVE, "beautiful");
             IndexWord ugly = Dictionary.getInstance().getIndexWord(POS.ADJECTIVE, "ugly");
             
