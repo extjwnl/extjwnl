@@ -21,11 +21,12 @@ public class DatabaseManagerImpl implements DatabaseManager, Createable {
             "SELECT iw.lemma " +
             "FROM IndexWord iw " +
             "WHERE iw.pos = ? AND iw.index_word_id = ?";
-
+ 
+    /** SQL query for getting all synsets for an index word. */
     private static final String SYNSET_IDS_FOR_INDEX_WORD_SQL =
-            "SELECT iws.synset_id " +
-            "FROM IndexWordSynset iws, IndexWord iw " +
-            "WHERE iws.index_word_id = iw.index_word_id AND iw.pos = ?  AND iw.lemma = ?";
+            "SELECT syn.file_offset, iws.synset_id, syn.synset_id "
+            + "FROM IndexWordSynset iws, IndexWord iw, Synset syn " 
+            + "WHERE iws.index_word_id = iw.index_word_id AND syn.synset_id = iws.synset_id AND iw.pos = ?  AND iw.lemma = ?";
 
     private static final String COUNT_INDEX_WORDS_SQL = 
             "SELECT MIN(index_word_id), MAX(index_word_id) FROM indexword WHERE pos = ?";

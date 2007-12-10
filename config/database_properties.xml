@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jwnl_properties language="en">
-	<version publisher="Princeton" number="2.0" language="en"/>
+	<version publisher="Princeton" number="3.0" language="en"/>
 	<dictionary class="net.didion.jwnl.dictionary.DatabaseBackedDictionary">
 		<param name="morphological_processor" value="net.didion.jwnl.dictionary.morph.DefaultMorphologicalProcessor">
 			<param name="operations">
@@ -38,7 +38,7 @@
 		<param name="dictionary_element_factory" value="net.didion.jwnl.princeton.data.PrincetonWN17DatabaseDictionaryElementFactory"/>
 		<param name="database_manager" value="net.didion.jwnl.dictionary.database.DatabaseManagerImpl">
 			<param name="driver" value="com.mysql.jdbc.Driver"/>
-			<param name="url" value="jdbc:mysql://localhost/jwnl?user=jwnl&amp;password=jwnl"/>
+			<param name="url" value="jdbc:mysql://localhost/jwnl?user=root"/>
 		</param>
 	</dictionary>
 	<resource class="PrincetonResource"/>

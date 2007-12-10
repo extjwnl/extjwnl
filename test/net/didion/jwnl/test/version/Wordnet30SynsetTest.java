@@ -19,15 +19,15 @@ public class Wordnet30SynsetTest extends TestCase {
     @Test
     public void testGetBySynset() {
         try {
-            JWNL.initialize(new FileInputStream("C:\\21csi\\workspaces\\hicin-data-translator\\com.p21csi.lib.net.didion.jwnl\\config\\file_properties.xml"));
-           
+            //JWNL.initialize(new FileInputStream("C:\\21csi\\workspaces\\hicin-data-translator\\com.p21csi.lib.net.didion.jwnl\\config\\file_properties.xml"));
+            JWNL.initialize(new FileInputStream("C:\\21csi\\workspaces\\hicin-data-translator\\jwnl\\config\\database_properties.xml"));
             /**
              * 3.0 offset for tank. 
              */
             long offset = 4389033;
             
             Synset syn = Dictionary.getInstance().getSynsetAt(POS.NOUN, offset);
-            
+            System.out.println("Synset: " + syn.toString());
             boolean match = false;
             for (Word w : syn.getWords()) {
                 if (w.getLemma().equals("tank")) {

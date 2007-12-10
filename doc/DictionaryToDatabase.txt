@@ -1,0 +1,30 @@
+DictionaryToDatabase
+Requires JNWNL Version 1.3 or greater
+
+DictionaryToDatabase allows you to create and populate a database with the WordNet data. This database is compatible with DatabaseBackedDictionary.
+
+**Cost/Benefit Tradeoff**
+
+This depends largely on the type of database you use, and whether the database is local or remote. 
+
+For example, using Axion, an in-process database, with all data stored in memory, is about as fast as using a Map-backed dictionary, but requires around 300MB of memory. Using Axion in file-backed mode, the speed is still faster than a file-backed dictionary and the memory requirements are quite small. However, the process of importing the WordNet data into file-backed Axion takes several hours.
+
+Using a traditional client-server database, such as MySQL, is slower than a Map- or Axion-backed dictionary, but can be as fast as or faster than a file-backed dictionary. About 37MB is required on the database server for the WordNet data, and it takes about 30 minutes to populate the database.
+
+The main benefit of using a database-backed dictionary is that the data is centralized and can be used by many clients. There is no need to set up and configure the WordNet data files on each client computer.
+
+**Usage**
+
+Make sure you have your file-properties.xml file set up correctly. Also, if you are using a database that is not in-process, make sure to create a new database for the the WordNet data. For example:
+
+create database jwnl;
+
+And then just call:
+
+java -cp jwnl.jar;utilities.jar;commons-logging.jar net.didion.jwnl.utilities.DictionaryToDatabase <property file> <create tables script> <driver class> <connection url> [username [password]]
+
+For example:
+
+java -cp jwnl.jar;utilities.jar;commons-logging.jar net.didion.jwnl.utilities.DictionaryToDatabase .\include\file-properties.xml .\include\create.sql com.mysql.jdbc.Driver jdbc:mysql://localhost/jwnl?user=jwnl&password=jwnl"
+
+Once you have loaded the data into the database, make sure you have configured database-properties.xml correctly and initialize JWNL using that file.

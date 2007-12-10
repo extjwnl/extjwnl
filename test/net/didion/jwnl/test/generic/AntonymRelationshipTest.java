@@ -25,7 +25,6 @@ public class AntonymRelationshipTest extends TestCase {
             IndexWord beautiful = Dictionary.getInstance().getIndexWord(POS.ADJECTIVE, "beautiful");
             IndexWord ugly = Dictionary.getInstance().getIndexWord(POS.ADJECTIVE, "ugly");
             
-            System.out.println("beautiful count: " + beautiful.getSenseCount());
             Synset[] bea = beautiful.getSenses();
             Synset beaSynset = bea[0];
             
@@ -33,9 +32,7 @@ public class AntonymRelationshipTest extends TestCase {
             Synset uglySynset = ug[0];
             
             if (beaSynset != null && uglySynset != null) {
-                System.out.println(beaSynset.toString());
-                System.out.println(uglySynset.toString());
-                RelationshipList list = RelationshipFinder.getInstance().findRelationships(beaSynset, uglySynset, PointerType.ANTONYM);
+                 RelationshipList list = RelationshipFinder.getInstance().findRelationships(beaSynset, uglySynset, PointerType.ANTONYM);
                 Iterator i = list.iterator();
                 while (i.hasNext()) {
                     
