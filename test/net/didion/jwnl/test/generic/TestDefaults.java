@@ -15,7 +15,7 @@ public class TestDefaults {
     /**
      * The location of the configuration file. 
      */
-    public static String CONFIG_PATH = "C:\\21csi\\jwnl\\";
+    public static String CONFIG_PATH = "C:\\21csi\\workspaces\\hicin-data-translator\\jwnl\\config\\";
     
     /**
      * The name of the file configuration. 
@@ -40,7 +40,7 @@ public class TestDefaults {
     /**
      * The testing type. Currently either FILE or DB.
      */
-    public static String testingType = TestDefaults.FILE;
+    public static String testingType = TestDefaults.DB;
   
     
     /**

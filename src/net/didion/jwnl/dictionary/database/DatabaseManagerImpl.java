@@ -17,57 +17,57 @@ public class DatabaseManagerImpl implements DatabaseManager, Createable {
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
 
-    private static final String LEMMA_FOR_INDEX_WORD_ID_SQL =
+    protected static final String LEMMA_FOR_INDEX_WORD_ID_SQL =
             "SELECT iw.lemma " +
             "FROM IndexWord iw " +
             "WHERE iw.pos = ? AND iw.index_word_id = ?";
  
     /** SQL query for getting all synsets for an index word. */
-    private static final String SYNSET_IDS_FOR_INDEX_WORD_SQL =
+    protected static final String SYNSET_IDS_FOR_INDEX_WORD_SQL =
             "SELECT syn.file_offset, iws.synset_id, syn.synset_id "
             + "FROM IndexWordSynset iws, IndexWord iw, Synset syn " 
             + "WHERE iws.index_word_id = iw.index_word_id AND syn.synset_id = iws.synset_id AND iw.pos = ?  AND iw.lemma = ?";
 
-    private static final String COUNT_INDEX_WORDS_SQL = 
+    protected static final String COUNT_INDEX_WORDS_SQL = 
             "SELECT MIN(index_word_id), MAX(index_word_id) FROM indexword WHERE pos = ?";
     
-    private static final String ALL_LEMMAS_SQL =
+    protected static final String ALL_LEMMAS_SQL =
             "SELECT lemma FROM IndexWord WHERE pos = ?";
 
-    private static final String ALL_LEMMAS_LIKE_SQL =
+    protected static final String ALL_LEMMAS_LIKE_SQL =
             "SELECT lemma FROM IndexWord WHERE pos = ? AND lemma LIKE ?";
 
-    private static final String SYNSET_SQL =
+    protected static final String SYNSET_SQL =
             "SELECT is_adj_cluster, gloss FROM Synset WHERE pos = ? AND file_offset = ?";
 
-    private static final String SYNSET_WORD_SQL =
+    protected static final String SYNSET_WORD_SQL =
             "SELECT sw.word, sw.word_index " +
             "FROM Synset s, SynsetWord sw " +
             "WHERE s.synset_id = sw.synset_id AND s.pos = ? AND s.file_offset = ?";
 
-    private static final String SYNSET_POINTER_SQL =
+    protected static final String SYNSET_POINTER_SQL =
             "SELECT sp.pointer_type, sp.target_offset, sp.target_pos, sp.source_index, sp.target_index " +
             "FROM Synset s, SynsetPointer sp " +
             "WHERE s.synset_id = sp.synset_id AND s.pos = ? AND s.file_offset = ?";
 
-    private static final String SYNSET_VERB_FRAME_SQL =
+    protected static final String SYNSET_VERB_FRAME_SQL =
             "SELECT svf.frame_number, svf.word_index " +
             "FROM Synset s, SynsetVerbFrame svf " +
             "WHERE s.synset_id = svf.synset_id AND s.pos = ? AND s.file_offset = ?";
 
-    private static final String ALL_SYNSETS_SQL =
+    protected static final String ALL_SYNSETS_SQL =
             "SELECT offset FROM Synset WHERE pos = ?";
 
-    private static final String EXCEPTION_SQL =
+    protected static final String EXCEPTION_SQL =
             "SELECT exception FROM Exception WHERE pos = ? AND lemma = ?";
 
-    private static final String ALL_EXCEPTIONS_SQL =
+    protected static final String ALL_EXCEPTIONS_SQL =
             "SELECT lemma FROM Exception WHERE pos = ?";
 
-    private static final Random _rand = new Random(new Date().getTime());
+    protected static final Random _rand = new Random(new Date().getTime());
 
-    private ConnectionManager _connectionManager;
-    private Map _minMaxIds = new HashMap();
+    protected ConnectionManager _connectionManager;
+    protected Map _minMaxIds = new HashMap();
 
     public DatabaseManagerImpl() {
     }
@@ -163,7 +163,7 @@ public class DatabaseManagerImpl implements DatabaseManager, Createable {
         return createPOSQuery(pos, ALL_EXCEPTIONS_SQL);
     }
 
-    private Query createPOSQuery(POS pos, String sql) throws JWNLException {
+    protected Query createPOSQuery(POS pos, String sql) throws JWNLException {
         Query query = null;
         try {
             query = _connectionManager.getQuery(sql);
@@ -177,7 +177,7 @@ public class DatabaseManagerImpl implements DatabaseManager, Createable {
         }
     }
 
-    private Query createPOSStringQuery(POS pos, String str, String sql) throws JWNLException {
+    protected Query createPOSStringQuery(POS pos, String str, String sql) throws JWNLException {
         Query query = null;
         try {
             query = _connectionManager.getQuery(sql);
@@ -192,7 +192,7 @@ public class DatabaseManagerImpl implements DatabaseManager, Createable {
         }
     }
 
-    private Query createPOSOffsetQuery(POS pos, long offset, String sql) throws JWNLException {
+    protected Query createPOSOffsetQuery(POS pos, long offset, String sql) throws JWNLException {
         Query query = null;
         try {
             query = _connectionManager.getQuery(sql);
@@ -207,7 +207,7 @@ public class DatabaseManagerImpl implements DatabaseManager, Createable {
         }
     }
 
-    private Query createPOSIdQuery(POS pos, int id, String sql) throws JWNLException {
+    protected Query createPOSIdQuery(POS pos, int id, String sql) throws JWNLException {
         Query query = null;
         try {
             query = _connectionManager.getQuery(sql);

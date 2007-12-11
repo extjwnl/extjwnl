@@ -185,6 +185,11 @@ public class FileManagerImpl implements FileManager {
 		}
 	}
 
+    /**
+     * Get indexed line pointer is typically used to find a word within an index file matching a given part of speech. 
+     * It first accesses the appropriate file (based on pos and dictionary type), then iterates through the file. Does so 
+     * by using an offset and string comparison algorithm. 
+     */
 	public long getIndexedLinePointer(POS pos, DictionaryFileType fileType, String target) throws IOException {
 		RandomAccessDictionaryFile file = (RandomAccessDictionaryFile)getFile(pos, fileType);
 		if (file == null || file.length() == 0) {
@@ -193,15 +198,15 @@ public class FileManagerImpl implements FileManager {
 		synchronized (file) {
 			long start = 0;
 			long stop = file.length();
-			long offset = start, midpoint;
+			long offset = start, midpoint; //our current offset within the file
 			int compare;
-			String word;
+			String word; //current word at a line
 			while (true) {
 				midpoint = (start + stop) / 2;
 				file.seek(midpoint);
 				file.readLine();
 				offset = file.getFilePointer();
-				if (stop == offset) {
+				if (stop == offset) { //we are at eof
 					file.seek(start);
 					offset = file.getFilePointer();
 					while (offset != stop) {
@@ -217,6 +222,9 @@ public class FileManagerImpl implements FileManager {
 				}
 				word = readLineWord(file);
 				compare = word.compareTo(target);
+                /**
+                 * Determines where to go within the file. 
+                 */
 				if (compare == 0) {
 					return offset;
 				} else if (compare > 0) {

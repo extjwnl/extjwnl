@@ -3,6 +3,8 @@ package net.didion.jwnl.utilities;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.Connection;
@@ -25,6 +27,7 @@ import net.didion.jwnl.dictionary.Dictionary;
 import net.didion.jwnl.dictionary.database.ConnectionManager;
 import net.didion.jwnl.util.MessageLog;
 import net.didion.jwnl.util.MessageLogLevel;
+import net.didion.jwnl.util.TokenizerParser;
 
 /**
  * DictionaryToDatabase is used to transfer a WordNet file database into an actual
@@ -42,7 +45,7 @@ public class DictionaryToDatabase
     /**
      * The usage string. 
      */
-    private static final String USAGE = "java net.didion.jwnl.utilities.DictionaryToDatabase <property file> <create tables script> <driver class> <connection url> [username [password]]";
+    private static final String USAGE = "java net.didion.jwnl.utilities.DictionaryToDatabase <property file> <index file location> <create tables script> <driver class> <connection url> [username [password]]";
     
     
     /**
@@ -75,6 +78,12 @@ public class DictionaryToDatabase
     private Map synsetOffsetToId;
     
     /**
+     * Maps the usage. The key is 'offset:lemma', the object[] contains
+     * the sense key (string) and the usage count (integer). 
+     */
+    private Map<String, Object[]> usageMap;
+    
+    /**
      * Run the program, requires 4 arguments. See DictionaryToDatabase.txt for more documentation. 
      * @param args
      */
@@ -88,6 +97,7 @@ public class DictionaryToDatabase
         try
         {
             JWNL.initialize(new FileInputStream(args[0]));
+            
         }
         catch(Exception ex)
         {
@@ -95,14 +105,18 @@ public class DictionaryToDatabase
             System.exit(-1);
         }
         Connection conn = null;
+        
         try
         {
-            String scriptFileName = args[1];
-            ConnectionManager mgr = new ConnectionManager(args[2], args[3], args.length <= 4 ? null : args[4], args.length <= 5 ? null : args[5]);
+            String indexSenseFileName = args[1];
+            String scriptFileName = args[2];
+            ConnectionManager mgr = new ConnectionManager(args[3], args[4], args.length <= 4 ? null : args[5], args.length <= 6 ? null : args[6]);
             conn = mgr.getConnection();
             DictionaryToDatabase d2d = new DictionaryToDatabase(conn);
+            d2d.loadSenseKeyAndUsage(indexSenseFileName);
             d2d.createTables(scriptFileName);
             d2d.insertData();
+            
         }
         catch(Exception e)
         {
@@ -144,6 +158,7 @@ public class DictionaryToDatabase
     {
         idToSynsetOffset = new HashMap();
         synsetOffsetToId = new HashMap();
+        usageMap = new HashMap<String, Object[]>();
         connection = conn;
         ((AbstractCachingDictionary)Dictionary.getInstance()).setCachingEnabled(false);
     }
@@ -201,7 +216,7 @@ public class DictionaryToDatabase
             idToSynsetOffset.clear();
             synsetOffsetToId.clear();
         }
-
+   
     }
 
     /**
@@ -227,7 +242,7 @@ public class DictionaryToDatabase
             iwStmt.setString(3, iw.getPOS().getKey());
             iwStmt.execute();
             idToSynsetOffset.put(new Integer(id), iw.getSynsetOffsets());
-            if(count++ % 100 == 0)
+            if(count++ % 1000 == 0)
                 System.out.println(count);
         } while(true);
     }
@@ -241,12 +256,15 @@ public class DictionaryToDatabase
         throws SQLException
     {
         PreparedStatement synsetStmt = connection.prepareStatement("INSERT INTO Synset VALUES(?,?,?,?,?)");
-        PreparedStatement synsetWordStmt = connection.prepareStatement("INSERT INTO SynsetWord VALUES(?,?,?,?)");
+        PreparedStatement synsetWordStmt = connection.prepareStatement("INSERT INTO SynsetWord VALUES(?,?,?,?,?,?)");
         PreparedStatement synsetPointerStmt = connection.prepareStatement("INSERT INTO SynsetPointer VALUES(?,?,?,?,?,?,?)");
         PreparedStatement synsetVerbFrameStmt = connection.prepareStatement("INSERT INTO SynsetVerbFrame VALUES(?,?,?,?)");
         LOG.log(MessageLogLevel.INFO, "storing synsets");
+        int count = 0;
         while(itr.hasNext()) 
         {
+            if(count++ % 1000 == 0)
+                System.out.println("synset: " + count);
             Synset synset = (Synset)itr.next();
             int id = nextId();
             synsetOffsetToId.put(new Long(synset.getOffset()), new Integer(id));
@@ -261,9 +279,22 @@ public class DictionaryToDatabase
             synsetVerbFrameStmt.setInt(2, id);
             for(int i = 0; i < words.length; i++)
             {
-                synsetWordStmt.setInt(1, nextId());
+                int wordId = nextId();
+                String synsetString = synset.getOffset() + ":" + words[i].getLemma();
+                Object[] arr = usageMap.get(synsetString);
+                String senseKey = "";
+                int usageCnt = 0;
+                if (arr != null) {
+                    senseKey = (String) arr[0];
+                    usageCnt = (Integer) arr[1];
+                }
+               
+                synsetWordStmt.setInt(1, wordId);
                 synsetWordStmt.setString(3, words[i].getLemma());
                 synsetWordStmt.setInt(4, words[i].getIndex());
+                synsetWordStmt.setString(5, senseKey);
+                synsetWordStmt.setInt(6, usageCnt);
+                
                 synsetWordStmt.execute();
                 if(!(words[i] instanceof Verb))
                     continue;
@@ -322,6 +353,54 @@ public class DictionaryToDatabase
             }
         }
 
+    }
+    
+    /**
+     * loads the sense key usage from a file. 
+     * @throws SQLException
+     */
+    private void loadSenseKeyAndUsage(String filename) throws SQLException {
+        LOG.log(MessageLogLevel.INFO, "storing sense key usage");
+        try {
+       BufferedReader in
+        = new BufferedReader(new FileReader(filename));
+        int count = 0;
+          while (in.ready()) {
+            
+            String indexLine = in.readLine();
+            TokenizerParser tokenizer = new TokenizerParser(indexLine, " ");
+            String senseKey = tokenizer.nextToken();
+            String[] lemmaKey = senseKey.split("%");
+            String lemma = lemmaKey[0];
+            long ofs = tokenizer.nextLong();
+            long number = tokenizer.nextInt();
+            String synsetString = ofs + ":" + lemma;
+            if(count++ % 1000 == 0)
+                System.out.println("sense key and usage: " + count);
+            String senseCount = tokenizer.nextToken();
+            String[] sc = null;
+            Object[] arr = new Object[2];
+            
+            if (JWNL.getVersion().getNumber() < 2.1 && JWNL.getOS().equals(JWNL.WINDOWS)) {
+                sc = senseCount.split("\\r\\n");
+            } else { 
+                sc = senseCount.split("\\n");
+            }
+            if (sc != null) {
+                int cnt = Integer.parseInt(sc[0]);
+                arr[0] = senseKey;
+                arr[1] = new Integer(cnt);
+                usageMap.put(synsetString, arr);
+                senseCount.trim();
+                
+            }
+        }
+        
+        } catch(FileNotFoundException e) {
+            e.printStackTrace();
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

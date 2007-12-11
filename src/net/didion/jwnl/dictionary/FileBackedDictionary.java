@@ -171,6 +171,7 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
 			}
 			if (word == null) {
 				try {
+                    /** determines the offset within the index file */
 					long offset = getFileManager().getIndexedLinePointer(
 					    pos, DictionaryFileType.INDEX, lemma.replace(' ', '_'));
 					if (offset >= 0) {

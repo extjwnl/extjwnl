@@ -26,9 +26,12 @@ public class SenseKeyTest extends TestCase {
             IndexWord word = Dictionary.getInstance().getIndexWord(POS.NOUN, "tank");
 			Synset[] syns = word.getSenses();
 			for (Synset syn : syns) {
+                System.out.println("Synset: " + syn.toString());
 				for (Word w: syn.getWords()) {
-                    w.getUsageCount();
-                    w.getSenseKey();
+                  
+                    System.out.println(w.getLemma() + " : " + w.getIndex() + " : " + syn.getOffset());
+                    System.out.println("count: " + w.getUsageCount());
+                    System.out.println("sense key: " + w.getSenseKey());
 				}
 			}
 			
