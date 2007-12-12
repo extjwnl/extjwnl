@@ -4,14 +4,9 @@
  */
 package net.didion.jwnl.dictionary.file_manager;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -19,13 +14,11 @@ import net.didion.jwnl.JWNL;
 import net.didion.jwnl.JWNLException;
 import net.didion.jwnl.JWNLRuntimeException;
 import net.didion.jwnl.data.POS;
-import net.didion.jwnl.data.Word;
 import net.didion.jwnl.dictionary.file.DictionaryCatalogSet;
 import net.didion.jwnl.dictionary.file.DictionaryFile;
 import net.didion.jwnl.dictionary.file.DictionaryFileType;
 import net.didion.jwnl.dictionary.file.RandomAccessDictionaryFile;
 import net.didion.jwnl.util.Grep;
-import net.didion.jwnl.util.TokenizerParser;
 import net.didion.jwnl.util.factory.Param;
 
 /**
@@ -52,6 +45,9 @@ public class FileManagerImpl implements FileManager {
      */
     private static final Random _rand = new Random(new Date().getTime());
 
+    /**
+     * The catalog set. 
+     */
 	private DictionaryCatalogSet _files;
 	
     /**
@@ -59,6 +55,10 @@ public class FileManagerImpl implements FileManager {
      */
 	private File senseFile;
 	
+    /**
+     * Uninitialized FileManagerImpl. 
+     *
+     */
 	public FileManagerImpl() {}
 
 	/**
@@ -78,6 +78,9 @@ public class FileManagerImpl implements FileManager {
 		Grep.setFile(senseFile);
 	}
 
+    /**
+     * {@inheritDoc}
+     */
 	public Object create(Map params) throws JWNLException {
 		Class fileClass = null;
 		try {
@@ -96,24 +99,40 @@ public class FileManagerImpl implements FileManager {
 		}
 	}
 
+    /**
+     * Checks the type to ensure it's valid. 
+     * @param c
+     */
 	private void checkFileType(Class c) {
 		if (!DictionaryFile.class.isAssignableFrom(c)) {
             throw new JWNLRuntimeException("DICTIONARY_EXCEPTION_003", c);
         }
 	}
 
+    /**
+     * {@inheritDoc}
+     */
 	public void close() {
 		_files.close();
 	}
 
+    /**
+     * Gets the file from a part of speech and file type (ie data.noun).
+     * @param pos - the part of speech (NOUN, ADJ, VERB, ADV)
+     * @param fileType - the file type (data, index, exc)
+     * @return - dictionary file
+     */
 	public DictionaryFile getFile(POS pos, DictionaryFileType fileType) {
 		return _files.getDictionaryFile(pos, fileType);
 	}
 
-	//
-	// IO primitives
-	//
+	
 
+    /**
+     * Skips the next line in the file. 
+     * @param file
+     * @throws IOException
+     */
 	private void skipLine(RandomAccessDictionaryFile file) throws IOException {
 		int c;
 		while (((c = file.read()) != -1) && c != '\n' && c != '\r');
@@ -123,9 +142,9 @@ public class FileManagerImpl implements FileManager {
 		}
 	}
 
-	//
-	// Line-based interface methods
-	//
+	/**
+     * {@inheritDoc}
+	 */
 	public String readLineAt(POS pos, DictionaryFileType fileType, long offset) throws IOException {
 		RandomAccessDictionaryFile file = (RandomAccessDictionaryFile)getFile(pos, fileType);
 		synchronized (file) {
@@ -141,7 +160,12 @@ public class FileManagerImpl implements FileManager {
 	}
 	
 	
-
+	/**
+     * Reads the first word from a file (ie offset, index word) 
+     * @param file - the file
+     * @return - string
+     * @throws IOException
+	 */
 	private String readLineWord(RandomAccessDictionaryFile file) throws IOException {
 		StringBuffer input = new StringBuffer();
 		int c;
@@ -151,6 +175,9 @@ public class FileManagerImpl implements FileManager {
 		return input.toString();
 	}
 
+    /**
+     * {@inheritDoc}
+     */
 	public long getNextLinePointer(POS pos, DictionaryFileType fileType, long offset) throws IOException {
 		RandomAccessDictionaryFile file = (RandomAccessDictionaryFile)getFile(pos, fileType);
 		synchronized (file) {
@@ -163,9 +190,9 @@ public class FileManagerImpl implements FileManager {
 		}
 	}
 
-	//
-	// Searching
-	//
+	/**
+     * {@inheritDoc}
+	 */
 	public long getMatchingLinePointer(POS pos, DictionaryFileType fileType, long offset, String substring)
 	    throws IOException {
 
@@ -236,6 +263,9 @@ public class FileManagerImpl implements FileManager {
 		}
 	}
 
+    /**
+     * {@inheritDoc}
+     */
     public long getRandomLinePointer(POS pos, DictionaryFileType fileType) throws IOException {
         long fileLength = ((RandomAccessDictionaryFile) getFile(pos, fileType)).length();
         long start = getFirstLinePointer(pos, fileType);
@@ -243,6 +273,9 @@ public class FileManagerImpl implements FileManager {
         return getNextLinePointer(pos, fileType, offset);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public long getFirstLinePointer(POS pos, DictionaryFileType fileType) throws IOException {
         long offset = 0;
         RandomAccessDictionaryFile file = (RandomAccessDictionaryFile) getFile(pos, fileType);

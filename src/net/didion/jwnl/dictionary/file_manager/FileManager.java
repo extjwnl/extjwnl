@@ -7,11 +7,8 @@ package net.didion.jwnl.dictionary.file_manager;
 import java.io.IOException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.util.List;
-import java.util.Map;
 
 import net.didion.jwnl.data.POS;
-import net.didion.jwnl.data.Word;
 import net.didion.jwnl.dictionary.file.DictionaryFileType;
 import net.didion.jwnl.util.factory.Createable;
 

@@ -135,13 +135,6 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory implements F
         }
         return proxy;
 	}
-	
-	/**
-	 * Sets the sense mapping this factory uses. 
-	 */
-	public void setSenseMapping(Map<String, Word> mapping) {
-		senseMap = mapping;
-	}
 
 	/**
 	 * Creates a word, also access the sense.idx file. 

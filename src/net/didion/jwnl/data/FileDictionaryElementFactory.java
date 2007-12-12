@@ -15,16 +15,29 @@ import net.didion.jwnl.util.factory.Createable;
  * facilitates using multiple versions of WordNet, or using a propritary data format.
  */
 public interface FileDictionaryElementFactory extends Createable {
-	/** Create an Exc from a line in an exception file. */
+    
+	/**
+     * Create an Exc from a line in an exception file.
+     * @param pos - the part of speech 
+     * @param line - unparsed line
+     * @return exception
+	 */
 	public Exc createExc(POS pos, String line);
-	/** Create a Synset from a line in a data file */
+	
+    /**
+     * Creates a synset from a line in a data file. 
+     * @param pos - the part of speech
+     * @param line - unparsed line
+     * @return synset
+     */
 	public Synset createSynset(POS pos, String line);
-	/** Create an IndexWord from a line in an index file. */
+    
+	/**
+     * Creates an IndexWord from a line in an index file. 
+     * @param pos - the part of speech 
+     * @param line - unparsed line
+     * @return indexword
+	 */
 	public IndexWord createIndexWord(POS pos, String line);
 	
-	/**
-	 * A mapping of terms. Key is synsetOffset+lemma.
-	 * @param senseMap
-	 */
-	public void setSenseMapping(Map<String, Word> senseMap);
 }
