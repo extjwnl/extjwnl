@@ -434,7 +434,10 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
 	private Word getIndexLineWord(long offset, String lemma) {
 		Word word = null;
 		try {
+			lemma = lemma.toLowerCase();
+			System.out.println(lemma + " : " + offset);
 			String indexLine = Grep.grep("" + offset, lemma);
+			System.out.println("index line: " + indexLine);
 			TokenizerParser tokenizer = new TokenizerParser(indexLine, " ");
 			String senseKey = tokenizer.nextToken();
 			long ofs = tokenizer.nextLong();
