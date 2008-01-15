@@ -110,12 +110,13 @@ public class DictionaryToDatabase
         {
             String indexSenseFileName = args[1];
             String scriptFileName = args[2];
-            ConnectionManager mgr = new ConnectionManager(args[3], args[4], args.length <= 4 ? null : args[5], args.length <= 6 ? null : args[6]);
+            ConnectionManager mgr = new ConnectionManager(args[3], args[4], args.length <= 5 ? null : args[5], args.length <= 6 ? null : args[6]);
             conn = mgr.getConnection();
             DictionaryToDatabase d2d = new DictionaryToDatabase(conn);
             d2d.loadSenseKeyAndUsage(indexSenseFileName);
             d2d.createTables(scriptFileName);
             d2d.insertData();
+            
             
         }
         catch(Exception e)

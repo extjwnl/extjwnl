@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jwnl_properties language="en">
 	<version publisher="Princeton" number="2.1" language="en"/>
-	<dictionary class="net.didion.jwnl.dictionary.FileBackedDictionary">
+	<dictionary class="net.didion.jwnl.dictionary.MapBackedDictionary">
 		<param name="morphological_processor" value="net.didion.jwnl.dictionary.morph.DefaultMorphologicalProcessor">
 			<param name="operations">
 				<param value="net.didion.jwnl.dictionary.morph.LookupExceptionsOperation"/>
@@ -35,11 +35,8 @@
 				</param>
 			</param>
 		</param>
-		<param name="dictionary_element_factory" value="net.didion.jwnl.princeton.data.PrincetonWN17FileDictionaryElementFactory"/>
-		<param name="file_manager" value="net.didion.jwnl.dictionary.file_manager.FileManagerImpl">
-			<param name="file_type" value="net.didion.jwnl.princeton.file.PrincetonRandomAccessDictionaryFile"/>
-			<param name="dictionary_path" value="c:\program files\wordnet\2.1\dict"/>
-		</param>
+		<param name="file_type" value="net.didion.jwnl.princeton.file.PrincetonObjectDictionaryFile"/>
+		<param name="dictionary_path" value="c:\program files\wordnet\2.1Map"/>
 	</dictionary>
 	<resource class="PrincetonResource"/>
 </jwnl_properties>

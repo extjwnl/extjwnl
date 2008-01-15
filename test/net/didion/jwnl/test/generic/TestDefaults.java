@@ -15,7 +15,7 @@ public class TestDefaults {
     /**
      * The location of the configuration file. 
      */
-    public static String CONFIG_PATH = "C:\\21csi\\workspaces\\hicin-data-translator\\jwnl\\config\\";
+    public static String CONFIG_PATH = "C:\\21csi\\workspaces\\jwnl-dev\\jwnl\\config\\";
     
     /**
      * The name of the file configuration. 
@@ -28,6 +28,11 @@ public class TestDefaults {
     public static String DATABASE_CONFIG_NAME = "database_properties.xml";
     
     /**
+     * The name of the map configuration. 
+     */
+    public static String MAP_CONFIG_NAME = "map_properties.xml";
+    
+    /**
      * The flag to use file backed wordnet.
      */
     public static String FILE = "Use File";
@@ -38,7 +43,12 @@ public class TestDefaults {
     public static String DB = "Use DB";
     
     /**
-     * The testing type. Currently either FILE or DB.
+     * The flag to use a map backed wordnet.
+     */
+    public static String MAP = "Use Map";
+    
+    /**
+     * The testing type. Currently either FILE, DB, or MAP.
      */
     public static String testingType = TestDefaults.DB;
   
@@ -53,7 +63,9 @@ public class TestDefaults {
                 return new FileInputStream(CONFIG_PATH + FILE_CONFIG_NAME);
             } else if (testingType.equals(TestDefaults.DB)) {
                 return new FileInputStream(CONFIG_PATH + DATABASE_CONFIG_NAME);
-            } 
+            } else if (testingType.equals(TestDefaults.MAP)) {
+            	return new FileInputStream(CONFIG_PATH + MAP_CONFIG_NAME);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

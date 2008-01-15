@@ -23,15 +23,16 @@ public class SenseKeyTest extends TestCase {
 	public void testSimpleSenseKey() {
 		try {
             JWNL.initialize(TestDefaults.getInputStream());
-            IndexWord word = Dictionary.getInstance().getIndexWord(POS.NOUN, "tank");
+            IndexWord word = Dictionary.getInstance().getIndexWord(POS.VERB, "get");
 			Synset[] syns = word.getSenses();
 			for (Synset syn : syns) {
                 System.out.println("Synset: " + syn.toString());
 				for (Word w: syn.getWords()) {
-                  
-                    System.out.println(w.getLemma() + " : " + w.getIndex() + " : " + syn.getOffset());
-                    System.out.println("count: " + w.getUsageCount());
-                    System.out.println("sense key: " + w.getSenseKey());
+					if (w.getLemma().equals("get")) {
+						 System.out.println("count: " + w.getUsageCount());
+		                
+					}
+                   
 				}
 			}
 			

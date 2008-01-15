@@ -77,7 +77,7 @@ public abstract class AbstractPrincetonDatabaseDictionaryElementFactory implemen
         for (Iterator itr = wordList.iterator(); itr.hasNext();) {
             Word word = (Word) itr.next();
             if (word instanceof Verb) {
-                verbFrameBits.or(((Verb) words).getVerbFrameFlags());
+                verbFrameBits.or(((Verb) word).getVerbFrameFlags());
             }
         }
 
