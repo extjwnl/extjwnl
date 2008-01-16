@@ -35,7 +35,7 @@ import net.didion.jwnl.util.TokenizerParser;
  * @author brett
  *
  */
-public class DictionaryToDatabase
+public class DictionaryToDatabaseWithUsageCount
 {
 
     /**
@@ -112,7 +112,7 @@ public class DictionaryToDatabase
             String scriptFileName = args[2];
             ConnectionManager mgr = new ConnectionManager(args[3], args[4], args.length <= 5 ? null : args[5], args.length <= 6 ? null : args[6]);
             conn = mgr.getConnection();
-            DictionaryToDatabase d2d = new DictionaryToDatabase(conn);
+            DictionaryToDatabaseWithUsageCount d2d = new DictionaryToDatabaseWithUsageCount(conn);
             d2d.loadSenseKeyAndUsage(indexSenseFileName);
             d2d.createTables(scriptFileName);
             d2d.insertData();
@@ -155,7 +155,7 @@ public class DictionaryToDatabase
      * Create a new DictionaryToDatabase with a database connection. JWNL already initialized.
      * @param conn - the database connection
      */
-    public DictionaryToDatabase(Connection conn)
+    public DictionaryToDatabaseWithUsageCount(Connection conn)
     {
         idToSynsetOffset = new HashMap();
         synsetOffsetToId = new HashMap();
@@ -431,6 +431,6 @@ public class DictionaryToDatabase
 
     static 
     {
-        LOG = new MessageLog(net.didion.jwnl.utilities.DictionaryToDatabase.class);
+        LOG = new MessageLog(net.didion.jwnl.utilities.DictionaryToDatabaseWithUsageCount.class);
     }
 }
