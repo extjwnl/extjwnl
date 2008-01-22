@@ -1,7 +1,6 @@
 package net.didion.jwnl.data;
 
 import net.didion.jwnl.JWNLException;
-import net.didion.jwnl.JWNLRuntimeException;
 
 /**
  * Proxy for a <code>Synset</code>. This class wraps a <code>Synset</code> that may be null at

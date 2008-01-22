@@ -524,7 +524,7 @@ public final class PointerUtils {
 			if (targets.size() > 0) {
 				for (Iterator itr = targets.iterator(); itr.hasNext();) {
                     PointerTargetNode ptr = (PointerTargetNode)itr.next();
-                    Synset s = ptr.getSynset();
+                    ptr.getSynset();
                     PointerTargetTreeNode node =
 					    new PointerTargetTreeNode(ptr.getPointerTarget(),
 					                              labelType == null ? type : labelType, parent);

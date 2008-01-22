@@ -4,14 +4,13 @@
  */
 package net.didion.jwnl.data;
 
-import net.didion.jwnl.JWNL;
-import net.didion.jwnl.JWNLRuntimeException;
-import net.didion.jwnl.util.Resolvable;
-
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+
+import net.didion.jwnl.JWNL;
+import net.didion.jwnl.util.Resolvable;
 
 /**
  * An <code>Adjective</code> is a <code>Word</code> that can have an adjective position.

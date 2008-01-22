@@ -1,8 +1,5 @@
 package net.didion.jwnl.test.version;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-
 import junit.framework.TestCase;
 import net.didion.jwnl.JWNL;
 import net.didion.jwnl.JWNLException;
@@ -13,11 +10,8 @@ import net.didion.jwnl.data.Word;
 import net.didion.jwnl.dictionary.Dictionary;
 import net.didion.jwnl.test.generic.TestDefaults;
 
-import org.junit.Test;
-
 public class Wordnet30SynsetTest extends TestCase {
 
-    @Test
     public void testGetBySynset() {
         try {
             JWNL.initialize(TestDefaults.getInputStream());
@@ -29,7 +23,8 @@ public class Wordnet30SynsetTest extends TestCase {
             Synset syn = Dictionary.getInstance().getSynsetAt(POS.NOUN, offset);
             System.out.println("Synset: " + syn.toString());
             boolean match = false;
-            for (Word w : syn.getWords()) {
+            for (int i = 0; i < syn.getWords().length; i++) {
+            	Word w = syn.getWords()[i];
                 if (w.getLemma().equals("tank")) {
                     match = true;
                     break;
@@ -53,7 +48,6 @@ public class Wordnet30SynsetTest extends TestCase {
      * Pulls a noun "tank" from the dictionary and checks to see if it has 5 senses.
      *
      */
-    @Test
     public void testGetWordSenses() {
         try {
             JWNL.initialize(TestDefaults.getInputStream());

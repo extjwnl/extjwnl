@@ -4,15 +4,14 @@
  */
 package net.didion.jwnl.dictionary.file;
 
-import net.didion.jwnl.JWNLRuntimeException;
-import net.didion.jwnl.JWNLException;
-import net.didion.jwnl.data.POS;
-
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
+import net.didion.jwnl.JWNLRuntimeException;
+import net.didion.jwnl.data.POS;
 
 /**
  * A container for the files associated with a catalog (the index, data, and exception

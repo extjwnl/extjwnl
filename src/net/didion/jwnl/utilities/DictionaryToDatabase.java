@@ -3,8 +3,6 @@ package net.didion.jwnl.utilities;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.Connection;
@@ -27,7 +25,6 @@ import net.didion.jwnl.dictionary.Dictionary;
 import net.didion.jwnl.dictionary.database.ConnectionManager;
 import net.didion.jwnl.util.MessageLog;
 import net.didion.jwnl.util.MessageLogLevel;
-import net.didion.jwnl.util.TokenizerParser;
 
 /**
  * DictionaryToDatabase is used to transfer a WordNet file database into an actual
@@ -42,24 +39,7 @@ public class DictionaryToDatabase
      * Our message log. 
      */
     private static final MessageLog LOG;
-    /**
-     * The usage string. 
-     */
-    private static final String USAGE = "java net.didion.jwnl.utilities.DictionaryToDatabase <property file> <index file location> <create tables script> <driver class> <connection url> [username [password]]";
-    
-    
-    /**
-     * SQL insert strings. Probably not the proper way to do things.
-     */
-    private static final String INSERT_INDEX_WORD = "INSERT INTO IndexWord VALUES(?,?,?)";
-    private static final String INSERT_SYNSET = "INSERT INTO Synset VALUES(?,?,?,?,?)";
-    private static final String INSERT_SYNSET_WORD = "INSERT INTO SynsetWord VALUES(?,?,?,?)";
-    private static final String INSERT_SYNSET_POINTER = "INSERT INTO SynsetPointer VALUES(?,?,?,?,?,?,?)";
-    private static final String INSERT_SYNSET_VERB_FRAME = "INSERT INTO SynsetVerbFrame VALUES(?,?,?,?)";
-    private static final String INSERT_INDEX_WORD_SYNSET = "INSERT INTO IndexWordSynset VALUES(?,?,?)";
-    private static final String INSERT_EXCEPTION = "INSERT INTO SynsetException VALUES(?,?,?,?)";
-    
-    
+
     private static int INTERNAL_ID = 0;
     private static long TIME = 0L;
     
@@ -77,11 +57,7 @@ public class DictionaryToDatabase
      */
     private Map synsetOffsetToId;
     
-    /**
-     * Maps the usage. The key is 'offset:lemma', the object[] contains
-     * the sense key (string) and the usage count (integer). 
-     */
-    private Map<String, Object[]> usageMap;
+    
     
     /**
      * Run the program, requires 4 arguments. See DictionaryToDatabase.txt for more documentation. 
@@ -108,12 +84,10 @@ public class DictionaryToDatabase
         
         try
         {
-            //String indexSenseFileName = args[1];
             String scriptFileName = args[1];
             ConnectionManager mgr = new ConnectionManager(args[2], args[3], args.length <= 4 ? null : args[4], args.length <= 5 ? null : args[5]);
             conn = mgr.getConnection();
             DictionaryToDatabase d2d = new DictionaryToDatabase(conn);
-            //d2d.loadSenseKeyAndUsage(indexSenseFileName);
             d2d.createTables(scriptFileName);
             d2d.insertData();
             
@@ -159,7 +133,6 @@ public class DictionaryToDatabase
     {
         idToSynsetOffset = new HashMap();
         synsetOffsetToId = new HashMap();
-        usageMap = new HashMap<String, Object[]>();
         connection = conn;
         ((AbstractCachingDictionary)Dictionary.getInstance()).setCachingEnabled(false);
     }
@@ -281,7 +254,6 @@ public class DictionaryToDatabase
             for(int i = 0; i < words.length; i++)
             {
                 int wordId = nextId();
-                String synsetString = synset.getOffset() + ":" + words[i].getLemma();
                
                 synsetWordStmt.setInt(1, wordId);
                 synsetWordStmt.setString(3, words[i].getLemma());

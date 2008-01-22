@@ -42,23 +42,7 @@ public class DictionaryToDatabaseWithUsageCount
      * Our message log. 
      */
     private static final MessageLog LOG;
-    /**
-     * The usage string. 
-     */
-    private static final String USAGE = "java net.didion.jwnl.utilities.DictionaryToDatabase <property file> <index file location> <create tables script> <driver class> <connection url> [username [password]]";
-    
-    
-    /**
-     * SQL insert strings. Probably not the proper way to do things.
-     */
-    private static final String INSERT_INDEX_WORD = "INSERT INTO IndexWord VALUES(?,?,?)";
-    private static final String INSERT_SYNSET = "INSERT INTO Synset VALUES(?,?,?,?,?)";
-    private static final String INSERT_SYNSET_WORD = "INSERT INTO SynsetWord VALUES(?,?,?,?)";
-    private static final String INSERT_SYNSET_POINTER = "INSERT INTO SynsetPointer VALUES(?,?,?,?,?,?,?)";
-    private static final String INSERT_SYNSET_VERB_FRAME = "INSERT INTO SynsetVerbFrame VALUES(?,?,?,?)";
-    private static final String INSERT_INDEX_WORD_SYNSET = "INSERT INTO IndexWordSynset VALUES(?,?,?)";
-    private static final String INSERT_EXCEPTION = "INSERT INTO Exception VALUES(?,?,?,?)";
-    
+
     
     private static int INTERNAL_ID = 0;
     private static long TIME = 0L;
@@ -81,7 +65,7 @@ public class DictionaryToDatabaseWithUsageCount
      * Maps the usage. The key is 'offset:lemma', the object[] contains
      * the sense key (string) and the usage count (integer). 
      */
-    private Map<String, Object[]> usageMap;
+    private Map usageMap;
     
     /**
      * Run the program, requires 4 arguments. See DictionaryToDatabase.txt for more documentation. 
@@ -159,7 +143,7 @@ public class DictionaryToDatabaseWithUsageCount
     {
         idToSynsetOffset = new HashMap();
         synsetOffsetToId = new HashMap();
-        usageMap = new HashMap<String, Object[]>();
+        usageMap = new HashMap();
         connection = conn;
         ((AbstractCachingDictionary)Dictionary.getInstance()).setCachingEnabled(false);
     }
@@ -282,12 +266,12 @@ public class DictionaryToDatabaseWithUsageCount
             {
                 int wordId = nextId();
                 String synsetString = synset.getOffset() + ":" + words[i].getLemma();
-                Object[] arr = usageMap.get(synsetString);
+                Object[] arr = (Object []) usageMap.get(synsetString);
                 String senseKey = "";
                 int usageCnt = 0;
                 if (arr != null) {
                     senseKey = (String) arr[0];
-                    usageCnt = (Integer) arr[1];
+                    usageCnt = ((Integer) arr[1]).intValue();
                 }
                
                 synsetWordStmt.setInt(1, wordId);
@@ -374,7 +358,7 @@ public class DictionaryToDatabaseWithUsageCount
             String[] lemmaKey = senseKey.split("%");
             String lemma = lemmaKey[0];
             long ofs = tokenizer.nextLong();
-            long number = tokenizer.nextInt();
+            tokenizer.nextInt();
             String synsetString = ofs + ":" + lemma;
             if(count++ % 1000 == 0)
                 System.out.println("sense key and usage: " + count);

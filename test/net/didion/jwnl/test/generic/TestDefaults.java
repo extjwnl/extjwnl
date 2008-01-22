@@ -50,7 +50,7 @@ public class TestDefaults {
     /**
      * The testing type. Currently either FILE, DB, or MAP.
      */
-    public static String testingType = TestDefaults.DB;
+    public static String testingType = TestDefaults.FILE;
   
     
     /**

@@ -1,7 +1,5 @@
 package net.didion.jwnl.util.cache;
 
-import net.didion.jwnl.JWNLRuntimeException;
-
 import java.util.HashMap;
 import java.util.Map;
 

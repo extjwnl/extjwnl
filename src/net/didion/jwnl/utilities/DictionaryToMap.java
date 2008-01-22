@@ -109,8 +109,4 @@ public class DictionaryToMap
     }
 
     private DictionaryCatalogSet _destFiles;
-    private static final int K = 1024;
-    private static final int REPORT_INC = 10000;
-    private static final float HASH_LOAD_FACTOR = 0.9F;
-    private static final String USAGE = "java DictionaryToMap <destination directory> <properties file>";
-}
+  }

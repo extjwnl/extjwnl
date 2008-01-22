@@ -56,7 +56,7 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
 	/**
 	 * A sense map, key is offsetlemma, word is populated with lemma, usage, and sense key.
 	 */
-	private Map<String, Word> senseMap;
+	private Map senseMap;
 	
 	/**
 	 * Construct a Dictionary that retrieves file data from <code>fileManager</code>.
@@ -98,7 +98,7 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
 		super(morph, enableCaching);
 		_db = manager;
 		_factory = factory;
-		senseMap = new HashMap<String, Word>();
+		senseMap = new HashMap();
 	}
 
 	/**
@@ -232,7 +232,7 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
                     line = getFileManager().readLineAt(pos, DictionaryFileType.DATA, offset);
                 }
                 synset = _factory.createSynset(pos, line);
-                Word[] words = synset.getWords();
+                synset.getWords();
                 
                 if (synset != null) {
                     cacheSynset(key, synset);
@@ -438,8 +438,8 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
 			String indexLine = Grep.grep("" + offset, lemma);
 			TokenizerParser tokenizer = new TokenizerParser(indexLine, " ");
 			String senseKey = tokenizer.nextToken();
-			long ofs = tokenizer.nextLong();
-			long number = tokenizer.nextInt();
+			tokenizer.nextLong();
+			tokenizer.nextInt();
 			String senseCount = tokenizer.nextToken();
             String[] sc = null;
             if (JWNL.getVersion().getNumber() < 2.1 && JWNL.getOS().equals(JWNL.WINDOWS)) {

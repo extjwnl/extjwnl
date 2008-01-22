@@ -106,8 +106,8 @@ public class Grep {
      * Use the linePattern to break the given CharBuffer into lines, applying
      * the input pattern to each line to see if we have a match
      */ 
-    private static List<String> grep() {
-    List<String> matches = new ArrayList<String>();
+    private static List grep() {
+    List matches = new ArrayList();
 	Matcher lm = linePattern.matcher(indexFile);	// Line matcher
 	Matcher pm = null;			// Pattern matcher
 	int lines = 0;
@@ -147,12 +147,12 @@ public class Grep {
      * @return
      * @throws IOException
      */
-    public static List<String> grep(String synsetOffset) throws IOException {
+    public static List grep(String synsetOffset) throws IOException {
 
     compile(synsetOffset);
 
 	// Perform the search
-	List<String> matches = grep();
+	List matches = grep();
 	
 	
 	return matches;
@@ -170,8 +170,9 @@ public class Grep {
     compile(synsetOffset);
     String m = "";
 	// Perform the search
-	List<String> matches = grep();
-	for (String match : matches) {
+	List matches = grep();
+	for (int i = 0; i < matches.size(); i++) {
+		String match = (String) matches.get(i);
 		if (match.indexOf(lemma) != -1) {
 			m = match;
 		}

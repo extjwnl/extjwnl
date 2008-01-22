@@ -4,9 +4,6 @@
  */
 package net.didion.jwnl.data;
 
-import java.util.List;
-import java.util.Map;
-
 import net.didion.jwnl.util.factory.Createable;
 
 /**

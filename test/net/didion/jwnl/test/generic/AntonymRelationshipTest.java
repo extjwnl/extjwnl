@@ -13,12 +13,9 @@ import net.didion.jwnl.data.relationship.RelationshipList;
 import net.didion.jwnl.data.relationship.SymmetricRelationship;
 import net.didion.jwnl.dictionary.Dictionary;
 
-import org.junit.Test;
-
 public class AntonymRelationshipTest extends TestCase {
     
-    @Test
-    public void testSimpleSenseKey() {
+   public void testSimpleSenseKey() {
         try {
             JWNL.initialize(TestDefaults.getInputStream());
             IndexWord beautiful = Dictionary.getInstance().getIndexWord(POS.ADJECTIVE, "beautiful");

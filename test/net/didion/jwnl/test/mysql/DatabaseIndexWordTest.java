@@ -1,7 +1,5 @@
 package net.didion.jwnl.test.mysql;
 
-import java.io.FileInputStream;
-
 import junit.framework.TestCase;
 import net.didion.jwnl.JWNL;
 import net.didion.jwnl.data.IndexWord;

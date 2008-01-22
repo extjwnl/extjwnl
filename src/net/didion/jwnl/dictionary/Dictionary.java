@@ -4,8 +4,9 @@
  */
 package net.didion.jwnl.dictionary;
 
+import java.util.Iterator;
+
 import net.didion.jwnl.JWNLException;
-import net.didion.jwnl.JWNLRuntimeException;
 import net.didion.jwnl.data.Exc;
 import net.didion.jwnl.data.IndexWord;
 import net.didion.jwnl.data.IndexWordSet;
@@ -14,8 +15,6 @@ import net.didion.jwnl.data.Synset;
 import net.didion.jwnl.util.MessageLog;
 import net.didion.jwnl.util.MessageLogLevel;
 import net.didion.jwnl.util.factory.Installable;
-
-import java.util.Iterator;
 
 /**
  * Abstract representation of a WordNet dictionary.

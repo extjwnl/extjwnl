@@ -6,9 +6,7 @@ package net.didion.jwnl.princeton.data;
 
 import java.util.ArrayList;
 import java.util.BitSet;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.StringTokenizer;
 
 import net.didion.jwnl.data.Exc;
@@ -33,10 +31,7 @@ import net.didion.jwnl.util.TokenizerParser;
 public abstract class AbstractPrincetonFileDictionaryElementFactory implements FileDictionaryElementFactory {
 	private static final MessageLog _log = new MessageLog(AbstractPrincetonFileDictionaryElementFactory.class);
 
-	/**
-	 * A map between offset/lemma and words. 
-	 */
-	private Map<String, Word> senseMap;
+	
 	
 	protected AbstractPrincetonFileDictionaryElementFactory() {
 	}

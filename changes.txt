@@ -1,0 +1,50 @@
+changes from version 1.3 to version 1.4
+
+- Updated classes in the data package to be compatible with WordNet 2.1 and WordNet 3.0. 
+- Extended API to add support for word tagged usage count and sense key information, for FileBackedDictionary and DatabaseBackedDictionary. 
+- Added DictionaryToDatabaseWithUsageCount - populates a database with the index.sense file included. 
+- Added a small amount JUnit test cases. 
+- Multiple bugs fixed with DatabaseManagerImpl:
+  - fixed a bug where the wrong offset was being returned
+  - fixed a query where incorrect synsets could be accessed
+- Added a new DatabaseManager and ElementFactory for databases using sense key information. 
+- Refactored and improved documentation.
+
+changes from version 1.2.1 to version 1.3
+
+- Updated classes in the data package to be compatible with WordNet 2.0
+- Updated DefaultMorphologicalProcessor to stem additonal suffixes added in WordNet 1.7
+- Fixed bugs in FileBackedDictionary and MapBackedDictionary that caused lookups on capitalized terms to return invalid results
+- Introduced DatabaseBackedDictionary, plus files to create and populate the WordNet database.
+- Removed the util.logging package. JWNL now has a runtime dependancy on Apache commons-logging.
+- Fixed several bugs in the relationshp api. The interface for finding relationships is now contained in RelationshipFinder.
+- License changed to BSD-style licence.
+- Improved the dictionary caching api. AbstractCachingDictionary now has methods to turn caching on and off and change the cache sizes.
+- Added getRandomIndexWord method to Dictionary.
+- Added new example programs (VocabTrainer, TextInterface) to the utilities package.
+- Added PointerType.getAllPointerTypesForPOS().
+
+changes from version 1.2 to version 1.2.1
+
+- Fixed npe in DictionaryToMap utility
+- Moved utilities and tests into the net.didion.jwnl package
+- changed license to LGPL
+
+changes from version 1.1 to version 1.2
+
+- JDK 1.4-specific optimizations:
+ * LRUCache uses LinkedListMap
+ * PrincetonChannelDictionaryFile uses channels to improve performance over PrincetonRandomAccessDictionaryFile
+- Reorganized packages:
+ * moved PointerUtils to the net.didion.jwnl.data
+ * moved cache-related classes (Cache, CacheSet, LRUCache, LRUCacheSet) to net.didion.jwnl.util.cache
+ * move factory interfaces/classes (Creatable, Installable, Element, Param) to net.didion.jwnl.util.factory
+ * eliminated the caching package
+ * moved dictionary file classes (AbstractDictionaryFile, DictionaryCatalog, DictionaryCatalogSet, DictionaryFile, DictionaryFileType, ObjectDictionaryFile, RandomAccessDictionaryFile) to net.didion.jwnl.dictionary.file
+- Shortened the names of the Princeton classes 
+- Made the dictionary path a parameter for file-based dictionaries rather than a parameter of version
+- Added clearCache() and clearCache(DictionaryFileType) methods to AbstractCachingDictionary
+- Reversed the key types of DictionaryCatalog and DictionaryCatalogSet so that DictionaryCatalog stores files by POS for a file type and DictionaryCatalogSet stores DictionaryCatalogs by file type
+- Changed DictionaryToMap to clear the cache for a file type after processing all the files of that type
+- Got rid of the CacheSet.CacheKey class...it was pretty useless and unnecessary
+- Fixed a bug in which "ches" endings were being stemmed to "c" instead of "ch"
