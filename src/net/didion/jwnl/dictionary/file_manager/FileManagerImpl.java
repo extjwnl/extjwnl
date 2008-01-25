@@ -69,9 +69,9 @@ public class FileManagerImpl implements FileManager {
 		checkFileType(dictionaryFileType);
 		_files = new DictionaryCatalogSet(searchDir, dictionaryFileType);
 		_files.open();
-        String sense = "\\index.sense";
+        String sense = System.getProperty("file.separator") + "index.sense";
         if (JWNL.getVersion().getNumber() < 2.1) {
-            sense = "\\sense.idx";
+            sense = System.getProperty("file.separator") + "sense.idx";
 		}
         senseFile = new File(searchDir + sense);
         
