@@ -81,6 +81,18 @@ public class SynsetProxy extends Synset {
 	public boolean containsWord(String lemma) {
 		return getSource().containsWord(lemma);
 	}
+	
+	public String getLexFileName() {
+		return getSource().getLexFileName();
+	}
+	
+	public long getLexFileId() {
+		return getSource().getLexFileId();
+	}
+	
+	public void setLexFileId(long lexFileId) {
+		getSource().setLexFileId(lexFileId);
+	}
 
 	protected Synset getSource() {
 		return _source;

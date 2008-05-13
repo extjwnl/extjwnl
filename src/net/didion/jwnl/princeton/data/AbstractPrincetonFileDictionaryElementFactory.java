@@ -60,7 +60,12 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory implements F
         TokenizerParser tokenizer = new TokenizerParser(line, " ");
 
         long offset = tokenizer.nextLong();
-        tokenizer.nextToken();	// lex_filenum
+        /**
+         * Grab the filenum token here. 
+         */
+        //String lexFileNameId = tokenizer.nextToken();	// lex_filenum
+        long lexFileNameId = tokenizer.nextLong();
+       
         String synsetPOS = tokenizer.nextToken();
         boolean isAdjectiveCluster = false;
         if (synsetPOS.equals("s")) {
@@ -124,6 +129,10 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory implements F
                 verbFrames.or(((Verb)words[i]).getVerbFrameFlags());
 
         Synset synset = new Synset(pos, offset, words, pointers, gloss, verbFrames, isAdjectiveCluster);
+        
+        //set the lexicographer file identifier
+        System.out.println("lexFileNameId: " + lexFileNameId);
+        synset.setLexFileId(lexFileNameId);
         proxy.setSource(synset);
         if (_log.isLevelEnabled(MessageLogLevel.TRACE)) {
             _log.log(MessageLogLevel.TRACE, "PRINCETON_INFO_002", new Object[]{pos, new Long(offset)});

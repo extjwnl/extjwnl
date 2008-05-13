@@ -35,6 +35,16 @@ public class Synset extends PointerTarget implements DictionaryElement {
 	private BitSet _verbFrameFlags;
 	/** for use only with WordNet 1.6 and earlier */
 	private boolean _isAdjectiveCluster;
+	
+	/**
+	 * The lexicographer file name id.
+	 */
+	private long lexFileId;
+	
+	/**
+	 * The proper name for the lexicographer file (noun.plant, etc)
+	 */
+	private String lexFileName;
 
 	public Synset(POS pos, long offset, Word[] words, Pointer[] pointers, String gloss, BitSet verbFrames) {
 		this(pos, offset, words, pointers, gloss, verbFrames, false);
@@ -150,5 +160,33 @@ public class Synset extends PointerTarget implements DictionaryElement {
 		in.defaultReadObject();
 		// set POS to reference the static instance defined in the current runtime environment
 		_pos = POS.getPOSForKey(_pos.getKey());
+	}
+
+	/**
+	 * Gets the lexicographer file name containing this synset.
+	 * @return two digit decimal integer
+	 */
+	public long getLexFileId() {
+		System.out.println("lexFileId: " + lexFileId);
+		return lexFileId;
+	}
+
+	/**
+	 * Sets the lexicographer file name containing this synset.
+	 * @param lexFileId - the lexicographer file name id
+	 */
+	public void setLexFileId(long lexFileId) {
+		this.lexFileId = lexFileId;
+		lexFileName = LexFileIdMap.getFileName(lexFileId);
+		System.out.println("lexFileName: " + lexFileName);
+		System.out.println("lexFileId: " + this.lexFileId);
+	}
+
+	/**
+	 * Gets the lex file name.
+	 * @return
+	 */
+	public String getLexFileName() {
+		return lexFileName;
 	}
 }
