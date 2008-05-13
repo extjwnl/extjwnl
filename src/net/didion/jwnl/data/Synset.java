@@ -167,7 +167,6 @@ public class Synset extends PointerTarget implements DictionaryElement {
 	 * @return two digit decimal integer
 	 */
 	public long getLexFileId() {
-		System.out.println("lexFileId: " + lexFileId);
 		return lexFileId;
 	}
 
@@ -178,8 +177,6 @@ public class Synset extends PointerTarget implements DictionaryElement {
 	public void setLexFileId(long lexFileId) {
 		this.lexFileId = lexFileId;
 		lexFileName = LexFileIdMap.getFileName(lexFileId);
-		System.out.println("lexFileName: " + lexFileName);
-		System.out.println("lexFileId: " + this.lexFileId);
 	}
 
 	/**

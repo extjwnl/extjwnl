@@ -131,7 +131,6 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory implements F
         Synset synset = new Synset(pos, offset, words, pointers, gloss, verbFrames, isAdjectiveCluster);
         
         //set the lexicographer file identifier
-        System.out.println("lexFileNameId: " + lexFileNameId);
         synset.setLexFileId(lexFileNameId);
         proxy.setSource(synset);
         if (_log.isLevelEnabled(MessageLogLevel.TRACE)) {
