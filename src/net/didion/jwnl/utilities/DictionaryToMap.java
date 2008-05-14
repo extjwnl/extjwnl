@@ -1,23 +1,42 @@
-// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
-// Jad home page: http://www.kpdus.com/jad.html
-// Decompiler options: packimports(3) 
-// Source File Name:   DictionaryToMap.java
 
 package net.didion.jwnl.utilities;
 
-import java.io.*;
-import java.util.*;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 import net.didion.jwnl.JWNL;
 import net.didion.jwnl.JWNLException;
 import net.didion.jwnl.data.DictionaryElement;
 import net.didion.jwnl.data.POS;
 import net.didion.jwnl.dictionary.AbstractCachingDictionary;
 import net.didion.jwnl.dictionary.Dictionary;
-import net.didion.jwnl.dictionary.file.*;
+import net.didion.jwnl.dictionary.file.DictionaryCatalogSet;
+import net.didion.jwnl.dictionary.file.DictionaryFileType;
+import net.didion.jwnl.dictionary.file.ObjectDictionaryFile;
 
+
+/**
+ * DictionaryToMap allows you to populate and create an in-memory map of the WordNet 
+ * library. The goal of this utility is to provide a performance boost to applications 
+ * using a high quantity of API calls to the JWNL library 
+ * (such as word sense disambiguation algorithms, or dictionary services). 
+ * @author brett
+ *
+ */
 public class DictionaryToMap
 {
 
+	/**
+	 * Initalize with the given map destination directory, using the properties file(usually file_properties.xml)
+	 * @param destDirectory - destination directory for in-memory map files
+	 * @param propFile - properties file of file-based WordNet
+	 * @throws JWNLException 
+	 * @throws IOException
+	 */
     public DictionaryToMap(String destDirectory, String propFile)
         throws JWNLException, IOException
     {
@@ -25,6 +44,11 @@ public class DictionaryToMap
         _destFiles = new DictionaryCatalogSet(destDirectory, net.didion.jwnl.princeton.file.PrincetonObjectDictionaryFile.class);
     }
 
+    /**
+     * Converts the current Dictionary to a MapBackedDictionary.
+     * @throws JWNLException
+     * @throws IOException
+     */
     public void convert()
         throws JWNLException, IOException
     {
