@@ -1,3 +1,8 @@
+1.4.1 rc2
+
+- fixed a bug which caused a file loading exception on Unix
+- added api methods to access the lexical filename and lexical file id.
+
 changes from version 1.3 to version 1.4
 
 - Updated classes in the data package to be compatible with WordNet 2.1 and WordNet 3.0. 
