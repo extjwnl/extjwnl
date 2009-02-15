@@ -28,6 +28,23 @@
 	  	<outputDirectory>target/classes</outputDirectory>
 	  	<testOutputDirectory>target/test</testOutputDirectory>
 	  	<finalName>${project.artifactId}-${project.version}</finalName>
+	  	<resources>
+      		<resource>
+        		<directory>${project.basedir}/resources</directory>
+      		</resource>
+    	</resources>
+	  	
+	  	<plugins>
+	      <plugin>
+	        <artifactId>maven-assembly-plugin</artifactId>
+	        <configuration>
+	          <descriptors>
+            	<descriptor>release-descriptor.xml</descriptor>
+          	</descriptors>
+	        </configuration>
+		  	</plugin>
+	  	</plugins>
+	  	
   	</build>
   
   <profiles>
