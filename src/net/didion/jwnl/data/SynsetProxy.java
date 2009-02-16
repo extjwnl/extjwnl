@@ -1,5 +1,7 @@
 package net.didion.jwnl.data;
 
+import java.util.BitSet;
+
 import net.didion.jwnl.JWNLException;
 
 /**
@@ -76,6 +78,15 @@ public class SynsetProxy extends Synset {
 
 	public String[] getVerbFrames() {
 		return getSource().getVerbFrames();
+	}
+	
+
+	public BitSet getVerbFrameFlags() {
+		return getSource().getVerbFrameFlags();
+	}
+
+	public int[] getVerbFrameIndicies() {
+		return getSource().getVerbFrameIndicies();
 	}
 
 	public boolean containsWord(String lemma) {

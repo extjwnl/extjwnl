@@ -102,6 +102,7 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory implements F
             pointers[i] = new Pointer(source, i, pointerType, targetPOS, targetOffset, targetIndex);
         }
 
+        BitSet verbFrames = new BitSet();
         if (pos == POS.VERB) {
             int verbFrameCount = tokenizer.nextInt();
             for (int i = 0; i < verbFrameCount; i++) {
@@ -111,8 +112,10 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory implements F
                 if (wordIndex > 0) {
                     ((MutableVerb) words[wordIndex - 1]).setVerbFrameFlag(frameNumber);
                 } else {
-                    for (int j = 0; j < words.length; ++j)
+                    for (int j = 0; j < words.length; ++j) {
                         ((MutableVerb) words[j]).setVerbFrameFlag(frameNumber);
+                    }
+                    verbFrames.set(frameNumber);
                 }
             }
         }
@@ -122,11 +125,6 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory implements F
         if (index > 0) {
             gloss = line.substring(index + 2).trim();
         }
-
-        BitSet verbFrames = new BitSet();
-        for (int i = 0; i < words.length; i++)
-            if (words[i] instanceof Verb)
-                verbFrames.or(((Verb)words[i]).getVerbFrameFlags());
 
         Synset synset = new Synset(pos, offset, words, pointers, gloss, verbFrames, isAdjectiveCluster);
         

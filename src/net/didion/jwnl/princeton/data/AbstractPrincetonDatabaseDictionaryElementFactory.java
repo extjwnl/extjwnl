@@ -61,6 +61,7 @@ public abstract class AbstractPrincetonDatabaseDictionaryElementFactory implemen
             pointerList.add(new Pointer(proxy, sourceIndex, type, targetPOS, targetOffset, targetIndex));
         }
 
+        BitSet vFrames = new BitSet();
         while (verbFrames.next()) {
             int frameNumber = verbFrames.getInt(1);
             int wordIndex = verbFrames.getInt(2);
@@ -70,21 +71,14 @@ public abstract class AbstractPrincetonDatabaseDictionaryElementFactory implemen
                 for (Iterator itr = wordList.iterator(); itr.hasNext();) {
                     ((MutableVerb) itr.next()).setVerbFrameFlag(frameNumber);
                 }
-            }
-        }
-
-        BitSet verbFrameBits = new BitSet();
-        for (Iterator itr = wordList.iterator(); itr.hasNext();) {
-            Word word = (Word) itr.next();
-            if (word instanceof Verb) {
-                verbFrameBits.or(((Verb) word).getVerbFrameFlags());
+                vFrames.set(frameNumber);
             }
         }
 
         proxy.setSource(new Synset(
                 pos, offset, (Word[]) wordList.toArray(new Word[wordList.size()]),
                 (Pointer[]) pointerList.toArray(new Pointer[pointerList.size()]),
-                gloss, verbFrameBits, isAdjectiveCluster));
+                gloss, vFrames, isAdjectiveCluster));
 
         return proxy;
     }
