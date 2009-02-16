@@ -56,16 +56,27 @@ public final class VerbFrame implements Serializable {
 		int[] indicies = getVerbFrameIndicies(bits);
 		String[] frames = new String[indicies.length];
 		for (int i = 0; i < indicies.length; i++)
-			frames[i] = _verbFrames[i].getFrame();
+			frames[i] = _verbFrames[indicies[i] - 1].getFrame();
 		return frames;
 	}
 
+	/**
+	 * Gets the verb frame indices for a synset. This is the collection
+	 * of f_num values for a synset definition. In the case of a synset, this
+	 * is only the values that are true for all words with the synset. In other
+	 * words, only the sentence frames that belong to all words. 
+	 * @param bits the bit set
+	 * @return an integer collection
+	 */
 	public static int[] getVerbFrameIndicies(BitSet bits) {
-		int[] indicies = new int[bits.cardinality()];
-		for (int i = 0; i < indicies.length; i++) {
-			indicies[i] = bits.nextSetBit(i == 0 ? 0 : indicies[i - 1]);
+		int[] indices = new int[bits.cardinality()];
+		int index = 0;
+		for (int i = bits.nextSetBit(0); i >=0; i = bits.nextSetBit(i+1)) {
+			indices[index++] = i;
 		}
-		return indicies;
+		
+		return indices;
+
 	}
 
 	private Resolvable _frame;
