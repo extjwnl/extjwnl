@@ -80,8 +80,26 @@ public final class POS implements Serializable {
 		return _cachedToString;
 	}
 
+	/**
+	 * Returns the underlying pos key's hashcode.
+	 * @return key hash code
+	 */
 	public int hashCode() {
 		return _key.toString().hashCode();
+	}
+	
+	/**
+	 * An instance of POS is equal to another iff they're underlying keys are
+	 * equal.
+	 * @param obj the comparison object
+	 * @return true if keys equal
+	 */
+	public boolean equals(Object obj) {
+		if (obj instanceof POS) {
+			POS pos = (POS) obj;
+			return _key.equals(pos.getKey());
+		}
+		return false;
 	}
 
 	// Accessors
@@ -91,6 +109,10 @@ public final class POS implements Serializable {
 		return _label.toString();
 	}
 
+	/**
+	 * Gets the key for this POS.
+	 * @return key
+	 */
 	public String getKey() {
 		return _key.toString();
 	}
