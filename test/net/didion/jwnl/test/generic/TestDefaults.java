@@ -15,7 +15,7 @@ public class TestDefaults {
     /**
      * The location of the configuration file. 
      */
-    public static String CONFIG_PATH = "C:\\21csi\\workspaces\\jwnl-dev\\jwnl\\config\\";
+    public static String CONFIG_PATH = "C:\\21csi\\jwnl\\workspace\\jwnl\\config\\";
     
     /**
      * The name of the file configuration. 

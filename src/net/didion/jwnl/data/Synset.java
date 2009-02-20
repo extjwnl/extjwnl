@@ -4,10 +4,11 @@
  */
 package net.didion.jwnl.data;
 
-import net.didion.jwnl.JWNL;
-
 import java.io.IOException;
 import java.util.BitSet;
+
+import net.didion.jwnl.JWNL;
+import net.didion.jwnl.JWNLException;
 
 /**
  * A <code>Synset</code>, or <b>syn</b>onym <b>set</b>, represents a
@@ -24,28 +25,29 @@ import java.util.BitSet;
 public class Synset extends PointerTarget implements DictionaryElement {
 	static final long serialVersionUID = 4038955719653496529L;
 
-	private POS _pos;
-	private Pointer[] _pointers;
+	protected POS _pos;
+	protected Pointer[] _pointers;
 	/** The offset of this synset in the data file. */
-	private long _offset;
+	protected long _offset;
 	/** The words in this synset. */
-	private Word[] _words;
+	protected Word[] _words;
 	/** The text (definition, usage examples) associated with the synset. */
-	private String _gloss;
-	private BitSet _verbFrameFlags;
+	protected String _gloss;
+	protected BitSet _verbFrameFlags;
 	/** for use only with WordNet 1.6 and earlier */
-	private boolean _isAdjectiveCluster;
+	protected boolean _isAdjectiveCluster;
 	
 	/**
 	 * The lexicographer file name id.
 	 */
-	private long lexFileId;
+	protected long lexFileNum;
 	
 	/**
 	 * The proper name for the lexicographer file (noun.plant, etc)
 	 */
-	private String lexFileName;
-
+	protected String lexFileName;
+	
+	
 	public Synset(POS pos, long offset, Word[] words, Pointer[] pointers, String gloss, BitSet verbFrames) {
 		this(pos, offset, words, pointers, gloss, verbFrames, false);
 	}
@@ -166,16 +168,16 @@ public class Synset extends PointerTarget implements DictionaryElement {
 	 * Gets the lexicographer file name containing this synset.
 	 * @return two digit decimal integer
 	 */
-	public long getLexFileId() {
-		return lexFileId;
+	public long getLexFileNum() {
+		return lexFileNum;
 	}
 
 	/**
 	 * Sets the lexicographer file name containing this synset.
 	 * @param lexFileId - the lexicographer file name id
 	 */
-	public void setLexFileId(long lexFileId) {
-		this.lexFileId = lexFileId;
+	public void setLexFileNum(long lexFileId) {
+		this.lexFileNum = lexFileId;
 		lexFileName = LexFileIdMap.getFileName(lexFileId);
 	}
 
@@ -185,5 +187,80 @@ public class Synset extends PointerTarget implements DictionaryElement {
 	 */
 	public String getLexFileName() {
 		return lexFileName;
+	}
+	
+	/**
+	 * Gets the sense key of a lemma. This will be refactored in 2.0 with 
+	 * the architecture reworking. 
+	 * @param lemma lemma sense to grab
+	 * @return sense key for lemma
+	 */
+	public String getSenseKey(String lemma) {
+		int ss_type = 5;
+		if (this.getPOS().equals(POS.NOUN)) {
+			ss_type = 1;
+		} else if (this.getPOS().equals(POS.VERB)) {
+			ss_type = 2;
+		} else if (this.getPOS().equals(POS.ADJECTIVE)) {
+			ss_type = 3;
+		} else if (this.getPOS().equals(POS.ADVERB)) {
+			ss_type = 4;
+		}
+			
+		if (isAdjectiveCluster()) {
+			ss_type = 5;
+		}
+		int lexId = -1;
+		for (int i = 0; i < this.getWords().length; i++) {
+			Word w = this.getWords()[i];
+			if (w.getLemma().equals(lemma)) {
+				lexId = w.getLexId();
+			}
+		}
+		
+		String lexNumStr = "";
+		long lexNum = getLexFileNum();
+		if (lexNum < 10) {
+			lexNumStr = "0" + lexNum;
+		} else {
+			lexNumStr = String.valueOf(lexNum);
+		}
+		
+		String lexIdStr = "";
+		if (lexId < 10) {
+			lexIdStr = "0" + lexId;
+		} else {
+			lexIdStr = String.valueOf(lexId);
+		}
+
+		String senseKey = lemma + "%" + ss_type + ":" + lexNumStr;
+		senseKey += ":" + lexIdStr + ":";
+		
+		String head = ":";
+		if (ss_type == 5) {
+			try {
+				Pointer[] p = this.getPointers(PointerType.SIMILAR_TO);
+				if (p.length > 0) {
+					Pointer headWord = p[0];
+					Word[] words = headWord.getTargetSynset().getWords();
+					if (words.length > 0) {
+						head = words[0].getLemma() + ":";
+						lexIdStr = "";
+						if (words[0].getLexId() < 10) {
+							lexIdStr = "0" + words[0].getLexId();
+						} else {
+							lexIdStr = String.valueOf(words[0].getLexId());
+						}
+						head += lexIdStr;
+					}
+				}
+			} catch (JWNLException e) { 
+				e.printStackTrace(); 
+			}
+		}
+		senseKey += head;
+		
+		return senseKey;
+		
 	}
 }

@@ -10,7 +10,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import net.didion.jwnl.JWNL;
 import net.didion.jwnl.JWNLException;
 import net.didion.jwnl.data.DictionaryElementType;
 import net.didion.jwnl.data.Exc;
@@ -18,13 +17,10 @@ import net.didion.jwnl.data.FileDictionaryElementFactory;
 import net.didion.jwnl.data.IndexWord;
 import net.didion.jwnl.data.POS;
 import net.didion.jwnl.data.Synset;
-import net.didion.jwnl.data.Word;
 import net.didion.jwnl.dictionary.file.DictionaryFileType;
 import net.didion.jwnl.dictionary.file_manager.FileManager;
-import net.didion.jwnl.util.Grep;
 import net.didion.jwnl.util.MessageLog;
 import net.didion.jwnl.util.MessageLogLevel;
-import net.didion.jwnl.util.TokenizerParser;
 import net.didion.jwnl.util.factory.Param;
 
 /**
@@ -403,61 +399,6 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
 				throw new JWNLException("DICTIONARY_EXCEPTION_008", new Object[]{_pos, _fileType}, ex);
 			}
 		}
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	public int getUsageCount(long offset, String lemma) {
-		int count = 0;
-		Word w = getIndexLineWord(offset, lemma);
-		
-		count = w.getUsageCount();
-		return count;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public String getSenseKey(long offset, String lemma) {
-		Word w = getIndexLineWord(offset, lemma);
-		String key = w.getSenseKey();
-		return key;
-	}
-	
-	/**
-     * Creates a word from an index line in the index.sense (or sense.idx < wordnet 2.1).
-     * @param offset - the synset offset
-     * @param lemma - the matching sense lemma
-     * @return an undefined word
-	 */
-	private Word getIndexLineWord(long offset, String lemma) {
-		Word word = null;
-		try {
-			lemma = lemma.toLowerCase();
-			String indexLine = Grep.grep("" + offset, lemma);
-			TokenizerParser tokenizer = new TokenizerParser(indexLine, " ");
-			String senseKey = tokenizer.nextToken();
-			tokenizer.nextLong();
-			tokenizer.nextInt();
-			String senseCount = tokenizer.nextToken();
-            String[] sc = null;
-            if (JWNL.getVersion().getNumber() < 2.1 && JWNL.getOS().equals(JWNL.WINDOWS)) {
-                sc = senseCount.split("\\r\\n");
-            } else { 
-                sc = senseCount.split("\\n");
-            }
-            if (sc != null) {
-                int count = Integer.parseInt(sc[0]);
-    		    senseCount.trim();
-              
-                word = new Word(lemma, senseKey, count);
-    			senseMap.put(offset + lemma, word);
-            }
-        } catch(IOException ioe) {
-            ioe.printStackTrace();
-        }
-		return word;
 	}
 	
 }

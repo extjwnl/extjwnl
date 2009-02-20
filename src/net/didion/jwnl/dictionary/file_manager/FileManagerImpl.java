@@ -10,7 +10,6 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Random;
 
-import net.didion.jwnl.JWNL;
 import net.didion.jwnl.JWNLException;
 import net.didion.jwnl.JWNLRuntimeException;
 import net.didion.jwnl.data.POS;
@@ -18,7 +17,6 @@ import net.didion.jwnl.dictionary.file.DictionaryCatalogSet;
 import net.didion.jwnl.dictionary.file.DictionaryFile;
 import net.didion.jwnl.dictionary.file.DictionaryFileType;
 import net.didion.jwnl.dictionary.file.RandomAccessDictionaryFile;
-import net.didion.jwnl.util.Grep;
 import net.didion.jwnl.util.factory.Param;
 
 /**
@@ -51,11 +49,6 @@ public class FileManagerImpl implements FileManager {
 	private DictionaryCatalogSet _files;
 	
     /**
-     * The sense key file. 
-     */
-	private File senseFile;
-	
-    /**
      * Uninitialized FileManagerImpl. 
      *
      */
@@ -69,13 +62,6 @@ public class FileManagerImpl implements FileManager {
 		checkFileType(dictionaryFileType);
 		_files = new DictionaryCatalogSet(searchDir, dictionaryFileType);
 		_files.open();
-        String sense = System.getProperty("file.separator") + "index.sense";
-        if (JWNL.getVersion().getNumber() < 2.1) {
-            sense = System.getProperty("file.separator") + "sense.idx";
-		}
-        senseFile = new File(searchDir + sense);
-        
-		Grep.setFile(senseFile);
 	}
 
     /**

@@ -123,9 +123,6 @@ public class PrincetonWN30DatabaseDictionaryElementFactory extends AbstractPrinc
             w = new Word(synset, index, lemma);
             
         }
-        w.setSenseKey(senseKey);
-        w.setUsageCount(usageCnt);
-        
         return w;
     }
     

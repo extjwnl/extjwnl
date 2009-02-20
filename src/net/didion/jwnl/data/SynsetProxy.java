@@ -97,12 +97,12 @@ public class SynsetProxy extends Synset {
 		return getSource().getLexFileName();
 	}
 	
-	public long getLexFileId() {
-		return getSource().getLexFileId();
+	public long getLexFileNum() {
+		return getSource().getLexFileNum();
 	}
 	
-	public void setLexFileId(long lexFileId) {
-		getSource().setLexFileId(lexFileId);
+	public void setLexFileNum(long lexFileId) {
+		getSource().setLexFileNum(lexFileId);
 	}
 
 	protected Synset getSource() {
@@ -112,4 +112,11 @@ public class SynsetProxy extends Synset {
 	public void setSource(Synset source) {
 		_source = source;
 	}
+
+	public boolean isAdjectiveCluster() {
+		return _source.isAdjectiveCluster();
+	}
+	
+	
+	
 }

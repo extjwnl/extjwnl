@@ -57,21 +57,21 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory implements F
 	}
 
 	public Synset createSynset(POS pos, String line) {
-        TokenizerParser tokenizer = new TokenizerParser(line, " ");
+	    TokenizerParser tokenizer = new TokenizerParser(line, " ");
 
         long offset = tokenizer.nextLong();
         /**
          * Grab the filenum token here. 
          */
         //String lexFileNameId = tokenizer.nextToken();	// lex_filenum
-        long lexFileNameId = tokenizer.nextLong();
+        long lexFileNum = tokenizer.nextLong();
        
         String synsetPOS = tokenizer.nextToken();
         boolean isAdjectiveCluster = false;
         if (synsetPOS.equals("s")) {
-            isAdjectiveCluster = true;
+            isAdjectiveCluster = true;    
         }
-
+  
         SynsetProxy proxy = new SynsetProxy(pos);
 
         int wordCount = tokenizer.nextHexInt();
@@ -79,12 +79,12 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory implements F
         for (int i = 0; i < wordCount; i++) {
             String lemma = tokenizer.nextToken();
             
-            tokenizer.nextHexInt(); // lex id
+            int lexId = tokenizer.nextHexInt(); // lex id
             
-          
+            
             
             words[i] = createWord(proxy, i, lemma);
-            
+            words[i].setLexId(lexId);
         }
 
         int pointerCount = tokenizer.nextInt();
@@ -129,7 +129,7 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory implements F
         Synset synset = new Synset(pos, offset, words, pointers, gloss, verbFrames, isAdjectiveCluster);
         
         //set the lexicographer file identifier
-        synset.setLexFileId(lexFileNameId);
+        synset.setLexFileNum(lexFileNum);
         proxy.setSource(synset);
         if (_log.isLevelEnabled(MessageLogLevel.TRACE)) {
             _log.log(MessageLogLevel.TRACE, "PRINCETON_INFO_002", new Object[]{pos, new Long(offset)});

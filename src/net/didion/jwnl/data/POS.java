@@ -97,7 +97,7 @@ public final class POS implements Serializable {
 	public boolean equals(Object obj) {
 		if (obj instanceof POS) {
 			POS pos = (POS) obj;
-			return _key.equals(pos.getKey());
+			return _key.toString().equals(pos.getKey());
 		}
 		return false;
 	}

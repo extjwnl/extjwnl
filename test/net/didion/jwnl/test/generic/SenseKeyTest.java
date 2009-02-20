@@ -26,8 +26,7 @@ public class SenseKeyTest extends TestCase {
 				for (int x = 0; x < syn.getWords().length; x++) {
 					Word w = syn.getWords()[x];
 					if (w.getLemma().equals("get")) {
-						 System.out.println("count: " + w.getUsageCount());
-		                
+		              
 					}
                    
 				}

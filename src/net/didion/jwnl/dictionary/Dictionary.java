@@ -168,19 +168,5 @@ public abstract class Dictionary implements Installable {
 		return set;
 	}
 	
-	/**
-	 * Gets the usage count for this offset/lemma combination. 
-	 * @param offset
-	 * @param lemma
-	 * @return
-	 */
-	public abstract int getUsageCount(long offset, String lemma);
-	
-	/**
-	 * Gets the sense key for this combination. 
-	 * @param offset
-	 * @param lemma
-	 * @return
-	 */
-	public abstract String getSenseKey(long offset, String lemma);
+
 }

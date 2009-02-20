@@ -32,39 +32,22 @@ public class Word extends PointerTarget {
     
 	private String _lemma;
 	
-	/**
-	 * The sense key for this word within the synset. 
-	 */
-	private String senseKey;
+	/** The lexicographer id that identifies this lemma. */
+	protected int lexId;
 	
-	/**
-	 * The usage tag of this specific word in the synset.
-	 */
-	private int usageTag = 0;
-	
-	/**
-	 * This is false until getSenseKey() is called. 
-	 */
-	private boolean keysLoaded = false;
-	
-	/**
-	 * This is false until getUsageCount() is called. 
-	 */
-	private boolean usageLoaded = false;
-	
-	/**
-	 * Proxy constructor for an unitialized word. 
-	 * @param lemma 
-	 * @param senseKey
-	 * @param usageCnt
-	 */
-	public Word(String lemma, String senseKey, int usageCnt) {
-		_lemma = lemma;
-		setSenseKey(senseKey);
-		setUsageCount(usageCnt); 
+
+
+    public int getLexId() {
+		return lexId;
 	}
 
-    /**
+
+	public void setLexId(int lexId) {
+		this.lexId = lexId;
+	}
+
+
+	/**
      * Constructs a word tied to a synset, it's position within the synset, and the lemma.
      * @param synset - the synset this word is contained in
      * @param index - the position of the word in the synset (usage)
@@ -75,22 +58,7 @@ public class Word extends PointerTarget {
 		_index = index;
 		_lemma = lemma;
 	}
-	
-	/**
-	 * Creates a word with the synset, index, lemma, and senseKey. 
-	 * @param synset the synset
-	 * @param index the index
-	 * @param lemma the lemma
-	 * @param senseKey
-	 * @param usageCnt 
-	 */
-	public Word(Synset synset, int index, String lemma, String senseKey, int usageCnt) {
-		_synset = synset;
-		_index = index;
-		_lemma = lemma;
-		setSenseKey(senseKey);
-		setUsageCount(usageCnt);
-	}
+
 
 	// Object methods
 
@@ -148,27 +116,6 @@ public class Word extends PointerTarget {
 	public String getLemma() {
 		return _lemma;
 	}
-	
-	/**
-	 * Sets the sense key to this word. 
-	 * @param sk the sense key
-	 */
-	public void setSenseKey(String sk) {
-		keysLoaded = true;
-		senseKey = sk;
-	}
-	
-	/**
-	 * Gets the sense key for this Word. For more information, see SenseIdX(5WN) in WordNet documentation.
-	 * @return WordNet sense key
-	 */
-	public String getSenseKey() {
-		if (!keysLoaded) {
-			senseKey = Dictionary.getInstance().getSenseKey(getSynset().getOffset(), getLemma());
-			keysLoaded = true;
-		}
-		return senseKey;
-	}
 
 	/** returns all the pointers of the synset that contains this word whose source is this word */
 	public Pointer[] getPointers() {
@@ -182,24 +129,4 @@ public class Word extends PointerTarget {
 		return (Pointer[]) list.toArray(new Pointer[list.size()]);
 	}
 
-	/**
-	 * Gets the usage if this word has been tagged within WordNet. 
-	 * @return - the usage number. 
-	 */
-	public int getUsageCount() {
-		if (!usageLoaded) {
-			usageTag = Dictionary.getInstance().getUsageCount(getSynset().getOffset(), getLemma());
-			usageLoaded = true;
-		}
-		return usageTag;
-	}
-
-	/**
-	 * Sets the usage tag for this word. 
-	 * @param usageTag - usage number in tagged texts.
-	 */
-	public void setUsageCount(int usageTag) {
-		this.usageTag = usageTag;
-		usageLoaded = true;
-	}
 }
