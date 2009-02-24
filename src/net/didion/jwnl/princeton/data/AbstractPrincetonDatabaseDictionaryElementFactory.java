@@ -1,5 +1,12 @@
 package net.didion.jwnl.princeton.data;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Iterator;
+import java.util.List;
+
 import net.didion.jwnl.data.DatabaseDictionaryElementFactory;
 import net.didion.jwnl.data.Exc;
 import net.didion.jwnl.data.IndexWord;
@@ -8,15 +15,7 @@ import net.didion.jwnl.data.Pointer;
 import net.didion.jwnl.data.PointerType;
 import net.didion.jwnl.data.Synset;
 import net.didion.jwnl.data.SynsetProxy;
-import net.didion.jwnl.data.Verb;
 import net.didion.jwnl.data.Word;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Iterator;
-import java.util.List;
 
 public abstract class AbstractPrincetonDatabaseDictionaryElementFactory implements DatabaseDictionaryElementFactory {
     public IndexWord createIndexWord(POS pos, String lemma, ResultSet rs) throws SQLException {

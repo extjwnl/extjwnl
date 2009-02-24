@@ -18,7 +18,6 @@ import net.didion.jwnl.data.PointerTarget;
 import net.didion.jwnl.data.PointerType;
 import net.didion.jwnl.data.Synset;
 import net.didion.jwnl.data.SynsetProxy;
-import net.didion.jwnl.data.Verb;
 import net.didion.jwnl.data.Word;
 import net.didion.jwnl.util.MessageLog;
 import net.didion.jwnl.util.MessageLogLevel;
@@ -60,10 +59,7 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory implements F
 	    TokenizerParser tokenizer = new TokenizerParser(line, " ");
 
         long offset = tokenizer.nextLong();
-        /**
-         * Grab the filenum token here. 
-         */
-        //String lexFileNameId = tokenizer.nextToken();	// lex_filenum
+      
         long lexFileNum = tokenizer.nextLong();
        
         String synsetPOS = tokenizer.nextToken();
@@ -148,7 +144,7 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory implements F
 		Word word; 
 		if (synset.getPOS().equals(POS.VERB)) {
             word = new MutableVerb(synset, index, lemma);
-        } else {
+         } else {
             word = new Word(synset, index, lemma);
         }
 
