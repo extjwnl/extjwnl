@@ -13,6 +13,12 @@ import java.util.List;
 /**
  * Represents an entry in an exception file. Contains all of the exceptions
  * for the given lemma.
+ * 
+ * Exception lists are alphabetized lists of inflected forms of words and 
+ * their base forms. The first field of each line is an inflected form, 
+ * followed by a space separated list of one or more base forms of the word. 
+ * There is one exception list file for each syntactic category. From wndb.5WN
+ * in WordNet base documentation. 
  */
 public final class Exc implements DictionaryElement {
     

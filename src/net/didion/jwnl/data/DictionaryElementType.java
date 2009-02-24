@@ -30,10 +30,16 @@ public class DictionaryElementType {
     public static final DictionaryElementType EXCEPTION = new DictionaryElementType("EXCEPTION");
 
     /**
+     * The name of the dictionary. 
+     */
+	private final String _name;
+    
+    /**
      * A list of the different dictionary types. 
      */
 	private static final List ALL_TYPES = Collections.unmodifiableList(
             Arrays.asList(new  DictionaryElementType[] { INDEX_WORD, SYNSET, EXCEPTION }));
+
 
     /**
      * Gets all the dictionary types. 
@@ -43,10 +49,6 @@ public class DictionaryElementType {
 		return ALL_TYPES;
 	}
 
-    /**
-     * The name of the dictionary. 
-     */
-	private final String _name;
 
     /**
      * Create a new DictionaryElementType. 
