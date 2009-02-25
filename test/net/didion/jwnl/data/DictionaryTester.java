@@ -34,6 +34,11 @@ public abstract class DictionaryTester {
 	/** Our logger. */ 
 	Log log = LogFactory.getLog("jwnl.tests");
 	
+	String glossDefinition = "an enclosed armored military vehicle; has a cannon and moves on caterpillar treads";
+	
+	String[] lemmas = {"tank", "army_tank", "armored_combat_vehicle", "armoured_combat_vehicle"};
+	
+	
 	/** 
 	 * Inits the dictionary. 
 	 */
@@ -80,10 +85,55 @@ public abstract class DictionaryTester {
 		log.info("IndexWord loading and Synset testing... passed.");
 		
 		testPointers(armoredTankSynset);
-		//TODO test synset gloss
+		testGloss(armoredTankSynset);
+		testWords(armoredTankSynset);
 		//TODO test specific pointers
-		//TODO test Word objects in Synset
 		
+		
+	}
+	
+	/**
+	 * Tests the words in the synset. 
+	 * @param synset synset 
+	 * @return true if passed test
+	 * @throws JWNLException exception on loading
+	 */
+	public boolean testWords(Synset synset) throws JWNLException {
+		boolean result = true;
+		for (int i = 0; i < synset.getWords().length; i++) {
+			Word w = synset.getWords()[i];
+			boolean found = false;
+			for (int z = 0; z < lemmas.length; z++) {	
+				if (w.getLemma().equals(lemmas[z])) {
+					found = true;
+				}
+			}
+			if (!found) {
+				fail("Synset word loading... failed.");
+				result = false;
+			}
+		}
+		if (result) {
+			log.info("Synset word loading... passed.");
+		}
+		return result;
+	}
+	
+	/**
+	 * Tests the gloss of the synset. 
+	 * @param synset synset 
+	 * @return true if gloss matches definition
+	 * @throws JWNLException exception in loading
+	 */
+	public boolean testGloss(Synset synset) throws JWNLException {
+		boolean match = false;
+		if (synset.getGloss().trim().equals(glossDefinition)) {
+			match = true;
+			log.info("Synset gloss test... passed.");
+		} else {
+			fail("Synset gloss test... failed.");
+		}
+		return match;
 	}
 	
 	/**
