@@ -28,6 +28,19 @@ public abstract class DictionaryTester {
 	/** The offset for wn 2.0. */
 	protected long wn20TankOffset = 4219085;
 	
+	/** Synset for "complete/finish" for wn2.0 */ 
+	protected long wn20VerbOffset = 470712;
+	
+	/** Synset for "complete/finish" for wn2.1 */
+	protected long wn21VerbOffset = 479055;
+	
+	/** Synset for "complete/finish" for wn3.0 */
+	protected long wn30VerbOffset = 484166;
+	
+	protected long[] verbOffsets = {wn20VerbOffset, wn21VerbOffset, wn30VerbOffset};
+	
+	protected long[] nounOffsets = {wn20TankOffset, wn21TankOffset, wn30TankOffset};
+	
 	/** The number of pointers the target synset has. */ 
 	protected long pointers = 7;
 	
@@ -51,7 +64,11 @@ public abstract class DictionaryTester {
 		try {
 			log.info("Beginning DictionaryTester...");
 			IndexWord w = Dictionary.getInstance().getIndexWord(POS.NOUN, "tank");
-			testIndexWord(w);		
+			testIndexWord(w);
+			
+			IndexWord v = Dictionary.getInstance().getIndexWord(POS.VERB, "complete");
+			testVerb(v);
+			
 			
 		} catch (JWNLException e) {
 			e.printStackTrace();
@@ -59,6 +76,49 @@ public abstract class DictionaryTester {
 		if (failures == 0) {
 			log.info("Testing succeeded with no failures.");
 		}
+	}
+	
+	public void testVerb(IndexWord verbIndex) throws JWNLException {
+		boolean verbTest = true;
+		Synset[] syns = verbIndex.getSenses();
+		
+		boolean match = false;
+		Synset synset = null;
+		for (int i = 0; i < syns.length; i++) {
+			Synset s = syns[i];
+			match = contains(s, verbOffsets);
+			if (match) { 
+				synset = s;
+				break;
+			}
+			
+		}
+		if (match) {
+			int[] indices = synset.getVerbFrameIndicies();
+			if (indices.length == 2) {
+				log.info("Verb synset frame size test... passed.");
+			} else {
+				verbTest = false;
+				fail("Verb synset frame size test... failed");
+			}
+			for (int i = 0; i < indices.length; i++) {
+				int index = indices[i];
+				if (index != 2 && index != 33) {
+					verbTest = false;
+					fail("Verb synset frame flags... failed");
+				}
+			}
+			
+		} else {
+			verbTest = false;
+			fail("Verb synset test... failed.");
+		}
+		if (verbTest) {
+			log.info("Verb test... passed.");
+		} else {
+			fail("Verb tests... failed.");
+		}
+		
 	}
 
 	/**
@@ -170,6 +230,22 @@ public abstract class DictionaryTester {
 		} else {
 			log.info("Pointer testing... passed.");
 		}
+	}
+	
+	/**
+	 * Simple utility function to match a synset with a collection of offsets. 
+	 * @param s synset
+	 * @param offsets offsets
+	 * @return true if match
+	 */
+	private boolean contains(Synset s, long[] offsets) {
+		boolean rval = false;
+		for (int i = 0; i < offsets.length; i++) {
+			if (s.getOffset() == offsets[i]) {
+				rval = true;
+			}
+		}
+		return rval;
 	}
 	
 	/**
