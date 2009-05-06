@@ -11,26 +11,29 @@ import java.util.Random;
 import java.util.Date;
 import java.util.HashMap;
 
+import javax.sql.DataSource;
+
 public class DatabaseManagerImpl implements DatabaseManager, Createable {
     public static final String DRIVER = "driver";
     public static final String URL = "url";
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
+	public static final String JNDI = "jndi";
 
     protected static final String LEMMA_FOR_INDEX_WORD_ID_SQL =
             "SELECT iw.lemma " +
             "FROM IndexWord iw " +
             "WHERE iw.pos = ? AND iw.index_word_id = ?";
- 
+
     /** SQL query for getting all synsets for an index word. */
     protected static final String SYNSET_IDS_FOR_INDEX_WORD_SQL =
             "SELECT syn.file_offset, iws.synset_id, syn.synset_id "
-            + "FROM IndexWordSynset iws, IndexWord iw, Synset syn " 
+            + "FROM IndexWordSynset iws, IndexWord iw, Synset syn "
             + "WHERE iws.index_word_id = iw.index_word_id AND syn.synset_id = iws.synset_id AND iw.pos = ?  AND iw.lemma = ?";
 
-    protected static final String COUNT_INDEX_WORDS_SQL = 
+    protected static final String COUNT_INDEX_WORDS_SQL =
             "SELECT MIN(index_word_id), MAX(index_word_id) FROM indexword WHERE pos = ?";
-    
+
     protected static final String ALL_LEMMAS_SQL =
             "SELECT lemma FROM IndexWord WHERE pos = ?";
 
@@ -77,10 +80,14 @@ public class DatabaseManagerImpl implements DatabaseManager, Createable {
     }
 
     public Object create(Map params) throws JWNLException {
-        String driverClassName = ((Param) params.get(DRIVER)).getValue();
-        String url = ((Param) params.get(URL)).getValue();
+        String driverClassName = params.containsKey(DRIVER) ? ((Param) params.get(DRIVER)).getValue() : null;
+        String url = params.containsKey(URL) ?((Param) params.get(URL)).getValue() : null;
         String userName = params.containsKey(USERNAME) ? ((Param) params.get(USERNAME)).getValue() : null;
         String password = params.containsKey(PASSWORD) ? ((Param) params.get(PASSWORD)).getValue() : null;
+        String jndi = params.containsKey(JNDI) ? ((Param) params.get(JNDI)).getValue() : null;
+        if (null != jndi && jndi.trim().length() > 0) {
+        	return new DatabaseManagerImpl(new ConnectionManager(jndi.trim()));
+        }
         return new DatabaseManagerImpl(new ConnectionManager(driverClassName, url, userName, password));
     }
 
