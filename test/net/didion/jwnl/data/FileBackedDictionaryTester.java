@@ -13,10 +13,18 @@ import net.didion.jwnl.JWNLException;
  */
 public class FileBackedDictionaryTester extends DictionaryTester {
 	
-	/** Properties location. */ 
+	/** Properties location. */
 	protected String properties = "C:\\21csi\\jwnl\\jwordnet\\trunk\\jwnl\\config\\file_properties.xml";
-	
-	/**
+
+    public FileBackedDictionaryTester(String properties) {
+        this.properties = properties;
+    }
+
+    public FileBackedDictionaryTester() {
+        //nop
+    }
+
+    /**
 	 * {@inheritDoc}
 	 */
 	public void initDictionary() {
@@ -34,7 +42,12 @@ public class FileBackedDictionaryTester extends DictionaryTester {
 	 * @param args none
 	 */
 	public static void main(String[] args) {
-		DictionaryTester t = new FileBackedDictionaryTester();
+        DictionaryTester t;
+        if (0 == args.length) {
+            t = new FileBackedDictionaryTester();
+        } else {
+            t = new FileBackedDictionaryTester(args[0]);
+        }
 		t.initDictionary();
 		t.test();
 	}
