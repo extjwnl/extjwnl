@@ -1,5 +1,4 @@
 /**
-/**
  * Java WordNet Library (JWNL)
  * See the documentation for copyright information.
  */
