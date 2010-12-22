@@ -1,6 +1,3 @@
-/**
- * 
- */
 package net.didion.jwnl.data;
 
 import java.util.ArrayList;

@@ -1,7 +1,3 @@
-/**
- * Java WordNet Library (JWNL)
- * See the documentation for copyright information.
- */
 package net.didion.jwnl.dictionary.file;
 
 import java.io.IOException;

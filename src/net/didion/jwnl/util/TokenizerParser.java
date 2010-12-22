@@ -1,7 +1,3 @@
-/**
- * Java WordNet Library (JWNL)
- * See the documentation for copyright information.
- */
 package net.didion.jwnl.util;
 import java.util.StringTokenizer;
 
