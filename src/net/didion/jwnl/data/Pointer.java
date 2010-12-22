@@ -16,153 +16,208 @@ import java.io.Serializable;
  * relationship holds between Words; a semantic relationship holds between Synsets.  Relationships
  * are <it>directional</it>:  the two roles of a relationship are the <it>source</it> and <it>target</it>.
  * Relationships are <it>typed</it>: the type of a relationship is a {@link PointerType}, and can
- * be retrieved via {@link Pointer#getType getType}. */
+ * be retrieved via {@link Pointer#getType getType}.
+ */
 public class Pointer implements Serializable {
-	static final long serialVersionUID = -1275571290466732179L;
+    static final long serialVersionUID = -1275571290466732179L;
 
-	/**
-	 * The index of this Pointer within the array of Pointer's in the source Synset.
-	 * Used by <code>equal</code>.
-	 */
-	private int _index;
-	private PointerType _pointerType;
-	/**
-	 * The source of this poiner. If the pointer applies to all words in the
-	 * parent synset, then <code>source</code> and <code>synset</code> are the same,
-	 * otherwise <code>source</code> is the specific <code>Word</code> object that
-	 * this pointer applies to.
-	 */
-	private PointerTarget _source = null;
-	/** An index that can be used to retrieve the target. */
-	private TargetIndex _targetIndex;
+    private PointerType _pointerType;
 
-	/** Cache for the target after it has been resolved. */
-	private transient PointerTarget _target = null;
+    private TargetIndex _targetIndex;
 
-	public Pointer(PointerTarget source, int index, PointerType pointerType,
-	               POS targetPOS, long targetOffset, int targetIndex) {
-		_source = source;
-		_index = index;
-		_pointerType = pointerType;
-		_targetIndex = new TargetIndex(targetPOS, targetOffset, targetIndex);
-	}
 
-	// Object methods //
+    /**
+     * The source of this poiner. If the pointer applies to all words in the
+     * parent synset, then <code>source</code> and <code>synset</code> are the same,
+     * otherwise <code>source</code> is the specific <code>Word</code> object that
+     * this pointer applies to.
+     */
+    private PointerTarget _source = null;
 
-	public boolean equals(Object object) {
-		return (object instanceof Pointer)
-		    && ((Pointer) object).getSource().equals(getSource())
-		    && ((Pointer) object).getSourceIndex() == getSourceIndex();
-	}
+    /**
+     * Cache for the target after it has been resolved.
+     */
+    private transient PointerTarget _target = null;
 
-	public int hashCode() {
-		return getSource().hashCode() ^ getSourceIndex();
-	}
+    public Pointer(PointerTarget source, PointerType pointerType,
+                   POS targetPOS, long targetOffset, int targetIndex) {
+        _source = source;
+        _pointerType = pointerType;
+        _targetIndex = new TargetIndex(targetPOS, targetOffset, targetIndex);
+    }
 
-	private transient String _cachedToString = null;
+    public Pointer(PointerType pointerType, PointerTarget source, PointerTarget target) {
+        _pointerType = pointerType;
+        _source = source;
+        _target = target;
+    }
 
-	public String toString() {
-		if (_cachedToString == null) {
-			String targetMsg = (_target == null) ? _targetIndex.toString() : _target.toString();
-			_cachedToString = JWNL.resolveMessage("DATA_TOSTRING_012",
-			                                      new Object[]{new Integer(getSourceIndex()), getSource(), targetMsg});
-		}
-		return _cachedToString;
-	}
+    public String toString() {
+        String targetMsg = (_target == null) ? _targetIndex.toString() : _target.toString();
+        return JWNL.resolveMessage("DATA_TOSTRING_012", new Object[]{getSourceIndex(), getSource(), targetMsg});
+    }
 
-	// Accessors
+    public int getSourceIndex() {
+        return _source.getIndex();
+    }
 
-	public int getSourceIndex() {
-		return _index;
-	}
+    public PointerType getType() {
+        return _pointerType;
+    }
 
-	public PointerType getType() {
-		return _pointerType;
-	}
+    /**
+     * True if this pointer's source is a Word
+     */
+    public boolean isLexical() {
+        return getSource() instanceof Word;
+    }
 
-	/** True if this pointer's source is a Word */
-	public boolean isLexical() {
-		return getSource() instanceof Word;
-	}
+    /**
+     * Get the source of this pointer.
+     * @return source of this pointer
+     */
+    public PointerTarget getSource() {
+        return _source;
+    }
 
-	/** Get the source of this pointer. */
-	public PointerTarget getSource() {
-		return _source;
-	}
+    /**
+     * Get the actual target of this pointer.
+     * @return actual target of this pointer
+     * @throws JWNLException JWNLException
+     */
+    public PointerTarget getTarget() throws JWNLException {
+        if (null == _target) {
+            Dictionary dic = Dictionary.getInstance();
+            Synset syn = dic.getSynsetAt(_targetIndex._pos, _targetIndex._offset);
+            _target = (_targetIndex._index == 0) ? syn : syn.getWord(_targetIndex._index - 1);
+        }
+        return _target;
+    }
 
-	/** Get the actual target of this pointer. */
-	public PointerTarget getTarget() throws JWNLException {
-		if (_target == null) {
-			Dictionary dic = Dictionary.getInstance();
-			Synset syn = dic.getSynsetAt(_targetIndex._pos, _targetIndex._offset);
-			_target = (_targetIndex._index == 0) ?
-			    (PointerTarget) syn : (PointerTarget) syn.getWord(_targetIndex._index - 1);
-		}
-		return _target;
-	}
+    public void setTarget(PointerTarget target) {
+        _target = target;
+        _targetIndex = null;
+    }
 
-	/**
-	 * Get the synset that is a) the target of this pointer, or b) the	 * synset that contains the target of this pointer.
-	 */
-	public Synset getTargetSynset() throws JWNLException {
-		PointerTarget target = getTarget();
-		if (target instanceof Word) {
-			return ((Word) target).getSynset();
-		} else {
-			return (Synset) target;
-		}
-	}
+    /**
+     * Get the synset that is a) the target of this pointer, or b) the synset that contains the target of this pointer.
+     * @return the synset that is a) the target of this pointer, or b) the synset that contains the target of this pointer.
+     * @throws JWNLException JWNLException
+     */
+    public Synset getTargetSynset() throws JWNLException {
+        return getTarget().getSynset();
+    }
 
-	/**
-	 * Get the offset of the target within the target synset. If the offset is	 * 0, then this pointer applies to all words in the target.
-	 */
-	public long getTargetOffset() {
-		return _targetIndex._offset;
-	}
+    /**
+     * Get the offset of the target synset.
+     * @return offset of the target synset
+     */
+    public long getTargetOffset() {
+        if (null == _target) {
+            return _targetIndex._offset;
+        } else {
+            return _target.getSynset().getOffset();
+        }
+    }
 
-	public int getTargetIndex() {
-		return _targetIndex._index;
-	}
+    public int getTargetIndex() {
+        if (null == _target) {
+            return _targetIndex._index;
+        } else {
+            return _target.getIndex();
+        }
+    }
 
-	public POS getTargetPOS() {
-		return _targetIndex._pos;
-	}
+    public POS getTargetPOS() {
+        if (null == _target) {
+            return _targetIndex._pos;
+        } else {
+            return _target.getSynset().getPOS();
+        }
+    }
 
-	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
-		in.defaultReadObject();
-		// set pointer type to reference the static instance defined in the current runtime environment
-		_pointerType = PointerType.getPointerTypeForKey(_pointerType.getKey());
-	}
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        // set pointer type to reference the static instance defined in the current runtime environment
+        _pointerType = PointerType.getPointerTypeForKey(_pointerType.getKey());
+    }
 
-	/**
-	 * This class is used to avoid paging in the target before it is required, and to prevent
-	 * keeping a large portion of the database resident once the target has been queried.
-	 */
-	private static class TargetIndex implements Serializable {
-		POS _pos;
-		long _offset;
-		int _index;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Pointer)) return false;
 
-		TargetIndex(POS pos, long offset, int index) {
-			_pos = pos;
-			_offset = offset;
-			_index = index;
-		}
+        Pointer pointer = (Pointer) o;
 
-		private transient String _cachedToString = null;
+        if (_pointerType != null ? !_pointerType.equals(pointer._pointerType) : pointer._pointerType != null)
+            return false;
+        if (_source != null ? !_source.equals(pointer._source) : pointer._source != null) return false;
+        if (null == _target) {
+            if (_targetIndex != null ? !_targetIndex.equals(pointer._targetIndex) : pointer._targetIndex != null)
+                return false;
+        } else {
+            if (!_target.getPOS().equals(pointer.getTargetPOS())
+                    || _target.getIndex() != pointer.getTargetIndex()
+                    || _target.getSynset().getOffset() != pointer.getTargetOffset())
+                return false;
+        }
 
-		public String toString() {
-			if (_cachedToString == null) {
-				_cachedToString =
-				    JWNL.resolveMessage("DATA_TOSTRING_013", new Object[]{_pos, new Long(_offset), new Integer(_index)});
-			}
-			return _cachedToString;
-		}
+        return true;
+    }
 
-		private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
-			in.defaultReadObject();
-			// set POS to reference the static instance defined in the current runtime environment
-			_pos = POS.getPOSForKey(_pos.getKey());
-		}
-	}
+    @Override
+    public int hashCode() {
+        int result = _pointerType != null ? _pointerType.hashCode() : 0;
+        result = 31 * result + (_targetIndex != null ? _targetIndex.hashCode() : 0);
+        result = 31 * result + (_source != null ? _source.hashCode() : 0);
+        return result;
+    }
+
+    /**
+     * This class is used to avoid paging in the target before it is required, and to prevent
+     * keeping a large portion of the database resident once the target has been queried.
+     */
+    private static class TargetIndex implements Serializable {
+        POS _pos;
+        long _offset;
+        int _index;
+
+        TargetIndex(POS pos, long offset, int index) {
+            _pos = pos;
+            _offset = offset;
+            _index = index;
+        }
+
+        public String toString() {
+            return JWNL.resolveMessage("DATA_TOSTRING_013", new Object[]{_pos, _offset, _index});
+        }
+
+        private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+            in.defaultReadObject();
+            // set POS to reference the static instance defined in the current runtime environment
+            _pos = POS.getPOSForKey(_pos.getKey());
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof TargetIndex)) return false;
+
+            TargetIndex that = (TargetIndex) o;
+
+            if (_index != that._index) return false;
+            if (_offset != that._offset) return false;
+            if (_pos != null ? !_pos.equals(that._pos) : that._pos != null) return false;
+
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = _pos != null ? _pos.hashCode() : 0;
+            result = 31 * result + (int) (_offset ^ (_offset >>> 32));
+            result = 31 * result + _index;
+            return result;
+        }
+    }
 }

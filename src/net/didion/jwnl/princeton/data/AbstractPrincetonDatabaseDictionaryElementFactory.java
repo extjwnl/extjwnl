@@ -14,7 +14,6 @@ import net.didion.jwnl.data.POS;
 import net.didion.jwnl.data.Pointer;
 import net.didion.jwnl.data.PointerType;
 import net.didion.jwnl.data.Synset;
-import net.didion.jwnl.data.SynsetProxy;
 import net.didion.jwnl.data.Word;
 
 public abstract class AbstractPrincetonDatabaseDictionaryElementFactory implements DatabaseDictionaryElementFactory {
@@ -35,29 +34,31 @@ public abstract class AbstractPrincetonDatabaseDictionaryElementFactory implemen
     }
 
     public Synset createSynset(
-            POS pos, long offset, ResultSet synset, ResultSet words, ResultSet pointers, ResultSet verbFrames)
+            POS pos, long offset, ResultSet synsets, ResultSet words, ResultSet pointers, ResultSet verbFrames)
             throws SQLException {
-        synset.next();
-        boolean isAdjectiveCluster = synset.getBoolean(1);
-        String gloss = synset.getString(2);
+        synsets.next();
+        Synset synset = new Synset();
+        boolean isAdjectiveCluster = synsets.getBoolean(1);
+        synset.setIsAdjectiveCluster(isAdjectiveCluster);
 
-        SynsetProxy proxy = new SynsetProxy(pos);
+        String gloss = synsets.getString(2);
+        synset.setGloss(gloss);
 
-        List wordList = new ArrayList();
+        synset.setPOS(pos);
+
         while (words.next()) {
             String lemma = words.getString(1);
             int index = words.getInt(2);
-            wordList.add(createWord(proxy, index, lemma));
+            synset.addWord(createWord(synset, index, lemma));
         }
 
-        List pointerList = new ArrayList();
         while (pointers.next()) {
             PointerType type = PointerType.getPointerTypeForKey(pointers.getString(1));
             long targetOffset = pointers.getLong(2);
             POS targetPOS = POS.getPOSForKey(pointers.getString(3));
             int sourceIndex = pointers.getInt(4);
             int targetIndex = pointers.getInt(5);
-            pointerList.add(new Pointer(proxy, sourceIndex, type, targetPOS, targetOffset, targetIndex));
+            synset.addPointer(new Pointer(synset, type, targetPOS, targetOffset, targetIndex));
         }
 
         BitSet vFrames = new BitSet();
@@ -65,21 +66,16 @@ public abstract class AbstractPrincetonDatabaseDictionaryElementFactory implemen
             int frameNumber = verbFrames.getInt(1);
             int wordIndex = verbFrames.getInt(2);
             if (wordIndex > 0) {
-                ((MutableVerb) wordList.get(wordIndex - 1)).setVerbFrameFlag(frameNumber);
+                ((MutableVerb) synset.getWord(wordIndex - 1)).setVerbFrameFlag(frameNumber);
             } else {
-                for (Iterator itr = wordList.iterator(); itr.hasNext();) {
-                    ((MutableVerb) itr.next()).setVerbFrameFlag(frameNumber);
+                for (Word w : synset.getWords()) {
+                    ((MutableVerb) w).setVerbFrameFlag(frameNumber);
                 }
                 vFrames.set(frameNumber);
             }
         }
 
-        proxy.setSource(new Synset(
-                pos, offset, (Word[]) wordList.toArray(new Word[wordList.size()]),
-                (Pointer[]) pointerList.toArray(new Pointer[pointerList.size()]),
-                gloss, vFrames, isAdjectiveCluster));
-
-        return proxy;
+        return synset;
     }
 
     protected Word createWord(Synset synset, int index, String lemma) {

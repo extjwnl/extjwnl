@@ -17,7 +17,6 @@ import net.didion.jwnl.data.Pointer;
 import net.didion.jwnl.data.PointerTarget;
 import net.didion.jwnl.data.PointerType;
 import net.didion.jwnl.data.Synset;
-import net.didion.jwnl.data.SynsetProxy;
 import net.didion.jwnl.data.Word;
 import net.didion.jwnl.util.MessageLog;
 import net.didion.jwnl.util.MessageLogLevel;
@@ -57,34 +56,38 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory implements F
 
 	public Synset createSynset(POS pos, String line) {
 	    TokenizerParser tokenizer = new TokenizerParser(line, " ");
+        Synset synset = new Synset();
 
         long offset = tokenizer.nextLong();
+        synset.setOffset(offset);
       
         long lexFileNum = tokenizer.nextLong();
+        synset.setLexFileNum(lexFileNum);
        
         String synsetPOS = tokenizer.nextToken();
+        synset.setPOS(pos);
         boolean isAdjectiveCluster = false;
         if (synsetPOS.equals("s")) {
             isAdjectiveCluster = true;    
         }
-  
-        SynsetProxy proxy = new SynsetProxy(pos);
+        synset.setIsAdjectiveCluster(isAdjectiveCluster);
 
         int wordCount = tokenizer.nextHexInt();
-        Word[] words = new Word[wordCount];
+        ArrayList<Word> words = new ArrayList<Word>(wordCount);
         for (int i = 0; i < wordCount; i++) {
             String lemma = tokenizer.nextToken();
             
             int lexId = tokenizer.nextHexInt(); // lex id
-            
-            
-            
-            words[i] = createWord(proxy, i, lemma);
-            words[i].setLexId(lexId);
+
+            //NB index: Word numbers are assigned to the word fields in a synset, from left to right, beginning with 1
+            Word w = createWord(synset, i + 1, lemma);
+            w.setLexId(lexId);
+            words.add(w);
         }
+        synset.addWords(words);
 
         int pointerCount = tokenizer.nextInt();
-        Pointer[] pointers = new Pointer[pointerCount];
+        ArrayList<Pointer> pointers = new ArrayList<Pointer>(pointerCount);
         for (int i = 0; i < pointerCount; i++) {
             String pt = tokenizer.nextToken();
             PointerType pointerType = PointerType.getPointerTypeForKey(pt);
@@ -93,27 +96,30 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory implements F
             int linkIndices = tokenizer.nextHexInt();
             int sourceIndex = linkIndices / 256;
             int targetIndex = linkIndices & 255;
-            PointerTarget source = (sourceIndex == 0) ? (PointerTarget) proxy : (PointerTarget) words[sourceIndex - 1];
+            PointerTarget source = (sourceIndex == 0) ? synset : synset.getWord(sourceIndex - 1);
 
-            pointers[i] = new Pointer(source, i, pointerType, targetPOS, targetOffset, targetIndex);
+            Pointer p = new Pointer(source, pointerType, targetPOS, targetOffset, targetIndex);
+            pointers.add(p);
         }
+        synset.addPointers(pointers);
 
-        BitSet verbFrames = new BitSet();
         if (pos == POS.VERB) {
+            BitSet verbFrames = new BitSet();
             int verbFrameCount = tokenizer.nextInt();
             for (int i = 0; i < verbFrameCount; i++) {
                 tokenizer.nextToken();	// "+"
                 int frameNumber = tokenizer.nextInt();
                 int wordIndex = tokenizer.nextHexInt();
                 if (wordIndex > 0) {
-                    ((MutableVerb) words[wordIndex - 1]).setVerbFrameFlag(frameNumber);
+                    ((MutableVerb) synset.getWord(wordIndex - 1)).setVerbFrameFlag(frameNumber);
                 } else {
-                    for (int j = 0; j < words.length; ++j) {
-                        ((MutableVerb) words[j]).setVerbFrameFlag(frameNumber);
+                    for (int j = 0; j < synset.getWords().length; ++j) {
+                        ((MutableVerb) synset.getWord(j)).setVerbFrameFlag(frameNumber);
                     }
                     verbFrames.set(frameNumber);
                 }
             }
+            synset.setVerbFrameFlags(verbFrames);
         }
 
         String gloss = null;
@@ -121,16 +127,12 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory implements F
         if (index > 0) {
             gloss = line.substring(index + 2).trim();
         }
+        synset.setGloss(gloss);
 
-        Synset synset = new Synset(pos, offset, words, pointers, gloss, verbFrames, isAdjectiveCluster);
-        
-        //set the lexicographer file identifier
-        synset.setLexFileNum(lexFileNum);
-        proxy.setSource(synset);
         if (_log.isLevelEnabled(MessageLogLevel.TRACE)) {
-            _log.log(MessageLogLevel.TRACE, "PRINCETON_INFO_002", new Object[]{pos, new Long(offset)});
+            _log.log(MessageLogLevel.TRACE, "PRINCETON_INFO_002", new Object[]{pos, offset});
         }
-        return proxy;
+        return synset;
 	}
 
 	/**

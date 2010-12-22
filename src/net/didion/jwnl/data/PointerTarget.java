@@ -14,13 +14,16 @@ import java.util.List;
  */
 public abstract class PointerTarget implements Serializable {
 	static final long serialVersionUID = 3230195199146939027L;
-	private transient PointerTarget[] _pointerTargets;
 
 	protected PointerTarget() {
 	}
 
 	/** Return this target's POS */
 	public abstract POS getPOS();
+
+    public abstract Synset getSynset();
+
+    public abstract int getIndex();
 
 	/** Return a list of Target's pointers */
 	public abstract Pointer[] getPointers();
@@ -33,23 +36,21 @@ public abstract class PointerTarget implements Serializable {
 
 	/** Get all pointers of type <code>type</code>.*/
 	public Pointer[] getPointers(PointerType type) {
-		List list = new ArrayList();
+		List<Pointer> list = new ArrayList<Pointer>();
 		Pointer[] pointers = getPointers();
-		for (int i = 0; i < pointers.length; ++i) {
-			if (pointers[i].getType().equals(type)
-                     || type.equals(PointerType.HYPERNYM) && pointers[i].getType().equals(PointerType.INSTANCE_HYPERNYM)
-                     || type.equals(PointerType.HYPONYM) && pointers[i].getType().equals(PointerType.INSTANCES_HYPONYM)) {
-                list.add(pointers[i]);
+        for (Pointer pointer : pointers) {
+            if (pointer.getType().equals(type)
+                    || type.equals(PointerType.HYPERNYM) && pointer.getType().equals(PointerType.INSTANCE_HYPERNYM)
+                    || type.equals(PointerType.HYPONYM) && pointer.getType().equals(PointerType.INSTANCES_HYPONYM)) {
+                list.add(pointer);
             }
         }
-		return (Pointer[])list.toArray(new Pointer[list.size()]);
+		return list.toArray(new Pointer[list.size()]);
 	}
 
 	/** Get all the pointer targets of this synset */
 	public PointerTarget[] getTargets() throws JWNLException {
-		if (_pointerTargets == null)
-			_pointerTargets = collectTargets(getPointers());
-		return _pointerTargets;
+		return collectTargets(getPointers());
 	}
 
 	/** Get all the targets of the pointers of type <code>type</code>.*/
