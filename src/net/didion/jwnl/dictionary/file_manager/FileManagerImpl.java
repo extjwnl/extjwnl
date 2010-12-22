@@ -89,7 +89,7 @@ public class FileManagerImpl implements FileManager {
      * Checks the type to ensure it's valid. 
      * @param c
      */
-	private void checkFileType(Class c) {
+	protected void checkFileType(Class c) {
 		if (!DictionaryFile.class.isAssignableFrom(c)) {
             throw new JWNLRuntimeException("DICTIONARY_EXCEPTION_003", c);
         }
@@ -152,7 +152,7 @@ public class FileManagerImpl implements FileManager {
      * @return - string
      * @throws IOException
 	 */
-	private String readLineWord(RandomAccessDictionaryFile file) throws IOException {
+	protected String readLineWord(RandomAccessDictionaryFile file) throws IOException {
 		StringBuffer input = new StringBuffer();
 		int c;
 		while (((c = file.read()) != -1) && c != '\n' && c != '\r' && c != ' ') {
