@@ -1,4 +1,5 @@
 /**
+/**
  * Java WordNet Library (JWNL)
  * See the documentation for copyright information.
  */
@@ -12,6 +13,7 @@ import net.didion.jwnl.data.list.PointerTargetTreeNode;
 import net.didion.jwnl.data.list.PointerTargetTreeNodeList;
 
 import java.util.Iterator;
+import java.util.ArrayList;
 
 /**
  * This class constains static methods for performing various pointer operations. A pointer from one synset/word to
@@ -512,33 +514,39 @@ public final class PointerUtils {
 		return treeList;
 	}
 
-	private PointerTargetTreeNodeList makePointerTargetTreeList(Synset synset, PointerType[] searchTypes,
+    //AA: to control cycles in sense-clustered wordnets by Rion Snow
+    private ArrayList<Synset> makePointerTargetTreeListStack = new ArrayList<Synset>();
+    private PointerTargetTreeNodeList makePointerTargetTreeList(Synset synset, PointerType[] searchTypes,
 	                                                            PointerType labelType, int depth,
 	                                                            boolean allowRedundancies,
 	                                                            PointerTargetTreeNode parent) throws JWNLException {
 	    depth--;
-		PointerTargetTreeNodeList list = new PointerTargetTreeNodeList();
-		for (int i = 0; i < searchTypes.length; i++) {
-			PointerType type = searchTypes[i];
-			PointerTargetNodeList targets = new PointerTargetNodeList(synset.getTargets(type));
-			if (targets.size() > 0) {
-				for (Iterator itr = targets.iterator(); itr.hasNext();) {
-                    PointerTargetNode ptr = (PointerTargetNode)itr.next();
-                    ptr.getSynset();
-                    PointerTargetTreeNode node =
-					    new PointerTargetTreeNode(ptr.getPointerTarget(),
-					                              labelType == null ? type : labelType, parent);
-					if (allowRedundancies || !list.contains(node)) {
-						if (depth != 0) {
-							node.setChildTreeList(makePointerTargetTreeList(node.getSynset(), searchTypes, labelType,
-							                                                depth, allowRedundancies, node));
-						}
-          				list.add(node);
-					}
-				}
-			}
-		}
-		return list;
+        PointerTargetTreeNodeList list = new PointerTargetTreeNodeList();
+        if (!makePointerTargetTreeListStack.contains(synset)) {
+            makePointerTargetTreeListStack.add(0, synset);
+            for (int i = 0; i < searchTypes.length; i++) {
+                PointerType type = searchTypes[i];
+                PointerTargetNodeList targets = new PointerTargetNodeList(synset.getTargets(type));
+                if (targets.size() > 0) {
+                    for (Iterator itr = targets.iterator(); itr.hasNext();) {
+                        PointerTargetNode ptr = (PointerTargetNode)itr.next();
+                        ptr.getSynset();
+                        PointerTargetTreeNode node =
+                            new PointerTargetTreeNode(ptr.getPointerTarget(),
+                                                      labelType == null ? type : labelType, parent);
+                        if (allowRedundancies || !list.contains(node)) {
+                            if (depth != 0) {
+                                node.setChildTreeList(makePointerTargetTreeList(node.getSynset(), searchTypes, labelType,
+                                                                                depth, allowRedundancies, node));
+                            }
+                            list.add(node);
+                        }
+                    }
+                }
+            }
+            makePointerTargetTreeListStack.remove(0);
+        }
+        return list;
 	}
 
 	/**
@@ -642,24 +650,26 @@ public final class PointerUtils {
 	                                                       int pointerDepth, int ancestorDepth,
 	                                                       boolean allowRedundancies) throws JWNLException {
 		ancestorDepth--;
-		PointerTargetTreeNodeList inherited = new PointerTargetTreeNodeList();
-		for (Iterator itr = list.iterator(); itr.hasNext();) {
-			PointerTargetTreeNode node = (PointerTargetTreeNode) itr.next();
-			if (allowRedundancies || !inherited.contains(node)) {
-				if (ancestorDepth == 0) {
-					inherited.add(node.getPointerTarget(),
-					              null,
-					              makePointerTargetTreeList(node.getSynset(), searchTypes, labelType, pointerDepth, allowRedundancies),
-					              PointerType.HYPERNYM);
-				} else {
-					inherited.add(node.getPointerTarget(),
-					              makeInheritedTreeList(node.getChildTreeList(), searchTypes, labelType,
-					                                    pointerDepth, ancestorDepth, allowRedundancies),
-					              makePointerTargetTreeList(node.getSynset(), searchTypes, labelType, pointerDepth, allowRedundancies),
-					              PointerType.HYPERNYM);
-				}
-			}
-		}
-		return inherited;
+        PointerTargetTreeNodeList inherited = new PointerTargetTreeNodeList();
+        if (null != list) {//AA: cycle with "period"...
+            for (Iterator itr = list.iterator(); itr.hasNext();) {
+                PointerTargetTreeNode node = (PointerTargetTreeNode) itr.next();
+                if (allowRedundancies || !inherited.contains(node)) {
+                    if (ancestorDepth == 0) {
+                        inherited.add(node.getPointerTarget(),
+                                      null,
+                                      makePointerTargetTreeList(node.getSynset(), searchTypes, labelType, pointerDepth, allowRedundancies),
+                                      PointerType.HYPERNYM);
+                    } else {
+                        inherited.add(node.getPointerTarget(),
+                                      makeInheritedTreeList(node.getChildTreeList(), searchTypes, labelType,
+                                                            pointerDepth, ancestorDepth, allowRedundancies),
+                                      makePointerTargetTreeList(node.getSynset(), searchTypes, labelType, pointerDepth, allowRedundancies),
+                                      PointerType.HYPERNYM);
+                    }
+                }
+            }
+        }
+        return inherited;
 	}
 }
