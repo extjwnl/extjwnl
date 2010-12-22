@@ -24,7 +24,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
 	public static final String READ_WRITE = "rw";
 
 	/** The random-access file. */
-	private RandomAccessFile _file = null;
+	protected RandomAccessFile _file = null;
 	/** The file permissions to use when opening a file. */
 	protected String _permissions;
 
