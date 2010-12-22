@@ -52,13 +52,8 @@ public class IndexWord implements DictionaryElement {
 		return getLemma().hashCode() ^ getPOS().hashCode();
 	}
 
-	private transient String _cachedToString = null;
-
 	public String toString() {
-		if (_cachedToString == null) {
-			_cachedToString = JWNL.resolveMessage("DATA_TOSTRING_002", new Object[]{getLemma(), getPOS()});
-		}
-		return _cachedToString;
+		return JWNL.resolveMessage("DATA_TOSTRING_002", new Object[]{getLemma(), getPOS()});
 	}
 
 	// Accessors	//
