@@ -7,8 +7,13 @@ package net.didion.jwnl.util;
  * and of all it's member objects).
  */
 public interface DeepCloneable extends Cloneable {
-	/** Create a shallow clone of the object */
-	public Object clone() throws CloneNotSupportedException;
-	/** Create a deep clone of the object */
-	public Object deepClone() throws UnsupportedOperationException;
+    /**
+     * Create a shallow clone of the object
+     */
+    public Object clone() throws CloneNotSupportedException;
+
+    /**
+     * Create a deep clone of the object
+     */
+    public Object deepClone() throws UnsupportedOperationException;
 }

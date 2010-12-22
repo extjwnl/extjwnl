@@ -5,29 +5,34 @@ import net.didion.jwnl.dictionary.file.DictionaryFileType;
 import net.didion.jwnl.dictionary.file.RandomAccessDictionaryFile;
 
 public abstract class AbstractPrincetonRandomAccessDictionaryFile extends AbstractPrincetonDictionaryFile
-																                                  implements RandomAccessDictionaryFile {
-	/** Used for caching the previously accessed file offset. */
-	private long _previousOffset;
-	/** Used for caching the offset of the line following the line at
-	 *  <code>previousOffset</code>. */
-	private long _nextOffset;
+        implements RandomAccessDictionaryFile {
+    /**
+     * Used for caching the previously accessed file offset.
+     */
+    private long _previousOffset;
+    /**
+     * Used for caching the offset of the line following the line at
+     * <code>previousOffset</code>.
+     */
+    private long _nextOffset;
 
-	public AbstractPrincetonRandomAccessDictionaryFile() {}
+    public AbstractPrincetonRandomAccessDictionaryFile() {
+    }
 
-	protected AbstractPrincetonRandomAccessDictionaryFile(String path, POS pos, DictionaryFileType fileType) {
-		super(path, pos, fileType);
-	}
+    protected AbstractPrincetonRandomAccessDictionaryFile(String path, POS pos, DictionaryFileType fileType) {
+        super(path, pos, fileType);
+    }
 
-	public void setNextLineOffset(long previousOffset, long nextOffset) {
-		_previousOffset = previousOffset;
-		_nextOffset = nextOffset;
-	}
+    public void setNextLineOffset(long previousOffset, long nextOffset) {
+        _previousOffset = previousOffset;
+        _nextOffset = nextOffset;
+    }
 
-	public boolean isPreviousLineOffset(long offset) {
-		return _previousOffset == offset;
-	}
+    public boolean isPreviousLineOffset(long offset) {
+        return _previousOffset == offset;
+    }
 
-	public long getNextLineOffset() {
-		return _nextOffset;
-	}
+    public long getNextLineOffset() {
+        return _nextOffset;
+    }
 }

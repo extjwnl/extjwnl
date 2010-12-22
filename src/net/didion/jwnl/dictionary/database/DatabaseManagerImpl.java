@@ -6,30 +6,30 @@ import net.didion.jwnl.util.factory.Createable;
 import net.didion.jwnl.util.factory.Param;
 
 import java.sql.SQLException;
-import java.util.Map;
-import java.util.Random;
 import java.util.Date;
 import java.util.HashMap;
-
-import javax.sql.DataSource;
+import java.util.Map;
+import java.util.Random;
 
 public class DatabaseManagerImpl implements DatabaseManager, Createable {
     public static final String DRIVER = "driver";
     public static final String URL = "url";
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
-	public static final String JNDI = "jndi";
+    public static final String JNDI = "jndi";
 
     protected static final String LEMMA_FOR_INDEX_WORD_ID_SQL =
             "SELECT iw.lemma " +
-            "FROM IndexWord iw " +
-            "WHERE iw.pos = ? AND iw.index_word_id = ?";
+                    "FROM IndexWord iw " +
+                    "WHERE iw.pos = ? AND iw.index_word_id = ?";
 
-    /** SQL query for getting all synsets for an index word. */
+    /**
+     * SQL query for getting all synsets for an index word.
+     */
     protected static final String SYNSET_IDS_FOR_INDEX_WORD_SQL =
             "SELECT syn.file_offset, iws.synset_id, syn.synset_id "
-            + "FROM IndexWordSynset iws, IndexWord iw, Synset syn "
-            + "WHERE iws.index_word_id = iw.index_word_id AND syn.synset_id = iws.synset_id AND iw.pos = ?  AND iw.lemma = ?";
+                    + "FROM IndexWordSynset iws, IndexWord iw, Synset syn "
+                    + "WHERE iws.index_word_id = iw.index_word_id AND syn.synset_id = iws.synset_id AND iw.pos = ?  AND iw.lemma = ?";
 
     protected static final String COUNT_INDEX_WORDS_SQL =
             "SELECT MIN(index_word_id), MAX(index_word_id) FROM indexword WHERE pos = ?";
@@ -45,18 +45,18 @@ public class DatabaseManagerImpl implements DatabaseManager, Createable {
 
     protected static final String SYNSET_WORD_SQL =
             "SELECT sw.word, sw.word_index " +
-            "FROM Synset s, SynsetWord sw " +
-            "WHERE s.synset_id = sw.synset_id AND s.pos = ? AND s.file_offset = ?";
+                    "FROM Synset s, SynsetWord sw " +
+                    "WHERE s.synset_id = sw.synset_id AND s.pos = ? AND s.file_offset = ?";
 
     protected static final String SYNSET_POINTER_SQL =
             "SELECT sp.pointer_type, sp.target_offset, sp.target_pos, sp.source_index, sp.target_index " +
-            "FROM Synset s, SynsetPointer sp " +
-            "WHERE s.synset_id = sp.synset_id AND s.pos = ? AND s.file_offset = ?";
+                    "FROM Synset s, SynsetPointer sp " +
+                    "WHERE s.synset_id = sp.synset_id AND s.pos = ? AND s.file_offset = ?";
 
     protected static final String SYNSET_VERB_FRAME_SQL =
             "SELECT svf.frame_number, svf.word_index " +
-            "FROM Synset s, SynsetVerbFrame svf " +
-            "WHERE s.synset_id = svf.synset_id AND s.pos = ? AND s.file_offset = ?";
+                    "FROM Synset s, SynsetVerbFrame svf " +
+                    "WHERE s.synset_id = svf.synset_id AND s.pos = ? AND s.file_offset = ?";
 
     protected static final String ALL_SYNSETS_SQL =
             "SELECT offset FROM Synset WHERE pos = ?";
@@ -81,12 +81,12 @@ public class DatabaseManagerImpl implements DatabaseManager, Createable {
 
     public Object create(Map params) throws JWNLException {
         String driverClassName = params.containsKey(DRIVER) ? ((Param) params.get(DRIVER)).getValue() : null;
-        String url = params.containsKey(URL) ?((Param) params.get(URL)).getValue() : null;
+        String url = params.containsKey(URL) ? ((Param) params.get(URL)).getValue() : null;
         String userName = params.containsKey(USERNAME) ? ((Param) params.get(USERNAME)).getValue() : null;
         String password = params.containsKey(PASSWORD) ? ((Param) params.get(PASSWORD)).getValue() : null;
         String jndi = params.containsKey(JNDI) ? ((Param) params.get(JNDI)).getValue() : null;
         if (null != jndi && jndi.trim().length() > 0) {
-        	return new DatabaseManagerImpl(new ConnectionManager(jndi.trim()));
+            return new DatabaseManagerImpl(new ConnectionManager(jndi.trim()));
         }
         return new DatabaseManagerImpl(new ConnectionManager(driverClassName, url, userName, password));
     }

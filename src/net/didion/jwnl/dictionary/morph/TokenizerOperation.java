@@ -1,9 +1,9 @@
 package net.didion.jwnl.dictionary.morph;
 
-import net.didion.jwnl.data.POS;
 import net.didion.jwnl.JWNLException;
-import net.didion.jwnl.util.factory.ParamList;
+import net.didion.jwnl.data.POS;
 import net.didion.jwnl.util.factory.Param;
+import net.didion.jwnl.util.factory.ParamList;
 
 import java.util.Arrays;
 import java.util.BitSet;
@@ -61,7 +61,7 @@ public class TokenizerOperation extends AbstractDelegatingOperation {
             addDelegate(TOKEN_OPERATIONS, new Operation[]{new LookupIndexWordOperation()});
         }
         if (!hasDelegate(PHRASE_OPERATIONS)) {
-            addDelegate(PHRASE_OPERATIONS, new Operation[] {new LookupIndexWordOperation()});
+            addDelegate(PHRASE_OPERATIONS, new Operation[]{new LookupIndexWordOperation()});
         }
 
         for (int i = 0; i < tokens.length; i++) {

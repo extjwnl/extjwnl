@@ -1,12 +1,7 @@
 package net.didion.jwnl.dictionary;
 
 import net.didion.jwnl.JWNLException;
-import net.didion.jwnl.data.DatabaseDictionaryElementFactory;
-import net.didion.jwnl.data.DictionaryElement;
-import net.didion.jwnl.data.Exc;
-import net.didion.jwnl.data.IndexWord;
-import net.didion.jwnl.data.POS;
-import net.didion.jwnl.data.Synset;
+import net.didion.jwnl.data.*;
 import net.didion.jwnl.dictionary.database.DatabaseManager;
 import net.didion.jwnl.dictionary.database.Query;
 import net.didion.jwnl.util.factory.Param;
@@ -267,18 +262,18 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
             return getException(getPOS(), derivation);
         }
     }
-    
+
     /**
-	 * Not implemented in DB yet. 
-	 */
-	public int getUsageCount(long offset, String lemma) {
-		return 0;
-	}
-	
-	/**
-	 * Not implemented in DB yet. 
-	 */
-	public String getSenseKey(long offset, String lemma) {
-		return null; 
-	}
+     * Not implemented in DB yet.
+     */
+    public int getUsageCount(long offset, String lemma) {
+        return 0;
+    }
+
+    /**
+     * Not implemented in DB yet.
+     */
+    public String getSenseKey(long offset, String lemma) {
+        return null;
+    }
 }

@@ -14,17 +14,17 @@ import net.didion.jwnl.data.list.PointerTargetNodeList;
  * common parent index.
  */
 public class SymmetricRelationship extends Relationship {
-	public SymmetricRelationship(
-	    PointerType type, PointerTargetNodeList nodes, Synset sourceSynset, Synset targetSynset) {
+    public SymmetricRelationship(
+            PointerType type, PointerTargetNodeList nodes, Synset sourceSynset, Synset targetSynset) {
 
-		super(type, nodes, sourceSynset, targetSynset);
-	}
+        super(type, nodes, sourceSynset, targetSynset);
+    }
 
-	public Relationship reverse() {
-		PointerTargetNodeList list = ((PointerTargetNodeList)getNodeList().deepClone()).reverse();
-		for (int i = 0; i < list.size(); i++) {
-			((PointerTargetNode)list.get(i)).setType(getType().getSymmetricType());
-		}
-		return new SymmetricRelationship(getType(), list, getSourceSynset(), getTargetSynset());
-	}
+    public Relationship reverse() {
+        PointerTargetNodeList list = ((PointerTargetNodeList) getNodeList().deepClone()).reverse();
+        for (int i = 0; i < list.size(); i++) {
+            ((PointerTargetNode) list.get(i)).setType(getType().getSymmetricType());
+        }
+        return new SymmetricRelationship(getType(), list, getSourceSynset(), getTargetSynset());
+    }
 }

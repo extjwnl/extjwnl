@@ -7,11 +7,15 @@ import java.io.Serializable;
  * <code>Synset</code>s, and <code>Exc</code>eptions) must implement this interface.
  */
 public interface DictionaryElement extends Serializable {
-    
-	/** Get a key that can be used to index this element. */
-	public Object getKey();
-	
-    
-    /** Get the element's type. */
-	public DictionaryElementType getType();
+
+    /**
+     * Get a key that can be used to index this element.
+     */
+    public Object getKey();
+
+
+    /**
+     * Get the element's type.
+     */
+    public DictionaryElementType getType();
 }

@@ -8,34 +8,34 @@ import java.util.Map;
  * capacity, the least recently used elements will be removed.
  */
 public class LRUCache extends LinkedHashMap implements Cache {
-	private int _capacity;
+    private int _capacity;
 
-	/**
-	 * @param capacity the maximum number of elements that can be contained in the cache.
-	 */
-	public LRUCache(int capacity) {
-		super(capacity);
-		setCapacity(capacity);
-	}
+    /**
+     * @param capacity the maximum number of elements that can be contained in the cache.
+     */
+    public LRUCache(int capacity) {
+        super(capacity);
+        setCapacity(capacity);
+    }
 
-	public boolean isFull() {
-		return size() >= getCapacity();
-	}
+    public boolean isFull() {
+        return size() >= getCapacity();
+    }
 
-	protected boolean removeEldestEntry(Map.Entry eldest) {
-		return size() > getCapacity();
-	}
+    protected boolean removeEldestEntry(Map.Entry eldest) {
+        return size() > getCapacity();
+    }
 
-	public int setCapacity(int capacity) {
-		_capacity = capacity;
-		return _capacity;
-	}
+    public int setCapacity(int capacity) {
+        _capacity = capacity;
+        return _capacity;
+    }
 
-	public int getCapacity() {
-		return _capacity;
-	}
+    public int getCapacity() {
+        return _capacity;
+    }
 
-	public int getSize() {
-		return size();
-	}
+    public int getSize() {
+        return size();
+    }
 }

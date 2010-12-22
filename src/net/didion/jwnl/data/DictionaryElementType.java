@@ -7,76 +7,79 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * WordNet contains different file types, index, synset data, and exception files. 
- * This class defines what the current dictionary is. 
- * @author brett
+ * WordNet contains different file types, index, synset data, and exception files.
+ * This class defines what the current dictionary is.
  *
+ * @author brett
  */
 public class DictionaryElementType {
-    
+
     /**
-     * Property to define an index file. 
+     * Property to define an index file.
      */
-	public static final DictionaryElementType INDEX_WORD = new DictionaryElementType("INDEX_WORD");
-	
+    public static final DictionaryElementType INDEX_WORD = new DictionaryElementType("INDEX_WORD");
+
     /**
-     * Property to define a synset file. 
+     * Property to define a synset file.
      */
     public static final DictionaryElementType SYNSET = new DictionaryElementType("SYNSET");
-	
+
     /**
-     * Property that defines an exception file. 
+     * Property that defines an exception file.
      */
     public static final DictionaryElementType EXCEPTION = new DictionaryElementType("EXCEPTION");
 
     /**
-     * The name of the dictionary. 
+     * The name of the dictionary.
      */
-	private final String _name;
-    
+    private final String _name;
+
     /**
-     * A list of the different dictionary types. 
+     * A list of the different dictionary types.
      */
-	private static final List ALL_TYPES = Collections.unmodifiableList(
-            Arrays.asList(new  DictionaryElementType[] { INDEX_WORD, SYNSET, EXCEPTION }));
+    private static final List ALL_TYPES = Collections.unmodifiableList(
+            Arrays.asList(new DictionaryElementType[]{INDEX_WORD, SYNSET, EXCEPTION}));
 
 
     /**
-     * Gets all the dictionary types. 
+     * Gets all the dictionary types.
+     *
      * @return
      */
-	public static List getAllDictionaryElementTypes() {
-		return ALL_TYPES;
-	}
+    public static List getAllDictionaryElementTypes() {
+        return ALL_TYPES;
+    }
 
 
     /**
-     * Create a new DictionaryElementType. 
+     * Create a new DictionaryElementType.
+     *
      * @param name
      */
-	private DictionaryElementType(String name) {
-		_name = name;
-	}
+    private DictionaryElementType(String name) {
+        _name = name;
+    }
 
     /**
      * {@inheritDoc}
      */
-	public String toString() {
-		return JWNL.resolveMessage("DATA_TOSTRING_016", getName());
-	}
+    public String toString() {
+        return JWNL.resolveMessage("DATA_TOSTRING_016", getName());
+    }
 
     /**
-     * Gets the name of this DictionaryElementType. 
+     * Gets the name of this DictionaryElementType.
+     *
      * @return
      */
-	public String getName() {
-		return _name;
-	}
+    public String getName() {
+        return _name;
+    }
 
     /**
      * {@inheritDoc}
      */
-	public int hashCode() {
-		return _name.hashCode();
-	}
+    public int hashCode() {
+        return _name.hashCode();
+    }
 }

@@ -12,45 +12,57 @@ import java.io.IOException;
  * naming scheme, the verb index file is called "verb.idx").
  */
 public abstract class AbstractDictionaryFile implements DictionaryFile {
-	private POS _pos;
-	/**
-	 * The type of the file. For example, the default implementation defines the
-	 * types INDEX, DATA, and EXCEPTION.
-	 */
-	private DictionaryFileType _fileType;
-	private File _file;
+    private POS _pos;
+    /**
+     * The type of the file. For example, the default implementation defines the
+     * types INDEX, DATA, and EXCEPTION.
+     */
+    private DictionaryFileType _fileType;
+    private File _file;
 
-	public AbstractDictionaryFile() {}
+    public AbstractDictionaryFile() {
+    }
 
-	protected AbstractDictionaryFile(String path, POS pos, DictionaryFileType fileType) {
-		_pos = pos;
-		_fileType = fileType;
-		_file = new File(path, makeFilename());
-	}
+    protected AbstractDictionaryFile(String path, POS pos, DictionaryFileType fileType) {
+        _pos = pos;
+        _fileType = fileType;
+        _file = new File(path, makeFilename());
+    }
 
-	/** Build a filename from the part-of-speech and the file type. */
-	protected abstract String makeFilename();
+    /**
+     * Build a filename from the part-of-speech and the file type.
+     */
+    protected abstract String makeFilename();
 
-	/** Open the file at path <code>path</code> */
-	protected abstract void openFile(File file) throws IOException;
+    /**
+     * Open the file at path <code>path</code>
+     */
+    protected abstract void openFile(File file) throws IOException;
 
-	/** The POS associated with this file.*/
-	public POS getPOS() {
-		return _pos;
-	}
+    /**
+     * The POS associated with this file.
+     */
+    public POS getPOS() {
+        return _pos;
+    }
 
-	public File getFile() {
-		return _file;
-	}
+    public File getFile() {
+        return _file;
+    }
 
-	/** The file type associated with this file.*/
-	public DictionaryFileType getFileType() {
-		return _fileType;
-	}
+    /**
+     * The file type associated with this file.
+     */
+    public DictionaryFileType getFileType() {
+        return _fileType;
+    }
 
-	/** Open the file. */
-	public void	open() throws IOException {
-		if (!isOpen())
-			openFile(_file);
-	}
+    /**
+     * Open the file.
+     */
+    public void open() throws IOException {
+        if (!isOpen()) {
+            openFile(_file);
+        }
+    }
 }

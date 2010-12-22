@@ -10,48 +10,48 @@ import java.util.Map;
  * instance of the superclass. It is required that subclasses implement
  * the install() method which creates an instance of the class from
  * property file parameters (<code>Param</code>s) and installs it.
- * <p>
+ * <p/>
  * For example:
  * <pre>
  * public abstract class Super implements Installable {
  *      private static Super INSTANCE;
  * 		private String str;
- *
+ * <p/>
  * 		protected void setInstance(Super instance) {
  * 			INSTANCE = instance;
- * 		}
- *
+ *         }
+ * <p/>
  * 		public Super getInstance() {
  * 			return INSTANCE;
- * 		}
- *
+ *         }
+ * <p/>
  * 		protected Super() {
- * 		}
- *
+ *         }
+ * <p/>
  * 		protected Super(String str) {
  * 			this.str = str;
- * 		}
- *
+ *         }
+ * <p/>
  * 		// other methods go here
  * }
- *
+ * <p/>
  * public class Sub extends Super {
  * 		public Sub() {
- * 		}
- *
+ *         }
+ * <p/>
  * 		protected Sub(String s) {
  *      	super(s);
- * 		}
- *
+ *         }
+ * <p/>
  * 		public void install(Map params) {
  * 			Param p = params.get("string");
  * 			Sub sub = new Sub(p.getValue());
  * 			setInstance(sub);
- * 		}
- *
+ *         }
+ * <p/>
  * 		// other methods go here
  * }
- *
+ * <p/>
  * public static void main(String[] args) {
  * 		Map params = getParams();
  * 		Sub.class.newInstance().install(params);
@@ -60,5 +60,5 @@ import java.util.Map;
  * A class that implements this interface must also define a no-arg constructor.
  */
 public interface Installable {
-	public void install(Map params) throws JWNLException;
+    public void install(Map params) throws JWNLException;
 }

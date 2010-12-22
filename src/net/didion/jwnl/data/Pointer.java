@@ -70,6 +70,7 @@ public class Pointer implements Serializable {
 
     /**
      * Get the source of this pointer.
+     *
      * @return source of this pointer
      */
     public PointerTarget getSource() {
@@ -78,6 +79,7 @@ public class Pointer implements Serializable {
 
     /**
      * Get the actual target of this pointer.
+     *
      * @return actual target of this pointer
      * @throws JWNLException JWNLException
      */
@@ -97,6 +99,7 @@ public class Pointer implements Serializable {
 
     /**
      * Get the synset that is a) the target of this pointer, or b) the synset that contains the target of this pointer.
+     *
      * @return the synset that is a) the target of this pointer, or b) the synset that contains the target of this pointer.
      * @throws JWNLException JWNLException
      */
@@ -106,6 +109,7 @@ public class Pointer implements Serializable {
 
     /**
      * Get the offset of the target synset.
+     *
      * @return offset of the target synset
      */
     public long getTargetOffset() {
@@ -140,22 +144,31 @@ public class Pointer implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Pointer)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Pointer)) {
+            return false;
+        }
 
         Pointer pointer = (Pointer) o;
 
-        if (_pointerType != null ? !_pointerType.equals(pointer._pointerType) : pointer._pointerType != null)
+        if (_pointerType != null ? !_pointerType.equals(pointer._pointerType) : pointer._pointerType != null) {
             return false;
-        if (_source != null ? !_source.equals(pointer._source) : pointer._source != null) return false;
+        }
+        if (_source != null ? !_source.equals(pointer._source) : pointer._source != null) {
+            return false;
+        }
         if (null == _target) {
-            if (_targetIndex != null ? !_targetIndex.equals(pointer._targetIndex) : pointer._targetIndex != null)
+            if (_targetIndex != null ? !_targetIndex.equals(pointer._targetIndex) : pointer._targetIndex != null) {
                 return false;
+            }
         } else {
             if (!_target.getPOS().equals(pointer.getTargetPOS())
                     || _target.getIndex() != pointer.getTargetIndex()
-                    || _target.getSynset().getOffset() != pointer.getTargetOffset())
+                    || _target.getSynset().getOffset() != pointer.getTargetOffset()) {
                 return false;
+            }
         }
 
         return true;
@@ -196,14 +209,24 @@ public class Pointer implements Serializable {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof TargetIndex)) return false;
+            if (this == o) {
+                return true;
+            }
+            if (!(o instanceof TargetIndex)) {
+                return false;
+            }
 
             TargetIndex that = (TargetIndex) o;
 
-            if (_index != that._index) return false;
-            if (_offset != that._offset) return false;
-            if (_pos != null ? !_pos.equals(that._pos) : that._pos != null) return false;
+            if (_index != that._index) {
+                return false;
+            }
+            if (_offset != that._offset) {
+                return false;
+            }
+            if (_pos != null ? !_pos.equals(that._pos) : that._pos != null) {
+                return false;
+            }
 
             return true;
         }

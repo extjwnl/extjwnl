@@ -11,105 +11,125 @@ import java.io.IOException;
  * An <code>IndexWord</code> is created or retrieved via {@link Dictionary#lookupIndexWord lookupIndexWord}.
  */
 public class IndexWord implements DictionaryElement {
-	static final long serialVersionUID = -2136983562978852712L;
-	/** This word's part-of-speech */
-	private POS _pos;
-	/** The string representation of this IndexWord */
-	private String _lemma;
-	/** senses are initially stored as offsets, and paged in on demand.*/
-	private long[] _synsetOffsets;
-	/** This is null until getSenses has been called. */
-	private transient Synset[] _synsets;
-	/** True when all synsets have been loaded */
-	private transient boolean _synsetsLoaded = false;
+    static final long serialVersionUID = -2136983562978852712L;
+    /**
+     * This word's part-of-speech
+     */
+    private POS _pos;
+    /**
+     * The string representation of this IndexWord
+     */
+    private String _lemma;
+    /**
+     * senses are initially stored as offsets, and paged in on demand.
+     */
+    private long[] _synsetOffsets;
+    /**
+     * This is null until getSenses has been called.
+     */
+    private transient Synset[] _synsets;
+    /**
+     * True when all synsets have been loaded
+     */
+    private transient boolean _synsetsLoaded = false;
 
-	public IndexWord(String lemma, POS pos, long[] synsetOffsets) {
-		_lemma = lemma;
-		_pos = pos;
-		_synsetOffsets = synsetOffsets;
-		_synsets = new Synset[synsetOffsets.length];
-	}
+    public IndexWord(String lemma, POS pos, long[] synsetOffsets) {
+        _lemma = lemma;
+        _pos = pos;
+        _synsetOffsets = synsetOffsets;
+        _synsets = new Synset[synsetOffsets.length];
+    }
 
-	public DictionaryElementType getType() {
-		return DictionaryElementType.INDEX_WORD;
-	}
+    public DictionaryElementType getType() {
+        return DictionaryElementType.INDEX_WORD;
+    }
 
-	// Object methods	//
+    // Object methods	//
 
     /**
-     * Returns true if the lemma and the part of speech both match. 
+     * Returns true if the lemma and the part of speech both match.
      */
-	public boolean equals(Object object) {
-		return (object instanceof IndexWord)
-		    && ((IndexWord) object).getLemma().equals(getLemma()) && ((IndexWord) object).getPOS().equals(getPOS());
-	}
+    public boolean equals(Object object) {
+        return (object instanceof IndexWord)
+                && ((IndexWord) object).getLemma().equals(getLemma()) && ((IndexWord) object).getPOS().equals(getPOS());
+    }
 
-	public int hashCode() {
-		return getLemma().hashCode() ^ getPOS().hashCode();
-	}
+    public int hashCode() {
+        return getLemma().hashCode() ^ getPOS().hashCode();
+    }
 
-	public String toString() {
-		return JWNL.resolveMessage("DATA_TOSTRING_002", new Object[]{getLemma(), getPOS()});
-	}
+    public String toString() {
+        return JWNL.resolveMessage("DATA_TOSTRING_002", new Object[]{getLemma(), getPOS()});
+    }
 
-	// Accessors	//
+    // Accessors	//
 
-	/** Get the word's part-of-speech. */
-	public POS getPOS() {
-		return _pos;
-	}
+    /**
+     * Get the word's part-of-speech.
+     */
+    public POS getPOS() {
+        return _pos;
+    }
 
-	/**
-	 * Return the word's <it>lemma</it>.  Its lemma is its orthographic representation, for
-	 * example <code>"dog"</code> or <code>"get up"</code>.
-	 */
-	public String getLemma() {
-		return _lemma;
-	}
+    /**
+     * Return the word's <it>lemma</it>.  Its lemma is its orthographic representation, for
+     * example <code>"dog"</code> or <code>"get up"</code>.
+     */
+    public String getLemma() {
+        return _lemma;
+    }
 
-	public long[] getSynsetOffsets() {
-		return _synsetOffsets;
-	}
+    public long[] getSynsetOffsets() {
+        return _synsetOffsets;
+    }
 
     /**
      * Gets the lemma of this word.
+     *
      * @return lemma
      */
-	public Object getKey() {
-		return getLemma();
-	}
+    public Object getKey() {
+        return getLemma();
+    }
 
-	/** Get the word's sense count. */
-	public int getSenseCount() {
-		return _synsetOffsets.length;
-	}
+    /**
+     * Get the word's sense count.
+     */
+    public int getSenseCount() {
+        return _synsetOffsets.length;
+    }
 
-	/** Get an array of all the senses of this word.*/
-	public Synset[] getSenses() throws JWNLException {
-		if (!_synsetsLoaded) {
-			for (int i = 0; i < getSynsetOffsets().length; ++i)
-				loadSynset(i);
-			_synsetsLoaded = true;
-		}
-		return _synsets;
-	}
+    /**
+     * Get an array of all the senses of this word.
+     */
+    public Synset[] getSenses() throws JWNLException {
+        if (!_synsetsLoaded) {
+            for (int i = 0; i < getSynsetOffsets().length; ++i) {
+                loadSynset(i);
+            }
+            _synsetsLoaded = true;
+        }
+        return _synsets;
+    }
 
-	/** Get a particular sense of this word. Sense indices start at 1. */
-	public Synset getSense(int index) throws JWNLException {
-		loadSynset(index - 1);
-		return _synsets[index - 1];
-	}
+    /**
+     * Get a particular sense of this word. Sense indices start at 1.
+     */
+    public Synset getSense(int index) throws JWNLException {
+        loadSynset(index - 1);
+        return _synsets[index - 1];
+    }
 
-	private void loadSynset(int i) throws JWNLException {
-		if (_synsets[i] == null) {
+    private void loadSynset(int i) throws JWNLException {
+        if (_synsets[i] == null) {
             _synsets[i] = Dictionary.getInstance().getSynsetAt(_pos, _synsetOffsets[i]);
         }
-	}
+    }
 
-	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
-		in.defaultReadObject();
-		// set POS to reference the static instance defined in the current runtime environment
-		_pos = POS.getPOSForKey(_pos.getKey());
-		_synsets = new Synset[_synsetOffsets.length];
-	}
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        // set POS to reference the static instance defined in the current runtime environment
+        _pos = POS.getPOSForKey(_pos.getKey());
+        _synsets = new Synset[_synsetOffsets.length];
+    }
 }

@@ -10,5 +10,5 @@ import java.util.Map;
  * implements this interface must also define a no-arg constructor.
  */
 public interface Createable {
-	public Object create(Map params) throws JWNLException;
+    public Object create(Map params) throws JWNLException;
 }

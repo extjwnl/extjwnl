@@ -10,11 +10,11 @@ import java.util.BitSet;
  * is created.
  */
 class MutableVerb extends Verb {
-	public MutableVerb(Synset synset, int index, String lemma) {
-		super(synset, index, lemma, new BitSet());
-	}
+    public MutableVerb(Synset synset, int index, String lemma) {
+        super(synset, index, lemma, new BitSet());
+    }
 
-	public void setVerbFrameFlag(int fnum) {
-		getVerbFrameFlags().set(fnum);
-	}
+    public void setVerbFrameFlag(int fnum) {
+        getVerbFrameFlags().set(fnum);
+    }
 }

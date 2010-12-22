@@ -130,10 +130,11 @@ public class Word extends PointerTarget {
         Pointer[] source = getSynset().getPointers();
         List<Pointer> list = new ArrayList<Pointer>(source.length);
         for (Pointer pointer : source) {
-            if (this.equals(pointer.getSource()))
+            if (this.equals(pointer.getSource())) {
                 list.add(pointer);
+            }
         }
-		return list.toArray(new Pointer[list.size()]);
-	}
+        return list.toArray(new Pointer[list.size()]);
+    }
 
 }

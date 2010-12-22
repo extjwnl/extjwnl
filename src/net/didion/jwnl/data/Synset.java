@@ -98,12 +98,15 @@ public class Synset extends PointerTarget implements DictionaryElement {
     public String toString() {
         StringBuilder words = new StringBuilder();
         for (int i = 0; i < getWordsSize(); ++i) {
-            if (i > 0) words.append(", ");
+            if (i > 0) {
+                words.append(", ");
+            }
             words.append(getWord(i).getLemma());
         }
 
-        if (getGloss() != null)
+        if (getGloss() != null) {
             words.append(" -- (").append(getGloss()).append(")");
+        }
 
 
         return JWNL.resolveMessage("DATA_TOSTRING_009", new Object[]{getOffset(), getPOS(), words.toString()});
@@ -281,8 +284,9 @@ public class Synset extends PointerTarget implements DictionaryElement {
      */
     public boolean containsWord(String lemma) {
         for (int i = 0; i < getWordsSize(); i++) {
-            if (getWord(i).getLemma().equals(lemma))
+            if (getWord(i).getLemma().equals(lemma)) {
                 return true;
+            }
         }
         return false;
     }
