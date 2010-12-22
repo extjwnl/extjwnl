@@ -16,7 +16,7 @@ public class IndexWordSet {
     /**
      * Map of IndexWords in this set.
      */
-    private Map _indexWords = new Hashtable(4, (float) 1.0);
+    private Map<POS, IndexWord> _indexWords = new Hashtable<POS, IndexWord>(4, (float) 1.0);
     private String _lemma;
 
     public IndexWordSet(String lemma) {
@@ -24,51 +24,66 @@ public class IndexWordSet {
     }
 
     /**
-     * Add an IndexWord to this set
+     * Adds an IndexWord to this set.
+     *
+     * @param word word to add
      */
     public void add(IndexWord word) {
         _indexWords.put(word.getPOS(), word);
     }
 
     /**
-     * Remove the IndexWord associated with <code>p</code> from this set.
+     * Removes the IndexWords associated with POS <code>p</code> from this set.
+     *
+     * @param p POS
      */
     public void remove(POS p) {
         _indexWords.remove(p);
     }
 
     /**
-     * Get the number of IndexWords in this set
+     * Gets the number of IndexWords in this set.
+     *
+     * @return the number of IndexWords in this set
      */
     public int size() {
         return _indexWords.size();
     }
 
     /**
-     * Get the IndexWord associated with <code>p</code>.
+     * Gets the IndexWord associated with POS <code>p</code>.
+     *
+     * @param p POS
+     * @return the IndexWord associated with POS <code>p</code>.
      */
     public IndexWord getIndexWord(POS p) {
-        return (IndexWord) _indexWords.get(p);
+        return _indexWords.get(p);
     }
 
     /**
-     * Get an array of the IndexWords in this set.
+     * Gets an array of the IndexWords in this set.
+     *
+     * @return an array of the IndexWords in this set
      */
     public IndexWord[] getIndexWordArray() {
         IndexWord[] words = new IndexWord[_indexWords.size()];
-        return (IndexWord[]) _indexWords.values().toArray(words);
+        return _indexWords.values().toArray(words);
     }
 
     /**
-     * Get a collection of the IndexWords in this set.
+     * Gets a collection of the IndexWords in this set.
+     *
+     * @return a collection of the IndexWords in this set
      */
     public Collection getIndexWordCollection() {
         return _indexWords.values();
     }
 
     /**
-     * Get a set of all the parts-of-speech for which there is an
+     * Gets a set of all the parts-of-speech for which there is an
      * IndexWord in this set.
+     *
+     * @return a set of all the parts-of-speech for which there is an IndexWord in this set
      */
     public Set getValidPOSSet() {
         return _indexWords.keySet();
@@ -77,35 +92,36 @@ public class IndexWordSet {
     /**
      * Return true if there is a word with part-of-speech <code>pos</code> in
      * this set.
+     *
+     * @param pos POS
+     * @return true if there is a word with part-of-speech <code>pos</code> in this set.
      */
     public boolean isValidPOS(POS pos) {
         return _indexWords.containsKey(pos);
     }
 
     /**
-     * Find out how many senses the word with part-of-speech <code>pos</code> has.
+     * Finds out how many senses the word with part-of-speech <code>pos</code> has.
+     *
+     * @param pos POS
+     * @return number of senses the word with part-of-speech <code>pos</code> has
      */
     public int getSenseCount(POS pos) {
         return getIndexWord(pos).getSenseCount();
     }
 
-    private transient String _cachedToString = null;
-
     public String toString() {
-        if (_cachedToString == null) {
-            String str;
-            if (size() == 0) {
-                str = JWNL.resolveMessage("DATA_TOSTRING_003");
-            } else {
-                StringBuffer buf = new StringBuffer();
-                for (Object o : getValidPOSSet()) {
-                    buf.append(getIndexWord((POS) o).toString());
-                }
-                str = buf.toString();
+        String str;
+        if (size() == 0) {
+            str = JWNL.resolveMessage("DATA_TOSTRING_003");
+        } else {
+            StringBuffer buf = new StringBuffer();
+            for (Object o : getValidPOSSet()) {
+                buf.append(getIndexWord((POS) o).toString());
             }
-            _cachedToString = JWNL.resolveMessage("DATA_TOSTRING_004", str);
+            str = buf.toString();
         }
-        return _cachedToString;
+        return JWNL.resolveMessage("DATA_TOSTRING_004", str);
     }
 
     public String getLemma() {
