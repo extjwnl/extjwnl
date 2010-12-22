@@ -7,7 +7,6 @@ import net.didion.jwnl.util.TypeCheckingList;
 import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedList;
 
 /**
@@ -37,8 +36,8 @@ public class PointerTargetNodeList extends TypeCheckingList {
 
     public PointerTargetNodeList(PointerTarget[] targets) {
         this();
-        for (int i = 0; i < targets.length; i++) {
-            add(targets[i]);
+        for (PointerTarget target : targets) {
+            add(target);
         }
     }
 
@@ -107,13 +106,14 @@ public class PointerTargetNodeList extends TypeCheckingList {
     }
 
     public Object clone() throws CloneNotSupportedException {
+        super.clone();
         return new PointerTargetNodeList((LinkedList) copyBackingList());
     }
 
-    public Object deepClone() throws UnsupportedOperationException {
+    public Object deepClone() throws CloneNotSupportedException {
         PointerTargetNodeList list = new PointerTargetNodeList();
-        for (Iterator itr = iterator(); itr.hasNext();) {
-            list.add(((PointerTargetNode) itr.next()).clone());
+        for (Object o : this) {
+            list.add(((PointerTargetNode) o).clone());
         }
         return list;
     }

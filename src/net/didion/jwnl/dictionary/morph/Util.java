@@ -30,11 +30,11 @@ public class Util {
 
     public static String[] split(String str) {
         char[] chars = str.toCharArray();
-        List tokens = new ArrayList();
+        List<String> tokens = new ArrayList<String>();
         StringBuffer buf = new StringBuffer();
-        for (int i = 0; i < chars.length; i++) {
-            if ((chars[i] >= 'a' && chars[i] <= 'z') || chars[i] == '\'') {
-                buf.append(chars[i]);
+        for (char aChar : chars) {
+            if ((aChar >= 'a' && aChar <= 'z') || aChar == '\'') {
+                buf.append(aChar);
             } else {
                 if (buf.length() > 0) {
                     tokens.add(buf.toString());
@@ -45,7 +45,7 @@ public class Util {
         if (buf.length() > 0) {
             tokens.add(buf.toString());
         }
-        return (String[]) tokens.toArray(new String[tokens.size()]);
+        return tokens.toArray(new String[tokens.size()]);
     }
 
     private Util() {

@@ -63,7 +63,7 @@ public class FileManagerImpl implements FileManager {
      * {@inheritDoc}
      */
     public Object create(Map params) throws JWNLException {
-        Class fileClass = null;
+        Class fileClass;
         try {
             fileClass = Class.forName(((Param) params.get(FILE_TYPE)).getValue());
         } catch (ClassNotFoundException ex) {
@@ -119,7 +119,6 @@ public class FileManagerImpl implements FileManager {
     private void skipLine(RandomAccessDictionaryFile file) throws IOException {
         int c;
         while (((c = file.read()) != -1) && c != '\n' && c != '\r') {
-            ;
         }
         c = file.read();
         if (c != '\n' && c != '\r') {
@@ -271,7 +270,7 @@ public class FileManagerImpl implements FileManager {
     public long getFirstLinePointer(POS pos, DictionaryFileType fileType) throws IOException {
         long offset = 0;
         RandomAccessDictionaryFile file = (RandomAccessDictionaryFile) getFile(pos, fileType);
-        String line = null;
+        String line;
         for (line = null; line == null || line.trim().length() == 0; line = readLineWord(file)) {
             offset = getNextLinePointer(pos, fileType, offset);
         }

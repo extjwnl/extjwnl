@@ -39,10 +39,9 @@ public class TestDictionaryElementType extends TestCase {
      * Test method for {@link net.didion.jwnl.data.DictionaryElementType#getName()}.
      */
     public void testGetName() {
-        List types = DictionaryElementType.getAllDictionaryElementTypes();
+        List<DictionaryElementType> types = DictionaryElementType.getAllDictionaryElementTypes();
 
-        for (int i = 0; i < types.size(); i++) {
-            DictionaryElementType type = (DictionaryElementType) types.get(i);
+        for (DictionaryElementType type : types) {
             if (!this.types.contains(type.getName())) {
                 fail("Type definitions");
             }

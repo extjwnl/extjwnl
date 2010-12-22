@@ -13,7 +13,7 @@ public abstract class AbstractPrincetonDatabaseDictionaryElementFactory implemen
     public IndexWord createIndexWord(POS pos, String lemma, ResultSet rs) throws SQLException {
         List offsets = new ArrayList();
         while (rs.next()) {
-            offsets.add(new Long(rs.getLong(1)));
+            offsets.add(rs.getLong(1));
         }
         if (offsets.isEmpty()) {
             return null;
@@ -22,7 +22,7 @@ public abstract class AbstractPrincetonDatabaseDictionaryElementFactory implemen
         long[] offsetArray = new long[offsets.size()];
         Iterator itr = offsets.iterator();
         for (int i = 0; itr.hasNext(); i++) {
-            offsetArray[i] = ((Long) itr.next()).longValue();
+            offsetArray[i] = (Long) itr.next();
         }
 
         return new IndexWord(lemma, pos, offsetArray);

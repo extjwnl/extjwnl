@@ -15,7 +15,7 @@ import java.util.*;
 
 /**
  * A <code>Dictionary</code> backed by <code>Map</code>s. Warning: this has huge memory requirements.
- * Make sure to start the interpreter with a large enough free memory pool to accomodate this.
+ * Make sure to start the interpreter with a large enough free memory pool to accommodate this.
  */
 public class MapBackedDictionary extends Dictionary {
     private static final MessageLog _log = new MessageLog(MapBackedDictionary.class);
@@ -63,7 +63,7 @@ public class MapBackedDictionary extends Dictionary {
         MorphologicalProcessor morph = (param == null) ? null : (MorphologicalProcessor) param.create();
 
         param = (Param) params.get(FILE_TYPE);
-        Class dictionaryFileType = null;
+        Class dictionaryFileType;
         try {
             dictionaryFileType = Class.forName(param.getValue());
         } catch (Exception ex) {
@@ -95,17 +95,15 @@ public class MapBackedDictionary extends Dictionary {
                 throw new JWNLException("DICTIONARY_EXCEPTION_019", ex);
             }
         }
-        // Load all the hashtables into memory
+        // Load all the hash tables into memory
         _log.log(MessageLogLevel.INFO, "Loading MapBackedDictionary");
         if (_log.isLevelEnabled(MessageLogLevel.TRACE)) {
             _log.log(MessageLogLevel.TRACE, "Starting Memory: " + Runtime.getRuntime().freeMemory());
         }
 
-        for (Iterator typeItr = DictionaryFileType.getAllDictionaryFileTypes().iterator(); typeItr.hasNext();) {
-            DictionaryFileType fileType = (DictionaryFileType) typeItr.next();
+        for (DictionaryFileType fileType : DictionaryFileType.getAllDictionaryFileTypes()) {
             DictionaryCatalog catalog = files.get(fileType);
-            for (Iterator posItr = POS.getAllPOS().iterator(); posItr.hasNext();) {
-                POS pos = (POS) posItr.next();
+            for (POS pos : POS.getAllPOS()) {
                 _log.log(MessageLogLevel.INFO, "Loading " + pos + " " + fileType);
                 putTable(pos, fileType, loadDictFile(catalog.get(pos)));
                 if (_log.isLevelEnabled(MessageLogLevel.TRACE)) {
@@ -164,7 +162,7 @@ public class MapBackedDictionary extends Dictionary {
     }
 
     public Synset getSynsetAt(POS pos, long offset) {
-        return (Synset) getTable(pos, DictionaryFileType.DATA).get(new Long(offset));
+        return (Synset) getTable(pos, DictionaryFileType.DATA).get(offset);
     }
 
     public Exc getException(POS pos, String derivation) {

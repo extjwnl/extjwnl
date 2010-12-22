@@ -31,7 +31,7 @@ public abstract class NodePrinter {
 
     /**
      * Print the contents of the given node, indenting it <var>indent</var> spaces.
-     * In each recurisive call to print, <var>indent</var> should be incremented by
+     * In each recursive call to print, <var>indent</var> should be incremented by
      * <var>indentIncrement</var>.
      */
     protected abstract void print(PrintStream stream, Node node, int indent, int indentIncrement);
@@ -66,7 +66,7 @@ public abstract class NodePrinter {
 
     /**
      * Print the contents of <var>itr</var> to the default stream. Indent the first line <var>indent</var>
-     * spaces. Each level of nesting will be printed intented <var>indentIncrement</var> spaces more than
+     * spaces. Each level of nesting will be printed intended <var>indentIncrement</var> spaces more than
      * the previous level of nesting.
      */
     public void print(TypeCheckingList.TypeCheckingListIterator itr, int indent, int indentIncrement) {
@@ -75,7 +75,7 @@ public abstract class NodePrinter {
 
     /**
      * Print the contents of <var>itr</var> to the given stream. Indent the first line <var>indent</var>
-     * spaces. Each level of nesting will be printed intented <var>indentIncrement</var> spaces more than
+     * spaces. Each level of nesting will be printed intended <var>indentIncrement</var> spaces more than
      * the previous level of nesting.
      */
     public void print(TypeCheckingList.TypeCheckingListIterator itr, PrintStream stream, int indent, int indentIncrement) {
@@ -141,7 +141,7 @@ public abstract class NodePrinter {
         }
 
         /**
-         * Move to the first postion in the iterator
+         * Move to the first position in the iterator
          */
         public void moveToFirst() {
             moveTo(0);

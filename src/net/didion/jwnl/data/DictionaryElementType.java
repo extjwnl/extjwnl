@@ -37,8 +37,8 @@ public class DictionaryElementType {
     /**
      * A list of the different dictionary types.
      */
-    private static final List ALL_TYPES = Collections.unmodifiableList(
-            Arrays.asList(new DictionaryElementType[]{INDEX_WORD, SYNSET, EXCEPTION}));
+    private static final List<DictionaryElementType> ALL_TYPES = Collections.unmodifiableList(
+            Arrays.asList(INDEX_WORD, SYNSET, EXCEPTION));
 
 
     /**
@@ -46,7 +46,7 @@ public class DictionaryElementType {
      *
      * @return
      */
-    public static List getAllDictionaryElementTypes() {
+    public static List<DictionaryElementType> getAllDictionaryElementTypes() {
         return ALL_TYPES;
     }
 

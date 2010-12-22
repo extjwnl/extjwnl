@@ -52,9 +52,9 @@ public final class JWNL {
         createResourceBundle();
         // set the OS
         String os = System.getProperty(OS_PROPERTY_NAME);
-        for (int i = 0; i < DEFINED_OS_ARRAY.length; i++) {
-            if (DEFINED_OS_ARRAY[i].matches(os)) {
-                _currentOS = DEFINED_OS_ARRAY[i];
+        for (OS definedOS : DEFINED_OS_ARRAY) {
+            if (definedOS.matches(os)) {
+                _currentOS = definedOS;
             }
         }
     }
@@ -101,7 +101,7 @@ public final class JWNL {
         }
 
         // parse the properties file
-        Document doc = null;
+        Document doc;
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             factory.setValidating(false);
@@ -183,7 +183,7 @@ public final class JWNL {
                 if (name == null && value == null) {
                     throw new JWNLException("JWNL_EXCEPTION_008");
                 } else {
-                    Param param = null;
+                    Param param;
                     if (value == null) {
                         param = new ParamList(name.toLowerCase(), getParams(n.getChildNodes()));
                     } else if (name == null) {
@@ -363,7 +363,7 @@ public final class JWNL {
         }
 
         public String toString() {
-            return resolveMessage("JWNL_TOSTRING_002", new Object[]{_publisher, new Double(_number), _locale});
+            return resolveMessage("JWNL_TOSTRING_002", new Object[]{_publisher, _number, _locale});
         }
 
         public int hashCode() {

@@ -24,7 +24,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
 
     protected POS _pos;
     protected Pointer[] _pointers;
-    protected final static Pointer[] _emptyPtrs = new Pointer[0];
+    protected final static Pointer[] _emptyPointers = new Pointer[0];
     /**
      * The offset of this synset in the data file.
      */
@@ -51,7 +51,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
     protected long lexFileNum;
 
     public Synset() {
-        _pointers = _emptyPtrs;
+        _pointers = _emptyPointers;
         _words = _emptyWords;
         _verbFrameFlags = _emptyVerbFrameFlags;
     }
@@ -275,8 +275,8 @@ public class Synset extends PointerTarget implements DictionaryElement {
         _verbFrameFlags = verbFrameFlags;
     }
 
-    public int[] getVerbFrameIndicies() {
-        return VerbFrame.getVerbFrameIndicies(_verbFrameFlags);
+    public int[] getVerbFrameIndices() {
+        return VerbFrame.getVerbFrameIndices(_verbFrameFlags);
     }
 
     /**

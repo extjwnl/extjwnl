@@ -18,8 +18,8 @@ public class Element {
 
     public Element(String className, Param[] params) {
         this(className);
-        for (int i = 0; i < params.length; i++) {
-            addParam(params[i]);
+        for (Param param : params) {
+            addParam(param);
         }
     }
 

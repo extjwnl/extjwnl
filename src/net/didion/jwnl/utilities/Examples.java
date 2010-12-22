@@ -21,7 +21,6 @@ import net.didion.jwnl.data.relationship.RelationshipList;
 import net.didion.jwnl.dictionary.Dictionary;
 
 import java.io.FileInputStream;
-import java.util.Iterator;
 
 /**
  * A class to demonstrate the functionality of the JWNL package.
@@ -61,7 +60,7 @@ public class Examples {
         DROLL = Dictionary.getInstance().lookupIndexWord(POS.ADJECTIVE, "droll");
     }
 
-    public void go() throws JWNLException {
+    public void go() throws JWNLException, CloneNotSupportedException {
         demonstrateMorphologicalAnalysis(MORPH_PHRASE);
         demonstrateListOperation(ACCOMPLISH);
         demonstrateTreeOperation(DOG);
@@ -92,23 +91,23 @@ public class Examples {
         hyponyms.print();
     }
 
-    private void demonstrateAsymmetricRelationshipOperation(IndexWord start, IndexWord end) throws JWNLException {
+    private void demonstrateAsymmetricRelationshipOperation(IndexWord start, IndexWord end) throws JWNLException, CloneNotSupportedException {
         // Try to find a relationship between the first sense of <var>start</var> and the first sense of <var>end</var>
         RelationshipList list = RelationshipFinder.getInstance().findRelationships(start.getSense(1), end.getSense(1), PointerType.HYPERNYM);
         System.out.println("Hypernym relationship between \"" + start.getLemma() + "\" and \"" + end.getLemma() + "\":");
-        for (Iterator itr = list.iterator(); itr.hasNext();) {
-            ((Relationship) itr.next()).getNodeList().print();
+        for (Object aList : list) {
+            ((Relationship) aList).getNodeList().print();
         }
         System.out.println("Common Parent Index: " + ((AsymmetricRelationship) list.get(0)).getCommonParentIndex());
         System.out.println("Depth: " + ((Relationship) list.get(0)).getDepth());
     }
 
-    private void demonstrateSymmetricRelationshipOperation(IndexWord start, IndexWord end) throws JWNLException {
+    private void demonstrateSymmetricRelationshipOperation(IndexWord start, IndexWord end) throws JWNLException, CloneNotSupportedException {
         // find all synonyms that <var>start</var> and <var>end</var> have in common
         RelationshipList list = RelationshipFinder.getInstance().findRelationships(start.getSense(1), end.getSense(1), PointerType.SIMILAR_TO);
         System.out.println("Synonym relationship between \"" + start.getLemma() + "\" and \"" + end.getLemma() + "\":");
-        for (Iterator itr = list.iterator(); itr.hasNext();) {
-            ((Relationship) itr.next()).getNodeList().print();
+        for (Object aList : list) {
+            ((Relationship) aList).getNodeList().print();
         }
         System.out.println("Depth: " + ((Relationship) list.get(0)).getDepth());
     }

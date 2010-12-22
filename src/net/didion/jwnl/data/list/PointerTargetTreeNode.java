@@ -76,9 +76,9 @@ public class PointerTargetTreeNode extends PointerTargetNode {
                     new Object[]{
                             getPointerTarget(),
                             getType(),
-                            new Boolean(!hasParent()),
-                            new Boolean(hasValidChildTreeList()),
-                            new Boolean(hasValidPointerTreeList())
+                            !hasParent(),
+                            hasValidChildTreeList(),
+                            hasValidPointerTreeList()
                     });
         }
         return _cachedToString;
@@ -157,7 +157,8 @@ public class PointerTargetTreeNode extends PointerTargetNode {
         }
     }
 
-    public Object clone() {
+    public Object clone() throws CloneNotSupportedException {
+        super.clone();
         return new PointerTargetTreeNode(getPointerTarget(),
                 getChildTreeList(),
                 getPointerTreeList(),

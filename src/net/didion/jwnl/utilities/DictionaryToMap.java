@@ -29,17 +29,17 @@ import java.util.Map;
 public class DictionaryToMap {
 
     /**
-     * Initalize with the given map destination directory, using the properties file(usually file_properties.xml)
+     * Initialize with the given map destination directory, using the properties file(usually file_properties.xml)
      *
-     * @param destDirectory - destination directory for in-memory map files
-     * @param propFile      - properties file of file-based WordNet
+     * @param destinationDirectory - destination directory for in-memory map files
+     * @param propFile             - properties file of file-based WordNet
      * @throws JWNLException
      * @throws IOException
      */
-    public DictionaryToMap(String destDirectory, String propFile)
+    public DictionaryToMap(String destinationDirectory, String propFile)
             throws JWNLException, IOException {
         JWNL.initialize(new FileInputStream(propFile));
-        _destFiles = new DictionaryCatalogSet(destDirectory, net.didion.jwnl.princeton.file.PrincetonObjectDictionaryFile.class);
+        _destinationFiles = new DictionaryCatalogSet(destinationDirectory, net.didion.jwnl.princeton.file.PrincetonObjectDictionaryFile.class);
     }
 
     /**
@@ -50,7 +50,7 @@ public class DictionaryToMap {
      */
     public void convert()
             throws JWNLException, IOException {
-        _destFiles.open();
+        _destinationFiles.open();
         boolean canClearCache = (Dictionary.getInstance() instanceof AbstractCachingDictionary) && ((AbstractCachingDictionary) Dictionary.getInstance()).isCachingEnabled();
         for (Iterator typeItr = DictionaryFileType.getAllDictionaryFileTypes().iterator(); typeItr.hasNext(); System.gc()) {
             DictionaryFileType fileType = (DictionaryFileType) typeItr.next();
@@ -65,7 +65,7 @@ public class DictionaryToMap {
             }
         }
 
-        _destFiles.close();
+        _destinationFiles.close();
     }
 
     private Iterator getIterator(POS pos, DictionaryFileType fileType)
@@ -85,7 +85,7 @@ public class DictionaryToMap {
 
     private void serialize(POS pos, DictionaryFileType fileType)
             throws JWNLException, IOException {
-        ObjectDictionaryFile file = (ObjectDictionaryFile) _destFiles.getDictionaryFile(pos, fileType);
+        ObjectDictionaryFile file = (ObjectDictionaryFile) _destinationFiles.getDictionaryFile(pos, fileType);
         int count = 0;
         for (Iterator itr = getIterator(pos, fileType); itr.hasNext(); itr.next()) {
             if (++count % 10000 == 0) {
@@ -127,5 +127,5 @@ public class DictionaryToMap {
         }
     }
 
-    private DictionaryCatalogSet _destFiles;
+    private DictionaryCatalogSet _destinationFiles;
 }

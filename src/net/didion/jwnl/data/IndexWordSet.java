@@ -2,7 +2,10 @@ package net.didion.jwnl.data;
 
 import net.didion.jwnl.JWNL;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * A class to simplify the access to a set of <code>IndexWord</code>s, each containing
@@ -90,14 +93,13 @@ public class IndexWordSet {
 
     public String toString() {
         if (_cachedToString == null) {
-            String str = "";
+            String str;
             if (size() == 0) {
                 str = JWNL.resolveMessage("DATA_TOSTRING_003");
             } else {
                 StringBuffer buf = new StringBuffer();
-                Iterator itr = getValidPOSSet().iterator();
-                while (itr.hasNext()) {
-                    buf.append(getIndexWord((POS) itr.next()).toString());
+                for (Object o : getValidPOSSet()) {
+                    buf.append(getIndexWord((POS) o).toString());
                 }
                 str = buf.toString();
             }

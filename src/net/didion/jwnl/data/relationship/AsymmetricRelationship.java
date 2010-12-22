@@ -34,7 +34,7 @@ public class AsymmetricRelationship extends Relationship {
 
     /**
      * Get the depth of the target, from the commonParentIndex, relative to the depth of the source.
-     * If both target and source are eqidistant from the commonParentIndex, this method returns 0;
+     * If both target and source are equidistant from the commonParentIndex, this method returns 0;
      */
     public int getRelativeTargetDepth() {
         if (_cachedRelativeTargetDepth == -1) {
@@ -45,7 +45,7 @@ public class AsymmetricRelationship extends Relationship {
         return _cachedRelativeTargetDepth;
     }
 
-    public Relationship reverse() {
+    public Relationship reverse() throws CloneNotSupportedException {
         PointerTargetNodeList list = ((PointerTargetNodeList) getNodeList().deepClone()).reverse();
         int commonParentIndex = (list.size() - 1) - getCommonParentIndex();
         for (int i = 0; i < list.size(); i++) {

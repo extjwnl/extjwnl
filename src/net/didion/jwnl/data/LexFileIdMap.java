@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * LexFileIdMap maps the names of the lexiographer files to the identifiers
+ * LexFileIdMap maps the names of the lexicographer files to the identifiers
  * found in the data.pos files.
  *
  * @author brett
@@ -16,12 +16,12 @@ public class LexFileIdMap {
     /**
      * A mapping <Long, String> of id's to files.
      */
-    static Map lexIdMap = new HashMap();
+    static Map<Long, String> lexIdMap = new HashMap<Long, String>();
 
     /**
      * A mapping <String, Long> of files to id's.
      */
-    static Map lexNameMap = new HashMap();
+    static Map<String, Long> lexNameMap = new HashMap<String, Long>();
 
     /**
      * Initialization variable for this map.
@@ -37,7 +37,7 @@ public class LexFileIdMap {
      */
     public static String getFileName(long id) {
         checkInit();
-        return (String) lexIdMap.get(new Long(id));
+        return (String) lexIdMap.get(id);
     }
 
     /**
@@ -48,8 +48,7 @@ public class LexFileIdMap {
      */
     public static long getFileId(String fileName) {
         checkInit();
-        Long rval = (Long) (lexNameMap.get(fileName));
-        return rval.longValue();
+        return (Long) (lexNameMap.get(fileName));
     }
 
     /**
@@ -57,7 +56,7 @@ public class LexFileIdMap {
      */
     private static void initMap() {
 
-        List names = new ArrayList();
+        List<String> names = new ArrayList<String>();
         names.add("adj.all");
         names.add("adj.pert");
         names.add("adv.all");
@@ -105,8 +104,8 @@ public class LexFileIdMap {
         names.add("adj.ppl");
 
         for (int i = 0; i < names.size(); i++) {
-            lexIdMap.put(new Long(i), names.get(i));
-            lexNameMap.put(names.get(i), new Long(i));
+            lexIdMap.put((long) i, names.get(i));
+            lexNameMap.put(names.get(i), (long) i);
         }
 
         init = true;

@@ -69,7 +69,9 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
                 } catch (SQLException e) {
                     throw new JWNLException("DICTIONARY_EXCEPTION_023", e);
                 } finally {
-                    query.close();
+                    if (query != null) {
+                        query.close();
+                    }
                 }
             }
         }
@@ -126,10 +128,18 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
             } catch (SQLException e) {
                 throw new JWNLException("DICTIONARY_EXCEPTION_023", e);
             } finally {
-                query.close();
-                wordQuery.close();
-                pointerQuery.close();
-                verbFrameQuery.close();
+                if (query != null) {
+                    query.close();
+                }
+                if (wordQuery != null) {
+                    wordQuery.close();
+                }
+                if (pointerQuery != null) {
+                    pointerQuery.close();
+                }
+                if (verbFrameQuery != null) {
+                    verbFrameQuery.close();
+                }
             }
         }
         return synset;
@@ -156,7 +166,9 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
             } catch (SQLException e) {
                 throw new JWNLException("DICTIONARY_EXCEPTION_023", e);
             } finally {
-                query.close();
+                if (query != null) {
+                    query.close();
+                }
             }
         }
         return exc;
@@ -226,6 +238,7 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
         }
 
         protected void finalize() throws Throwable {
+            super.finalize();
             _lemmas.close();
         }
     }

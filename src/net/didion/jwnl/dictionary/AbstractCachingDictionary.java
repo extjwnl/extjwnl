@@ -6,7 +6,10 @@ import net.didion.jwnl.util.cache.Cache;
 import net.didion.jwnl.util.cache.CacheSet;
 import net.didion.jwnl.util.cache.LRUCache;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Observable;
+import java.util.Observer;
 
 /**
  * Extends <code>Dictionary</code> to provide caching of elements.
@@ -49,8 +52,8 @@ public abstract class AbstractCachingDictionary extends Dictionary {
     }
 
     public void setCacheCapacity(int size) {
-        for (Iterator itr = DictionaryElementType.getAllDictionaryElementTypes().iterator(); itr.hasNext();) {
-            setCacheCapacity((DictionaryElementType) itr.next(), size);
+        for (DictionaryElementType d : DictionaryElementType.getAllDictionaryElementTypes()) {
+            setCacheCapacity(d, size);
         }
     }
 
@@ -59,8 +62,8 @@ public abstract class AbstractCachingDictionary extends Dictionary {
     }
 
     public void clearCache() {
-        for (Iterator itr = DictionaryElementType.getAllDictionaryElementTypes().iterator(); itr.hasNext();) {
-            clearCache((DictionaryElementType) itr.next());
+        for (DictionaryElementType d : DictionaryElementType.getAllDictionaryElementTypes()) {
+            clearCache(d);
         }
     }
 

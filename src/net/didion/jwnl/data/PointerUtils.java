@@ -4,10 +4,9 @@ import net.didion.jwnl.JWNLException;
 import net.didion.jwnl.data.list.*;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 /**
- * This class constains static methods for performing various pointer operations. A pointer from one synset/word to
+ * This class contains static methods for performing various pointer operations. A pointer from one synset/word to
  * another connotes a relationship between those words. The type of the relationship is specified by the type
  * of pointer. See the WordNet documentation for information on pointer types. To avoid confusion with
  * the <code>Relationship</code> class, these relationships will be referred to as links.
@@ -78,8 +77,8 @@ public final class PointerUtils {
      */
     public PointerTargetNodeList getCoordinateTerms(Synset synset) throws JWNLException {
         PointerTargetNodeList list = new PointerTargetNodeList();
-        for (Iterator itr = getDirectHypernyms(synset).iterator(); itr.hasNext();) {
-            list.addAll(getPointerTargets(((PointerTargetNode) itr.next()).getSynset(), PointerType.HYPONYM));
+        for (Object o : getDirectHypernyms(synset)) {
+            list.addAll(getPointerTargets(((PointerTargetNode) o).getSynset(), PointerType.HYPONYM));
         }
         return list;
     }
@@ -189,7 +188,7 @@ public final class PointerUtils {
     /**
      * Get meronyms of <code>synset</code> and of all its ancestors
      */
-    public PointerTargetTree getInteritedMeronyms(Synset synset) throws JWNLException {
+    public PointerTargetTree getInheritedMeronyms(Synset synset) throws JWNLException {
         return getInheritedMeronyms(synset, INFINITY, INFINITY);
     }
 
@@ -429,7 +428,7 @@ public final class PointerUtils {
      * Get the group that this verb belongs to.
      */
     public PointerTargetNodeList getVerbGroup(Synset synset) throws JWNLException {
-        // We need to go through all this hastle because
+        // We need to go through all this hassle because
         // 1. a verb does not always have links to all the verbs in its group
         // 2. two verbs in the same group sometimes have reciprocal links, and we want
         //    to make sure that each verb synset appears in the final list only once
@@ -441,8 +440,8 @@ public final class PointerUtils {
         do {
             index++;
             PointerTargetNode node = (PointerTargetNode) nodes.get(index);
-            for (Iterator itr = getPointerTargets(node.getSynset(), PointerType.VERB_GROUP).iterator(); itr.hasNext();) {
-                PointerTargetNode testNode = (PointerTargetNode) itr.next();
+            for (Object o : getPointerTargets(node.getSynset(), PointerType.VERB_GROUP)) {
+                PointerTargetNode testNode = (PointerTargetNode) o;
                 if (!nodes.contains(testNode)) {
                     nodes.add(testNode);
                     maxIndex++;
@@ -465,7 +464,7 @@ public final class PointerUtils {
     }
 
     /**
-     * Find derrived links of <code>synset</code>
+     * Find derived links of <code>synset</code>
      */
     public PointerTargetNodeList getDerived(Synset synset) throws JWNLException {
         return getPointerTargets(synset, PointerType.DERIVED);
@@ -590,8 +589,8 @@ public final class PointerUtils {
                                                                PointerType labelType, int depth,
                                                                boolean allowRedundancies) throws JWNLException {
         PointerTargetTreeNodeList treeList = new PointerTargetTreeNodeList();
-        for (Iterator itr = list.iterator(); itr.hasNext();) {
-            PointerTargetNode node = (PointerTargetNode) itr.next();
+        for (Object aList : list) {
+            PointerTargetNode node = (PointerTargetNode) aList;
             treeList.add(node.getPointerTarget(),
                     makePointerTargetTreeList(node.getSynset(), searchTypes, labelType, depth, allowRedundancies),
                     labelType);
@@ -610,12 +609,11 @@ public final class PointerUtils {
         PointerTargetTreeNodeList list = new PointerTargetTreeNodeList();
         if (!makePointerTargetTreeListStack.contains(synset)) {
             makePointerTargetTreeListStack.add(0, synset);
-            for (int i = 0; i < searchTypes.length; i++) {
-                PointerType type = searchTypes[i];
+            for (PointerType type : searchTypes) {
                 PointerTargetNodeList targets = new PointerTargetNodeList(synset.getTargets(type));
                 if (targets.size() > 0) {
-                    for (Iterator itr = targets.iterator(); itr.hasNext();) {
-                        PointerTargetNode ptr = (PointerTargetNode) itr.next();
+                    for (Object target : targets) {
+                        PointerTargetNode ptr = (PointerTargetNode) target;
                         ptr.getSynset();
                         PointerTargetTreeNode node =
                                 new PointerTargetTreeNode(ptr.getPointerTarget(),
@@ -744,8 +742,8 @@ public final class PointerUtils {
         ancestorDepth--;
         PointerTargetTreeNodeList inherited = new PointerTargetTreeNodeList();
         if (null != list) {//AA: cycle with "period"...
-            for (Iterator itr = list.iterator(); itr.hasNext();) {
-                PointerTargetTreeNode node = (PointerTargetTreeNode) itr.next();
+            for (Object aList : list) {
+                PointerTargetTreeNode node = (PointerTargetTreeNode) aList;
                 if (allowRedundancies || !inherited.contains(node)) {
                     if (ancestorDepth == 0) {
                         inherited.add(node.getPointerTarget(),

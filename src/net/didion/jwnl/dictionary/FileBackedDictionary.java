@@ -9,7 +9,6 @@ import net.didion.jwnl.util.MessageLogLevel;
 import net.didion.jwnl.util.factory.Param;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -55,11 +54,6 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
     public static final String EXCEPTION_WORD_CACHE_SIZE = "exception_word_cache_size";
 
     /**
-     * A sense map, key is offsetlemma, word is populated with lemma, usage, and sense key.
-     */
-    private Map senseMap;
-
-    /**
      * Construct a Dictionary that retrieves file data from <code>fileManager</code>.
      * A client can use this to create a Dictionary backed by a RemoteFileManager.
      *
@@ -71,7 +65,7 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
 
     /**
      * Construct a Dictionary that retrieves file data from <code>fileManager</code>.
-     * If enableCaching is true, lookup operations will check the relavant cache before
+     * If enableCaching is true, lookup operations will check the relevant cache before
      * doing a lookup and will cache their results after doing a lookup.
      */
     public static void install(FileManager fileManager, MorphologicalProcessor morph,
@@ -100,7 +94,6 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
         super(morph, enableCaching);
         _db = manager;
         _factory = factory;
-        senseMap = new HashMap();
     }
 
     /**
@@ -239,11 +232,9 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
                 synset = _factory.createSynset(pos, line);
                 synset.getWords();
 
-                if (synset != null) {
-                    cacheSynset(key, synset);
-                }
+                cacheSynset(key, synset);
             } catch (IOException e) {
-                throw new JWNLException("DICTIONARY_EXCEPTION_005", new Long(offset), e);
+                throw new JWNLException("DICTIONARY_EXCEPTION_005", offset, e);
             }
         }
         return synset;
@@ -272,14 +263,14 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
         derivation = prepareQueryString(derivation);
 
         Exc exc = null;
-        POSKey key = null;
+        POSKey key;
         if (derivation != null) {
             if (isCachingEnabled()) {
                 key = new POSKey(pos, derivation);
                 exc = getCachedException(key);
             }
             if (exc == null) {
-                long offset = -1;
+                long offset;
                 try {
                     offset = getFileManager().getIndexedLinePointer(
                             pos, DictionaryFileType.EXCEPTION, derivation.replace(' ', '_'));

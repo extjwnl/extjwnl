@@ -17,10 +17,9 @@ public class DictionaryFileType {
     public static final DictionaryFileType DATA = new DictionaryFileType("DATA_KEY", DictionaryElementType.SYNSET);
     public static final DictionaryFileType EXCEPTION = new DictionaryFileType("EXCEPTION_KEY", DictionaryElementType.EXCEPTION);
 
-    private static final List ALL_TYPES = Collections.unmodifiableList(Arrays.asList(
-            new DictionaryFileType[]{INDEX, DATA, EXCEPTION}));
+    private static final List<DictionaryFileType> ALL_TYPES = Collections.unmodifiableList(Arrays.asList(INDEX, DATA, EXCEPTION));
 
-    public static List getAllDictionaryFileTypes() {
+    public static List<DictionaryFileType> getAllDictionaryFileTypes() {
         return ALL_TYPES;
     }
 

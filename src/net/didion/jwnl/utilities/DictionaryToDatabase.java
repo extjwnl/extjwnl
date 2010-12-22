@@ -42,12 +42,12 @@ public class DictionaryToDatabase {
     /**
      * Mapping of database id's to synset offset id's. 1 to 1.
      */
-    private Map idToSynsetOffset;
+    private Map<Integer, long[]> idToSynsetOffset;
 
     /**
      * Mapping of synset offset id's to database id's. 1:1.
      */
-    private Map synsetOffsetToId;
+    private Map<Long, Integer> synsetOffsetToId;
 
 
     /**
@@ -110,8 +110,8 @@ public class DictionaryToDatabase {
      * @param conn - the database connection
      */
     public DictionaryToDatabase(Connection conn) {
-        idToSynsetOffset = new HashMap();
-        synsetOffsetToId = new HashMap();
+        idToSynsetOffset = new HashMap<Integer, long[]>();
+        synsetOffsetToId = new HashMap<Long, Integer>();
         connection = conn;
         ((AbstractCachingDictionary) Dictionary.getInstance()).setCachingEnabled(false);
     }
@@ -190,7 +190,7 @@ public class DictionaryToDatabase {
             iwStmt.setString(2, iw.getLemma());
             iwStmt.setString(3, iw.getPOS().getKey());
             iwStmt.execute();
-            idToSynsetOffset.put(new Integer(id), iw.getSynsetOffsets());
+            idToSynsetOffset.put(id, iw.getSynsetOffsets());
             if (count++ % 1000 == 0) {
                 System.out.println(count);
             }
@@ -217,7 +217,7 @@ public class DictionaryToDatabase {
             }
             Synset synset = (Synset) itr.next();
             int id = nextId();
-            synsetOffsetToId.put(new Long(synset.getOffset()), new Integer(id));
+            synsetOffsetToId.put(synset.getOffset(), id);
             synsetStmt.setInt(1, id);
             synsetStmt.setLong(2, synset.getOffset());
             synsetStmt.setString(3, synset.getPOS().getKey());
@@ -227,23 +227,23 @@ public class DictionaryToDatabase {
             Word words[] = synset.getWords();
             synsetWordStmt.setInt(2, id);
             synsetVerbFrameStmt.setInt(2, id);
-            for (int i = 0; i < words.length; i++) {
+            for (Word word : words) {
                 int wordId = nextId();
 
                 synsetWordStmt.setInt(1, wordId);
-                synsetWordStmt.setString(3, words[i].getLemma());
-                synsetWordStmt.setInt(4, words[i].getIndex());
+                synsetWordStmt.setString(3, word.getLemma());
+                synsetWordStmt.setInt(4, word.getIndex());
 
 
                 synsetWordStmt.execute();
-                if (!(words[i] instanceof Verb)) {
+                if (!(word instanceof Verb)) {
                     continue;
                 }
-                synsetVerbFrameStmt.setInt(4, words[i].getIndex());
-                int flags[] = ((Verb) words[i]).getVerbFrameIndicies();
-                for (int j = 0; j < flags.length; j++) {
+                synsetVerbFrameStmt.setInt(4, word.getIndex());
+                int flags[] = ((Verb) word).getVerbFrameIndices();
+                for (int flag : flags) {
                     synsetVerbFrameStmt.setInt(1, nextId());
-                    synsetVerbFrameStmt.setInt(3, flags[j]);
+                    synsetVerbFrameStmt.setInt(3, flag);
                     synsetVerbFrameStmt.execute();
                 }
 
@@ -268,21 +268,18 @@ public class DictionaryToDatabase {
     /**
      * Store the index word synsets.
      *
-     * @throws SQLException
+     * @throws java.sql.SQLException SQLException
      */
-    private void storeIndexWordSynsets()
-            throws SQLException {
+    private void storeIndexWordSynsets() throws SQLException {
         LOG.log(MessageLogLevel.INFO, "storing index word synsets");
         PreparedStatement iwsStmt = connection.prepareStatement("INSERT INTO IndexWordSynset VALUES(?,?,?)");
-        for (Iterator itr = idToSynsetOffset.entrySet().iterator(); itr.hasNext();) {
-            java.util.Map.Entry entry = (java.util.Map.Entry) itr.next();
-            int iwId = ((Integer) entry.getKey()).intValue();
+        for (Map.Entry<Integer, long[]> entry : idToSynsetOffset.entrySet()) {
+            int iwId = entry.getKey();
             iwsStmt.setInt(2, iwId);
-            long offsets[] = (long[]) entry.getValue();
+            long offsets[] = entry.getValue();
             int i = 0;
             while (i < offsets.length) {
-                Integer offset = (Integer) synsetOffsetToId.get(new Long(offsets[i]));
-                int synsetId = offset.intValue();
+                int synsetId = synsetOffsetToId.get(offsets[i]);
                 iwsStmt.setInt(1, nextId());
                 iwsStmt.setLong(3, synsetId);
                 iwsStmt.execute();
@@ -306,11 +303,10 @@ public class DictionaryToDatabase {
         while (itr.hasNext()) {
             Exc exc = (Exc) itr.next();
             exStmt.setString(4, exc.getLemma());
-            Iterator excItr = exc.getExceptions().iterator();
-            while (excItr.hasNext()) {
+            for (Object o : exc.getExceptions()) {
                 exStmt.setInt(1, nextId());
                 exStmt.setString(2, exc.getPOS().getKey());
-                exStmt.setString(3, (String) excItr.next());
+                exStmt.setString(3, (String) o);
                 exStmt.execute();
             }
         }

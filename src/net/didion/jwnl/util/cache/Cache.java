@@ -7,7 +7,7 @@ package net.didion.jwnl.util.cache;
 public interface Cache {
     /**
      * Store <var>value</var> in the cache, indexed by <var>key</var>.  This operation makes
-     * it likely, although not certain, that a subsquent call to <code>get</code> with the
+     * it likely, although not certain, that a subsequent call to <code>get</code> with the
      * same (<code>equal</code>) key will retrieve the same (<code>==</code>) value.
      * <p/>
      * <P>Multiple calls to <code>put</code> with the same <var>key</var> and <var>value</var>

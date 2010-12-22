@@ -6,7 +6,6 @@ import net.didion.jwnl.util.Resolvable;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -22,20 +21,21 @@ public final class POS implements Serializable {
     public static final POS ADJECTIVE = new POS("ADJECTIVE", "ADJECTIVE_KEY");
     public static final POS ADVERB = new POS("ADVERB", "ADVERB_KEY");
 
-    private static final List ALL_POS =
-            Collections.unmodifiableList(Arrays.asList(new POS[]{NOUN, VERB, ADJECTIVE, ADVERB}));
+    private static final List<POS> ALL_POS = Collections.unmodifiableList(Arrays.asList(NOUN, VERB, ADJECTIVE, ADVERB));
 
-    public static List getAllPOS() {
+    public static List<POS> getAllPOS() {
         return ALL_POS;
     }
 
     /**
      * Return the <code>POS</code> whose key matches <var>label</var>,
      * or null if the label does not match any POS.
+     *
+     * @param label POS label
+     * @return POS
      */
     public static POS getPOSForLabel(String label) {
-        for (Iterator itr = ALL_POS.iterator(); itr.hasNext();) {
-            POS pos = (POS) itr.next();
+        for (POS pos : ALL_POS) {
             if (pos.getLabel().equals(label)) {
                 return pos;
             }
@@ -46,10 +46,12 @@ public final class POS implements Serializable {
     /**
      * Return the <code>POS</code> whose key matches <var>key</var>,
      * or null if the key does not match any POS.
+     *
+     * @param key key for POS
+     * @return POS
      */
     public static POS getPOSForKey(String key) {
-        for (Iterator itr = ALL_POS.iterator(); itr.hasNext();) {
-            POS pos = (POS) itr.next();
+        for (POS pos : ALL_POS) {
             if (pos.getKey().equals(key)) {
                 return pos;
             }
@@ -77,7 +79,7 @@ public final class POS implements Serializable {
     }
 
     /**
-     * Returns the underlying pos key's hashcode.
+     * Returns the underlying pos key's hash code.
      *
      * @return key hash code
      */
@@ -100,10 +102,10 @@ public final class POS implements Serializable {
         return false;
     }
 
-    // Accessors
-
     /**
      * Return a label intended for textual presentation.
+     *
+     * @return a label intended for textual presentation
      */
     public String getLabel() {
         return _label.toString();
@@ -112,7 +114,7 @@ public final class POS implements Serializable {
     /**
      * Gets the key for this POS.
      *
-     * @return key
+     * @return key for this POS
      */
     public String getKey() {
         return _key.toString();

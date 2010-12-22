@@ -7,15 +7,15 @@ import java.util.*;
  */
 public class ResourceBundleSet extends ResourceBundle {
     private Locale _locale = Locale.getDefault();
-    private List _resources = new ArrayList();
+    private List<String> _resources = new ArrayList<String>();
 
     public ResourceBundleSet(String resource) {
         addResource(resource);
     }
 
     public ResourceBundleSet(String[] resources) {
-        for (int i = 0; i < resources.length; i++) {
-            addResource(resources[i]);
+        for (String resource : resources) {
+            addResource(resource);
         }
     }
 
@@ -24,7 +24,7 @@ public class ResourceBundleSet extends ResourceBundle {
     }
 
     public String[] getResources() {
-        return (String[]) _resources.toArray(new String[_resources.size()]);
+        return _resources.toArray(new String[_resources.size()]);
     }
 
     public void setLocale(Locale locale) {
@@ -32,9 +32,9 @@ public class ResourceBundleSet extends ResourceBundle {
     }
 
     protected Object handleGetObject(String key) {
-        for (Iterator itr = _resources.iterator(); itr.hasNext();) {
+        for (Object _resource : _resources) {
             try {
-                ResourceBundle bundle = getBndl((String) itr.next());
+                ResourceBundle bundle = getBndl((String) _resource);
                 String msg = bundle.getString(key);
                 if (msg != null) {
                     return msg;

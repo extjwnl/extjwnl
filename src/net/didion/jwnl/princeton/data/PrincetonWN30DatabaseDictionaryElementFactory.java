@@ -99,7 +99,7 @@ public class PrincetonWN30DatabaseDictionaryElementFactory extends AbstractPrinc
      *
      * @param synset   - the synset this word belongs to
      * @param index    - the index of this word
-     * @param lemma    - phrase defintion
+     * @param lemma    - phrase definition
      * @param senseKey - the sense key
      * @param usageCnt - the tagged usage count
      * @return word

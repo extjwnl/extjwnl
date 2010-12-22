@@ -13,20 +13,20 @@ public final class VerbFrame implements Serializable {
     static final long serialVersionUID = 1450633678809744269L;
 
     private static VerbFrame[] _verbFrames;
-    private static boolean _initalized = false;
+    private static boolean _initialized = false;
 
     public static void initialize() {
-        if (!_initalized) {
+        if (!_initialized) {
             int framesSize = Integer.parseInt(JWNL.resolveMessage("NUMBER_OF_VERB_FRAMES"));
             _verbFrames = new VerbFrame[framesSize];
             for (int i = 1; i <= framesSize; i++) {
                 _verbFrames[i - 1] = new VerbFrame(getKeyString(i), i);
             }
-            _initalized = true;
+            _initialized = true;
         }
     }
 
-    public static final String getKeyString(int i) {
+    public static String getKeyString(int i) {
         StringBuffer buf = new StringBuffer();
         buf.append("VERB_FRAME_");
         int numZerosToAppend = 3 - String.valueOf(i).length();
@@ -55,10 +55,10 @@ public final class VerbFrame implements Serializable {
      * frame is valid for the word.
      */
     public static String[] getFrames(BitSet bits) {
-        int[] indicies = getVerbFrameIndicies(bits);
-        String[] frames = new String[indicies.length];
-        for (int i = 0; i < indicies.length; i++) {
-            frames[i] = _verbFrames[indicies[i] - 1].getFrame();
+        int[] indices = getVerbFrameIndices(bits);
+        String[] frames = new String[indices.length];
+        for (int i = 0; i < indices.length; i++) {
+            frames[i] = _verbFrames[indices[i] - 1].getFrame();
         }
         return frames;
     }
@@ -72,7 +72,7 @@ public final class VerbFrame implements Serializable {
      * @param bits the bit set
      * @return an integer collection
      */
-    public static int[] getVerbFrameIndicies(BitSet bits) {
+    public static int[] getVerbFrameIndices(BitSet bits) {
         int[] indices = new int[bits.cardinality()];
         int index = 0;
         for (int i = bits.nextSetBit(0); i >= 0; i = bits.nextSetBit(i + 1)) {

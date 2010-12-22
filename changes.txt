@@ -18,11 +18,11 @@ changes from version 1.3 to version 1.4
 changes from version 1.2.1 to version 1.3
 
 - Updated classes in the data package to be compatible with WordNet 2.0
-- Updated DefaultMorphologicalProcessor to stem additonal suffixes added in WordNet 1.7
+- Updated DefaultMorphologicalProcessor to stem additional suffixes added in WordNet 1.7
 - Fixed bugs in FileBackedDictionary and MapBackedDictionary that caused lookups on capitalized terms to return invalid results
 - Introduced DatabaseBackedDictionary, plus files to create and populate the WordNet database.
-- Removed the util.logging package. JWNL now has a runtime dependancy on Apache commons-logging.
-- Fixed several bugs in the relationshp api. The interface for finding relationships is now contained in RelationshipFinder.
+- Removed the util.logging package. JWNL now has a runtime dependency on Apache commons-logging.
+- Fixed several bugs in the relationship api. The interface for finding relationships is now contained in RelationshipFinder.
 - License changed to BSD-style licence.
 - Improved the dictionary caching api. AbstractCachingDictionary now has methods to turn caching on and off and change the cache sizes.
 - Added getRandomIndexWord method to Dictionary.

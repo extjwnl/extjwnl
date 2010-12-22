@@ -17,10 +17,10 @@ import java.util.Map;
 
 /**
  * Default implementation of <code>MorphologicalProcessor</code>. This isn't a true
- * morpological analyzer (it doesn't figure out all the characteristics of each word
+ * morphological analyzer (it doesn't figure out all the characteristics of each word
  * it processes). This is basically a stemmer that uses WordNet exception files instead
  * of complex stemming rules. It also tries to be intelligent by removing delimiters and
- * doing concatanation.
+ * doing concatenation.
  */
 public class DefaultMorphologicalProcessor implements MorphologicalProcessor {
     /**
@@ -35,7 +35,7 @@ public class DefaultMorphologicalProcessor implements MorphologicalProcessor {
     private static final int DEFAULT_CACHE_CAPACITY = 1000;
 
     private Cache _lookupCache;
-    ;
+
     private Operation[] _operations;
 
     public DefaultMorphologicalProcessor() {
@@ -60,7 +60,7 @@ public class DefaultMorphologicalProcessor implements MorphologicalProcessor {
 
         Param param = (Param) params.get(CACHE_CAPACITY);
         int capacity = (param == null) ?
-                DEFAULT_CACHE_CAPACITY : new Integer(param.getValue()).intValue();
+                DEFAULT_CACHE_CAPACITY : Integer.parseInt(param.getValue());
 
         return new DefaultMorphologicalProcessor(operationArray, capacity);
     }
@@ -106,7 +106,7 @@ public class DefaultMorphologicalProcessor implements MorphologicalProcessor {
      * @return IndexWord the IndexWord found during lookup, or null if an IndexWord is not found
      */
     private IndexWord lookupNextBaseForm(POS pos, String derivation, LookupInfo info) throws JWNLException {
-        if (derivation.equals("") || derivation == null) {
+        if (derivation == null || derivation.equals("")) {
             return null;
         }
 
@@ -125,7 +125,6 @@ public class DefaultMorphologicalProcessor implements MorphologicalProcessor {
             str = info.getBaseForms().getNextForm();
         } else {
             while (str == null && info.isNextOperationAvailable() && !info.executeNextOperation()) {
-                ;
             }
             if (info.getBaseForms().isMoreFormsAvailable()) {
                 str = info.getBaseForms().getNextForm();
@@ -172,8 +171,8 @@ public class DefaultMorphologicalProcessor implements MorphologicalProcessor {
             if (!isNextOperationAvailable()) {
                 throw new JWNLRuntimeException("DICTIONARY_EXCEPTION_027");
             }
-            Operation oper = _operations[++_currentOperation];
-            return oper.execute(_pos, _derivation, _baseForms);
+            Operation o = _operations[++_currentOperation];
+            return o.execute(_pos, _derivation, _baseForms);
         }
 
         public BaseFormSet getBaseForms() {

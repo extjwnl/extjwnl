@@ -15,7 +15,7 @@ import java.util.List;
 public interface MorphologicalProcessor extends Createable {
     /**
      * Try to turn <var>derivation</var> into a word that is found in the index file for <var>pos</var>.
-     * If there is more than one possible base form, then the frist call to this method should
+     * If there is more than one possible base form, then the first call to this method should
      * return the first base form found. The return value for subsequent calls is undefined (it could
      * be the same base form, or the next base form - it is up to the implementer to decide, but the
      * decision should be noted.

@@ -22,7 +22,7 @@ public class TokenizerOperation extends AbstractDelegatingOperation {
     public static final String PHRASE_OPERATIONS = "phrase_operations";
     /**
      * Parameter list that determines the delimiters this
-     * operation will use to concatanate tokens.
+     * operation will use to concatenate tokens.
      */
     public static final String DELIMITERS = "delimiters";
 
@@ -37,7 +37,7 @@ public class TokenizerOperation extends AbstractDelegatingOperation {
 
     protected AbstractDelegatingOperation getInstance(Map params) throws JWNLException {
         ParamList delimiters = (ParamList) params.get(DELIMITERS);
-        String[] delimiterArray = null;
+        String[] delimiterArray;
         if (delimiters == null || delimiters.getParams().size() == 0) {
             delimiterArray = new String[]{" "};
         } else {
@@ -98,8 +98,8 @@ public class TokenizerOperation extends AbstractDelegatingOperation {
             for (int i = 0; i < length; i++) {
                 tokens[i] = tokenForms[i + startIndex].getForm(indexArray[i]);
             }
-            for (int i = 0; i < _delimiters.length; i++) {
-                if (tryAllCombinations(pos, tokens, _delimiters[i], forms)) {
+            for (String _delimiter : _delimiters) {
+                if (tryAllCombinations(pos, tokens, _delimiter, forms)) {
                     foundForms = true;
                 }
             }

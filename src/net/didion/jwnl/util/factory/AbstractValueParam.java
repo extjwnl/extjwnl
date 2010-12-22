@@ -12,8 +12,8 @@ public abstract class AbstractValueParam implements Param {
     }
 
     protected AbstractValueParam(Param[] params) {
-        for (int i = 0; i < params.length; i++) {
-            addParam(params[i]);
+        for (Param param : params) {
+            addParam(param);
         }
     }
 
@@ -23,7 +23,7 @@ public abstract class AbstractValueParam implements Param {
 
     /**
      * If the value of this parameter is a class name, and that class is creatable, this method will create
-     * an instance of it using this Param's parameters.
+     * an instance of it using this Param parameters.
      */
     public Object create() throws JWNLException {
         try {

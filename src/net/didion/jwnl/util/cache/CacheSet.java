@@ -16,8 +16,8 @@ public abstract class CacheSet {
     }
 
     public CacheSet(Object[] keys, int size) {
-        for (int i = 0; i < keys.length; i++) {
-            addCache(keys[i], size);
+        for (Object key : keys) {
+            addCache(key, size);
         }
     }
 

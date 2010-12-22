@@ -20,25 +20,25 @@ public class Adjective extends Word {
     public static final AdjectivePosition PREDICATIVE = new AdjectivePosition("AP_PREDICATIVE", "AP_PREDICATIVE_KEY");
     public static final AdjectivePosition ATTRIBUTIVE = new AdjectivePosition("AP_ATTRIBUTIVE", "AP_ATTRIBUTIVE_KEY");
     public static final AdjectivePosition IMMEDIATE_POSTNOMINAL =
-            new AdjectivePosition("AP_IMMEDIATE_POSTNOMIAL", "AP_IMMEDIATE_POSTNOMIAL_KEY");
+            new AdjectivePosition("AP_IMMEDIATE_POSTNOMINAL", "AP_IMMEDIATE_POSTNOMINAL_KEY");
 
     public static final AdjectivePosition[] ADJECTIVE_POSITIONS = {NONE, PREDICATIVE, ATTRIBUTIVE, IMMEDIATE_POSTNOMINAL};
 
-    private static final Map KEY_TO_OBJECT_MAP = new HashMap();
+    private static final Map<String, AdjectivePosition> KEY_TO_OBJECT_MAP = new HashMap<String, AdjectivePosition>();
 
     private static boolean _initialized = false;
 
     public static void initialize() {
         if (!_initialized) {
-            for (int i = 0; i < ADJECTIVE_POSITIONS.length; i++) {
-                KEY_TO_OBJECT_MAP.put(ADJECTIVE_POSITIONS[i].getKey(), ADJECTIVE_POSITIONS[i]);
+            for (AdjectivePosition adjectivePosition : ADJECTIVE_POSITIONS) {
+                KEY_TO_OBJECT_MAP.put(adjectivePosition.getKey(), adjectivePosition);
             }
             _initialized = true;
         }
     }
 
     public static AdjectivePosition getAdjectivePositionForKey(String key) {
-        return (AdjectivePosition) KEY_TO_OBJECT_MAP.get(key);
+        return KEY_TO_OBJECT_MAP.get(key);
     }
 
     private AdjectivePosition _adjectivePosition;

@@ -10,7 +10,6 @@ import java.io.IOException;
  * the appropriate methods to read from the file.
  */
 public interface DictionaryFile {
-    public static final String COMMENT_HEADER = "  ";
 
     /**
      * Create a new instance of the dictionary file

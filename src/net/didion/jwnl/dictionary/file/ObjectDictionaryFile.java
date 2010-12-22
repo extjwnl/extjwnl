@@ -3,7 +3,7 @@ package net.didion.jwnl.dictionary.file;
 import java.io.IOException;
 
 /**
- * <code>DictioanryFile</code> that reads and writes serailazed objects.
+ * <code>DictionaryFile</code> that reads and writes serialized objects.
  */
 public interface ObjectDictionaryFile extends DictionaryFile {
     /**

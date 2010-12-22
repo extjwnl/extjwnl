@@ -73,27 +73,26 @@ public final class PointerType implements Serializable {
     /**
      * A list of all <code>PointerType</code>s.
      */
-    private static final List ALL_TYPES = Collections.unmodifiableList(Arrays.asList(new PointerType[]{
+    private static final List<PointerType> ALL_TYPES = Collections.unmodifiableList(Arrays.asList(
             ANTONYM, HYPERNYM, HYPONYM, ATTRIBUTE, SEE_ALSO, ENTAILMENT, ENTAILED_BY, CAUSE, VERB_GROUP,
             MEMBER_MERONYM, SUBSTANCE_MERONYM, PART_MERONYM, MEMBER_HOLONYM, SUBSTANCE_HOLONYM, PART_HOLONYM,
             SIMILAR_TO, PARTICIPLE_OF, DERIVED, NOMINALIZATION, CATEGORY, REGION, USAGE, CATEGORY_MEMBER,
             REGION_MEMBER, USAGE_MEMBER, INSTANCE_HYPERNYM, INSTANCES_HYPONYM
-    }));
+    ));
 
-    private static final Map POS_TO_MASK_MAP = new HashMap();
-    private static final Map KEY_TO_POINTER_TYPE_MAP = new HashMap();
+    private static final Map<POS, Integer> POS_TO_MASK_MAP = new HashMap<POS, Integer>();
+    private static final Map<String, PointerType> KEY_TO_POINTER_TYPE_MAP = new HashMap<String, PointerType>();
 
     private static boolean _initialized = false;
 
     public static void initialize() {
         if (!_initialized) {
-            POS_TO_MASK_MAP.put(POS.NOUN, new Integer(N));
-            POS_TO_MASK_MAP.put(POS.VERB, new Integer(V));
-            POS_TO_MASK_MAP.put(POS.ADJECTIVE, new Integer(ADJ));
-            POS_TO_MASK_MAP.put(POS.ADVERB, new Integer(ADV));
+            POS_TO_MASK_MAP.put(POS.NOUN, N);
+            POS_TO_MASK_MAP.put(POS.VERB, V);
+            POS_TO_MASK_MAP.put(POS.ADJECTIVE, ADJ);
+            POS_TO_MASK_MAP.put(POS.ADVERB, ADV);
 
-            for (Iterator itr = ALL_TYPES.iterator(); itr.hasNext();) {
-                PointerType pt = (PointerType) itr.next();
+            for (PointerType pt : ALL_TYPES) {
                 KEY_TO_POINTER_TYPE_MAP.put(pt.getKey(), pt);
             }
 
@@ -130,17 +129,16 @@ public final class PointerType implements Serializable {
      * Return the <code>PointerType</code> whose key matches <var>key</var>.
      */
     public static PointerType getPointerTypeForKey(String key) {
-        return (PointerType) KEY_TO_POINTER_TYPE_MAP.get(key);
+        return KEY_TO_POINTER_TYPE_MAP.get(key);
     }
 
-    public static List getAllPointerTypes() {
+    public static List<PointerType> getAllPointerTypes() {
         return ALL_TYPES;
     }
 
-    public static List getAllPointerTypesForPOS(POS pos) {
-        List types = new ArrayList();
-        for (Iterator itr = ALL_TYPES.iterator(); itr.hasNext();) {
-            PointerType pt = (PointerType) itr.next();
+    public static List<PointerType> getAllPointerTypesForPOS(POS pos) {
+        List<PointerType> types = new ArrayList<PointerType>();
+        for (PointerType pt : ALL_TYPES) {
             if (pt.appliesTo(pos)) {
                 types.add(pt);
             }
@@ -157,7 +155,7 @@ public final class PointerType implements Serializable {
     }
 
     private static int getPOSMask(POS pos) {
-        return ((Integer) POS_TO_MASK_MAP.get(pos)).intValue();
+        return POS_TO_MASK_MAP.get(pos);
     }
 
     private Resolvable _label;

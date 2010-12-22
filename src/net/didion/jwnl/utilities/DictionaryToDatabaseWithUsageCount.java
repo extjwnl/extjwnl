@@ -41,12 +41,12 @@ public class DictionaryToDatabaseWithUsageCount {
     /**
      * Mapping of database id's to synset offset id's. 1 to 1.
      */
-    private Map idToSynsetOffset;
+    private Map<Integer, long[]> idToSynsetOffset;
 
     /**
      * Mapping of synset offset id's to database id's. 1:1.
      */
-    private Map synsetOffsetToId;
+    private Map<Long, Integer> synsetOffsetToId;
 
     /**
      * Maps the usage. The key is 'offset:lemma', the object[] contains
@@ -116,8 +116,8 @@ public class DictionaryToDatabaseWithUsageCount {
      * @param conn - the database connection
      */
     public DictionaryToDatabaseWithUsageCount(Connection conn) {
-        idToSynsetOffset = new HashMap();
-        synsetOffsetToId = new HashMap();
+        idToSynsetOffset = new HashMap<Integer, long[]>();
+        synsetOffsetToId = new HashMap<Long, Integer>();
         usageMap = new HashMap();
         connection = conn;
         ((AbstractCachingDictionary) Dictionary.getInstance()).setCachingEnabled(false);
@@ -197,7 +197,7 @@ public class DictionaryToDatabaseWithUsageCount {
             iwStmt.setString(2, iw.getLemma());
             iwStmt.setString(3, iw.getPOS().getKey());
             iwStmt.execute();
-            idToSynsetOffset.put(new Integer(id), iw.getSynsetOffsets());
+            idToSynsetOffset.put(id, iw.getSynsetOffsets());
             if (count++ % 1000 == 0) {
                 System.out.println(count);
             }
@@ -224,7 +224,7 @@ public class DictionaryToDatabaseWithUsageCount {
             }
             Synset synset = (Synset) itr.next();
             int id = nextId();
-            synsetOffsetToId.put(new Long(synset.getOffset()), new Integer(id));
+            synsetOffsetToId.put(synset.getOffset(), id);
             synsetStmt.setInt(1, id);
             synsetStmt.setLong(2, synset.getOffset());
             synsetStmt.setString(3, synset.getPOS().getKey());
@@ -234,32 +234,32 @@ public class DictionaryToDatabaseWithUsageCount {
             Word words[] = synset.getWords();
             synsetWordStmt.setInt(2, id);
             synsetVerbFrameStmt.setInt(2, id);
-            for (int i = 0; i < words.length; i++) {
+            for (Word word : words) {
                 int wordId = nextId();
-                String synsetString = synset.getOffset() + ":" + words[i].getLemma();
+                String synsetString = synset.getOffset() + ":" + word.getLemma();
                 Object[] arr = (Object[]) usageMap.get(synsetString);
                 String senseKey = "";
                 int usageCnt = 0;
                 if (arr != null) {
                     senseKey = (String) arr[0];
-                    usageCnt = ((Integer) arr[1]).intValue();
+                    usageCnt = (Integer) arr[1];
                 }
 
                 synsetWordStmt.setInt(1, wordId);
-                synsetWordStmt.setString(3, words[i].getLemma());
-                synsetWordStmt.setInt(4, words[i].getIndex());
+                synsetWordStmt.setString(3, word.getLemma());
+                synsetWordStmt.setInt(4, word.getIndex());
                 synsetWordStmt.setString(5, senseKey);
                 synsetWordStmt.setInt(6, usageCnt);
 
                 synsetWordStmt.execute();
-                if (!(words[i] instanceof Verb)) {
+                if (!(word instanceof Verb)) {
                     continue;
                 }
-                synsetVerbFrameStmt.setInt(4, words[i].getIndex());
-                int flags[] = ((Verb) words[i]).getVerbFrameIndicies();
-                for (int j = 0; j < flags.length; j++) {
+                synsetVerbFrameStmt.setInt(4, word.getIndex());
+                int flags[] = ((Verb) word).getVerbFrameIndices();
+                for (int flag : flags) {
                     synsetVerbFrameStmt.setInt(1, nextId());
-                    synsetVerbFrameStmt.setInt(3, flags[j]);
+                    synsetVerbFrameStmt.setInt(3, flag);
                     synsetVerbFrameStmt.execute();
                 }
 
@@ -290,15 +290,13 @@ public class DictionaryToDatabaseWithUsageCount {
             throws SQLException {
         LOG.log(MessageLogLevel.INFO, "storing index word synsets");
         PreparedStatement iwsStmt = connection.prepareStatement("INSERT INTO IndexWordSynset VALUES(?,?,?)");
-        for (Iterator itr = idToSynsetOffset.entrySet().iterator(); itr.hasNext();) {
-            java.util.Map.Entry entry = (java.util.Map.Entry) itr.next();
-            int iwId = ((Integer) entry.getKey()).intValue();
+        for (Map.Entry<Integer, long[]> entry : idToSynsetOffset.entrySet()) {
+            int iwId = entry.getKey();
             iwsStmt.setInt(2, iwId);
-            long offsets[] = (long[]) entry.getValue();
+            long offsets[] = entry.getValue();
             int i = 0;
             while (i < offsets.length) {
-                Integer offset = (Integer) synsetOffsetToId.get(new Long(offsets[i]));
-                int synsetId = offset.intValue();
+                int synsetId = synsetOffsetToId.get(offsets[i]);
                 iwsStmt.setInt(1, nextId());
                 iwsStmt.setLong(3, synsetId);
                 iwsStmt.execute();
@@ -333,7 +331,7 @@ public class DictionaryToDatabaseWithUsageCount {
                     System.out.println("sense key and usage: " + count);
                 }
                 String senseCount = tokenizer.nextToken();
-                String[] sc = null;
+                String[] sc;
                 Object[] arr = new Object[2];
 
                 if (JWNL.getVersion().getNumber() < 2.1 && JWNL.getOS().equals(JWNL.WINDOWS)) {
@@ -344,7 +342,7 @@ public class DictionaryToDatabaseWithUsageCount {
                 if (sc != null) {
                     int cnt = Integer.parseInt(sc[0]);
                     arr[0] = senseKey;
-                    arr[1] = new Integer(cnt);
+                    arr[1] = cnt;
                     usageMap.put(synsetString, arr);
                     senseCount.trim();
 
@@ -371,11 +369,10 @@ public class DictionaryToDatabaseWithUsageCount {
         while (itr.hasNext()) {
             Exc exc = (Exc) itr.next();
             exStmt.setString(4, exc.getLemma());
-            Iterator excItr = exc.getExceptions().iterator();
-            while (excItr.hasNext()) {
+            for (Object o : exc.getExceptions()) {
                 exStmt.setInt(1, nextId());
                 exStmt.setString(2, exc.getPOS().getKey());
-                exStmt.setString(3, (String) excItr.next());
+                exStmt.setString(3, (String) o);
                 exStmt.execute();
             }
         }

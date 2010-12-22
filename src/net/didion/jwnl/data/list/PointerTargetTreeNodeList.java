@@ -123,7 +123,7 @@ public class PointerTargetTreeNodeList extends PointerTargetNodeList {
     }
 
     /**
-     * Find all occurances of <code>node</code> within the list.
+     * Find all occurrences of <code>node</code> within the list.
      */
     public PointerTargetTreeNode[] findAll(PointerTargetTreeNode node) {
         List v = getAllMatches(new FindNodeOperation(node));
@@ -135,13 +135,14 @@ public class PointerTargetTreeNodeList extends PointerTargetNodeList {
     }
 
     public Object clone() throws CloneNotSupportedException {
+        super.clone();
         return new PointerTargetTreeNodeList((LinkedList) copyBackingList());
     }
 
     public Object deepClone() throws UnsupportedOperationException {
         PointerTargetTreeNodeList list = new PointerTargetTreeNodeList();
-        for (Iterator itr = iterator(); itr.hasNext();) {
-            list.add(((PointerTargetTreeNode) itr.next()).deepClone());
+        for (Object o : this) {
+            list.add(((PointerTargetTreeNode) o).deepClone());
         }
         return list;
     }

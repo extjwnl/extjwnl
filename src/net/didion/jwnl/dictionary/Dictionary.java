@@ -164,18 +164,17 @@ public abstract class Dictionary implements Installable {
      *
      * @param lemma the word for which to lookup senses
      * @return An array of IndexWords, each of which is a sense of <var>word</var>
+     * @throws net.didion.jwnl.JWNLException JWNLException
      */
     public IndexWordSet lookupAllIndexWords(String lemma) throws JWNLException {
         lemma = prepareQueryString(lemma);
         IndexWordSet set = new IndexWordSet(lemma);
-        for (Iterator itr = POS.getAllPOS().iterator(); itr.hasNext();) {
-            IndexWord current = lookupIndexWord((POS) itr.next(), lemma);
+        for (POS pos : POS.getAllPOS()) {
+            IndexWord current = lookupIndexWord(pos, lemma);
             if (current != null) {
                 set.add(current);
             }
         }
         return set;
     }
-
-
 }

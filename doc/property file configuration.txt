@@ -10,7 +10,7 @@ Basically, the properties file allows you to specify three properties:
     ..parameters
 </dictionary>
 
-- Version: Gives information on the version of WordNet being interfaced with. Excactly 1 version tag is required in a properties file.
+- Version: Gives information on the version of WordNet being interfaced with. Exactly 1 version tag is required in a properties file.
 
 <version publisher="[publisher]" number="[version number]" language="[language]" country="[country]"/>
 

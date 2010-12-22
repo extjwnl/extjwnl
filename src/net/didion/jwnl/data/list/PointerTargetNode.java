@@ -55,7 +55,7 @@ public class PointerTargetNode implements Node {
      */
     public Synset getSynset() {
         if (isLexical()) {
-            return ((Word) _target).getSynset();
+            return _target.getSynset();
         } else {
             return (Synset) _target;
         }
@@ -97,7 +97,8 @@ public class PointerTargetNode implements Node {
         return getPointerTarget().hashCode() ^ getType().hashCode();
     }
 
-    public Object clone() {
+    public Object clone() throws CloneNotSupportedException {
+        super.clone();
         return new PointerTargetNode(getPointerTarget(), getType());
     }
 

@@ -39,7 +39,7 @@ public abstract class Relationship {
         _targetSynset = targetSynset;
     }
 
-    public abstract Relationship reverse();
+    public abstract Relationship reverse() throws CloneNotSupportedException;
 
     /**
      * Get the list that contains the nodes of this relationship.

@@ -101,8 +101,7 @@ public abstract class DictionaryTester {
 
         boolean match = false;
         Synset synset = null;
-        for (int i = 0; i < syns.length; i++) {
-            Synset s = syns[i];
+        for (Synset s : syns) {
             match = contains(s, verbOffsets);
             if (match) {
                 synset = s;
@@ -111,15 +110,14 @@ public abstract class DictionaryTester {
 
         }
         if (match) {
-            int[] indices = synset.getVerbFrameIndicies();
+            int[] indices = synset.getVerbFrameIndices();
             if (indices.length == 2) {
                 log.info("Verb synset frame size test... passed.");
             } else {
                 verbTest = false;
                 fail("Verb synset frame size test... failed");
             }
-            for (int i = 0; i < indices.length; i++) {
-                int index = indices[i];
+            for (int index : indices) {
                 if (index != 2 && index != 33) {
                     verbTest = false;
                     fail("Verb synset frame flags... failed");
@@ -182,8 +180,8 @@ public abstract class DictionaryTester {
         for (int i = 0; i < synset.getWords().length; i++) {
             Word w = synset.getWords()[i];
             boolean found = false;
-            for (int z = 0; z < lemmas.length; z++) {
-                if (w.getLemma().equals(lemmas[z])) {
+            for (String lemma : lemmas) {
+                if (w.getLemma().equals(lemma)) {
                     found = true;
                 }
             }
@@ -263,8 +261,8 @@ public abstract class DictionaryTester {
      */
     private boolean contains(Synset s, long[] offsets) {
         boolean rval = false;
-        for (int i = 0; i < offsets.length; i++) {
-            if (s.getOffset() == offsets[i]) {
+        for (long offset : offsets) {
+            if (s.getOffset() == offset) {
                 rval = true;
             }
         }

@@ -17,7 +17,7 @@ public interface RandomAccessDictionaryFile extends DictionaryFile {
     public String readLine() throws IOException;
 
     /**
-     * Go to postion <var>pos</var> in the file.
+     * Go to position <var>pos</var> in the file.
      */
     public void seek(long pos) throws IOException;
 

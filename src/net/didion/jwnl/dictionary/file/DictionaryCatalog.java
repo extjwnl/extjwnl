@@ -14,16 +14,16 @@ import java.util.Map;
  * files associated with a POS).
  */
 public class DictionaryCatalog {
-    private Map _files = new HashMap();
+    private Map<POS, DictionaryFile> _files = new HashMap<POS, DictionaryFile>();
     private DictionaryFileType _fileType;
 
     public DictionaryCatalog(String path, DictionaryFileType fileType, Class dictionaryFileType) {
         _fileType = fileType;
         try {
             Constructor c = dictionaryFileType.getConstructor(new Class[0]);
-            DictionaryFile factory = (DictionaryFile) c.newInstance(null);
-            for (Iterator itr = POS.getAllPOS().iterator(); itr.hasNext();) {
-                DictionaryFile file = factory.newInstance(path, (POS) itr.next(), fileType);
+            DictionaryFile factory = (DictionaryFile) c.newInstance();
+            for (POS pos : POS.getAllPOS()) {
+                DictionaryFile file = factory.newInstance(path, pos, fileType);
                 _files.put(file.getPOS(), file);
             }
         } catch (Exception ex) {
@@ -67,7 +67,7 @@ public class DictionaryCatalog {
     }
 
     public DictionaryFile get(POS pos) {
-        return (DictionaryFile) _files.get(pos);
+        return _files.get(pos);
     }
 
     public DictionaryFileType getFileType() {

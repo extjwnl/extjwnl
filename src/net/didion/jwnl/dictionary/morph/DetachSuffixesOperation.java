@@ -7,7 +7,7 @@ import net.didion.jwnl.util.factory.Param;
 import java.util.*;
 
 /**
- * Remove all aplicable suffixes from the word(s) and do a look-up.
+ * Remove all applicable suffixes from the word(s) and do a look-up.
  * This class accepts parameters in the form of:
  * <pre>
  * <p/>
@@ -20,12 +20,12 @@ import java.util.*;
 public class DetachSuffixesOperation extends AbstractDelegatingOperation {
     public static final String OPERATIONS = "operations";
 
-    private Map _suffixMap;
+    private Map<POS, String[][]> _suffixMap;
 
     protected AbstractDelegatingOperation getInstance(Map params) throws JWNLException {
-        Map suffixMap = new HashMap();
-        for (Iterator itr = params.values().iterator(); itr.hasNext();) {
-            Param p = (Param) itr.next();
+        Map<POS, String[][]> suffixMap = new HashMap<POS, String[][]>();
+        for (Object o : params.values()) {
+            Param p = (Param) o;
             POS pos = POS.getPOSForLabel(p.getName());
             if (pos != null) {
                 suffixMap.put(pos, getSuffixArray(p.getValue()));
@@ -39,7 +39,7 @@ public class DetachSuffixesOperation extends AbstractDelegatingOperation {
         if (!"|".equals(tokenizer.nextToken())) {
             throw new JWNLException("DICTIONARY_EXCEPTION_028");
         }
-        List suffixList = new ArrayList();
+        List<String[]> suffixList = new ArrayList<String[]>();
         while (tokenizer.hasMoreTokens()) {
             String next = tokenizer.nextToken();
             String first = "";
@@ -55,13 +55,13 @@ public class DetachSuffixesOperation extends AbstractDelegatingOperation {
             }
             suffixList.add(new String[]{first, second});
         }
-        return (String[][]) suffixList.toArray(new String[suffixList.size()][]);
+        return suffixList.toArray(new String[suffixList.size()][]);
     }
 
     public DetachSuffixesOperation() {
     }
 
-    public DetachSuffixesOperation(Map suffixMap) {
+    public DetachSuffixesOperation(Map<POS, String[][]> suffixMap) {
         _suffixMap = suffixMap;
     }
 
@@ -69,25 +69,24 @@ public class DetachSuffixesOperation extends AbstractDelegatingOperation {
         return new String[]{OPERATIONS};
     }
 
-    public Map getSuffixMap() {
+    public Map<POS, String[][]> getSuffixMap() {
         return _suffixMap;
     }
 
-    public void setSuffixMap(Map suffixMap) {
+    public void setSuffixMap(Map<POS, String[][]> suffixMap) {
         _suffixMap = suffixMap;
     }
 
     public boolean execute(POS pos, String derivation, BaseFormSet forms) throws JWNLException {
-        String[][] suffixArray = (String[][]) _suffixMap.get(pos);
+        String[][] suffixArray = _suffixMap.get(pos);
         if (suffixArray == null) {
             return false;
         }
 
         boolean addedBaseForm = false;
-        for (int i = 0; i < suffixArray.length; i++) {
-            if (derivation.endsWith(suffixArray[i][0])) {
-                String stem = derivation.substring(
-                        0, derivation.length() - suffixArray[i][0].length()) + suffixArray[i][1];
+        for (String[] aSuffixArray : suffixArray) {
+            if (derivation.endsWith(aSuffixArray[0])) {
+                String stem = derivation.substring(0, derivation.length() - aSuffixArray[0].length()) + aSuffixArray[1];
                 if (delegate(pos, stem, forms, OPERATIONS)) {
                     addedBaseForm = true;
                 }

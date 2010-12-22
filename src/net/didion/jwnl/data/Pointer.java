@@ -23,7 +23,7 @@ public class Pointer implements Serializable {
 
 
     /**
-     * The source of this poiner. If the pointer applies to all words in the
+     * The source of this pointer. If the pointer applies to all words in the
      * parent synset, then <code>source</code> and <code>synset</code> are the same,
      * otherwise <code>source</code> is the specific <code>Word</code> object that
      * this pointer applies to.
@@ -224,6 +224,7 @@ public class Pointer implements Serializable {
             if (_offset != that._offset) {
                 return false;
             }
+            //noinspection RedundantIfStatement
             if (_pos != null ? !_pos.equals(that._pos) : that._pos != null) {
                 return false;
             }

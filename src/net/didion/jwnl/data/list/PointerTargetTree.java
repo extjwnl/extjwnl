@@ -4,7 +4,6 @@ import net.didion.jwnl.data.PointerTarget;
 import net.didion.jwnl.data.Synset;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -48,7 +47,7 @@ public class PointerTargetTree {
 
     /**
      * Walk the tree and perform the operation <code>opr</code> on each node.
-     * Searchs the tree exhaustively and returns a List containing all nodes
+     * Searches the tree exhaustively and returns a List containing all nodes
      * that are returned by <code>opr</code>.
      */
     public List getAllMatches(PointerTargetTreeNodeList.Operation opr) {
@@ -63,7 +62,7 @@ public class PointerTargetTree {
     }
 
     /**
-     * Find the first occurance of <code>node</code> in the tree.
+     * Find the first occurrence of <code>node</code> in the tree.
      */
     public PointerTargetTreeNode findFirst(PointerTargetTreeNode node) {
         return (PointerTargetTreeNode) getFirstMatch(new PointerTargetTreeNodeList.FindNodeOperation(node));
@@ -77,7 +76,7 @@ public class PointerTargetTree {
     }
 
     /**
-     * Find all occurances of <code>node</code> in the tree.
+     * Find all occurrences of <code>node</code> in the tree.
      */
     public PointerTargetTreeNode[] findAll(PointerTargetTreeNode node) {
         List list = getAllMatches(new PointerTargetTreeNodeList.FindNodeOperation(node));
@@ -129,8 +128,8 @@ public class PointerTargetTree {
         // since the tree could have been made up of multiple types, we need to set the type of
         // the root node now that we're breaking the tree down into lists that can only be of
         // one type
-        for (Iterator itr = list.iterator(); itr.hasNext();) {
-            PointerTargetNodeList l = (PointerTargetNodeList) itr.next();
+        for (Object aList : list) {
+            PointerTargetNodeList l = (PointerTargetNodeList) aList;
             if (l.size() >= 2) {
                 PointerTargetNode root = (PointerTargetNode) l.get(0);
                 PointerTargetNode node = (PointerTargetNode) l.get(1);

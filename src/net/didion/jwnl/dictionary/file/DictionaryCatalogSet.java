@@ -20,8 +20,8 @@ public class DictionaryCatalogSet {
      */
     public DictionaryCatalogSet(String path, Class dictionaryFileType) {
         path = path.trim();
-        for (Iterator itr = DictionaryFileType.getAllDictionaryFileTypes().iterator(); itr.hasNext();) {
-            DictionaryCatalog cat = new DictionaryCatalog(path, (DictionaryFileType) itr.next(), dictionaryFileType);
+        for (DictionaryFileType d : DictionaryFileType.getAllDictionaryFileTypes()) {
+            DictionaryCatalog cat = new DictionaryCatalog(path, d, dictionaryFileType);
             _catalogs.put(cat.getKey(), cat);
         }
     }

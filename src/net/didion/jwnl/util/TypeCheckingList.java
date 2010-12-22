@@ -36,7 +36,7 @@ public class TypeCheckingList implements List, DeepCloneable {
     private void init(List backingList, Class type) {
         _type = type;
         if (!backingList.isEmpty()) {
-            typecheck(backingList);
+            checkType(backingList);
         }
         _list = backingList;
     }
@@ -50,6 +50,7 @@ public class TypeCheckingList implements List, DeepCloneable {
     }
 
     public Object clone() throws CloneNotSupportedException {
+        super.clone();
         return new TypeCheckingList(copyBackingList(), getType());
     }
 
@@ -58,15 +59,15 @@ public class TypeCheckingList implements List, DeepCloneable {
      */
     protected List copyBackingList() throws CloneNotSupportedException {
         try {
-            Method cloneMethod = getList().getClass().getMethod("clone", null);
-            return (List) cloneMethod.invoke(getList(), null);
+            Method cloneMethod = getList().getClass().getMethod("clone");
+            return (List) cloneMethod.invoke(getList());
         } catch (Exception ex) {
             throw new CloneNotSupportedException();
         }
     }
 
-    public Object deepClone() throws UnsupportedOperationException {
-        throw new UnsupportedOperationException();
+    public Object deepClone() throws CloneNotSupportedException {
+        throw new CloneNotSupportedException();
     }
 
     // object methods
@@ -78,28 +79,28 @@ public class TypeCheckingList implements List, DeepCloneable {
     // methods that do type-checking
 
     public boolean add(Object o) {
-        typecheck(o);
+        checkType(o);
         return getList().add(o);
     }
 
     public void add(int index, Object o) {
-        typecheck(o);
+        checkType(o);
         getList().add(index, o);
     }
 
     public boolean addAll(Collection c) {
-        typecheck(c);
+        checkType(c);
         return getList().addAll(c);
     }
 
     public boolean addAll(int index, Collection c) {
-        typecheck(c);
+        checkType(c);
         return getList().addAll(index, c);
     }
 
     public boolean contains(Object o) {
         try {
-            typecheck(o);
+            checkType(o);
             return getList().contains(o);
         } catch (Exception ex) {
             return false;
@@ -108,7 +109,7 @@ public class TypeCheckingList implements List, DeepCloneable {
 
     public boolean containsAll(Collection c) {
         try {
-            typecheck(c);
+            checkType(c);
             return getList().containsAll(c);
         } catch (Exception ex) {
             return false;
@@ -116,13 +117,13 @@ public class TypeCheckingList implements List, DeepCloneable {
     }
 
     public Object set(int index, Object element) {
-        typecheck(element);
+        checkType(element);
         return getList().set(index, element);
     }
 
     public int indexOf(Object o) {
         try {
-            typecheck(o);
+            checkType(o);
             return getList().indexOf(o);
         } catch (Exception ex) {
             return -1;
@@ -131,7 +132,7 @@ public class TypeCheckingList implements List, DeepCloneable {
 
     public int lastIndexOf(Object o) {
         try {
-            typecheck(o);
+            checkType(o);
             return getList().lastIndexOf(o);
         } catch (Exception ex) {
             return -1;
@@ -140,7 +141,7 @@ public class TypeCheckingList implements List, DeepCloneable {
 
     public boolean remove(Object o) {
         try {
-            typecheck(o);
+            checkType(o);
             return getList().remove(o);
         } catch (Exception ex) {
             return false;
@@ -216,7 +217,7 @@ public class TypeCheckingList implements List, DeepCloneable {
 
     // type checking methods
 
-    private void typecheck(Object obj) {
+    private void checkType(Object obj) {
         if (!getType().isInstance(obj)) {
             throw new JWNLRuntimeException("UTILS_EXCEPTION_003", getType());
         }
@@ -224,10 +225,10 @@ public class TypeCheckingList implements List, DeepCloneable {
 
     private Collection _lastCheckedCollection = null;
 
-    private void typecheck(Collection c) {
+    private void checkType(Collection c) {
         if (c != _lastCheckedCollection) {
-            for (Iterator iterator = c.iterator(); iterator.hasNext();) {
-                typecheck(iterator.next());
+            for (Object aC : c) {
+                checkType(aC);
             }
         }
         _lastCheckedCollection = c;
@@ -250,12 +251,12 @@ public class TypeCheckingList implements List, DeepCloneable {
         // Methods that do type-checking.
 
         public void set(Object o) {
-            typecheck(o);
+            checkType(o);
             getListIterator().set(o);
         }
 
         public void add(Object o) {
-            typecheck(o);
+            checkType(o);
             getListIterator().add(o);
         }
 

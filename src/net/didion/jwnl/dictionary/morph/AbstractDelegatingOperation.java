@@ -12,17 +12,17 @@ public abstract class AbstractDelegatingOperation implements Operation {
     private Map _operationSets;
 
     public Object create(Map params) throws JWNLException {
-        AbstractDelegatingOperation oper = getInstance(params);
+        AbstractDelegatingOperation operation = getInstance(params);
         String[] keys = getKeys();
-        for (int i = 0; i < keys.length; i++) {
-            ParamList paramList = (ParamList) params.get(keys[i]);
+        for (String key : keys) {
+            ParamList paramList = (ParamList) params.get(key);
             if (paramList != null) {
                 List operations = (List) paramList.create();
                 Operation[] operationArray = (Operation[]) operations.toArray(new Operation[operations.size()]);
-                oper.addDelegate(keys[i], operationArray);
+                operation.addDelegate(key, operationArray);
             }
         }
-        return oper;
+        return operation;
     }
 
     public void addDelegate(String key, Operation[] operations) {
@@ -44,8 +44,8 @@ public abstract class AbstractDelegatingOperation implements Operation {
     protected boolean delegate(POS pos, String lemma, BaseFormSet forms, String key) throws JWNLException {
         Operation[] operations = (Operation[]) _operationSets.get(key);
         boolean result = false;
-        for (int i = 0; i < operations.length; i++) {
-            if (operations[i].execute(pos, lemma, forms)) {
+        for (Operation operation : operations) {
+            if (operation.execute(pos, lemma, forms)) {
                 result = true;
             }
         }

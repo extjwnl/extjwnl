@@ -6,7 +6,6 @@ import net.didion.jwnl.util.factory.Createable;
 
 import java.io.IOException;
 import java.rmi.Remote;
-import java.rmi.RemoteException;
 
 /**
  * <code>FileManager</code> defines the interface between the <code>FileBackedDictionary</code> and the file system.
@@ -19,12 +18,12 @@ public interface FileManager extends Remote, Createable {
      *
      * @return The file offset of the start of the matching line, or <code>-1</code> if no such line exists.
      */
-    long getIndexedLinePointer(POS pos, DictionaryFileType fileType, String index) throws IOException, RemoteException;
+    long getIndexedLinePointer(POS pos, DictionaryFileType fileType, String index) throws IOException;
 
     /**
      * Read the line that begins at file offset <var>offset</var>.
      */
-    String readLineAt(POS pos, DictionaryFileType fileType, long offset) throws IOException, RemoteException;
+    String readLineAt(POS pos, DictionaryFileType fileType, long offset) throws IOException;
 
     /**
      * Search for the line following the line that begins at <var>offset</var>.
@@ -32,15 +31,15 @@ public interface FileManager extends Remote, Createable {
      * @return The file offset of the start of the line, or <code>-1</code> if <var>offset</var>
      *         is the last line in the file.
      */
-    long getNextLinePointer(POS pos, DictionaryFileType fileType, long offset) throws IOException, RemoteException;
+    long getNextLinePointer(POS pos, DictionaryFileType fileType, long offset) throws IOException;
 
     /**
      * Search for a line whose index word contains <var>substring</var>, starting at <var>offset</var>.
      *
-     * @return The file offset of the start of the matchng line, or <code>-1</code> if
+     * @return The file offset of the start of the matching line, or <code>-1</code> if
      *         no such line exists.
      */
-    long getMatchingLinePointer(POS pos, DictionaryFileType fileType, long offset, String substring) throws IOException, RemoteException;
+    long getMatchingLinePointer(POS pos, DictionaryFileType fileType, long offset, String substring) throws IOException;
 
     /**
      * Return a randomly-chosen line pointer (offset of the beginning of a line).

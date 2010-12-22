@@ -44,7 +44,7 @@ public class RelationshipFinder {
      * This method creates a symmetric or asymmetric relationship based on whether <var>type</var> is symmetric.
      */
     public RelationshipList findRelationships(
-            Synset sourceSynset, Synset targetSynset, PointerType type) throws JWNLException {
+            Synset sourceSynset, Synset targetSynset, PointerType type) throws JWNLException, CloneNotSupportedException {
 
         return (type.isSymmetric()) ?
                 findSymmetricRelationships(sourceSynset, targetSynset, type) :
@@ -57,7 +57,7 @@ public class RelationshipFinder {
      * whether <var>type</var> is symmetric.
      */
     public RelationshipList findRelationships(
-            Synset sourceSynset, Synset targetSynset, PointerType type, int depth) throws JWNLException {
+            Synset sourceSynset, Synset targetSynset, PointerType type, int depth) throws JWNLException, CloneNotSupportedException {
 
         return (type.isSymmetric()) ?
                 findSymmetricRelationships(sourceSynset, targetSynset, type, depth) :
@@ -69,7 +69,7 @@ public class RelationshipFinder {
      * asymmetric if its type is asymmetric (i.e. it's not its own inverse).
      */
     private RelationshipList findAsymmetricRelationships(
-            Synset sourceSynset, Synset targetSynset, PointerType type) throws JWNLException {
+            Synset sourceSynset, Synset targetSynset, PointerType type) throws JWNLException, CloneNotSupportedException {
 
         return findAsymmetricRelationships(sourceSynset, targetSynset, type, DEFAULT_ASYMMETRIC_SEARCH_DEPTH);
     }
@@ -79,7 +79,7 @@ public class RelationshipFinder {
      * asymmetric if its type is asymmetric (i.e. it's not its own inverse).
      */
     private RelationshipList findAsymmetricRelationships(
-            Synset sourceSynset, Synset targetSynset, PointerType type, int depth) throws JWNLException {
+            Synset sourceSynset, Synset targetSynset, PointerType type, int depth) throws JWNLException, CloneNotSupportedException {
 
         // We run the reversal function on the trees to get linear (non-branching)
         // paths from the source word to its deepest ancestor (i.e. if there are
@@ -92,10 +92,10 @@ public class RelationshipFinder {
 
         RelationshipList relationships = new RelationshipList();
         // Do an exhaustive search for relationships
-        for (int i = 0; i < sourceRelations.length; i++) {
-            for (int j = 0; j < targetRelations.length; j++) {
+        for (PointerTargetNodeList sourceRelation : sourceRelations) {
+            for (PointerTargetNodeList targetRelation : targetRelations) {
                 Relationship relationship = findAsymmetricRelationship(
-                        sourceRelations[i], targetRelations[j], type, sourceSynset, targetSynset);
+                        sourceRelation, targetRelation, type, sourceSynset, targetSynset);
                 if (relationship != null) {
                     relationships.add(relationship);
                 }
@@ -118,7 +118,7 @@ public class RelationshipFinder {
      */
     private Relationship findAsymmetricRelationship(
             PointerTargetNodeList sourceNodes, PointerTargetNodeList targetNodes,
-            PointerType type, Synset sourceSynset, Synset targetSynset) {
+            PointerType type, Synset sourceSynset, Synset targetSynset) throws CloneNotSupportedException {
 
         // If the deepest ancestors of the words are not the same,
         // then there is no relationship between the words.
@@ -150,7 +150,7 @@ public class RelationshipFinder {
 
     /**
      * A symmetric relationship is one whose type is symmetric (i.e. is it's own
-     * inverse. An example of a symmetric relationship is synonomy.
+     * inverse. An example of a symmetric relationship is synonymy.
      */
     private RelationshipList findSymmetricRelationships(
             Synset sourceSynset, Synset targetSynset, PointerType type) throws JWNLException {
@@ -179,15 +179,15 @@ public class RelationshipFinder {
         List l = tree.getAllMatches(opr);
 
         RelationshipList list = new RelationshipList();
-        for (int i = 0; i < l.size(); i++) {
-            PointerTargetNodeList nodes = findSymmetricRelationship((PointerTargetTreeNode) l.get(i), type);
+        for (Object aL : l) {
+            PointerTargetNodeList nodes = findSymmetricRelationship((PointerTargetTreeNode) aL, type);
             list.add(new SymmetricRelationship(type, nodes, sourceSynset, targetSynset));
         }
         return list;
     }
 
     /**
-     * Build a relationsip from <var>node</var> back to it's root ancestor and
+     * Build a relationship from <var>node</var> back to it's root ancestor and
      * then reverse the list.
      */
     private PointerTargetNodeList findSymmetricRelationship(PointerTargetTreeNode node, PointerType type) {

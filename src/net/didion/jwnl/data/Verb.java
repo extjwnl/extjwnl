@@ -25,8 +25,8 @@ public class Verb extends Word {
         return _verbFrameFlags;
     }
 
-    public int[] getVerbFrameIndicies() {
-        return VerbFrame.getVerbFrameIndicies(_verbFrameFlags);
+    public int[] getVerbFrameIndices() {
+        return VerbFrame.getVerbFrameIndices(_verbFrameFlags);
     }
 
     public String[] getVerbFrames() {
@@ -50,7 +50,7 @@ public class Verb extends Word {
     public String toString() {
         if (_cachedToString == null) {
             _cachedToString = JWNL.resolveMessage("DATA_TOSTRING_008", new Object[]{getPOS(), getLemma(), getSynset(),
-                    new Integer(getIndex()),
+                    getIndex(),
                     getVerbFramesAsString()});
         }
         return _cachedToString;

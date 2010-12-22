@@ -39,7 +39,7 @@ public class RemoteFileManager extends FileManagerImpl {
      *
      * @throws RemoteException If remote operation failed.
      */
-    public RemoteFileManager(String searchDir, Class dictionaryFileType) throws IOException, RemoteException {
+    public RemoteFileManager(String searchDir, Class dictionaryFileType) throws IOException {
         super(searchDir, dictionaryFileType);
         UnicastRemoteObject.exportObject(this);
     }
@@ -67,7 +67,7 @@ public class RemoteFileManager extends FileManagerImpl {
      * @throws RemoteException      If remote operation failed.
      * @throws UnknownHostException If the host could not be located.
      */
-    public static FileManager lookup(String hostname) throws AccessException, NotBoundException, RemoteException, UnknownHostException {
+    public static FileManager lookup(String hostname) throws NotBoundException, RemoteException {
         Registry registry = LocateRegistry.getRegistry(hostname);
         return (FileManager) registry.lookup(BINDING_NAME);
     }

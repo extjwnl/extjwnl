@@ -19,8 +19,8 @@ public class LookupExceptionsOperation implements Operation {
         Exc exc = Dictionary.getInstance().getException(pos, derivation);
         if (exc != null) {
             String[] exceptions = exc.getExceptionArray();
-            for (int i = 0; i < exceptions.length; i++) {
-                form.add(exceptions[i]);
+            for (String exception : exceptions) {
+                form.add(exception);
             }
             return true;
         }

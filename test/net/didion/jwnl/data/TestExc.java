@@ -8,6 +8,7 @@ import java.util.List;
 /**
  * @author bwalenz
  */
+@SuppressWarnings({"FieldCanBeLocal", "FieldCanBeLocal"})
 public class TestExc extends TestCase {
 
     /**
@@ -55,7 +56,7 @@ public class TestExc extends TestCase {
     }
 
     /**
-     * Test method for {@link net.didion.jwnl.data.Exc#getException()}.
+     * Test method for {@link net.didion.jwnl.data.Exc#getException(int)}.
      */
     public void testGetException() {
         assertTrue(testObj.getException(0).equals(exc1));
