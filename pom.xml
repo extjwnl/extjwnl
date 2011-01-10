@@ -7,7 +7,7 @@
 
     <name>Extended Java WordNet Library</name>
 
-    <version>1.0</version>
+    <version>20110110</version>
 
     <dependencies>
         <dependency>
