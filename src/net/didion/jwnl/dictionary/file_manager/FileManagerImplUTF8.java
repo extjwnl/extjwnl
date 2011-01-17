@@ -26,7 +26,7 @@ public class FileManagerImplUTF8 extends FileManagerImpl implements FileManager 
     public FileManagerImplUTF8() {
     }
 
-    private int LINE_MAX = 10240;//10K buffer
+    private int LINE_MAX = 1024;//1K buffer
     private byte[] lineArr = new byte[LINE_MAX];
 
     /**

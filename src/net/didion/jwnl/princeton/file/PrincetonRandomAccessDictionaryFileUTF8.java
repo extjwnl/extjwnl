@@ -37,36 +37,53 @@ public class PrincetonRandomAccessDictionaryFileUTF8 extends PrincetonRandomAcce
 
     public String readLine() throws IOException {
         if (isOpen()) {
-            long offStart = _file.getFilePointer();
-            String result = super.readLine();
-            if (null != result) {
-                long offEnd = _file.getFilePointer();
-                _file.seek(offStart);
-                int c;
-                int idx = 1;
-                while (((c = read()) != -1) && c != '\n' && c != '\r') {
-                    lineArr[idx - 1] = (byte) c;
-                    idx++;
-                    if (LINE_MAX == idx) {
-                        byte[] t = new byte[LINE_MAX * 2];
-                        System.arraycopy(lineArr, 0, t, 0, LINE_MAX);
-                        lineArr = t;
-                        LINE_MAX = 2 * LINE_MAX;
+            int c = -1;
+            boolean eol = false;
+            boolean utf = false;
+            int idx = 1;
+            StringBuilder input = new StringBuilder();
+
+            while (!eol) {
+                switch (c = read()) {
+                    case -1:
+                    case '\n':
+                        eol = true;
+                        break;
+                    case '\r':
+                        eol = true;
+                        long cur = getFilePointer();
+                        if ((read()) != '\n') {
+                            seek(cur);
+                        }
+                        break;
+                    default: {
+                        lineArr[idx - 1] = (byte) c;
+                        if (127 < lineArr[idx - 1]) {
+                            utf = true;
+                        }
+                        input.append((char) c);
+                        idx++;
+                        if (LINE_MAX == idx) {
+                            byte[] t = new byte[LINE_MAX * 2];
+                            System.arraycopy(lineArr, 0, t, 0, LINE_MAX);
+                            lineArr = t;
+                            LINE_MAX = 2 * LINE_MAX;
+                        }
+                        break;
                     }
                 }
-                if (1 < idx) {
-                    ByteBuffer bb = ByteBuffer.wrap(lineArr, 0, idx - 1);
-                    CharBuffer cb = decoder.decode(bb);
-                    result = cb.toString();
-                } else {
-                    result = "";
-                    if (-1 == c) {
-                        result = null;
-                    }
-                }
-                _file.seek(offEnd);
             }
-            return result;
+
+            if ((c == -1) && (input.length() == 0)) {
+                return null;
+            }
+            if (utf & (1 < idx)) {
+                ByteBuffer bb = ByteBuffer.wrap(lineArr, 0, idx - 1);
+                CharBuffer cb = decoder.decode(bb);
+                return cb.toString();
+            } else {
+                return input.toString();
+            }
         } else {
             throw new JWNLRuntimeException("PRINCETON_EXCEPTION_001");
         }
