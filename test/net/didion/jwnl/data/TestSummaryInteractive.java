@@ -19,7 +19,7 @@ public class TestSummaryInteractive {
     public static void main(String[] args) throws IOException, JWNLException {
         BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
 
-        JWNL.initialize(new FileInputStream("../config/file_properties.xml"));
+        JWNL.initialize(new FileInputStream("./config/file_properties.xml"));
         Dictionary dic = Dictionary.getInstance();
         System.err.flush();
         System.out.flush();

@@ -23,7 +23,7 @@ public class TestSummary {
 
     @BeforeClass
     public static void runOnceBeforeAllTests() throws FileNotFoundException, JWNLException {
-        JWNL.initialize(new FileInputStream("../config/file_properties.xml"));
+        JWNL.initialize(new FileInputStream("./config/file_properties.xml"));
         dic = Dictionary.getInstance();
     }
 
