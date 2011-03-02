@@ -1,15 +1,11 @@
-/**
- * Java WordNet Library (JWNL)
- * See the documentation for copyright information.
- *
- * @version 1.1
- */
 package net.didion.jwnl.princeton.file;
 
 import net.didion.jwnl.JWNLRuntimeException;
 import net.didion.jwnl.data.POS;
-import net.didion.jwnl.dictionary.file.DictionaryFile;
+import net.didion.jwnl.dictionary.Dictionary;
+import net.didion.jwnl.dictionary.file.DictionaryFileFactory;
 import net.didion.jwnl.dictionary.file.DictionaryFileType;
+import net.didion.jwnl.util.factory.Param;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,27 +13,32 @@ import java.io.IOException;
 import java.nio.CharBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
+import java.util.Map;
 
 /**
  * A <code>RandomAccessDictionaryFile</code> that accesses files named with Princeton's dictionary file naming convention.
  * Uses java.nio.channels.FileChannel for file access.
+ *
+ * @author didion
+ * @author Aliaksandr Autayeu avtaev@gmail.com
  */
-public class PrincetonChannelDictionaryFile extends AbstractPrincetonRandomAccessDictionaryFile {
+public class PrincetonChannelDictionaryFile extends AbstractPrincetonRandomAccessDictionaryFile implements DictionaryFileFactory<PrincetonChannelDictionaryFile> {
     /**
      * The random-access file.
      */
-    private CharBuffer _buffer = null;
-    private FileChannel _channel = null;
+    private CharBuffer buffer = null;
+    private FileChannel channel = null;
 
-    public PrincetonChannelDictionaryFile() {
+    public PrincetonChannelDictionaryFile(Dictionary dictionary, Map<String, Param> params) {
+        super(dictionary, params);
     }
 
-    public DictionaryFile newInstance(String path, POS pos, DictionaryFileType fileType) {
-        return new PrincetonChannelDictionaryFile(path, pos, fileType);
+    public PrincetonChannelDictionaryFile(Dictionary dictionary, String path, POS pos, DictionaryFileType fileType, Map<String, Param> params) {
+        super(dictionary, path, pos, fileType, params);
     }
 
-    public PrincetonChannelDictionaryFile(String path, POS pos, DictionaryFileType fileType) {
-        super(path, pos, fileType);
+    public PrincetonChannelDictionaryFile newInstance(Dictionary dictionary, String path, POS pos, DictionaryFileType fileType) {
+        return new PrincetonChannelDictionaryFile(dictionary, path, pos, fileType, params);
     }
 
     public String readLine() throws IOException {
@@ -48,8 +49,8 @@ public class PrincetonChannelDictionaryFile extends AbstractPrincetonRandomAcces
             boolean eol = false;
 
             while (!eol) {
-                c = _buffer.get((int) getFilePointer());
-                _buffer.position((int) getFilePointer() + 1);
+                c = buffer.get((int) getFilePointer());
+                buffer.position((int) getFilePointer() + 1);
 
                 switch (c) {
                     case (char) -1:
@@ -58,8 +59,8 @@ public class PrincetonChannelDictionaryFile extends AbstractPrincetonRandomAcces
                         break;
                     case '\r':
                         eol = true;
-                        if ((_buffer.get((int) getFilePointer() + 1)) == '\n') {
-                            _buffer.position((int) getFilePointer() + 1);
+                        if ((buffer.get((int) getFilePointer() + 1)) == '\n') {
+                            buffer.position((int) getFilePointer() + 1);
                         }
                         break;
                     default:
@@ -73,41 +74,61 @@ public class PrincetonChannelDictionaryFile extends AbstractPrincetonRandomAcces
         }
     }
 
+    public String readLineWord() throws IOException {
+        if (isOpen()) {
+            StringBuffer input = new StringBuffer();
+            int c;
+            while (((c = read()) != -1) && c != '\n' && c != '\r' && c != ' ') {
+                input.append((char) c);
+            }
+            return input.toString();
+        } else {
+            throw new JWNLRuntimeException("PRINCETON_EXCEPTION_001");
+        }
+    }
+
     public void seek(long pos) throws IOException {
-        _buffer.position((int) pos);
+        buffer.position((int) pos);
     }
 
     public long getFilePointer() throws IOException {
-        return (long) _buffer.position();
+        return (long) buffer.position();
     }
 
     public boolean isOpen() {
-        return _channel != null;
+        return channel != null;
+    }
+
+    public void save() {
+        //nop
     }
 
     public void close() {
         try {
-            _buffer = null;
-            _channel.close();
+            buffer = null;
+            channel.close();
         } catch (IOException ex) {
         } finally {
-            _channel = null;
+            channel = null;
         }
     }
 
     protected void openFile(File file) throws IOException {
-        _channel = new FileInputStream(file).getChannel();
-        _buffer = Charset.forName("ISO-8859-15").newDecoder().decode(
-                _channel.map(FileChannel.MapMode.READ_ONLY, 0, _channel.size()));
+        channel = new FileInputStream(file).getChannel();
+        if (null != encoding) {
+            buffer = Charset.forName(encoding).newDecoder().decode(channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size()));
+        } else {
+            buffer = Charset.defaultCharset().newDecoder().decode(channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size()));
+        }
     }
 
     public long length() throws IOException {
-        // Do not use "_buffer.length()" because it returns the
+        // Do not use "buffer.length()" because it returns the
         // buffer length, not the total length of the file
-        return _channel.size();
+        return channel.size();
     }
 
     public int read() throws IOException {
-        return (int) _buffer.get();
+        return (int) buffer.get();
     }
 }

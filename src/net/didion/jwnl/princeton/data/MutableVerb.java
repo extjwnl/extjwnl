@@ -2,6 +2,7 @@ package net.didion.jwnl.princeton.data;
 
 import net.didion.jwnl.data.Synset;
 import net.didion.jwnl.data.Verb;
+import net.didion.jwnl.dictionary.Dictionary;
 
 import java.util.BitSet;
 
@@ -10,8 +11,8 @@ import java.util.BitSet;
  * is created.
  */
 class MutableVerb extends Verb {
-    public MutableVerb(Synset synset, int index, String lemma) {
-        super(synset, index, lemma, new BitSet());
+    public MutableVerb(Dictionary dictionary, Synset synset, int index, String lemma) {
+        super(dictionary, synset, index, lemma, new BitSet());
     }
 
     public void setVerbFrameFlag(int fnum) {

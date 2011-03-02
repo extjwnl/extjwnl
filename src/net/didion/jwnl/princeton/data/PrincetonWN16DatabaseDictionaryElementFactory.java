@@ -1,16 +1,24 @@
 package net.didion.jwnl.princeton.data;
 
-import net.didion.jwnl.JWNLException;
 import net.didion.jwnl.data.Adjective;
 import net.didion.jwnl.data.POS;
 import net.didion.jwnl.data.Synset;
 import net.didion.jwnl.data.Word;
+import net.didion.jwnl.dictionary.Dictionary;
+import net.didion.jwnl.util.factory.Param;
 
 import java.util.Map;
 
+/**
+ * Element factory for WN1.6.
+ *
+ * @author didion
+ * @author Aliaksandr Autayeu avtaev@gmail.com
+ */
 public class PrincetonWN16DatabaseDictionaryElementFactory extends AbstractPrincetonDatabaseDictionaryElementFactory {
-    public Object create(Map params) throws JWNLException {
-        return new PrincetonWN16DatabaseDictionaryElementFactory();
+
+    public PrincetonWN16DatabaseDictionaryElementFactory(Dictionary dictionary, Map<String, Param> params) {
+        super(dictionary);
     }
 
     protected Word createWord(Synset synset, int index, String lemma) {
@@ -22,7 +30,7 @@ public class PrincetonWN16DatabaseDictionaryElementFactory extends AbstractPrinc
                 adjectivePosition = Adjective.getAdjectivePositionForKey(marker);
                 lemma = lemma.substring(0, lparen);
             }
-            return new Adjective(synset, index, lemma, adjectivePosition);
+            return new Adjective(dictionary, synset, index, lemma, adjectivePosition);
         } else {
             return super.createWord(synset, index, lemma);
         }

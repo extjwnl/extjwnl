@@ -1,32 +1,36 @@
 package net.didion.jwnl.data;
 
 import net.didion.jwnl.JWNL;
+import net.didion.jwnl.dictionary.Dictionary;
 
 import java.util.BitSet;
 
 /**
  * A <code>Verb</code> is a subclass of <code>Word</code> that can have 1 or more
  * <code>VerbFrame</code>s (use cases of the verb).
+ *
+ * @author didion
+ * @author Aliaksandr Autayeu avtaev@gmail.com
  */
 public class Verb extends Word {
-    static final long serialVersionUID = 1639186403690898842L;
+    private static final long serialVersionUID = 1639186403690898842L;
     /**
      * A bit array of all the verb frames that are valid for this word.
      * see {@link VerbFrame} for more explanation.
      */
-    private BitSet _verbFrameFlags;
+    private BitSet verbFrameFlags;
 
-    public Verb(Synset synset, int index, String lemma, BitSet verbFrameFlags) {
-        super(synset, index, lemma);
-        _verbFrameFlags = verbFrameFlags;
+    public Verb(Dictionary dictionary, Synset synset, int index, String lemma, BitSet verbFrameFlags) {
+        super(dictionary, synset, index, lemma);
+        this.verbFrameFlags = verbFrameFlags;
     }
 
     public BitSet getVerbFrameFlags() {
-        return _verbFrameFlags;
+        return verbFrameFlags;
     }
 
     public int[] getVerbFrameIndices() {
-        return VerbFrame.getVerbFrameIndices(_verbFrameFlags);
+        return VerbFrame.getVerbFrameIndices(verbFrameFlags);
     }
 
     public String[] getVerbFrames() {
@@ -45,14 +49,9 @@ public class Verb extends Word {
         return buf.toString();
     }
 
-    private transient String _cachedToString = null;
-
     public String toString() {
-        if (_cachedToString == null) {
-            _cachedToString = JWNL.resolveMessage("DATA_TOSTRING_008", new Object[]{getPOS(), getLemma(), getSynset(),
-                    getIndex(),
-                    getVerbFramesAsString()});
-        }
-        return _cachedToString;
+        return JWNL.resolveMessage("DATA_TOSTRING_008", new Object[]{getPOS(), getLemma(), getSynset(),
+                getIndex(),
+                getVerbFramesAsString()});
     }
 }

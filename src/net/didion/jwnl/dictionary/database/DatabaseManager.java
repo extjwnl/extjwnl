@@ -2,8 +2,9 @@ package net.didion.jwnl.dictionary.database;
 
 import net.didion.jwnl.JWNLException;
 import net.didion.jwnl.data.POS;
+import net.didion.jwnl.util.factory.Owned;
 
-public interface DatabaseManager {
+public interface DatabaseManager extends Owned {
     Query getIndexWordSynsetsQuery(POS pos, String lemma) throws JWNLException;
 
     Query getIndexWordLemmasQuery(POS pos) throws JWNLException;

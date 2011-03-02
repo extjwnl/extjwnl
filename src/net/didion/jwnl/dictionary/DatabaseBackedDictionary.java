@@ -5,11 +5,11 @@ import net.didion.jwnl.data.*;
 import net.didion.jwnl.dictionary.database.DatabaseManager;
 import net.didion.jwnl.dictionary.database.Query;
 import net.didion.jwnl.util.factory.Param;
+import org.w3c.dom.Document;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.NoSuchElementException;
 
 public class DatabaseBackedDictionary extends AbstractCachingDictionary {
@@ -21,34 +21,25 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
     public static final String DICTIONARY_ELEMENT_FACTORY = "dictionary_element_factory";
     public static final String DATABASE_MANAGER = "database_manager";
 
-    private DatabaseDictionaryElementFactory _elementFactory;
-    private DatabaseManager _dbManager;
+    private DatabaseDictionaryElementFactory elementFactory;
+    private DatabaseManager dbManager;
 
-    public DatabaseBackedDictionary() {
-    }
-
-    private DatabaseBackedDictionary(
-            MorphologicalProcessor morph,
-            DatabaseDictionaryElementFactory elementFactory,
-            DatabaseManager dbManager) {
-        super(morph);
-        _elementFactory = elementFactory;
-        _dbManager = dbManager;
-    }
-
-    public void install(Map params) throws JWNLException {
-        Param param = (Param) params.get(MORPH);
+    public DatabaseBackedDictionary(Document doc) throws JWNLException {
+        super(doc);
+        Param param = params.get(MORPH);
         MorphologicalProcessor morph =
                 (param == null) ? null : (MorphologicalProcessor) param.create();
 
-        param = (Param) params.get(DICTIONARY_ELEMENT_FACTORY);
+        param = params.get(DICTIONARY_ELEMENT_FACTORY);
         DatabaseDictionaryElementFactory factory =
                 (param == null) ? null : (DatabaseDictionaryElementFactory) param.create();
 
-        param = (Param) params.get(DATABASE_MANAGER);
+        param = params.get(DATABASE_MANAGER);
         DatabaseManager manager = (param == null) ? null : (DatabaseManager) param.create();
 
-        setDictionary(new DatabaseBackedDictionary(morph, factory, manager));
+        elementFactory = factory;
+        dbManager = manager;
+        setMorphologicalProcessor(morph);
     }
 
     public IndexWord getIndexWord(POS pos, String lemma) throws JWNLException {
@@ -61,8 +52,8 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
             if (word == null) {
                 Query query = null;
                 try {
-                    query = _dbManager.getIndexWordSynsetsQuery(pos, lemma);
-                    word = _elementFactory.createIndexWord(pos, lemma, query.execute());
+                    query = dbManager.getIndexWordSynsetsQuery(pos, lemma);
+                    word = elementFactory.createIndexWord(pos, lemma, query.execute());
                     if (word != null && isCachingEnabled()) {
                         cacheIndexWord(new POSKey(pos, lemma), word);
                     }
@@ -78,18 +69,18 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
         return word;
     }
 
-    public Iterator getIndexWordIterator(POS pos) throws JWNLException {
-        Query query = _dbManager.getIndexWordLemmasQuery(pos);
+    public Iterator<IndexWord> getIndexWordIterator(POS pos) throws JWNLException {
+        Query query = dbManager.getIndexWordLemmasQuery(pos);
         return new IndexWordIterator(pos, query);
     }
 
-    public Iterator getIndexWordIterator(POS pos, String substring) throws JWNLException {
-        Query query = _dbManager.getIndexWordLemmasQuery(pos, substring);
+    public Iterator<IndexWord> getIndexWordIterator(POS pos, String substring) throws JWNLException {
+        Query query = dbManager.getIndexWordLemmasQuery(pos, substring);
         return new IndexWordIterator(pos, query);
     }
 
     public IndexWord getRandomIndexWord(POS pos) throws JWNLException {
-        Query query = _dbManager.getRandomIndexWordQuery(pos);
+        Query query = dbManager.getRandomIndexWordQuery(pos);
         String lemma = null;
 
         try {
@@ -116,12 +107,12 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
             Query pointerQuery = null;
             Query verbFrameQuery = null;
             try {
-                query = _dbManager.getSynsetQuery(pos, offset);
-                wordQuery = _dbManager.getSynsetWordQuery(pos, offset);
-                pointerQuery = _dbManager.getPointerQuery(pos, offset);
-                verbFrameQuery = _dbManager.getVerbFrameQuery(pos, offset);
-                synset = _elementFactory.createSynset(pos, offset, query.execute(), wordQuery.execute(),
-                        pointerQuery.execute(), verbFrameQuery.execute());
+                query = dbManager.getSynsetQuery(pos, offset);
+                wordQuery = dbManager.getSynsetWordQuery(pos, offset);
+                pointerQuery = dbManager.getPointerQuery(pos, offset);
+                verbFrameQuery = dbManager.getVerbFrameQuery(pos, offset);
+                synset = elementFactory.createSynset(pos, offset, query.execute(), wordQuery.execute(),
+                        pointerQuery.execute(), POS.VERB.equals(pos) ? verbFrameQuery.execute() : null);
                 if (synset != null && isCachingEnabled()) {
                     cacheSynset(new POSKey(pos, offset), synset);
                 }
@@ -145,12 +136,13 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
         return synset;
     }
 
-    public Iterator getSynsetIterator(POS pos) throws JWNLException {
-        Query query = _dbManager.getSynsetsQuery(pos);
+    public Iterator<Synset> getSynsetIterator(POS pos) throws JWNLException {
+        Query query = dbManager.getSynsetsQuery(pos);
         return new SynsetIterator(pos, query);
     }
 
     public Exc getException(POS pos, String derivation) throws JWNLException {
+        derivation = prepareQueryString(derivation);
         Exc exc = null;
         if (isCachingEnabled()) {
             exc = getCachedException(new POSKey(pos, derivation));
@@ -158,8 +150,8 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
         if (exc == null) {
             Query query = null;
             try {
-                query = _dbManager.getExceptionQuery(pos, derivation);
-                exc = _elementFactory.createExc(pos, derivation, query.execute());
+                query = dbManager.getExceptionQuery(pos, derivation);
+                exc = elementFactory.createExc(pos, derivation, query.execute());
                 if (exc != null && isCachingEnabled()) {
                     cacheException(new POSKey(pos, derivation), exc);
                 }
@@ -174,43 +166,43 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
         return exc;
     }
 
-    public Iterator getExceptionIterator(POS pos) throws JWNLException {
-        Query query = _dbManager.getExceptionsQuery(pos);
+    public Iterator<Exc> getExceptionIterator(POS pos) throws JWNLException {
+        Query query = dbManager.getExceptionsQuery(pos);
         return new ExceptionIterator(pos, query);
     }
 
     public void close() {
     }
 
-    private abstract class DatabaseElementIterator implements Iterator {
-        private POS _pos;
-        private Query _lemmas;
-        private boolean _advanced = false;
-        private boolean _hasNext = false;
+    private abstract class DatabaseElementIterator<E extends DictionaryElement> implements Iterator<E> {
+        private POS pos;
+        private Query lemmas;
+        private boolean advanced = false;
+        private boolean hasNext = false;
 
         protected DatabaseElementIterator(POS pos, Query query) {
-            _pos = pos;
-            _lemmas = query;
+            this.pos = pos;
+            lemmas = query;
         }
 
         public boolean hasNext() {
-            if (!_advanced) {
-                _advanced = true;
+            if (!advanced) {
+                advanced = true;
                 try {
-                    _hasNext = getResults().next();
+                    hasNext = getResults().next();
                 } catch (SQLException e) {
-                    _hasNext = false;
+                    hasNext = false;
                 }
             }
-            if (!_hasNext) {
-                _lemmas.close();
+            if (!hasNext) {
+                lemmas.close();
             }
-            return _hasNext;
+            return hasNext;
         }
 
-        public Object next() {
+        public E next() {
             if (hasNext()) {
-                _advanced = false;
+                advanced = false;
                 try {
                     return createElement();
                 } catch (Exception e) {
@@ -224,53 +216,53 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
             throw new UnsupportedOperationException();
         }
 
-        protected abstract DictionaryElement createElement() throws Exception;
+        protected abstract E createElement() throws Exception;
 
         protected POS getPOS() {
-            return _pos;
+            return pos;
         }
 
         protected ResultSet getResults() throws SQLException {
-            if (!_lemmas.isExecuted()) {
-                _lemmas.execute();
+            if (!lemmas.isExecuted()) {
+                lemmas.execute();
             }
-            return _lemmas.getResults();
+            return lemmas.getResults();
         }
 
         protected void finalize() throws Throwable {
             super.finalize();
-            _lemmas.close();
+            lemmas.close();
         }
     }
 
-    private class IndexWordIterator extends DatabaseElementIterator {
+    private class IndexWordIterator extends DatabaseElementIterator<IndexWord> {
         public IndexWordIterator(POS pos, Query query) {
             super(pos, query);
         }
 
-        protected DictionaryElement createElement() throws Exception {
+        protected IndexWord createElement() throws Exception {
             String lemma = getResults().getString(1);
             return getIndexWord(getPOS(), lemma);
         }
     }
 
-    private class SynsetIterator extends DatabaseElementIterator {
+    private class SynsetIterator extends DatabaseElementIterator<Synset> {
         public SynsetIterator(POS pos, Query query) {
             super(pos, query);
         }
 
-        protected DictionaryElement createElement() throws Exception {
+        protected Synset createElement() throws Exception {
             long offset = getResults().getLong(1);
             return getSynsetAt(getPOS(), offset);
         }
     }
 
-    private class ExceptionIterator extends DatabaseElementIterator {
+    private class ExceptionIterator extends DatabaseElementIterator<Exc> {
         public ExceptionIterator(POS pos, Query query) {
             super(pos, query);
         }
 
-        protected DictionaryElement createElement() throws Exception {
+        protected Exc createElement() throws Exception {
             String derivation = getResults().getString(1);
             return getException(getPOS(), derivation);
         }

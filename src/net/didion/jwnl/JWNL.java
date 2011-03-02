@@ -5,25 +5,18 @@ import net.didion.jwnl.data.PointerType;
 import net.didion.jwnl.data.VerbFrame;
 import net.didion.jwnl.dictionary.Dictionary;
 import net.didion.jwnl.util.ResourceBundleSet;
-import net.didion.jwnl.util.factory.*;
-import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
 /**
  * Contains system info as well as JWNL properties.
+ *
+ * @author didion
+ * @author Aliaksandr Autayeu avtaev@gmail.com
  */
-public final class JWNL {
+public class JWNL {
     // OS types
     public static final OS WINDOWS = new OS("windows");
     public static final OS UNIX = new OS("unix");
@@ -33,30 +26,29 @@ public final class JWNL {
     public static final OS[] DEFINED_OS_ARRAY = {WINDOWS, UNIX, MAC};
     public static final String OS_PROPERTY_NAME = "os.name";
 
-    private static final String JAVA_VERSION_PROPERTY = "java.version";
     private static final String CORE_RESOURCE = "JWNLResource";
 
-    // initialization stages
-    private static final int UNINITIALIZED = 0;
-    private static final int START = 1;
-    private static final int DICTIONARY_PATH_SET = 2;
-    private static final int VERSION_SET = 3;
-    private static final int INITIALIZED = 4;
-
-    private static Version _version;
-    private static ResourceBundleSet _bundle;
-    private static OS _currentOS = UNDEFINED;
-    private static int _initStage = UNINITIALIZED;
+    private static ResourceBundleSet bundle;
+    private static OS currentOS = UNDEFINED;
 
     static {
-        createResourceBundle();
+        bundle = new ResourceBundleSet(CORE_RESOURCE);
+        // set the locale
+        //bundle.setLocale(Locale.getDefault());//enable when enough translations will be available.
+        bundle.setLocale(new Locale("en", ""));
+
         // set the OS
         String os = System.getProperty(OS_PROPERTY_NAME);
         for (OS definedOS : DEFINED_OS_ARRAY) {
             if (definedOS.matches(os)) {
-                _currentOS = definedOS;
+                currentOS = definedOS;
             }
         }
+
+        // initialize bundle-dependant resources
+        PointerType.initialize();
+        Adjective.initialize();
+        VerbFrame.initialize();
     }
 
     /**
@@ -64,21 +56,6 @@ public final class JWNL {
      */
     private JWNL() {
     }
-
-    // tag names
-    private static final String VERSION_TAG = "version";
-    private static final String DICTIONARY_TAG = "dictionary";
-    private static final String PARAM_TAG = "param";
-    private static final String RESOURCE_TAG = "resource";
-
-    // attribute names
-    private static final String LANGUAGE_ATTRIBUTE = "language";
-    private static final String COUNTRY_ATTRIBUTE = "country";
-    private static final String CLASS_ATTRIBUTE = "class";
-    private static final String NAME_ATTRIBUTE = "name";
-    private static final String VALUE_ATTRIBUTE = "value";
-    private static final String PUBLISHER_ATTRIBUTE = "publisher";
-    private static final String NUMBER_ATTRIBUTE = "number";
 
     /**
      * Parses a properties file and sets the ready state at various points. Initializes the
@@ -88,167 +65,31 @@ public final class JWNL {
      * @throws JWNLException various JWNL exceptions, depending on where this fails
      */
     public static void initialize(InputStream propertiesStream) throws JWNLException {
-        checkInitialized(UNINITIALIZED);
-
-        _initStage = START;
-        try {
-            // find the properties file
-            if (propertiesStream == null || propertiesStream.available() <= 0) {
-                throw new JWNLException("JWNL_EXCEPTION_001");
-            }
-        } catch (IOException ex) {
-            throw new JWNLException("JWNL_EXCEPTION_001", ex);
-        }
-
-        // parse the properties file
-        Document doc;
-        try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            factory.setValidating(false);
-            DocumentBuilder docBuilder = factory.newDocumentBuilder();
-            doc = docBuilder.parse(propertiesStream);
-        } catch (Exception ex) {
-            throw new JWNLException("JWNL_EXCEPTION_002", ex);
-        }
-
-        // do this in a separate try/catch since parse can also throw an IOException
-        try {
-            propertiesStream.close();
-        } catch (IOException ex) {
-        }
-
-        org.w3c.dom.Element root = doc.getDocumentElement();
-
-        // set the locale
-        _bundle.setLocale(getLocale(
-                getAttribute(root, LANGUAGE_ATTRIBUTE),
-                getAttribute(root, COUNTRY_ATTRIBUTE)));
-
-        // add additional resources
-        NodeList resourceNodes = root.getElementsByTagName(RESOURCE_TAG);
-        for (int i = 0; i < resourceNodes.getLength(); i++) {
-            String resource = getAttribute(resourceNodes.item(i), CLASS_ATTRIBUTE);
-            if (resource != null) {
-                _bundle.addResource(resource);
-            }
-        }
-
-        // initialize bundle-dependant resources
-        PointerType.initialize();
-        Adjective.initialize();
-        VerbFrame.initialize();
-
-        // parse version information
-        NodeList versionNodes = root.getElementsByTagName(VERSION_TAG);
-        if (versionNodes.getLength() == 0) {
-            throw new JWNLException("JWNL_EXCEPTION_003");
-        }
-        Node version = versionNodes.item(0);
-
-        _initStage = DICTIONARY_PATH_SET;
-
-        String number = getAttribute(version, NUMBER_ATTRIBUTE);
-        _version = new Version(
-                getAttribute(version, PUBLISHER_ATTRIBUTE),
-                (number == null) ? 0.0 : Double.parseDouble(number),
-                getLocale(getAttribute(version, LANGUAGE_ATTRIBUTE), getAttribute(version, COUNTRY_ATTRIBUTE)));
-
-        _initStage = VERSION_SET;
-
-        // parse dictionary
-        NodeList dictionaryNodeList = root.getElementsByTagName(DICTIONARY_TAG);
-        if (dictionaryNodeList.getLength() == 0) {
-            throw new JWNLException("JWNL_EXCEPTION_005");
-        }
-        createElementFromNode(dictionaryNodeList.item(0)).install();
-
-        _initStage = INITIALIZED;
-    }
-
-    private static void createResourceBundle() {
-        _bundle = new ResourceBundleSet(CORE_RESOURCE);
-    }
-
-    private static Element createElementFromNode(Node node) throws JWNLException {
-        return new Element(getAttribute(node, CLASS_ATTRIBUTE), getParams(node.getChildNodes()));
-    }
-
-    private static Param[] getParams(NodeList list) throws JWNLException {
-        List params = new ArrayList();
-        for (int i = 0; i < list.getLength(); i++) {
-            Node n = list.item(i);
-            if (n.getNodeType() == Node.ELEMENT_NODE && n.getNodeName().equals(PARAM_TAG)) {
-                String name = getAttribute(n, NAME_ATTRIBUTE);
-                String value = getAttribute(n, VALUE_ATTRIBUTE);
-                if (name == null && value == null) {
-                    throw new JWNLException("JWNL_EXCEPTION_008");
-                } else {
-                    Param param;
-                    if (value == null) {
-                        param = new ParamList(name.toLowerCase(), getParams(n.getChildNodes()));
-                    } else if (name == null) {
-                        param = new ValueParam(value, getParams(n.getChildNodes()));
-                    } else {
-                        param = new NameValueParam(name.toLowerCase(), value, getParams(n.getChildNodes()));
-                    }
-                    params.add(param);
-                }
-            }
-        }
-        return (Param[]) params.toArray(new Param[params.size()]);
-    }
-
-    private static String getAttribute(Node node, String attributeName) {
-        NamedNodeMap map = node.getAttributes();
-        if (map != null) {
-            Node n = map.getNamedItem(attributeName);
-            if (n != null) {
-                return n.getNodeValue();
-            }
-        }
-        return null;
-    }
-
-    private static Locale getLocale(String language, String country) {
-        if (language == null) {
-            return Locale.getDefault();
-        } else if (country == null) {
-            return new Locale(language, "");
-        } else {
-            return new Locale(language, country);
-        }
-    }
-
-    public static boolean isInitialized() {
-        return _initStage == INITIALIZED;
+        Dictionary.getInstance(propertiesStream);
     }
 
     /**
      * Get the current OS.
+     *
+     * @return the current OS
      */
     public static OS getOS() {
-        return _currentOS;
-    }
-
-    public static double getJavaVersion() {
-        String versionStr = System.getProperty(JAVA_VERSION_PROPERTY);
-        return Double.parseDouble(versionStr.substring(0, 3));
-    }
-
-    /**
-     * Get the current WordNet version
-     */
-    public static Version getVersion() {
-        checkInitialized(VERSION_SET);
-        return _version;
+        return currentOS;
     }
 
     public static ResourceBundle getResourceBundle() {
-        return _bundle;
+        return bundle;
+    }
+
+    public static ResourceBundleSet getResourceBundleSet() {
+        return bundle;
     }
 
     /**
-     * Resolve <var>msg</var> in one of the resource bundles used by the system
+     * Resolves <var>msg</var> in one of the resource bundles used by the system
+     *
+     * @param msg message to resolve
+     * @return resolved message
      */
     public static String resolveMessage(String msg) {
         return resolveMessage(msg, new Object[0]);
@@ -257,7 +98,9 @@ public final class JWNL {
     /**
      * Resolve <var>msg</var> in one of the resource bundles used by the system.
      *
+     * @param msg message to resolve
      * @param obj parameter to insert into the resolved message
+     * @return resolved message
      */
     public static String resolveMessage(String msg, Object obj) {
         return resolveMessage(msg, new Object[]{obj});
@@ -266,11 +109,12 @@ public final class JWNL {
     /**
      * Resolve <var>msg</var> in one of the resource bundles used by the system
      *
+     * @param msg    message to resolve
      * @param params parameters to insert into the resolved message
+     * @return resolved message
      */
     public static String resolveMessage(String msg, Object[] params) {
-        checkInitialized(UNINITIALIZED);
-        return insertParams(_bundle.getString(msg), params);
+        return insertParams(bundle.getString(msg), params);
     }
 
     private static String insertParams(String str, Object[] params) {
@@ -288,86 +132,28 @@ public final class JWNL {
         return buf.toString();
     }
 
-    private static void checkInitialized(int requiredStage) {
-        if (requiredStage > _initStage) {
-            throw new JWNLRuntimeException("JWNL_EXCEPTION_007");
-        }
-    }
-
-    public static void shutdown() {
-        _initStage = UNINITIALIZED;
-        Dictionary.uninstall();
-        _version = null;
-        createResourceBundle();
-    }
-
     /**
      * Used to create constants that represent the major categories of operating systems.
      */
     public static final class OS {
-        private String _name;
+        private String name;
 
         protected OS(String name) {
-            _name = name;
+            this.name = name;
         }
 
         public String toString() {
-            return resolveMessage("JWNL_TOSTRING_001", _name);
+            return resolveMessage("JWNL_TOSTRING_001", name);
         }
 
         /**
          * Returns true if <var>testOS</var> is a version of this OS. For example, calling
          * WINDOWS.matches("Windows 95") returns true.
+         * @param testOS OS string
+         * @return true if <var>testOS</var> is a version of this OS
          */
-        public boolean matches(String test) {
-            return test.toLowerCase().indexOf(_name.toLowerCase()) >= 0;
-        }
-    }
-
-    /**
-     * Represents a version of WordNet.
-     */
-    public static final class Version {
-        private static final String UNSPECIFIED = "unspecified";
-
-        private String _publisher;
-        private double _number;
-        private Locale _locale;
-
-        public Version(String publisher, double number, Locale locale) {
-            if (publisher == null) {
-                publisher = UNSPECIFIED;
-            }
-            _publisher = publisher;
-            _number = number;
-            _locale = locale;
-        }
-
-        public String getPublisher() {
-            return _publisher;
-        }
-
-        public double getNumber() {
-            return _number;
-        }
-
-        public Locale getLocale() {
-            return _locale;
-        }
-
-        public boolean equals(Object obj) {
-            return (obj instanceof Version)
-                    && _publisher.equals(((Version) obj)._publisher)
-                    && _number == ((Version) obj)._number
-                    && _locale.equals(((Version) obj)._locale);
-        }
-
-        public String toString() {
-            return resolveMessage("JWNL_TOSTRING_002", new Object[]{_publisher, _number, _locale});
-        }
-
-        public int hashCode() {
-            return _publisher.hashCode() ^ (int) (_number * 100);
+        public boolean matches(String testOS) {
+            return testOS.toLowerCase().indexOf(name.toLowerCase()) >= 0;
         }
     }
 }

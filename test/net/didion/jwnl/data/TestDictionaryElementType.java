@@ -1,52 +1,32 @@
 package net.didion.jwnl.data;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author bwalenz
+ * @author Aliaksandr Autayeu avtaev@gmail.com
  */
-public class TestDictionaryElementType extends TestCase {
+public class TestDictionaryElementType {
 
-    /**
-     * Internal types list.
-     */
-    List types;
+    @Test
+    public void testGetAllDictionaryElementTypes() {
+        Assert.assertEquals(3, DictionaryElementType.getAllDictionaryElementTypes().size());
+    }
 
-    /* (non-Javadoc)
-      * @see junit.framework.TestCase#setUp()
-      */
-    protected void setUp() throws Exception {
-        types = new ArrayList();
+    @Test
+    public void testGetName() {
+        List<String> types = new ArrayList<String>();
         types.add("EXCEPTION");
         types.add("INDEX_WORD");
         types.add("SYNSET");
-    }
 
-    /**
-     * Test method for {@link net.didion.jwnl.data.DictionaryElementType#getAllDictionaryElementTypes()}.
-     */
-    public void testGetAllDictionaryElementTypes() {
-        List types = DictionaryElementType.getAllDictionaryElementTypes();
-
-        assertTrue(types.size() == 3);
-    }
-
-
-    /**
-     * Test method for {@link net.didion.jwnl.data.DictionaryElementType#getName()}.
-     */
-    public void testGetName() {
-        List<DictionaryElementType> types = DictionaryElementType.getAllDictionaryElementTypes();
-
-        for (DictionaryElementType type : types) {
-            if (!this.types.contains(type.getName())) {
-                fail("Type definitions");
-            }
+        for (DictionaryElementType type : DictionaryElementType.getAllDictionaryElementTypes()) {
+            Assert.assertTrue(types.contains(type.getName()));
         }
-
     }
-
 }

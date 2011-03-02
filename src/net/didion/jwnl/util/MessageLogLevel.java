@@ -10,21 +10,21 @@ public class MessageLogLevel {
     public static final MessageLogLevel ERROR = new MessageLogLevel("ERROR");
     public static final MessageLogLevel FATAL = new MessageLogLevel("FATAL");
 
-    private final String _name;
+    private final String name;
 
     private MessageLogLevel(String name) {
-        _name = name;
+        this.name = name;
     }
 
     public String getName() {
-        return _name;
+        return name;
     }
 
     public String toString() {
-        return JWNL.resolveMessage("", _name);
+        return JWNL.resolveMessage("", name);
     }
 
     public int hashCode() {
-        return _name.hashCode();
+        return name.hashCode();
     }
 }

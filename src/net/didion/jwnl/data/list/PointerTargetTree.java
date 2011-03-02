@@ -10,30 +10,30 @@ import java.util.List;
  * A container for the root node of a pointer target tree.
  */
 public class PointerTargetTree {
-    private PointerTargetTreeNode _rootNode;
+    private PointerTargetTreeNode rootNode;
 
     public PointerTargetTree(PointerTargetTreeNode rootNode) {
-        _rootNode = rootNode;
+        this.rootNode = rootNode;
     }
 
     public PointerTargetTree(Synset synset, PointerTargetTreeNodeList list) {
-        _rootNode = new PointerTargetTreeNode(synset);
-        _rootNode.setChildTreeList(list);
+        rootNode = new PointerTargetTreeNode(synset);
+        rootNode.setChildTreeList(list);
     }
 
     public PointerTargetTreeNode getRootNode() {
-        return _rootNode;
+        return rootNode;
     }
 
     /**
      * Two PointerTargetTree's are equal if their root nodes are equal.
      */
     public boolean equals(Object obj) {
-        return (obj instanceof PointerTargetTree) && _rootNode.equals(((PointerTargetTree) obj).getRootNode());
+        return (obj instanceof PointerTargetTree) && rootNode.equals(((PointerTargetTree) obj).getRootNode());
     }
 
     /**
-     * Walk the tree and perform the operation <code>opr</code> on
+     * Walk the tree and perform the operation <var>opr</var> on
      * each node. Continues until either opr returns a non-null
      * value, or it reaches the last node in the tree.
      */
@@ -46,9 +46,9 @@ public class PointerTargetTree {
     }
 
     /**
-     * Walk the tree and perform the operation <code>opr</code> on each node.
+     * Walk the tree and perform the operation <var>opr</var> on each node.
      * Searches the tree exhaustively and returns a List containing all nodes
-     * that are returned by <code>opr</code>.
+     * that are returned by <var>opr</var>.
      */
     public List getAllMatches(PointerTargetTreeNodeList.Operation opr) {
         List list = new ArrayList();
@@ -62,7 +62,7 @@ public class PointerTargetTree {
     }
 
     /**
-     * Find the first occurrence of <code>node</code> in the tree.
+     * Find the first occurrence of <var>node</var> in the tree.
      */
     public PointerTargetTreeNode findFirst(PointerTargetTreeNode node) {
         return (PointerTargetTreeNode) getFirstMatch(new PointerTargetTreeNodeList.FindNodeOperation(node));
@@ -76,7 +76,7 @@ public class PointerTargetTree {
     }
 
     /**
-     * Find all occurrences of <code>node</code> in the tree.
+     * Find all occurrences of <var>node</var> in the tree.
      */
     public PointerTargetTreeNode[] findAll(PointerTargetTreeNode node) {
         List list = getAllMatches(new PointerTargetTreeNodeList.FindNodeOperation(node));

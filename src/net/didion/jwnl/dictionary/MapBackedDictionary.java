@@ -1,147 +1,105 @@
 package net.didion.jwnl.dictionary;
 
 import net.didion.jwnl.JWNLException;
-import net.didion.jwnl.JWNLRuntimeException;
-import net.didion.jwnl.data.Exc;
-import net.didion.jwnl.data.IndexWord;
-import net.didion.jwnl.data.POS;
-import net.didion.jwnl.data.Synset;
+import net.didion.jwnl.data.*;
 import net.didion.jwnl.dictionary.file.*;
 import net.didion.jwnl.util.MessageLog;
 import net.didion.jwnl.util.MessageLogLevel;
 import net.didion.jwnl.util.factory.Param;
+import org.w3c.dom.Document;
 
 import java.util.*;
 
 /**
  * A <code>Dictionary</code> backed by <code>Map</code>s. Warning: this has huge memory requirements.
  * Make sure to start the interpreter with a large enough free memory pool to accommodate this.
+ *
+ * @author didion
+ * @author Aliaksandr Autayeu avtaev@gmail.com
  */
 public class MapBackedDictionary extends Dictionary {
-    private static final MessageLog _log = new MessageLog(MapBackedDictionary.class);
+
+    private static final MessageLog log = new MessageLog(MapBackedDictionary.class);
     /**
      * <code>MorphologicalProcessor</code> class install parameter. The value should be the
      * class of <code>MorphologicalProcessor</code> to use.
      */
     public static final String MORPH = "morphological_processor";
-    /**
-     * File type install parameter. The value should be * the name of the appropriate subclass
-     * of <code>DictionaryFileType</code>.
-     */
-    public static final String FILE_TYPE = "file_type";
-    /**
-     * The path of the dictionary files
-     */
-    public static final String PATH = "dictionary_path";
+
     /**
      * Random number generator used by getRandomIndexWord()
      */
-    private static final Random _rand = new Random(new Date().getTime());
+    private static final Random rand = new Random(new Date().getTime());
 
-    private Map _tableMap = new HashMap();
+    private Map<MapTableKey, Map<Object, ? extends DictionaryElement>> tableMap = new HashMap<MapTableKey, Map<Object, ? extends DictionaryElement>>();
 
-    public MapBackedDictionary() {
-    }
-
-    public static void install(String searchDir, Class dictionaryFileType) throws JWNLException {
-        install(searchDir, dictionaryFileType, null);
-    }
-
-    public static void install(String searchDir, Class dictionaryFileType, MorphologicalProcessor morph) throws JWNLException {
-        checkFileType(dictionaryFileType);
-        DictionaryCatalogSet files = new DictionaryCatalogSet(searchDir, dictionaryFileType);
-        setDictionary(new MapBackedDictionary(files, morph));
-        files.close();
-    }
-
-    /**
-     * Install a <code>MapBackedDictionary</code> from a map of parameters. The parameters are chosen from the static
-     * variables above.
-     */
-    public void install(Map params) throws JWNLException {
-        Param param = (Param) params.get(MORPH);
+    public MapBackedDictionary(Document doc) throws JWNLException {
+        super(doc);
+        Param param = params.get(MORPH);
         MorphologicalProcessor morph = (param == null) ? null : (MorphologicalProcessor) param.create();
 
-        param = (Param) params.get(FILE_TYPE);
-        Class dictionaryFileType;
-        try {
-            dictionaryFileType = Class.forName(param.getValue());
-        } catch (Exception ex) {
-            throw new JWNLException("DICTIONARY_EXCEPTION_003", param.getValue(), ex);
-        }
-        checkFileType(dictionaryFileType);
-
-        param = (Param) params.get(PATH);
-        String path = param.getValue();
-
-        install(path, dictionaryFileType, morph);
+        this.setMorphologicalProcessor(morph);
+        this.load();
     }
 
-    private static void checkFileType(Class c) {
-        if (!ObjectDictionaryFile.class.isAssignableFrom(c)) {
-            throw new JWNLRuntimeException("DICTIONARY_EXCEPTION_010", c);
-        }
-    }
-
-    /**
-     * Create a <code>MapBackedDictionary</code> with the specified set of files.
-     */
-    private MapBackedDictionary(DictionaryCatalogSet files, MorphologicalProcessor morph) throws JWNLException {
-        super(morph);
+    private void load() throws JWNLException {
+        DictionaryCatalogSet<ObjectDictionaryFile> files = new DictionaryCatalogSet<ObjectDictionaryFile>(this, params, ObjectDictionaryFile.class);
         if (!files.isOpen()) {
             try {
                 files.open();
-            } catch (Exception ex) {
-                throw new JWNLException("DICTIONARY_EXCEPTION_019", ex);
+            } catch (Exception e) {
+                throw new JWNLException("DICTIONARY_EXCEPTION_019", e);
             }
         }
         // Load all the hash tables into memory
-        _log.log(MessageLogLevel.INFO, "Loading MapBackedDictionary");
-        if (_log.isLevelEnabled(MessageLogLevel.TRACE)) {
-            _log.log(MessageLogLevel.TRACE, "Starting Memory: " + Runtime.getRuntime().freeMemory());
+        log.log(MessageLogLevel.INFO, "DICTIONARY_INFO_009");
+        if (log.isLevelEnabled(MessageLogLevel.TRACE)) {
+            log.log(MessageLogLevel.TRACE, "DICTIONARY_INFO_010", Runtime.getRuntime().freeMemory());
         }
 
         for (DictionaryFileType fileType : DictionaryFileType.getAllDictionaryFileTypes()) {
-            DictionaryCatalog catalog = files.get(fileType);
+            DictionaryCatalog<ObjectDictionaryFile> catalog = files.get(fileType);
             for (POS pos : POS.getAllPOS()) {
-                _log.log(MessageLogLevel.INFO, "Loading " + pos + " " + fileType);
+                log.log(MessageLogLevel.INFO, "DICTIONARY_INFO_011", new Object[]{pos.getLabel(), fileType.getName()});
                 putTable(pos, fileType, loadDictFile(catalog.get(pos)));
-                if (_log.isLevelEnabled(MessageLogLevel.TRACE)) {
-                    _log.log(MessageLogLevel.TRACE, "Current Memory: " + Runtime.getRuntime().freeMemory());
+                if (log.isLevelEnabled(MessageLogLevel.TRACE)) {
+                    log.log(MessageLogLevel.TRACE, "DICTIONARY_INFO_012", Runtime.getRuntime().freeMemory());
                 }
             }
         }
+        files.close();
     }
 
     public IndexWord getIndexWord(POS pos, String lemma) {
         return (IndexWord) getTable(pos, DictionaryFileType.INDEX).get(prepareQueryString(lemma));
     }
 
-    public Iterator getIndexWordIterator(POS pos, String substring) {
+    public Iterator<IndexWord> getIndexWordIterator(POS pos, String substring) {
         substring = prepareQueryString(substring);
 
-        final Iterator itr = getIndexWordIterator(pos);
-        String temp = null;
+        final Iterator<IndexWord> itr = getIndexWordIterator(pos);
+        IndexWord start = null;
         while (itr.hasNext()) {
-            IndexWord word = (IndexWord) itr.next();
-            String w = word.getLemma();
-            if (w.indexOf(substring) != -1) {
-                temp = w;
+            IndexWord word = itr.next();
+            if (word.getLemma().indexOf(substring) != -1) {
+                start = word;
                 break;
             }
         }
-        return new IndexWordIterator(itr, substring, temp);
+        return new IndexWordIterator(itr, substring, start);
     }
 
-    public Iterator getIndexWordIterator(POS pos) {
-        return getIterator(getTable(pos, DictionaryFileType.INDEX));
+    public Iterator<IndexWord> getIndexWordIterator(POS pos) {
+        @SuppressWarnings({"unchecked", "UnnecessaryLocalVariable"})
+        Iterator<IndexWord> result = (Iterator<IndexWord>) getIterator(getTable(pos, DictionaryFileType.INDEX));
+        return result;
     }
 
     // this is a very inefficient implementation, but a better
     // one would require a custom Map implementation that allowed
     // access to the underlying Entry array.
     public IndexWord getRandomIndexWord(POS pos) throws JWNLException {
-        int index = _rand.nextInt(getTable(pos, DictionaryFileType.INDEX).size());
+        int index = rand.nextInt(getTable(pos, DictionaryFileType.INDEX).size());
         Iterator itr = getIndexWordIterator(pos);
         for (int i = 0; i < index && itr.hasNext(); i++) {
             itr.next();
@@ -149,15 +107,19 @@ public class MapBackedDictionary extends Dictionary {
         return (itr.hasNext()) ? (IndexWord) itr.next() : null;
     }
 
-    public Iterator getSynsetIterator(POS pos) {
-        return getIterator(getTable(pos, DictionaryFileType.DATA));
+    public Iterator<Synset> getSynsetIterator(POS pos) {
+        @SuppressWarnings({"unchecked", "UnnecessaryLocalVariable"})
+        Iterator<Synset> result = (Iterator<Synset>) getIterator(getTable(pos, DictionaryFileType.DATA));
+        return result;
     }
 
-    public Iterator getExceptionIterator(POS pos) {
-        return getIterator(getTable(pos, DictionaryFileType.EXCEPTION));
+    public Iterator<Exc> getExceptionIterator(POS pos) {
+        @SuppressWarnings({"unchecked", "UnnecessaryLocalVariable"})
+        Iterator<Exc> result = (Iterator<Exc>) getIterator(getTable(pos, DictionaryFileType.EXCEPTION));
+        return result;
     }
 
-    private Iterator getIterator(Map map) {
+    private Iterator<? extends DictionaryElement> getIterator(Map<Object, ? extends DictionaryElement> map) {
         return map.values().iterator();
     }
 
@@ -170,75 +132,81 @@ public class MapBackedDictionary extends Dictionary {
     }
 
     public void close() {
-        _tableMap = null;
+        tableMap = null;
     }
 
-    private Map loadDictFile(DictionaryFile file) throws JWNLException {
+    private synchronized Map<Object, ? extends DictionaryElement> loadDictFile(ObjectDictionaryFile file) throws JWNLException {
         try {
-            return (Map) ((ObjectDictionaryFile) file).readObject();
-        } catch (Exception ex) {
-            throw new JWNLException("DICTIONARY_EXCEPTION_020", file.getFile(), ex);
+            Dictionary.setRestoreDictionary(this);
+            @SuppressWarnings({"unchecked", "UnnecessaryLocalVariable"})
+            Map<Object, ? extends DictionaryElement> result = (Map<Object, ? extends DictionaryElement>) file.readObject();
+            return result;
+        } catch (Exception e) {
+            throw new JWNLException("DICTIONARY_EXCEPTION_020", file.getFile(), e);
         }
     }
 
     /**
      * Use <var>table</var> for lookups to the file represented by <var>pos</var> and
      * <var>fileType</var>.
+     *
+     * @param pos      POS
+     * @param fileType element type
+     * @param table    hashmap with elements
      */
-    private void putTable(POS pos, DictionaryFileType fileType, Map table) {
-        _tableMap.put(new MapTableKey(pos, fileType), table);
+    private void putTable(POS pos, DictionaryFileType fileType, Map<Object, ? extends DictionaryElement> table) {
+        tableMap.put(new MapTableKey(pos, fileType), table);
     }
 
     private Map getTable(POS pos, DictionaryFileType fileType) {
-        return (Map) _tableMap.get(new MapTableKey(pos, fileType));
+        return tableMap.get(new MapTableKey(pos, fileType));
     }
 
     private static final class MapTableKey {
-        private POS _pos;
-        private DictionaryFileType _fileType;
+        private POS pos;
+        private DictionaryFileType fileType;
 
         private MapTableKey(POS pos, DictionaryFileType fileType) {
-            _pos = pos;
-            _fileType = fileType;
+            this.pos = pos;
+            this.fileType = fileType;
         }
 
         public int hashCode() {
-            return _pos.hashCode() ^ _fileType.hashCode();
+            return pos.hashCode() ^ fileType.hashCode();
         }
 
         public boolean equals(Object obj) {
             if (obj instanceof MapTableKey) {
                 MapTableKey k = (MapTableKey) obj;
-                return _pos.equals(k._pos) && _fileType.equals(k._fileType);
+                return pos.equals(k.pos) && fileType.equals(k.fileType);
             }
             return false;
         }
     }
 
-    private static final class IndexWordIterator implements Iterator {
-        private Iterator _itr;
-        private String _searchString;
-        private String _startWord;
+    public static final class IndexWordIterator implements Iterator<IndexWord> {
+        private Iterator<IndexWord> itr;
+        private String searchString;
+        private IndexWord startWord;
 
-        public IndexWordIterator(Iterator itr, String searchString, String startWord) {
-            _itr = itr;
-            _searchString = searchString;
-            _startWord = startWord;
+        public IndexWordIterator(Iterator<IndexWord> itr, String searchString, IndexWord startWord) {
+            this.itr = itr;
+            this.searchString = searchString;
+            this.startWord = startWord;
         }
 
         public boolean hasNext() {
-            return (_startWord != null);
+            return (startWord != null);
         }
 
-        public Object next() {
+        public IndexWord next() {
             if (hasNext()) {
-                String thisWord = _startWord;
-                _startWord = null;
-                while (_itr.hasNext()) {
-                    IndexWord word = (IndexWord) _itr.next();
-                    String w = word.getLemma();
-                    if (w.indexOf(_searchString) != -1) {
-                        _startWord = w;
+                IndexWord thisWord = startWord;
+                startWord = null;
+                while (itr.hasNext()) {
+                    IndexWord word = itr.next();
+                    if (word.getLemma().indexOf(searchString) != -1) {
+                        startWord = word;
                         break;
                     }
                 }
@@ -255,6 +223,10 @@ public class MapBackedDictionary extends Dictionary {
 
     /**
      * Not implemented in Map yet.
+     *
+     * @param offset offset
+     * @param lemma  lemma
+     * @return usage count
      */
     public int getUsageCount(long offset, String lemma) {
         return 0;
@@ -262,6 +234,10 @@ public class MapBackedDictionary extends Dictionary {
 
     /**
      * Not implemented in Map yet.
+     *
+     * @param offset offset
+     * @param lemma  lemma
+     * @return sense key
      */
     public String getSenseKey(long offset, String lemma) {
         return null;

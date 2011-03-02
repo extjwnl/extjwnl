@@ -23,20 +23,20 @@ public abstract class Relationship {
     /**
      * The nodes that comprise the relationship.
      */
-    private PointerTargetNodeList _nodes;
+    private PointerTargetNodeList nodes;
     /**
      * The relationship's type
      */
-    private PointerType _type;
+    private PointerType type;
 
-    private Synset _sourceSynset;
-    private Synset _targetSynset;
+    private Synset sourceSynset;
+    private Synset targetSynset;
 
     protected Relationship(PointerType type, PointerTargetNodeList nodes, Synset sourceSynset, Synset targetSynset) {
-        _type = type;
-        _nodes = nodes;
-        _sourceSynset = sourceSynset;
-        _targetSynset = targetSynset;
+        this.type = type;
+        this.nodes = nodes;
+        this.sourceSynset = sourceSynset;
+        this.targetSynset = targetSynset;
     }
 
     public abstract Relationship reverse() throws CloneNotSupportedException;
@@ -45,26 +45,26 @@ public abstract class Relationship {
      * Get the list that contains the nodes of this relationship.
      */
     public PointerTargetNodeList getNodeList() {
-        return _nodes;
+        return nodes;
     }
 
     /**
      * Get the pointer target of the source node.
      */
     public PointerTarget getSourcePointerTarget() {
-        return ((PointerTargetNode) _nodes.get(0)).getPointerTarget();
+        return ((PointerTargetNode) nodes.get(0)).getPointerTarget();
     }
 
     /**
      * Get the pointer target of the target node.
      */
     public PointerTarget getTargetPointerTarget() {
-        return ((PointerTargetNode) _nodes.get(_nodes.size() - 1)).getPointerTarget();
+        return ((PointerTargetNode) nodes.get(nodes.size() - 1)).getPointerTarget();
     }
 
     public String toString() {
         StringBufferOutputStream stream = new StringBufferOutputStream();
-        _nodes.print(new PrintStream(stream));
+        nodes.print(new PrintStream(stream));
         return stream.getStringBuffer().toString();
     }
 
@@ -82,21 +82,21 @@ public abstract class Relationship {
     }
 
     public PointerType getType() {
-        return _type;
+        return type;
     }
 
     /**
      * Get the Synset that is the source of this relationship.
      */
     public Synset getSourceSynset() {
-        return _sourceSynset;
+        return sourceSynset;
     }
 
     /**
      * Get the Synset that is the target of this relationship.
      */
     public Synset getTargetSynset() {
-        return _targetSynset;
+        return targetSynset;
     }
 
     public int getSize() {

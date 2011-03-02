@@ -1,45 +1,68 @@
 package net.didion.jwnl.dictionary.file;
 
+import net.didion.jwnl.JWNLException;
 import net.didion.jwnl.data.POS;
+import net.didion.jwnl.dictionary.Dictionary;
+import net.didion.jwnl.util.factory.Owned;
+import net.didion.jwnl.util.factory.Param;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * Represents a single dictionary file. Extensions or implementations of this interface should provide
  * the appropriate methods to read from the file.
+ *
+ * @author didion
+ * @author Aliaksandr Autayeu avtaev@gmail.com
  */
-public interface DictionaryFile {
+public interface DictionaryFile extends Owned {
 
     /**
-     * Create a new instance of the dictionary file
-     */
-    public DictionaryFile newInstance(String path, POS pos, DictionaryFileType fileType);
-
-    /**
-     * Close the file
+     * Closes the file.
      */
     public void close();
 
     /**
-     * Return true if the file is open
+     * Returns true if the file is open.
      */
     public boolean isOpen();
 
     /**
-     * The POS associated with this file.
+     * Returns the POS associated with this file.
      */
     public POS getPOS();
 
+    /**
+     * Returns the file.
+     *
+     * @return the file
+     */
     public File getFile();
 
     /**
-     * The file type associated with this file.
+     * Returns the file type associated with this file.
      */
     public DictionaryFileType getFileType();
 
     /**
-     * Open the file.
+     * Opens the file.
      */
     public void open() throws IOException;
+
+    /**
+     * Deletes the file.
+     *
+     * @throws IOException IOException
+     */
+    public boolean delete() throws IOException;
+
+    /**
+     * Saves the file.
+     *
+     * @throws IOException IOException
+     */
+    public void save() throws IOException, JWNLException;
+
 }

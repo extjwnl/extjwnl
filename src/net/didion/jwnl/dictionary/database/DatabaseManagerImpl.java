@@ -2,7 +2,7 @@ package net.didion.jwnl.dictionary.database;
 
 import net.didion.jwnl.JWNLException;
 import net.didion.jwnl.data.POS;
-import net.didion.jwnl.util.factory.Createable;
+import net.didion.jwnl.dictionary.Dictionary;
 import net.didion.jwnl.util.factory.Param;
 
 import java.sql.SQLException;
@@ -11,7 +11,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-public class DatabaseManagerImpl implements DatabaseManager, Createable {
+/**
+ * Database manager.
+ *
+ * @author didion
+ * @author Aliaksandr Autayeu avtaev@gmail.com
+ */
+public class DatabaseManagerImpl implements DatabaseManager {
     public static final String DRIVER = "driver";
     public static final String URL = "url";
     public static final String USERNAME = "username";
@@ -67,28 +73,25 @@ public class DatabaseManagerImpl implements DatabaseManager, Createable {
     protected static final String ALL_EXCEPTIONS_SQL =
             "SELECT lemma FROM Exception WHERE pos = ?";
 
-    protected static final Random _rand = new Random(new Date().getTime());
+    protected static final Random rand = new Random(new Date().getTime());
 
-    protected ConnectionManager _connectionManager;
-    protected Map _minMaxIds = new HashMap();
+    protected ConnectionManager connectionManager;
+    protected Map<POS, MinMax> minMaxIds = new HashMap<POS, MinMax>();
+    protected Dictionary dictionary;
 
-    public DatabaseManagerImpl() {
-    }
-
-    public DatabaseManagerImpl(ConnectionManager connectionManager) {
-        _connectionManager = connectionManager;
-    }
-
-    public Object create(Map params) throws JWNLException {
-        String driverClassName = params.containsKey(DRIVER) ? ((Param) params.get(DRIVER)).getValue() : null;
-        String url = params.containsKey(URL) ? ((Param) params.get(URL)).getValue() : null;
-        String userName = params.containsKey(USERNAME) ? ((Param) params.get(USERNAME)).getValue() : null;
-        String password = params.containsKey(PASSWORD) ? ((Param) params.get(PASSWORD)).getValue() : null;
-        String jndi = params.containsKey(JNDI) ? ((Param) params.get(JNDI)).getValue() : null;
+    public DatabaseManagerImpl(Dictionary dictionary, Map<String, Param> params) throws JWNLException {
+        String driverClassName = params.containsKey(DRIVER) ? params.get(DRIVER).getValue() : null;
+        String url = params.containsKey(URL) ? params.get(URL).getValue() : null;
+        String userName = params.containsKey(USERNAME) ? params.get(USERNAME).getValue() : null;
+        String password = params.containsKey(PASSWORD) ? params.get(PASSWORD).getValue() : null;
+        String jndi = params.containsKey(JNDI) ? params.get(JNDI).getValue() : null;
         if (null != jndi && jndi.trim().length() > 0) {
-            return new DatabaseManagerImpl(new ConnectionManager(jndi.trim()));
+            connectionManager = new ConnectionManager(jndi.trim());
+        } else {
+            connectionManager = new ConnectionManager(driverClassName, url, userName, password);
         }
-        return new DatabaseManagerImpl(new ConnectionManager(driverClassName, url, userName, password));
+
+        this.dictionary = dictionary;
     }
 
     public Query getIndexWordSynsetsQuery(POS pos, String lemma) throws JWNLException {
@@ -104,14 +107,14 @@ public class DatabaseManagerImpl implements DatabaseManager, Createable {
     }
 
     public Query getRandomIndexWordQuery(POS pos) throws JWNLException {
-        MinMax minMax = (MinMax) _minMaxIds.get(pos);
+        MinMax minMax = minMaxIds.get(pos);
         if (minMax == null) {
             Query query = createPOSQuery(pos, COUNT_INDEX_WORDS_SQL);
             try {
                 query.execute();
                 query.getResults().next();
                 minMax = new MinMax(query.getResults().getInt(1), query.getResults().getInt(2));
-                _minMaxIds.put(pos, minMax);
+                minMaxIds.put(pos, minMax);
             } catch (SQLException ex) {
                 throw new JWNLException("DICTIONARY_EXCEPTION_023", ex);
             } finally {
@@ -120,25 +123,25 @@ public class DatabaseManagerImpl implements DatabaseManager, Createable {
                 }
             }
         }
-        int id = minMax.getMin() + _rand.nextInt(minMax.getMax() - minMax.getMin());
+        int id = minMax.getMin() + rand.nextInt(minMax.getMax() - minMax.getMin());
         return createPOSIdQuery(pos, id, LEMMA_FOR_INDEX_WORD_ID_SQL);
     }
 
     private class MinMax {
-        private int _min;
-        private int _max;
+        private int min;
+        private int max;
 
         public MinMax(int min, int max) {
-            _min = min;
-            _max = max;
+            this.min = min;
+            this.max = max;
         }
 
         public int getMin() {
-            return _min;
+            return min;
         }
 
         public int getMax() {
-            return _max;
+            return max;
         }
     }
 
@@ -173,7 +176,7 @@ public class DatabaseManagerImpl implements DatabaseManager, Createable {
     protected Query createPOSQuery(POS pos, String sql) throws JWNLException {
         Query query = null;
         try {
-            query = _connectionManager.getQuery(sql);
+            query = connectionManager.getQuery(sql);
             query.getStatement().setString(1, pos.getKey());
             return query;
         } catch (SQLException ex) {
@@ -187,7 +190,7 @@ public class DatabaseManagerImpl implements DatabaseManager, Createable {
     protected Query createPOSStringQuery(POS pos, String str, String sql) throws JWNLException {
         Query query = null;
         try {
-            query = _connectionManager.getQuery(sql);
+            query = connectionManager.getQuery(sql);
             query.getStatement().setString(1, pos.getKey());
             query.getStatement().setString(2, str);
             return query;
@@ -202,7 +205,7 @@ public class DatabaseManagerImpl implements DatabaseManager, Createable {
     protected Query createPOSOffsetQuery(POS pos, long offset, String sql) throws JWNLException {
         Query query = null;
         try {
-            query = _connectionManager.getQuery(sql);
+            query = connectionManager.getQuery(sql);
             query.getStatement().setString(1, pos.getKey());
             query.getStatement().setLong(2, offset);
             return query;
@@ -217,7 +220,7 @@ public class DatabaseManagerImpl implements DatabaseManager, Createable {
     protected Query createPOSIdQuery(POS pos, int id, String sql) throws JWNLException {
         Query query = null;
         try {
-            query = _connectionManager.getQuery(sql);
+            query = connectionManager.getQuery(sql);
             query.getStatement().setString(1, pos.getKey());
             query.getStatement().setInt(2, id);
             return query;
@@ -227,5 +230,13 @@ public class DatabaseManagerImpl implements DatabaseManager, Createable {
             }
             throw new JWNLException("DICTIONARY_EXCEPTION_023", ex);
         }
+    }
+
+    public Dictionary getDictionary() {
+        return dictionary;
+    }
+
+    public void setDictionary(Dictionary dictionary) {
+        this.dictionary = dictionary;
     }
 }

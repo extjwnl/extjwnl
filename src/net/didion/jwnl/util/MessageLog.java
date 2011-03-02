@@ -5,10 +5,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class MessageLog {
-    private Log _log;
+    private Log log;
 
     public MessageLog(Class clazz) {
-        _log = LogFactory.getLog(clazz);
+        log = LogFactory.getLog(clazz);
     }
 
     public void log(MessageLogLevel level, String messageKey) {
@@ -37,17 +37,17 @@ public class MessageLog {
 
     public boolean isLevelEnabled(MessageLogLevel level) {
         if (level == MessageLogLevel.TRACE) {
-            return _log.isTraceEnabled();
+            return log.isTraceEnabled();
         } else if (level == MessageLogLevel.DEBUG) {
-            return _log.isDebugEnabled();
+            return log.isDebugEnabled();
         } else if (level == MessageLogLevel.INFO) {
-            return _log.isInfoEnabled();
+            return log.isInfoEnabled();
         } else if (level == MessageLogLevel.WARN) {
-            return _log.isWarnEnabled();
+            return log.isWarnEnabled();
         } else if (level == MessageLogLevel.ERROR) {
-            return _log.isErrorEnabled();
+            return log.isErrorEnabled();
         } else if (level == MessageLogLevel.FATAL) {
-            return _log.isFatalEnabled();
+            return log.isFatalEnabled();
         }
         return false;
     }
@@ -55,17 +55,17 @@ public class MessageLog {
     private void doLog(MessageLogLevel level, String message) {
         if (isLevelEnabled(level)) {
             if (level == MessageLogLevel.TRACE) {
-                _log.trace(message);
+                log.trace(message);
             } else if (level == MessageLogLevel.DEBUG) {
-                _log.debug(message);
+                log.debug(message);
             } else if (level == MessageLogLevel.INFO) {
-                _log.info(message);
+                log.info(message);
             } else if (level == MessageLogLevel.WARN) {
-                _log.warn(message);
+                log.warn(message);
             } else if (level == MessageLogLevel.ERROR) {
-                _log.error(message);
+                log.error(message);
             } else if (level == MessageLogLevel.FATAL) {
-                _log.fatal(message);
+                log.fatal(message);
             }
         }
     }
@@ -73,17 +73,17 @@ public class MessageLog {
     private void doLog(MessageLogLevel level, String message, Throwable t) {
         if (isLevelEnabled(level)) {
             if (level == MessageLogLevel.TRACE) {
-                _log.trace(message, t);
+                log.trace(message, t);
             } else if (level == MessageLogLevel.DEBUG) {
-                _log.debug(message, t);
+                log.debug(message, t);
             } else if (level == MessageLogLevel.INFO) {
-                _log.info(message, t);
+                log.info(message, t);
             } else if (level == MessageLogLevel.WARN) {
-                _log.warn(message, t);
+                log.warn(message, t);
             } else if (level == MessageLogLevel.ERROR) {
-                _log.error(message, t);
+                log.error(message, t);
             } else if (level == MessageLogLevel.FATAL) {
-                _log.fatal(message, t);
+                log.fatal(message, t);
             }
         }
     }

@@ -8,21 +8,25 @@ import java.util.BitSet;
 
 /**
  * A <code>VerbFrame</code> is the frame of a sentence in which it is proper to use a given verb.
+ *
+ * @author didion
+ * @author Aliaksandr Autayeu avtaev@gmail.com
  */
-public final class VerbFrame implements Serializable {
-    static final long serialVersionUID = 1450633678809744269L;
+public class VerbFrame implements Serializable {
 
-    private static VerbFrame[] _verbFrames;
-    private static boolean _initialized = false;
+    private static final long serialVersionUID = 1450633678809744261L;
+
+    private static VerbFrame[] verbFrames;
+    private static boolean initialized = false;
 
     public static void initialize() {
-        if (!_initialized) {
+        if (!initialized) {
             int framesSize = Integer.parseInt(JWNL.resolveMessage("NUMBER_OF_VERB_FRAMES"));
-            _verbFrames = new VerbFrame[framesSize];
+            verbFrames = new VerbFrame[framesSize];
             for (int i = 1; i <= framesSize; i++) {
-                _verbFrames[i - 1] = new VerbFrame(getKeyString(i), i);
+                verbFrames[i - 1] = new VerbFrame(getKeyString(i), i);
             }
-            _initialized = true;
+            initialized = true;
         }
     }
 
@@ -38,14 +42,14 @@ public final class VerbFrame implements Serializable {
     }
 
     public static int getVerbFramesSize() {
-        return _verbFrames.length;
+        return verbFrames.length;
     }
 
     /**
      * Get frame at index <var>index</var>.
      */
     public static String getFrame(int index) {
-        return _verbFrames[index - 1].getFrame();
+        return verbFrames[index - 1].getFrame();
     }
 
     /**
@@ -58,7 +62,7 @@ public final class VerbFrame implements Serializable {
         int[] indices = getVerbFrameIndices(bits);
         String[] frames = new String[indices.length];
         for (int i = 0; i < indices.length; i++) {
-            frames[i] = _verbFrames[indices[i] - 1].getFrame();
+            frames[i] = verbFrames[indices[i] - 1].getFrame();
         }
         return frames;
     }
@@ -80,32 +84,26 @@ public final class VerbFrame implements Serializable {
         }
 
         return indices;
-
     }
 
-    private Resolvable _frame;
-    private int _index;
+    private Resolvable frame;
+    private int index;
 
     private VerbFrame(String frame, int index) {
-        _frame = new Resolvable(frame);
-        _index = index;
+        this.frame = new Resolvable(frame);
+        this.index = index;
     }
 
     public String getFrame() {
-        return _frame.toString();
+        return frame.toString();
     }
 
     public int getIndex() {
-        return _index;
+        return index;
     }
 
-    private String _cachedToString = null;
-
     public String toString() {
-        if (_cachedToString == null) {
-            _cachedToString = JWNL.resolveMessage("DATA_TOSTRING_007", getFrame());
-        }
-        return _cachedToString;
+        return JWNL.resolveMessage("DATA_TOSTRING_007", getFrame());
     }
 
     public int hashCode() {

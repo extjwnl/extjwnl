@@ -1,25 +1,36 @@
 package net.didion.jwnl.util.factory;
 
-public class NameValueParam extends AbstractValueParam {
-    private String _name;
-    private String _value;
+import net.didion.jwnl.dictionary.Dictionary;
 
-    public NameValueParam(String name, String value) {
-        _name = name;
-        _value = value;
+import java.util.List;
+
+/**
+ * Param with name and value.
+ *
+ * @author didion
+ * @author Aliaksandr Autayeu avtaev@gmail.com
+ */
+public class NameValueParam extends AbstractValueParam {
+    private String name;
+    private String value;
+
+    public NameValueParam(Dictionary dictionary, String name, String value) {
+        super(dictionary);
+        this.name = name;
+        this.value = value;
     }
 
-    public NameValueParam(String name, String value, Param[] params) {
-        super(params);
-        _name = name;
-        _value = value;
+    public NameValueParam(Dictionary dictionary, String name, String value, List<Param> params) {
+        super(dictionary, params);
+        this.name = name;
+        this.value = value;
     }
 
     public String getName() {
-        return _name;
+        return name;
     }
 
     public String getValue() {
-        return _value;
+        return value;
     }
 }

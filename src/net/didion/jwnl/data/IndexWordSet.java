@@ -11,16 +11,19 @@ import java.util.Set;
  * A class to simplify the access to a set of <code>IndexWord</code>s, each containing
  * one part of speech of the same word. IndexWordSets are usually created by a
  * call to {@link net.didion.jwnl.dictionary.Dictionary#lookupAllIndexWords Dictionary.lookupAllIndexWords}.
+ *
+ * @author didion
+ * @author Aliaksandr Autayeu avtaev@gmail.com
  */
 public class IndexWordSet {
     /**
      * Map of IndexWords in this set.
      */
-    private Map<POS, IndexWord> _indexWords = new Hashtable<POS, IndexWord>(4, (float) 1.0);
-    private String _lemma;
+    private Map<POS, IndexWord> indexWords = new Hashtable<POS, IndexWord>(4, (float) 1.0);
+    private String lemma;
 
     public IndexWordSet(String lemma) {
-        _lemma = lemma;
+        this.lemma = lemma;
     }
 
     /**
@@ -29,16 +32,16 @@ public class IndexWordSet {
      * @param word word to add
      */
     public void add(IndexWord word) {
-        _indexWords.put(word.getPOS(), word);
+        indexWords.put(word.getPOS(), word);
     }
 
     /**
-     * Removes the IndexWords associated with POS <code>p</code> from this set.
+     * Removes the IndexWords associated with POS <var>p</var> from this set.
      *
      * @param p POS
      */
     public void remove(POS p) {
-        _indexWords.remove(p);
+        indexWords.remove(p);
     }
 
     /**
@@ -47,17 +50,17 @@ public class IndexWordSet {
      * @return the number of IndexWords in this set
      */
     public int size() {
-        return _indexWords.size();
+        return indexWords.size();
     }
 
     /**
-     * Gets the IndexWord associated with POS <code>p</code>.
+     * Gets the IndexWord associated with POS <var>p</var>.
      *
      * @param p POS
-     * @return the IndexWord associated with POS <code>p</code>.
+     * @return the IndexWord associated with POS <var>p</var>.
      */
     public IndexWord getIndexWord(POS p) {
-        return _indexWords.get(p);
+        return indexWords.get(p);
     }
 
     /**
@@ -66,8 +69,8 @@ public class IndexWordSet {
      * @return an array of the IndexWords in this set
      */
     public IndexWord[] getIndexWordArray() {
-        IndexWord[] words = new IndexWord[_indexWords.size()];
-        return _indexWords.values().toArray(words);
+        IndexWord[] words = new IndexWord[indexWords.size()];
+        return indexWords.values().toArray(words);
     }
 
     /**
@@ -76,7 +79,7 @@ public class IndexWordSet {
      * @return a collection of the IndexWords in this set
      */
     public Collection getIndexWordCollection() {
-        return _indexWords.values();
+        return indexWords.values();
     }
 
     /**
@@ -86,28 +89,28 @@ public class IndexWordSet {
      * @return a set of all the parts-of-speech for which there is an IndexWord in this set
      */
     public Set getValidPOSSet() {
-        return _indexWords.keySet();
+        return indexWords.keySet();
     }
 
     /**
-     * Return true if there is a word with part-of-speech <code>pos</code> in
+     * Return true if there is a word with part-of-speech <var>pos</var> in
      * this set.
      *
      * @param pos POS
-     * @return true if there is a word with part-of-speech <code>pos</code> in this set.
+     * @return true if there is a word with part-of-speech <var>pos</var> in this set.
      */
     public boolean isValidPOS(POS pos) {
-        return _indexWords.containsKey(pos);
+        return indexWords.containsKey(pos);
     }
 
     /**
-     * Finds out how many senses the word with part-of-speech <code>pos</code> has.
+     * Finds out how many senses the word with part-of-speech <var>pos</var> has.
      *
      * @param pos POS
-     * @return number of senses the word with part-of-speech <code>pos</code> has
+     * @return number of senses the word with part-of-speech <var>pos</var> has
      */
     public int getSenseCount(POS pos) {
-        return getIndexWord(pos).getSenseCount();
+        return getIndexWord(pos).getSenses().size();
     }
 
     public String toString() {
@@ -125,7 +128,7 @@ public class IndexWordSet {
     }
 
     public String getLemma() {
-        return _lemma;
+        return lemma;
     }
 
     /**

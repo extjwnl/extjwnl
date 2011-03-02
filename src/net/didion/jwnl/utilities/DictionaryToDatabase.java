@@ -1,6 +1,6 @@
 package net.didion.jwnl.utilities;
 
-import net.didion.jwnl.JWNL;
+import net.didion.jwnl.JWNLException;
 import net.didion.jwnl.data.*;
 import net.didion.jwnl.dictionary.AbstractCachingDictionary;
 import net.didion.jwnl.dictionary.Dictionary;
@@ -15,56 +15,52 @@ import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 /**
- * DictionaryToDatabase is used to transfer a WordNet file database into an actual
- * database structure.
+ * DictionaryToDatabase is used to transfer a WordNet file database into an actual database structure.
  *
  * @author brett
+ * @author Aliaksandr Autayeu avtaev@gmail.com
  */
 public class DictionaryToDatabase {
 
-    /**
-     * Our message log.
-     */
-    private static final MessageLog LOG;
+    private static final MessageLog log = new MessageLog(DictionaryToDatabase.class);
 
-    private static int INTERNAL_ID = 0;
-    private static long TIME = 0L;
+    protected static int INTERNAL_ID = 0;
+    protected static long TIME = 0L;
 
     /**
      * The database connection.
      */
-    private Connection connection;
+    protected Connection connection;
     /**
      * Mapping of database id's to synset offset id's. 1 to 1.
      */
-    private Map<Integer, long[]> idToSynsetOffset;
+    protected Map<Integer, long[]> idToSynsetOffset;
 
     /**
      * Mapping of synset offset id's to database id's. 1:1.
      */
-    private Map<Long, Integer> synsetOffsetToId;
+    protected Map<Long, Integer> synsetOffsetToId;
 
+    protected Dictionary dictionary;
 
     /**
      * Run the program, requires 4 arguments. See DictionaryToDatabase.txt for more documentation.
      *
-     * @param args
+     * @param args args
      */
     public static void main(String args[]) {
         if (args.length < 4) {
-            System.out.println("java net.didion.jwnl.utilities.DictionaryToDatabase <property file> <create tables script> <driver class> <connection url> [username [password]]");
-            System.exit(-1);
+            System.out.println("DictionaryToDatabase <property file> <create tables script> <driver class> <connection url> [username [password]]");
+            System.exit(0);
         }
+        Dictionary dictionary = null;
         try {
-            JWNL.initialize(new FileInputStream(args[0]));
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
+            dictionary = Dictionary.getInstance(new FileInputStream(args[0]));
+        } catch (Exception e) {
+            e.printStackTrace();
             System.exit(-1);
         }
         Connection conn = null;
@@ -73,11 +69,9 @@ public class DictionaryToDatabase {
             String scriptFileName = args[1];
             ConnectionManager mgr = new ConnectionManager(args[2], args[3], args.length <= 4 ? null : args[4], args.length <= 5 ? null : args[5]);
             conn = mgr.getConnection();
-            DictionaryToDatabase d2d = new DictionaryToDatabase(conn);
+            DictionaryToDatabase d2d = new DictionaryToDatabase(dictionary, conn);
             d2d.createTables(scriptFileName);
             d2d.insertData();
-
-
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(-1);
@@ -85,20 +79,20 @@ public class DictionaryToDatabase {
             if (conn != null) {
                 try {
                     conn.close();
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
+                } catch (SQLException e) {
+                    e.printStackTrace();
                 }
             }
         }
     }
 
-    private static synchronized int nextId() {
+    protected static synchronized int nextId() {
         INTERNAL_ID++;
-        if (LOG.isLevelEnabled(MessageLogLevel.DEBUG) && INTERNAL_ID % 1000 == 0) {
+        if (log.isLevelEnabled(MessageLogLevel.DEBUG) && INTERNAL_ID % 1000 == 0) {
             long temp = System.currentTimeMillis();
-            LOG.log(MessageLogLevel.DEBUG, "inserted " + INTERNAL_ID + "th entry");
-            LOG.log(MessageLogLevel.DEBUG, "free memory: " + Runtime.getRuntime().freeMemory());
-            LOG.log(MessageLogLevel.DEBUG, "time: " + (temp - TIME));
+            System.out.println("inserted " + INTERNAL_ID + "th entry");
+            System.out.println("free memory: " + Runtime.getRuntime().freeMemory());
+            System.out.println("time: " + (temp - TIME));
             TIME = System.currentTimeMillis();
         }
         return INTERNAL_ID;
@@ -107,25 +101,28 @@ public class DictionaryToDatabase {
     /**
      * Create a new DictionaryToDatabase with a database connection. JWNL already initialized.
      *
-     * @param conn - the database connection
+     * @param dictionary the dictionary
+     * @param conn       the database connection
      */
-    public DictionaryToDatabase(Connection conn) {
+    public DictionaryToDatabase(Dictionary dictionary, Connection conn) {
+        this.dictionary = dictionary;
         idToSynsetOffset = new HashMap<Integer, long[]>();
         synsetOffsetToId = new HashMap<Long, Integer>();
         connection = conn;
-        ((AbstractCachingDictionary) Dictionary.getInstance()).setCachingEnabled(false);
+        if (dictionary instanceof AbstractCachingDictionary) {
+            ((AbstractCachingDictionary) dictionary).setCachingEnabled(false);
+        }
     }
 
     /**
      * Create the database tables.
      *
      * @param scriptFilePath - the sql script filename
-     * @throws IOException
-     * @throws SQLException
+     * @throws IOException  IOException
+     * @throws SQLException SQLException
      */
-    public void createTables(String scriptFilePath)
-            throws IOException, SQLException {
-        LOG.log(MessageLogLevel.INFO, "creating tables");
+    public void createTables(String scriptFilePath) throws IOException, SQLException {
+        System.out.println("creating tables");
         BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(scriptFilePath)));
         StringBuffer buf = new StringBuffer();
         for (String line = reader.readLine(); line != null; line = reader.readLine()) {
@@ -143,79 +140,77 @@ public class DictionaryToDatabase {
             }
         }
 
-        LOG.log(MessageLogLevel.INFO, "creating tables");
+        System.out.println("created tables");
     }
 
     /**
      * Inserts the data into the database. Iterates through the various POS,
      * then stores all the index words, synsets, exceptions of that POS.
      *
-     * @throws Exception
+     * @throws JWNLException JWNLException
+     * @throws SQLException  SQLException
      */
-    public void insertData()
-            throws Exception {
+    public void insertData() throws JWNLException, SQLException {
         TIME = System.currentTimeMillis();
-        POS pos;
-        for (Iterator posItr = POS.getAllPOS().iterator(); posItr.hasNext(); LOG.log(MessageLogLevel.INFO, "done inserting data for pos " + pos)) {
-            pos = (POS) posItr.next();
-            LOG.log(MessageLogLevel.INFO, "inserting data for pos " + pos);
-            storeIndexWords(Dictionary.getInstance().getIndexWordIterator(pos));
-            storeSynsets(Dictionary.getInstance().getSynsetIterator(pos));
+        for (POS pos : POS.getAllPOS()) {
+            System.out.println("inserting data for pos " + pos);
+            storeIndexWords(dictionary.getIndexWordIterator(pos));
+            storeSynsets(dictionary.getSynsetIterator(pos));
             storeIndexWordSynsets();
-            storeExceptions(Dictionary.getInstance().getExceptionIterator(pos));
+            storeExceptions(dictionary.getExceptionIterator(pos));
             idToSynsetOffset.clear();
             synsetOffsetToId.clear();
+            System.out.println("done inserting data for pos " + pos);
         }
-
     }
 
     /**
      * Store all the index words.
      *
-     * @param itr - the part of speech iterator
-     * @throws SQLException
+     * @param itr - the index word iterator
+     * @throws SQLException SQLException
      */
-    private void storeIndexWords(Iterator itr)
-            throws SQLException {
-        LOG.log(MessageLogLevel.INFO, "storing index words");
+    protected void storeIndexWords(Iterator<IndexWord> itr) throws SQLException {
+        System.out.println("storing index words");
         PreparedStatement iwStmt = connection.prepareStatement("INSERT INTO IndexWord VALUES(?,?,?)");
         int count = 0;
-        do {
-            if (!itr.hasNext()) {
-                break;
+        while (itr.hasNext()) {
+            if (count % 1000 == 0) {
+                System.out.println("indexword: " + count);
             }
-            IndexWord iw = (IndexWord) itr.next();
+            count++;
+            IndexWord iw = itr.next();
             int id = nextId();
             iwStmt.setInt(1, id);
             iwStmt.setString(2, iw.getLemma());
             iwStmt.setString(3, iw.getPOS().getKey());
             iwStmt.execute();
             idToSynsetOffset.put(id, iw.getSynsetOffsets());
-            if (count++ % 1000 == 0) {
-                System.out.println(count);
-            }
-        } while (true);
+        }
+        System.out.println("indexword: " + count);
+        System.out.println("stored index words");
     }
 
     /**
      * Store all of the synsets in the database.
      *
-     * @param itr
-     * @throws SQLException
+     * @param itr itr
+     * @throws SQLException SQLException
+     * @throws JWNLException JWNLException
      */
-    private void storeSynsets(Iterator itr)
-            throws SQLException {
+    protected void storeSynsets(Iterator<Synset> itr) throws SQLException, JWNLException {
         PreparedStatement synsetStmt = connection.prepareStatement("INSERT INTO Synset VALUES(?,?,?,?,?)");
-        PreparedStatement synsetWordStmt = connection.prepareStatement("INSERT INTO SynsetWord VALUES(?,?,?,?)");
+        PreparedStatement synsetWordStmt = getSynsetWordStmt();
         PreparedStatement synsetPointerStmt = connection.prepareStatement("INSERT INTO SynsetPointer VALUES(?,?,?,?,?,?,?)");
         PreparedStatement synsetVerbFrameStmt = connection.prepareStatement("INSERT INTO SynsetVerbFrame VALUES(?,?,?,?)");
-        LOG.log(MessageLogLevel.INFO, "storing synsets");
+        System.out.println("storing synsets");
         int count = 0;
         while (itr.hasNext()) {
-            if (count++ % 1000 == 0) {
+            if (count % 1000 == 0) {
                 System.out.println("synset: " + count);
             }
-            Synset synset = (Synset) itr.next();
+            count++;
+            Synset synset = itr.next();
             int id = nextId();
             synsetOffsetToId.put(synset.getOffset(), id);
             synsetStmt.setInt(1, id);
@@ -224,84 +219,97 @@ public class DictionaryToDatabase {
             synsetStmt.setBoolean(4, synset.isAdjectiveCluster());
             synsetStmt.setString(5, synset.getGloss());
             synsetStmt.execute();
-            Word words[] = synset.getWords();
+            List<Word> words = synset.getWords();
             synsetWordStmt.setInt(2, id);
             synsetVerbFrameStmt.setInt(2, id);
+
+            BitSet allWordFrames = synset.getVerbFrameFlags();
+            synsetVerbFrameStmt.setInt(4, 0);//applicable to all words
+            for (int i = allWordFrames.nextSetBit(0); i >= 0; i = allWordFrames.nextSetBit(i + 1)) {
+                synsetVerbFrameStmt.setInt(1, nextId());
+                synsetVerbFrameStmt.setInt(3, i);
+                synsetVerbFrameStmt.execute();
+            }
+
             for (Word word : words) {
                 int wordId = nextId();
-
                 synsetWordStmt.setInt(1, wordId);
-                synsetWordStmt.setString(3, word.getLemma());
-                synsetWordStmt.setInt(4, word.getIndex());
 
+                fillSynsetWordStmt(synsetWordStmt, synset, word);
 
                 synsetWordStmt.execute();
-                if (!(word instanceof Verb)) {
-                    continue;
+                if (word instanceof Verb) {
+                    synsetVerbFrameStmt.setInt(4, word.getIndex());
+                    BitSet bits = ((Verb) word).getVerbFrameFlags();
+                    for (int i = bits.nextSetBit(0); i >= 0; i = bits.nextSetBit(i + 1)) {
+                        if (!allWordFrames.get(i)) {
+                            synsetVerbFrameStmt.setInt(1, nextId());
+                            synsetVerbFrameStmt.setInt(3, i);
+                            synsetVerbFrameStmt.execute();
+                        }
+                    }
                 }
-                synsetVerbFrameStmt.setInt(4, word.getIndex());
-                int flags[] = ((Verb) word).getVerbFrameIndices();
-                for (int flag : flags) {
-                    synsetVerbFrameStmt.setInt(1, nextId());
-                    synsetVerbFrameStmt.setInt(3, flag);
-                    synsetVerbFrameStmt.execute();
-                }
-
             }
 
-            Pointer pointers[] = synset.getPointers();
+            List<Pointer> pointers = synset.getPointers();
             synsetPointerStmt.setInt(2, id);
-            int i = 0;
-            while (i < pointers.length) {
+            for (Pointer pointer : pointers) {
                 synsetPointerStmt.setInt(1, nextId());
-                synsetPointerStmt.setString(3, pointers[i].getType().getKey());
-                synsetPointerStmt.setLong(4, pointers[i].getTargetOffset());
-                synsetPointerStmt.setString(5, pointers[i].getTargetPOS().getKey());
-                synsetPointerStmt.setInt(6, pointers[i].getSourceIndex());
-                synsetPointerStmt.setInt(7, pointers[i].getTargetIndex());
+                synsetPointerStmt.setString(3, pointer.getType().getKey());
+                synsetPointerStmt.setLong(4, pointer.getTargetOffset());
+                synsetPointerStmt.setString(5, pointer.getTargetPOS().getKey());
+                synsetPointerStmt.setInt(6, pointer.getSourceIndex());
+                synsetPointerStmt.setInt(7, pointer.getTargetIndex());
                 synsetPointerStmt.execute();
-                i++;
             }
         }
+        System.out.println("synset: " + count);
+        System.out.println("stored synsets");
+    }
+
+    protected void fillSynsetWordStmt(PreparedStatement synsetWordStmt, Synset synset, Word word) throws SQLException {
+        synsetWordStmt.setString(3, word.getLemma());
+        synsetWordStmt.setInt(4, word.getIndex());
+    }
+
+    protected PreparedStatement getSynsetWordStmt() throws SQLException {
+        return connection.prepareStatement("INSERT INTO SynsetWord VALUES(?,?,?,?)");
     }
 
     /**
      * Store the index word synsets.
      *
-     * @throws java.sql.SQLException SQLException
+     * @throws SQLException SQLException
      */
-    private void storeIndexWordSynsets() throws SQLException {
-        LOG.log(MessageLogLevel.INFO, "storing index word synsets");
+    protected void storeIndexWordSynsets() throws SQLException {
+        System.out.println("storing index word synsets");
         PreparedStatement iwsStmt = connection.prepareStatement("INSERT INTO IndexWordSynset VALUES(?,?,?)");
         for (Map.Entry<Integer, long[]> entry : idToSynsetOffset.entrySet()) {
             int iwId = entry.getKey();
             iwsStmt.setInt(2, iwId);
             long offsets[] = entry.getValue();
-            int i = 0;
-            while (i < offsets.length) {
-                int synsetId = synsetOffsetToId.get(offsets[i]);
+            for (long offset : offsets) {
+                int synsetId = synsetOffsetToId.get(offset);
                 iwsStmt.setInt(1, nextId());
                 iwsStmt.setLong(3, synsetId);
                 iwsStmt.execute();
-                i++;
             }
         }
-
+        System.out.println("stored index word synsets");
     }
 
 
     /**
      * Store the exceptions file.
      *
-     * @param itr
-     * @throws SQLException
+     * @param itr iterator
+     * @throws SQLException SQLException
      */
-    private void storeExceptions(Iterator itr)
-            throws SQLException {
-        LOG.log(MessageLogLevel.INFO, "storing exceptions");
+    protected void storeExceptions(Iterator<Exc> itr) throws SQLException {
+        System.out.println("storing exceptions");
         PreparedStatement exStmt = connection.prepareStatement("INSERT INTO SynsetException VALUES(?,?,?,?)");
         while (itr.hasNext()) {
-            Exc exc = (Exc) itr.next();
+            Exc exc = itr.next();
             exStmt.setString(4, exc.getLemma());
             for (Object o : exc.getExceptions()) {
                 exStmt.setInt(1, nextId());
@@ -310,9 +318,5 @@ public class DictionaryToDatabase {
                 exStmt.execute();
             }
         }
-    }
-
-    static {
-        LOG = new MessageLog(net.didion.jwnl.utilities.DictionaryToDatabase.class);
     }
 }

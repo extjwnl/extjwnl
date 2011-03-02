@@ -1,10 +1,14 @@
 package net.didion.jwnl.data;
 
-import net.didion.jwnl.JWNL;
 import net.didion.jwnl.JWNLException;
 import net.didion.jwnl.dictionary.Dictionary;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * DictionaryTester is a test suite for dictionary methods
@@ -12,13 +16,9 @@ import org.apache.commons.logging.LogFactory;
  * function.
  *
  * @author bwalenz
+ * @author Aliaksandr Autayeu avtaev@gmail.com
  */
 public abstract class DictionaryTester {
-
-    /**
-     * The number of failures.
-     */
-    protected int failures = 0;
 
     /**
      * The offset for wn30.
@@ -50,233 +50,55 @@ public abstract class DictionaryTester {
      */
     protected long wn30VerbOffset = 484166;
 
-    protected long[] verbOffsets = {wn20VerbOffset, wn21VerbOffset, wn30VerbOffset};
+    protected List<Long> verbOffsets = Arrays.asList(wn20VerbOffset, wn21VerbOffset, wn30VerbOffset);
 
-    protected long[] nounOffsets = {wn20TankOffset, wn21TankOffset, wn30TankOffset};
-
-    /**
-     * The number of pointers the target synset has.
-     */
-    protected long pointers = 7;
-
-    /**
-     * Our logger.
-     */
-    Log log = LogFactory.getLog("jwnl.tests");
+    protected List<Long> nounOffsets = Arrays.asList(wn20TankOffset, wn21TankOffset, wn30TankOffset);
 
     String glossDefinition = "an enclosed armored military vehicle; has a cannon and moves on caterpillar treads";
 
-    String[] lemmas = {"tank", "army_tank", "armored_combat_vehicle", "armoured_combat_vehicle"};
+    protected List<String> lemmas = Arrays.asList("tank", "army_tank", "armored_combat_vehicle", "armoured_combat_vehicle");
 
+    protected Dictionary dictionary;
 
-    /**
-     * Inits the dictionary.
-     */
-    public abstract void initDictionary();
+    @Before
+    public abstract void initDictionary() throws IOException, JWNLException;
 
-    /**
-     * Tests IndexWord creation and Synset functionality.
-     */
-    public void test() {
-        try {
-            log.info("Beginning DictionaryTester...");
-            IndexWord w = Dictionary.getInstance().getIndexWord(POS.NOUN, "tank");
-            testIndexWord(w);
-
-            IndexWord v = Dictionary.getInstance().getIndexWord(POS.VERB, "complete");
-            testVerb(v);
-
-
-        } catch (JWNLException e) {
-            e.printStackTrace();
-        }
-        if (failures == 0) {
-            log.info("Testing succeeded with no failures.");
-        }
-    }
-
-    public void testVerb(IndexWord verbIndex) throws JWNLException {
-        boolean verbTest = true;
-        Synset[] syns = verbIndex.getSenses();
-
-        boolean match = false;
+    @Test
+    public void testTank() throws JWNLException {
+        IndexWord iw = dictionary.getIndexWord(POS.NOUN, "tank");
+        Assert.assertNotNull("IndexWord loaded", iw);
         Synset synset = null;
-        for (Synset s : syns) {
-            match = contains(s, verbOffsets);
-            if (match) {
+        for (Synset s : iw.getSenses()) {
+            if (nounOffsets.contains(s.getOffset())) {
                 synset = s;
                 break;
             }
-
         }
-        if (match) {
-            int[] indices = synset.getVerbFrameIndices();
-            if (indices.length == 2) {
-                log.info("Verb synset frame size test... passed.");
-            } else {
-                verbTest = false;
-                fail("Verb synset frame size test... failed");
-            }
-            for (int index : indices) {
-                if (index != 2 && index != 33) {
-                    verbTest = false;
-                    fail("Verb synset frame flags... failed");
-                }
-            }
-
-        } else {
-            verbTest = false;
-            fail("Verb synset test... failed.");
+        Assert.assertNotNull("Synset search", synset);
+        Assert.assertEquals("Pointer testing", 7, synset.getPointers().size());
+        Assert.assertEquals("Synset gloss test", glossDefinition, synset.getGloss());
+        for (Word w : synset.getWords()) {
+            Assert.assertTrue("Synset word loading: " + w.getLemma(), lemmas.contains(w.getLemma()));
         }
-        if (verbTest) {
-            log.info("Verb test... passed.");
-        } else {
-            fail("Verb tests... failed.");
-        }
-
-    }
-
-    /**
-     * Tests whether or not the index word has the offsets defined.
-     *
-     * @param iw index word
-     * @throws JWNLException exception on loading
-     */
-    public void testIndexWord(IndexWord iw) throws JWNLException {
-        boolean containsSynset = false;
-        Synset armoredTankSynset = null;
-        for (int i = 0; i < iw.getSenses().length; i++) {
-            Synset s = iw.getSenses()[i];
-            boolean found = testSynset(s);
-            if (found) {
-                containsSynset = true;
-                armoredTankSynset = s;
-            }
-        }
-        if (!containsSynset) {
-            fail("IndexWord loading and Synset testing... failed.");
-            return;
-        }
-
-        log.info("IndexWord loading and Synset testing... passed.");
-
-        testPointers(armoredTankSynset);
-        testGloss(armoredTankSynset);
-        testWords(armoredTankSynset);
         //TODO test specific pointers
-
-
     }
 
-    /**
-     * Tests the words in the synset.
-     *
-     * @param synset synset
-     * @return true if passed test
-     * @throws JWNLException exception on loading
-     */
-    public boolean testWords(Synset synset) throws JWNLException {
-        boolean result = true;
-        for (int i = 0; i < synset.getWords().length; i++) {
-            Word w = synset.getWords()[i];
-            boolean found = false;
-            for (String lemma : lemmas) {
-                if (w.getLemma().equals(lemma)) {
-                    found = true;
-                }
-            }
-            if (!found) {
-                fail("Synset word loading... failed.");
-                result = false;
+    @Test
+    public void testComplete() throws JWNLException {
+        IndexWord iw = dictionary.getIndexWord(POS.VERB, "complete");
+        Assert.assertNotNull("IndexWord loaded", iw);
+        Synset synset = null;
+        for (Synset s : iw.getSenses()) {
+            if (verbOffsets.contains(s.getOffset())) {
+                synset = s;
+                break;
             }
         }
-        if (result) {
-            log.info("Synset word loading... passed.");
-        }
-        return result;
+        Assert.assertNotNull("Synset search", synset);
+        int[] indices = synset.getVerbFrameIndices();
+        Assert.assertNotNull(indices);
+        Assert.assertEquals("Verb synset frame size test", 2, indices.length);
+        Assert.assertEquals("Verb synset frame test", 2, indices[0]);
+        Assert.assertEquals("Verb synset frame test", 33, indices[1]);
     }
-
-    /**
-     * Tests the gloss of the synset.
-     *
-     * @param synset synset
-     * @return true if gloss matches definition
-     * @throws JWNLException exception in loading
-     */
-    public boolean testGloss(Synset synset) throws JWNLException {
-        boolean match = false;
-        if (synset.getGloss().trim().equals(glossDefinition)) {
-            match = true;
-            log.info("Synset gloss test... passed.");
-        } else {
-            fail("Synset gloss test... failed.");
-        }
-        return match;
-    }
-
-    /**
-     * Tests if the synset contains the offset.
-     *
-     * @param synset synset
-     * @return true if synset has defined offset
-     * @throws JWNLException exception in loading
-     */
-    public boolean testSynset(Synset synset) throws JWNLException {
-        boolean found = false;
-        if (JWNL.getVersion().getNumber() == 2.0) {
-            if (synset.getOffset() == wn20TankOffset) {
-                found = true;
-            }
-        } else if (JWNL.getVersion().getNumber() == 2.1) {
-            if (synset.getOffset() == wn21TankOffset) {
-                found = true;
-            }
-        } else if (JWNL.getVersion().getNumber() == 3.0) {
-            if (synset.getOffset() == wn30TankOffset) {
-                found = true;
-            }
-        }
-        return found;
-    }
-
-    /**
-     * Tests if the synset has the desired number of pointers.
-     *
-     * @param synset synset
-     */
-    public void testPointers(Synset synset) {
-        if (!(synset.getPointers().length == pointers)) {
-            fail("Pointer testing... failed. Info: " + synset.getPointers().length + " should be: " + pointers);
-        } else {
-            log.info("Pointer testing... passed.");
-        }
-    }
-
-    /**
-     * Simple utility function to match a synset with a collection of offsets.
-     *
-     * @param s       synset
-     * @param offsets offsets
-     * @return true if match
-     */
-    private boolean contains(Synset s, long[] offsets) {
-        boolean rval = false;
-        for (long offset : offsets) {
-            if (s.getOffset() == offset) {
-                rval = true;
-            }
-        }
-        return rval;
-    }
-
-    /**
-     * Utility function.
-     *
-     * @param testName
-     */
-    public void fail(String testName) {
-        failures++;
-        log.error(testName);
-    }
-
 }

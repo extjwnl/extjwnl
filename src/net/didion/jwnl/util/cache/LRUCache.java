@@ -7,8 +7,9 @@ import java.util.Map;
  * A fixed-capacity <code>Cache</code> that stores the most recently used elements. Once the cache reaches
  * capacity, the least recently used elements will be removed.
  */
-public class LRUCache extends LinkedHashMap implements Cache {
-    private int _capacity;
+public class LRUCache<K, V> extends LinkedHashMap<K, V> implements Cache<K, V> {
+
+    private int capacity;
 
     /**
      * @param capacity the maximum number of elements that can be contained in the cache.
@@ -22,17 +23,17 @@ public class LRUCache extends LinkedHashMap implements Cache {
         return size() >= getCapacity();
     }
 
-    protected boolean removeEldestEntry(Map.Entry eldest) {
+    protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
         return size() > getCapacity();
     }
 
     public int setCapacity(int capacity) {
-        _capacity = capacity;
-        return _capacity;
+        this.capacity = capacity;
+        return this.capacity;
     }
 
     public int getCapacity() {
-        return _capacity;
+        return capacity;
     }
 
     public int getSize() {

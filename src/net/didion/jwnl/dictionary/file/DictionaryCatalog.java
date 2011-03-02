@@ -1,10 +1,13 @@
 package net.didion.jwnl.dictionary.file;
 
+import net.didion.jwnl.JWNLException;
 import net.didion.jwnl.JWNLRuntimeException;
 import net.didion.jwnl.data.POS;
+import net.didion.jwnl.dictionary.Dictionary;
+import net.didion.jwnl.util.factory.Owned;
+import net.didion.jwnl.util.factory.Param;
 
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -12,40 +15,84 @@ import java.util.Map;
 /**
  * A container for the files associated with a catalog (the index, data, and exception
  * files associated with a POS).
+ *
+ * @author didion
+ * @author Aliaksandr Autayeu avtaev@gmail.com
  */
-public class DictionaryCatalog {
-    private Map<POS, DictionaryFile> _files = new HashMap<POS, DictionaryFile>();
-    private DictionaryFileType _fileType;
+public class DictionaryCatalog<E extends DictionaryFile> implements Owned {
 
-    public DictionaryCatalog(String path, DictionaryFileType fileType, Class dictionaryFileType) {
-        _fileType = fileType;
+    /**
+     * Dictionary path install parameter. The value should be the absolute path
+     * of the directory containing the dictionary files.
+     */
+    public static final String DICTIONARY_PATH_KEY = "dictionary_path";
+
+    /**
+     * File type install parameter. The value should be the
+     * name of the appropriate subclass of DictionaryFileType.
+     */
+    public static final String DICTIONARY_FILE_TYPE_KEY = "file_type";
+
+    private Map<POS, E> files = new HashMap<POS, E>();
+    private DictionaryFileType fileType;
+    private Dictionary dictionary;
+
+    public DictionaryCatalog(Dictionary dictionary, DictionaryFileType fileType, Class desiredDictionaryFileType, Map<String, Param> params) throws JWNLException {
+        this.dictionary = dictionary;
+        this.fileType = fileType;
+
+        if (!params.containsKey(DICTIONARY_PATH_KEY)) {
+            throw new JWNLException("DICTIONARY_EXCEPTION_052", DICTIONARY_PATH_KEY);
+        }
+        String path = params.get(DICTIONARY_PATH_KEY).getValue();
+
+        if (!params.containsKey(DICTIONARY_FILE_TYPE_KEY)) {
+            throw new JWNLException("DICTIONARY_EXCEPTION_052", DICTIONARY_FILE_TYPE_KEY);
+        }
+
         try {
-            Constructor c = dictionaryFileType.getConstructor(new Class[0]);
-            DictionaryFile factory = (DictionaryFile) c.newInstance();
-            for (POS pos : POS.getAllPOS()) {
-                DictionaryFile file = factory.newInstance(path, pos, fileType);
-                _files.put(file.getPOS(), file);
+            Class fileClass;
+            try {
+                fileClass = Class.forName(params.get(DICTIONARY_FILE_TYPE_KEY).getValue());
+                if (!desiredDictionaryFileType.isAssignableFrom(fileClass)) {
+                    throw new JWNLRuntimeException("DICTIONARY_EXCEPTION_003", fileClass);
+                }
+            } catch (ClassNotFoundException ex) {
+                throw new JWNLRuntimeException("DICTIONARY_EXCEPTION_002", ex);
             }
-        } catch (Exception ex) {
-            throw new JWNLRuntimeException("DICTIONARY_EXCEPTION_0018", new Object[]{fileType, dictionaryFileType}, ex);
+
+            @SuppressWarnings("unchecked")
+            DictionaryFileFactory<E> factory = (DictionaryFileFactory<E>) params.get(DICTIONARY_FILE_TYPE_KEY).create();
+            for (POS pos : POS.getAllPOS()) {
+                E file = factory.newInstance(dictionary, path, pos, fileType);
+                files.put(file.getPOS(), file);
+            }
+        } catch (Exception e) {
+            throw new JWNLRuntimeException("DICTIONARY_EXCEPTION_018", fileType, e);
         }
     }
 
-    public Object getKey() {
+    public DictionaryFileType getKey() {
         return getFileType();
     }
 
     public void open() throws IOException {
         if (!isOpen()) {
-            for (Iterator itr = getFileIterator(); itr.hasNext();) {
-                ((DictionaryFile) itr.next()).open();
+            for (Iterator<E> itr = getFileIterator(); itr.hasNext();) {
+                itr.next().open();
             }
         }
     }
 
+    public void delete() throws IOException {
+        for (Iterator<E> itr = getFileIterator(); itr.hasNext();) {
+            itr.next().delete();
+        }
+    }
+
     public boolean isOpen() {
-        for (Iterator itr = getFileIterator(); itr.hasNext();) {
-            if (!((DictionaryFile) itr.next()).isOpen()) {
+        for (Iterator<E> itr = getFileIterator(); itr.hasNext();) {
+            if (!itr.next().isOpen()) {
                 return false;
             }
         }
@@ -53,24 +100,38 @@ public class DictionaryCatalog {
     }
 
     public void close() {
-        for (Iterator itr = getFileIterator(); itr.hasNext();) {
-            ((AbstractDictionaryFile) itr.next()).close();
+        for (Iterator<E> itr = getFileIterator(); itr.hasNext();) {
+            itr.next().close();
         }
     }
 
     public int size() {
-        return _files.size();
+        return files.size();
     }
 
-    public Iterator getFileIterator() {
-        return _files.values().iterator();
+    public Iterator<E> getFileIterator() {
+        return files.values().iterator();
     }
 
-    public DictionaryFile get(POS pos) {
-        return _files.get(pos);
+    public E get(POS pos) {
+        return files.get(pos);
     }
 
     public DictionaryFileType getFileType() {
-        return _fileType;
+        return fileType;
+    }
+
+    public Dictionary getDictionary() {
+        return dictionary;
+    }
+
+    public void setDictionary(Dictionary dictionary) {
+        this.dictionary = dictionary;
+    }
+
+    public void save() throws IOException, JWNLException {
+        for (Iterator<E> itr = getFileIterator(); itr.hasNext();) {
+            itr.next().save();
+        }
     }
 }

@@ -1,72 +1,54 @@
 package net.didion.jwnl.data;
 
-import junit.framework.TestCase;
+import net.didion.jwnl.JWNLException;
+import net.didion.jwnl.dictionary.Dictionary;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.IOException;
+import java.util.Arrays;
 
 /**
+ * Tests Exc class.
+ *
  * @author bwalenz
+ * @author Aliaksandr Autayeu avtaev@gmail.com
  */
-@SuppressWarnings({"FieldCanBeLocal", "FieldCanBeLocal"})
-public class TestExc extends TestCase {
+public class TestExc extends BaseDictionaryTest {
 
-    /**
-     * The private test object.
-     */
     private Exc testObj;
 
-    /**
-     * Lemma representing this exception.
-     */
-    private String lemma = "alam";
+    private static final POS pos = POS.NOUN;
+    private static final String lemma = "alam";
+    private static final String exc1 = "exc1";
+    private static final String exc2 = "exc2";
 
-    /**
-     * List of exceptions from the lemma.
-     */
-    private List exceptions;
-
-    /**
-     * First notional exception.
-     */
-    private String exc1 = "exc1";
-
-    /* (non-Javadoc)
-      * @see junit.framework.TestCase#setUp()
-      */
-    protected void setUp() throws Exception {
-        exceptions = new ArrayList();
-        exceptions.add(exc1);
-        exceptions.add("exc2");
-        testObj = new Exc(POS.NOUN, lemma, exceptions);
+    @Before
+    public void setUp() throws JWNLException, IOException {
+        Dictionary dictionary = Dictionary.getInstance(getProperties());
+        testObj = new Exc(dictionary, pos, lemma, Arrays.asList(exc1, exc2));
     }
 
-    /**
-     * Test method for {@link net.didion.jwnl.data.Exc#getPOS()}.
-     */
+    @Test
     public void testGetPOS() {
-        assertTrue(testObj.getPOS().equals(POS.NOUN));
+        Assert.assertEquals(pos, testObj.getPOS());
     }
 
-    /**
-     * Test method for {@link net.didion.jwnl.data.Exc#getLemma()}.
-     */
+    @Test
     public void testGetLemma() {
-        assertTrue(testObj.getLemma().equals(lemma));
+        Assert.assertEquals(lemma, testObj.getLemma());
     }
 
-    /**
-     * Test method for {@link net.didion.jwnl.data.Exc#getException(int)}.
-     */
-    public void testGetException() {
-        assertTrue(testObj.getException(0).equals(exc1));
+    @Test
+    public void testGetExceptions() {
+        Assert.assertEquals(2, testObj.getExceptions().size());
+        Assert.assertEquals(exc1, testObj.getExceptions().get(0));
+        Assert.assertEquals(exc2, testObj.getExceptions().get(1));
     }
 
-    /**
-     * Test method for {@link net.didion.jwnl.data.Exc#getExceptionsSize()}.
-     */
-    public void testGetExceptionsSize() {
-        assertTrue(testObj.getExceptionsSize() == 2);
+    @Test(expected = JWNLException.class)
+    public void testConstructor() throws JWNLException {
+        testObj = new Exc(null, null, null, null);
     }
-
 }

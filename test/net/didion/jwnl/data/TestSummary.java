@@ -1,6 +1,5 @@
 package net.didion.jwnl.data;
 
-import net.didion.jwnl.JWNL;
 import net.didion.jwnl.JWNLException;
 import net.didion.jwnl.dictionary.Dictionary;
 import org.junit.Assert;
@@ -23,8 +22,7 @@ public class TestSummary {
 
     @BeforeClass
     public static void runOnceBeforeAllTests() throws FileNotFoundException, JWNLException {
-        JWNL.initialize(new FileInputStream("./config/file_properties.xml"));
-        dic = Dictionary.getInstance();
+        dic = Dictionary.getInstance(new FileInputStream("./config/file_properties.xml"));
     }
 
     @Test
@@ -32,11 +30,11 @@ public class TestSummary {
         String queryString = "car";
         IndexWord iw = dic.getIndexWord(POS.NOUN, queryString);
         Assert.assertNotNull(iw);
-        Assert.assertEquals("auto", iw.getSense(1).getWord(0).getSummary());
-        Assert.assertEquals("railcar", iw.getSense(2).getWord(0).getSummary());
-        Assert.assertEquals("gondola", iw.getSense(3).getWord(0).getSummary());
-        Assert.assertEquals("elevator car", iw.getSense(4).getWord(0).getSummary());
-        Assert.assertEquals("cable car", iw.getSense(5).getWord(1).getSummary());
+        String[] tests = {"auto", "railcar", "gondola", "elevator car", "cable car"};
+        int[][] indices = {{0, 0}, {1, 0}, {2, 0}, {3, 0}, {4, 1}};
+        for (int i = 0; i < tests.length; i++) {
+            Assert.assertEquals(tests[i], iw.getSenses().get(indices[i][0]).getWords().get(indices[i][1]).getSummary());
+        }
     }
 
     @Test
@@ -44,9 +42,11 @@ public class TestSummary {
         String queryString = "java";
         IndexWord iw = dic.getIndexWord(POS.NOUN, queryString);
         Assert.assertNotNull(iw);
-        Assert.assertEquals("island", iw.getSense(1).getWord(0).getSummary());
-        Assert.assertEquals("coffee", iw.getSense(2).getWord(1).getSummary());
-        Assert.assertEquals("object-oriented programing language", iw.getSense(3).getWord(0).getSummary());
+        String[] tests = {"island", "coffee", "object-oriented programing language"};
+        int[][] indices = {{0, 0}, {1, 1}, {2, 0}};
+        for (int i = 0; i < tests.length; i++) {
+            Assert.assertEquals(tests[i], iw.getSenses().get(indices[i][0]).getWords().get(indices[i][1]).getSummary());
+        }
     }
 
     @Test
@@ -54,27 +54,21 @@ public class TestSummary {
         String queryString = "bank";
         IndexWord iw = dic.getIndexWord(POS.NOUN, queryString);
         Assert.assertNotNull(iw);
-        Assert.assertEquals("side", iw.getSense(1).getWord(0).getSummary());
-        Assert.assertEquals("banking concern", iw.getSense(2).getWord(1).getSummary());
-        Assert.assertEquals("ridge", iw.getSense(3).getWord(0).getSummary());
-        Assert.assertEquals("array", iw.getSense(4).getWord(0).getSummary());
-        Assert.assertEquals("reserve", iw.getSense(5).getWord(0).getSummary());
-        Assert.assertEquals("funds", iw.getSense(6).getWord(0).getSummary());
-        Assert.assertEquals("cant", iw.getSense(7).getWord(0).getSummary());
-        Assert.assertEquals("coin bank", iw.getSense(8).getWord(3).getSummary());
-        Assert.assertEquals("bank building", iw.getSense(9).getWord(0).getSummary());
-        Assert.assertEquals("flight maneuver", iw.getSense(10).getWord(0).getSummary());
+        {
+            String[] tests = {"side", "banking concern", "ridge", "array", "reserve", "funds", "cant", "coin bank", "bank building", "flight maneuver"};
+            int[][] indices = {{0, 0}, {1, 1}, {2, 0}, {3, 0}, {4, 0}, {5, 0}, {6, 0}, {7, 0}, {8, 0}, {9, 0}};
+            for (int i = 0; i < tests.length; i++) {
+                Assert.assertEquals(tests[i], iw.getSenses().get(indices[i][0]).getWords().get(indices[i][1]).getSummary());
+            }
+        }
 
         iw = dic.getIndexWord(POS.VERB, queryString);
         Assert.assertNotNull(iw);
-        Assert.assertEquals("tip", iw.getSense(1).getWord(0).getSummary());
-        Assert.assertEquals("enclose", iw.getSense(2).getWord(0).getSummary());
-        Assert.assertEquals("transact", iw.getSense(3).getWord(0).getSummary());
-        Assert.assertEquals("act", iw.getSense(4).getWord(0).getSummary());
-        Assert.assertEquals("work", iw.getSense(5).getWord(0).getSummary());
-        Assert.assertEquals("deposit", iw.getSense(6).getWord(1).getSummary());
-        Assert.assertEquals("cover", iw.getSense(7).getWord(0).getSummary());
-        Assert.assertEquals("rely", iw.getSense(8).getWord(3).getSummary());
+        String[] tests = {"tip", "enclose", "transact", "act", "work", "deposit", "cover", "rely"};
+        int[][] indices = {{0, 0}, {1, 1}, {2, 0}, {3, 0}, {4, 0}, {5, 1}, {6, 0}, {7, 3}};
+        for (int i = 0; i < tests.length; i++) {
+            Assert.assertEquals(tests[i], iw.getSenses().get(indices[i][0]).getWords().get(indices[i][1]).getSummary());
+        }
     }
 
     @Test
@@ -82,17 +76,21 @@ public class TestSummary {
         String queryString = "cannon";
         IndexWord iw = dic.getIndexWord(POS.NOUN, queryString);
         Assert.assertNotNull(iw);
-        Assert.assertEquals("gun", iw.getSense(1).getWord(0).getSummary());
-        Assert.assertEquals("cannon", iw.getSense(2).getWord(0).getSummary());
-        Assert.assertEquals("armor plate", iw.getSense(3).getWord(0).getSummary());
-        Assert.assertEquals("cannon", iw.getSense(4).getWord(0).getSummary());
-        Assert.assertEquals("shank", iw.getSense(5).getWord(0).getSummary());
-        Assert.assertEquals("carom", iw.getSense(6).getWord(1).getSummary());
+        {
+            String[] tests = {"gun", "cannon", "armor plate", "cannon", "shank", "carom"};
+            int[][] indices = {{0, 0}, {1, 1}, {2, 0}, {3, 0}, {4, 0}, {5, 0}, {6, 1}};
+            for (int i = 0; i < tests.length; i++) {
+                Assert.assertEquals(tests[i], iw.getSenses().get(indices[i][0]).getWords().get(indices[i][1]).getSummary());
+            }
+        }
 
         iw = dic.getIndexWord(POS.VERB, queryString);
         Assert.assertNotNull(iw);
-        Assert.assertEquals("hit", iw.getSense(1).getWord(0).getSummary());
-        Assert.assertEquals("discharge", iw.getSense(2).getWord(0).getSummary());
+        String[] tests = {"hit", "discharge"};
+        int[][] indices = {{0, 0}, {1, 0}};
+        for (int i = 0; i < tests.length; i++) {
+            Assert.assertEquals(tests[i], iw.getSenses().get(indices[i][0]).getWords().get(indices[i][1]).getSummary());
+        }
     }
 
     @Test
@@ -100,11 +98,15 @@ public class TestSummary {
         String queryString = "cannon";
         IndexWord iw = dic.getIndexWord(POS.NOUN, queryString);
         Assert.assertNotNull(iw);
-        List<Synset> senses = Arrays.asList(iw.getSense(1), iw.getSense(3), iw.getSense(5), iw.getSense(6));
-        Assert.assertEquals("gun", iw.getSense(1).getWord(0).getSummary(senses));
-        Assert.assertEquals("armor plate", iw.getSense(3).getWord(0).getSummary(senses));
-        Assert.assertEquals("shank", iw.getSense(5).getWord(0).getSummary(senses));
-        Assert.assertEquals("carom", iw.getSense(6).getWord(1).getSummary(senses));
+        {
+            List<Synset> senses = Arrays.asList(iw.getSenses().get(0), iw.getSenses().get(2), iw.getSenses().get(4), iw.getSenses().get(5));
+            String[] tests = {"gun", "cannon", "armor plate", "cannon", "shank", "carom"};
+            int[][] indices = {{0, 0}, {2, 0}, {4, 0}, {5, 1}};
+            for (int i = 0; i < tests.length; i++) {
+                Assert.assertEquals(tests[i], iw.getSenses().get(indices[i][0]).getWords().get(indices[i][1]).getSummary(senses));
+            }
+
+        }
     }
 
 
@@ -113,32 +115,25 @@ public class TestSummary {
         String queryString = "case";
         IndexWord iw = dic.getIndexWord(POS.NOUN, queryString);
         Assert.assertNotNull(iw);
-        Assert.assertEquals("example", iw.getSense(1).getWord(0).getSummary());
-        Assert.assertEquals("event", iw.getSense(2).getWord(1).getSummary());
-        Assert.assertEquals("suit", iw.getSense(3).getWord(2).getSummary());
-        Assert.assertEquals("fact", iw.getSense(4).getWord(0).getSummary());
-        Assert.assertEquals("container", iw.getSense(5).getWord(0).getSummary());
-        Assert.assertEquals("soul", iw.getSense(6).getWord(0).getSummary());
-        Assert.assertEquals("subject", iw.getSense(7).getWord(1).getSummary());
-        Assert.assertEquals("problem", iw.getSense(8).getWord(0).getSummary());
-        Assert.assertEquals("argument", iw.getSense(9).getWord(0).getSummary());
-        Assert.assertEquals("caseful", iw.getSense(10).getWord(0).getSummary());
-        Assert.assertEquals("grammatical case", iw.getSense(11).getWord(0).getSummary());
-        Assert.assertEquals("state of mind", iw.getSense(12).getWord(0).getSummary());
-        Assert.assertEquals("type", iw.getSense(13).getWord(3).getSummary());
-        Assert.assertEquals("font", iw.getSense(14).getWord(4).getSummary());
-        Assert.assertEquals("sheath", iw.getSense(15).getWord(1).getSummary());
-        Assert.assertEquals("shell", iw.getSense(16).getWord(1).getSummary());
-        Assert.assertEquals("casing", iw.getSense(17).getWord(1).getSummary());
-        Assert.assertEquals("compositor's case", iw.getSense(18).getWord(0).getSummary());
-        Assert.assertEquals("slip", iw.getSense(19).getWord(0).getSummary());
-        Assert.assertEquals("vitrine", iw.getSense(20).getWord(0).getSummary());
+        {
+            String[] tests = {"example", "event", "suit", "fact", "container", "soul", "subject", "problem", "argument", "caseful",
+            "grammatical case", "state of mind", "type", "font", "sheath", "shell", "casing", "compositor's case", "slip", "vitrine"};
+            int[][] indices = {{0, 0}, {1, 1}, {2, 2}, {3, 0}, {4, 0}, {5, 0}, {6, 1}, {7, 0}, {8, 0}, {9, 0},
+            {10, 0}, {11, 0}, {12, 3}, {13, 4}, {14, 1}, {15, 1}, {16, 1}, {17, 1}, {18, 0}, {19, 0}};
+            for (int i = 0; i < tests.length; i++) {
+                Assert.assertEquals(tests[i], iw.getSenses().get(indices[i][0]).getWords().get(indices[i][1]).getSummary());
+            }
+
+        }
 
 
         iw = dic.getIndexWord(POS.VERB, queryString);
         Assert.assertNotNull(iw);
-        Assert.assertEquals("inspect", iw.getSense(1).getWord(0).getSummary());
-        Assert.assertEquals("encase", iw.getSense(2).getWord(2).getSummary());
+        String[] tests = {"inspect", "encase"};
+        int[][] indices = {{0, 0}, {1, 2}};
+        for (int i = 0; i < tests.length; i++) {
+            Assert.assertEquals(tests[i], iw.getSenses().get(indices[i][0]).getWords().get(indices[i][1]).getSummary());
+        }
     }
 
     @Test
@@ -146,14 +141,20 @@ public class TestSummary {
         String queryString = "nice";
         IndexWord iw = dic.getIndexWord(POS.NOUN, queryString);
         Assert.assertNotNull(iw);
-        Assert.assertEquals("city", iw.getSense(1).getWord(0).getSummary());
+        {
+            String[] tests = {"city"};
+            int[][] indices = {{0, 0}};
+            for (int i = 0; i < tests.length; i++) {
+                Assert.assertEquals(tests[i], iw.getSenses().get(indices[i][0]).getWords().get(indices[i][1]).getSummary());
+            }
 
+        }
         iw = dic.getIndexWord(POS.ADJECTIVE, queryString);
         Assert.assertNotNull(iw);
-        Assert.assertEquals("good", iw.getSense(1).getWord(0).getSummary());
-        Assert.assertEquals("decent", iw.getSense(2).getWord(1).getSummary());
-        Assert.assertEquals("skillful", iw.getSense(3).getWord(0).getSummary());
-        Assert.assertEquals("dainty", iw.getSense(4).getWord(1).getSummary());
-        Assert.assertEquals("gracious", iw.getSense(5).getWord(2).getSummary());
+        String[] tests = {"good", "decent", "skillful", "dainty", "gracious"};
+        int[][] indices = {{0, 0}, {1, 1}, {2, 0}, {3, 1}, {4, 2}};
+        for (int i = 0; i < tests.length; i++) {
+            Assert.assertEquals(tests[i], iw.getSenses().get(indices[i][0]).getWords().get(indices[i][1]).getSummary());
+        }
     }
 }

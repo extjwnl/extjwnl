@@ -13,60 +13,66 @@ public class PointerTargetNode implements Node {
     /**
      * The PointerTarget
      */
-    private PointerTarget _target;
+    private PointerTarget target;
     /**
      * The relation type that produced this node. e.g. if you make a call to
      * getDirectHypernyms(), each node in the resultant list will have a
      * type of PointerType.HYPERNYM.
      */
-    private PointerType _type;
+    private PointerType type;
 
     public PointerTargetNode(PointerTarget target) {
         this(target, null);
     }
 
     public PointerTargetNode(PointerTarget target, PointerType type) {
-        this._target = target;
-        this._type = type;
+        this.target = target;
+        this.type = type;
     }
 
     public void setType(PointerType type) {
-        this._type = type;
+        this.type = type;
     }
 
     public PointerType getType() {
-        return _type;
+        return type;
     }
 
     public PointerTarget getPointerTarget() {
-        return _target;
+        return target;
     }
 
     /**
      * Returns true if the target is a Word, else false.
+     *
+     * @return true if the target is a Word, else false
      */
     public boolean isLexical() {
-        return _target instanceof Word;
+        return target instanceof Word;
     }
 
     /**
      * If the target is a synset, return it, otherwise it's a word
      * so return the word's parent synset.
+     *
+     * @return If the target is a synset, return it, otherwise it's a word so return the word's parent synset
      */
     public Synset getSynset() {
         if (isLexical()) {
-            return _target.getSynset();
+            return target.getSynset();
         } else {
-            return (Synset) _target;
+            return (Synset) target;
         }
     }
 
     /**
      * If the target is a word, return it, otherwise return null.
+     *
+     * @return if the target is a word, return it, otherwise return null
      */
     public Word getWord() {
         if (isLexical()) {
-            return (Word) _target;
+            return (Word) target;
         } else {
             return null;
         }
@@ -83,14 +89,8 @@ public class PointerTargetNode implements Node {
         return false;
     }
 
-    private transient String _cachedToString = null;
-
     public String toString() {
-        if (_cachedToString == null) {
-            _cachedToString =
-                    JWNL.resolveMessage("DATA_TOSTRING_014", new Object[]{getPointerTarget(), getType()});
-        }
-        return _cachedToString;
+        return JWNL.resolveMessage("DATA_TOSTRING_014", new Object[]{getPointerTarget(), getType()});
     }
 
     public int hashCode() {

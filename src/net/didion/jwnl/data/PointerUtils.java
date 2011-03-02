@@ -11,7 +11,7 @@ import java.util.ArrayList;
  * of pointer. See the WordNet documentation for information on pointer types. To avoid confusion with
  * the <code>Relationship</code> class, these relationships will be referred to as links.
  */
-public final class PointerUtils {
+public class PointerUtils {
     /**
      * Representation of infinite depth. Used to tell the pointer operations to
      * return all links to an infinite depth.

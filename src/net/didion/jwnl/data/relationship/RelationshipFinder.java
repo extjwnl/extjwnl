@@ -29,10 +29,10 @@ public class RelationshipFinder {
      * @return int the sense of the source word that contains the target word
      */
     public int getImmediateRelationship(IndexWord sourceWord, IndexWord targetWord) throws JWNLException {
-        Synset[] senses = sourceWord.getSenses();
+        List<Synset> senses = sourceWord.getSenses();
         String lemma = targetWord.getLemma();
-        for (int i = 0; i < senses.length; i++) {
-            if (senses[i].containsWord(lemma)) {
+        for (int i = 0; i < senses.size(); i++) {
+            if (senses.get(i).containsWord(lemma)) {
                 return i + 1;
             }
         }

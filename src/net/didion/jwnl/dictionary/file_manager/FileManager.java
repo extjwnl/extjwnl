@@ -1,17 +1,20 @@
 package net.didion.jwnl.dictionary.file_manager;
 
+import net.didion.jwnl.JWNLException;
 import net.didion.jwnl.data.POS;
 import net.didion.jwnl.dictionary.file.DictionaryFileType;
-import net.didion.jwnl.util.factory.Createable;
+import net.didion.jwnl.util.factory.Owned;
 
 import java.io.IOException;
-import java.rmi.Remote;
 
 /**
  * <code>FileManager</code> defines the interface between the <code>FileBackedDictionary</code> and the file system.
  * Methods in this interface operate on and return offsets, which are indices into a dictionary file.
+ *
+ * @author didion
+ * @author Aliaksandr Autayeu avtaev@gmail.com
  */
-public interface FileManager extends Remote, Createable {
+public interface FileManager extends Owned {
     /**
      * Search for the line whose first word is <var>index</var> (that is, that begins with
      * <var>index</var> followed by a space or tab).
@@ -65,4 +68,14 @@ public interface FileManager extends Remote, Createable {
      * Shut down the file manager.
      */
     void close();
+
+    /**
+     * Saves the files.
+     */
+    void save() throws IOException, JWNLException;
+
+    /**
+     * Deletes the dictionary.
+     */
+    void delete() throws IOException;
 }

@@ -1,16 +1,15 @@
 package net.didion.jwnl.dictionary.morph;
 
-import net.didion.jwnl.JWNLException;
 import net.didion.jwnl.data.POS;
-
-import java.util.Map;
+import net.didion.jwnl.dictionary.Dictionary;
 
 /**
  * yet to be implemented
  */
-public class RemovePrepPhrasesOperation implements Operation {
-    public Object create(Map params) throws JWNLException {
-        return new RemovePrepPhrasesOperation();
+public class RemovePrepPhrasesOperation extends AbstractOperation {
+
+    public RemovePrepPhrasesOperation(Dictionary dictionary) {
+        super(dictionary);
     }
 
     public boolean execute(POS pos, String lemma, BaseFormSet baseForm) {

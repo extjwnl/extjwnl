@@ -1,12 +1,5 @@
-/**
- * Java WordNet Library (JWNL)
- * See the documentation for copyright information.
- *
- * @version 1.1
- */
 package net.didion.jwnl.utilities;
 
-import net.didion.jwnl.JWNL;
 import net.didion.jwnl.JWNLException;
 import net.didion.jwnl.data.IndexWord;
 import net.didion.jwnl.data.POS;
@@ -24,6 +17,9 @@ import java.io.FileInputStream;
 
 /**
  * A class to demonstrate the functionality of the JWNL package.
+ *
+ * @author didion
+ * @author Aliaksandr Autayeu avtaev@gmail.com
  */
 public class Examples {
     private static final String USAGE = "java Examples <properties file>";
@@ -37,10 +33,10 @@ public class Examples {
         String propsFile = args[0];
         try {
             // initialize JWNL (this must be done before JWNL can be used)
-            JWNL.initialize(new FileInputStream(propsFile));
-            new Examples().go();
-        } catch (Exception ex) {
-            ex.printStackTrace();
+            Dictionary dictionary = Dictionary.getInstance(new FileInputStream(propsFile));
+            new Examples(dictionary).go();
+        } catch (Exception e) {
+            e.printStackTrace();
             System.exit(-1);
         }
     }
@@ -51,13 +47,15 @@ public class Examples {
     private IndexWord FUNNY;
     private IndexWord DROLL;
     private String MORPH_PHRASE = "running-away";
+    private Dictionary dictionary;
 
-    public Examples() throws JWNLException {
-        ACCOMPLISH = Dictionary.getInstance().getIndexWord(POS.VERB, "accomplish");
-        DOG = Dictionary.getInstance().getIndexWord(POS.NOUN, "dog");
-        CAT = Dictionary.getInstance().lookupIndexWord(POS.NOUN, "cat");
-        FUNNY = Dictionary.getInstance().lookupIndexWord(POS.ADJECTIVE, "funny");
-        DROLL = Dictionary.getInstance().lookupIndexWord(POS.ADJECTIVE, "droll");
+    public Examples(Dictionary dictionary) throws JWNLException {
+        this.dictionary = dictionary;
+        ACCOMPLISH = dictionary.getIndexWord(POS.VERB, "accomplish");
+        DOG = dictionary.getIndexWord(POS.NOUN, "dog");
+        CAT = dictionary.lookupIndexWord(POS.NOUN, "cat");
+        FUNNY = dictionary.lookupIndexWord(POS.ADJECTIVE, "funny");
+        DROLL = dictionary.lookupIndexWord(POS.ADJECTIVE, "droll");
     }
 
     public void go() throws JWNLException, CloneNotSupportedException {
@@ -74,26 +72,26 @@ public class Examples {
         // is not stemmed. So we have to both remove the hyphen and stem
         // "running" before we get to an entry that is in WordNet
         System.out.println("Base form for \"" + phrase + "\": " +
-                Dictionary.getInstance().lookupIndexWord(POS.VERB, phrase));
+                dictionary.lookupIndexWord(POS.VERB, phrase));
     }
 
     private void demonstrateListOperation(IndexWord word) throws JWNLException {
         // Get all of the hypernyms (parents) of the first sense of <var>word</var>
-        PointerTargetNodeList hypernyms = PointerUtils.getInstance().getDirectHypernyms(word.getSense(1));
+        PointerTargetNodeList hypernyms = PointerUtils.getInstance().getDirectHypernyms(word.getSenses().get(0));
         System.out.println("Direct hypernyms of \"" + word.getLemma() + "\":");
         hypernyms.print();
     }
 
     private void demonstrateTreeOperation(IndexWord word) throws JWNLException {
         // Get all the hyponyms (children) of the first sense of <var>word</var>
-        PointerTargetTree hyponyms = PointerUtils.getInstance().getHyponymTree(word.getSense(1));
+        PointerTargetTree hyponyms = PointerUtils.getInstance().getHyponymTree(word.getSenses().get(0));
         System.out.println("Hyponyms of \"" + word.getLemma() + "\":");
         hyponyms.print();
     }
 
     private void demonstrateAsymmetricRelationshipOperation(IndexWord start, IndexWord end) throws JWNLException, CloneNotSupportedException {
         // Try to find a relationship between the first sense of <var>start</var> and the first sense of <var>end</var>
-        RelationshipList list = RelationshipFinder.getInstance().findRelationships(start.getSense(1), end.getSense(1), PointerType.HYPERNYM);
+        RelationshipList list = RelationshipFinder.getInstance().findRelationships(start.getSenses().get(0), end.getSenses().get(0), PointerType.HYPERNYM);
         System.out.println("Hypernym relationship between \"" + start.getLemma() + "\" and \"" + end.getLemma() + "\":");
         for (Object aList : list) {
             ((Relationship) aList).getNodeList().print();
@@ -104,7 +102,7 @@ public class Examples {
 
     private void demonstrateSymmetricRelationshipOperation(IndexWord start, IndexWord end) throws JWNLException, CloneNotSupportedException {
         // find all synonyms that <var>start</var> and <var>end</var> have in common
-        RelationshipList list = RelationshipFinder.getInstance().findRelationships(start.getSense(1), end.getSense(1), PointerType.SIMILAR_TO);
+        RelationshipList list = RelationshipFinder.getInstance().findRelationships(start.getSenses().get(0), end.getSenses().get(0), PointerType.SIMILAR_TO);
         System.out.println("Synonym relationship between \"" + start.getLemma() + "\" and \"" + end.getLemma() + "\":");
         for (Object aList : list) {
             ((Relationship) aList).getNodeList().print();

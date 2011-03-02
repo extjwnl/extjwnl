@@ -4,24 +4,34 @@ import net.didion.jwnl.JWNLException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-public class ParamList implements Param {
-    private String _name;
-    private List<Param> _params = new ArrayList<Param>();
+/**
+ * List of parameters.
+ *
+ * @author didion
+ * @author Aliaksandr Autayeu avtaev@gmail.com
+ */
+public class ParamList extends ArrayList<Param> implements Param {
+
+    private String name;
 
     public ParamList(String name) {
-        _name = name;
+        this.name = name;
     }
 
-    public ParamList(String name, Param[] params) {
-        _name = name;
-        for (Param param : params) {
-            addParam(param);
-        }
+    public ParamList(String name, List<Param> params) {
+        this.name = name;
+        addAll(params);
+    }
+
+    public ParamList(String name, Map<String, Param> params) {
+        this.name = name;
+        addAll(params.values());
     }
 
     public String getName() {
-        return _name;
+        return name;
     }
 
     public String getValue() {
@@ -29,16 +39,16 @@ public class ParamList implements Param {
     }
 
     public void addParam(Param param) {
-        _params.add(param);
+        add(param);
     }
 
     public List<Param> getParams() {
-        return _params;
+        return this;
     }
 
     public Object create() throws JWNLException {
         List<Param> params = getParams();
-        List results = new ArrayList(params.size());
+        List<Object> results = new ArrayList<Object>(params.size());
         for (Param param : params) {
             results.add(param.create());
         }

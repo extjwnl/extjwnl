@@ -32,7 +32,7 @@ public class DictionaryElementType {
     /**
      * The name of the dictionary.
      */
-    private final String _name;
+    private final String name;
 
     /**
      * A list of the different dictionary types.
@@ -57,12 +57,9 @@ public class DictionaryElementType {
      * @param name
      */
     private DictionaryElementType(String name) {
-        _name = name;
+        this.name = name;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public String toString() {
         return JWNL.resolveMessage("DATA_TOSTRING_016", getName());
     }
@@ -73,13 +70,10 @@ public class DictionaryElementType {
      * @return
      */
     public String getName() {
-        return _name;
+        return name;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public int hashCode() {
-        return _name.hashCode();
+        return name.hashCode();
     }
 }

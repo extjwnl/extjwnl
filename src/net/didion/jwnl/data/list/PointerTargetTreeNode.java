@@ -19,23 +19,23 @@ public class PointerTargetTreeNode extends PointerTargetNode {
     /**
      * The list of all this node's children
      */
-    private PointerTargetTreeNodeList _childTreeList;
+    private PointerTargetTreeNodeList childTreeList;
     /**
      * This list of pointers associated with this node
      */
-    private PointerTargetTreeNodeList _pointerTreeList;
+    private PointerTargetTreeNodeList pointerTreeList;
     /**
      * This node's parent
      */
-    private PointerTargetTreeNode _parent;
+    private PointerTargetTreeNode parent;
 
     public PointerTargetTreeNode(PointerTarget target, PointerTargetTreeNodeList childTreeList,
                                  PointerTargetTreeNodeList pointerTreeList, PointerType type,
                                  PointerTargetTreeNode parent) {
         super(target, type);
-        _parent = parent;
-        _childTreeList = childTreeList;
-        _pointerTreeList = pointerTreeList;
+        this.parent = parent;
+        this.childTreeList = childTreeList;
+        this.pointerTreeList = pointerTreeList;
     }
 
     public PointerTargetTreeNode(PointerTarget target) {
@@ -68,45 +68,40 @@ public class PointerTargetTreeNode extends PointerTargetNode {
         return (obj instanceof PointerTargetTreeNode) && super.equals(obj);
     }
 
-    private transient String _cachedToString = null;
-
     public String toString() {
-        if (_cachedToString == null) {
-            _cachedToString = JWNL.resolveMessage("DATA_TOSTRING_015",
-                    new Object[]{
-                            getPointerTarget(),
-                            getType(),
-                            !hasParent(),
-                            hasValidChildTreeList(),
-                            hasValidPointerTreeList()
-                    });
-        }
-        return _cachedToString;
+        return JWNL.resolveMessage("DATA_TOSTRING_015",
+                new Object[]{
+                        getPointerTarget(),
+                        getType(),
+                        !hasParent(),
+                        hasValidChildTreeList(),
+                        hasValidPointerTreeList()
+                });
     }
 
 
     public void setChildTreeList(PointerTargetTreeNodeList list) {
-        _childTreeList = list;
+        childTreeList = list;
     }
 
     public void setPointerTreeList(PointerTargetTreeNodeList list) {
-        _pointerTreeList = list;
+        pointerTreeList = list;
     }
 
     public void setParent(PointerTargetTreeNode parent) {
-        _parent = parent;
+        this.parent = parent;
     }
 
     public PointerTargetTreeNode getParent() {
-        return _parent;
+        return parent;
     }
 
     public PointerTargetTreeNodeList getChildTreeList() {
-        return _childTreeList;
+        return childTreeList;
     }
 
     public PointerTargetTreeNodeList getPointerTreeList() {
-        return _pointerTreeList;
+        return pointerTreeList;
     }
 
     public boolean hasChildTreeList() {

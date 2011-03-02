@@ -1,15 +1,18 @@
 package net.didion.jwnl.utilities;
 
 
-import net.didion.jwnl.JWNL;
 import net.didion.jwnl.JWNLException;
 import net.didion.jwnl.data.DictionaryElement;
 import net.didion.jwnl.data.POS;
 import net.didion.jwnl.dictionary.AbstractCachingDictionary;
 import net.didion.jwnl.dictionary.Dictionary;
+import net.didion.jwnl.dictionary.file.DictionaryCatalog;
 import net.didion.jwnl.dictionary.file.DictionaryCatalogSet;
 import net.didion.jwnl.dictionary.file.DictionaryFileType;
 import net.didion.jwnl.dictionary.file.ObjectDictionaryFile;
+import net.didion.jwnl.princeton.file.PrincetonObjectDictionaryFile;
+import net.didion.jwnl.util.factory.NameValueParam;
+import net.didion.jwnl.util.factory.Param;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -25,59 +28,62 @@ import java.util.Map;
  * (such as word sense disambiguation algorithms, or dictionary services).
  *
  * @author brett
+ * @author Aliaksandr Autayeu avtaev@gmail.com
  */
 public class DictionaryToMap {
+
+    private Dictionary dictionary;
+    private DictionaryCatalogSet<ObjectDictionaryFile> destinationFiles;
 
     /**
      * Initialize with the given map destination directory, using the properties file(usually file_properties.xml)
      *
      * @param destinationDirectory - destination directory for in-memory map files
      * @param propFile             - properties file of file-based WordNet
-     * @throws JWNLException
-     * @throws IOException
+     * @throws JWNLException JWNLException
+     * @throws IOException   IOException
      */
     public DictionaryToMap(String destinationDirectory, String propFile)
             throws JWNLException, IOException {
-        JWNL.initialize(new FileInputStream(propFile));
-        _destinationFiles = new DictionaryCatalogSet(destinationDirectory, net.didion.jwnl.princeton.file.PrincetonObjectDictionaryFile.class);
+        dictionary = Dictionary.getInstance(new FileInputStream(propFile));
+        HashMap<String, Param> params = new HashMap<String, Param>();
+        params.put(DictionaryCatalog.DICTIONARY_PATH_KEY, new NameValueParam(dictionary, DictionaryCatalog.DICTIONARY_PATH_KEY, destinationDirectory));
+        params.put(DictionaryCatalog.DICTIONARY_FILE_TYPE_KEY, new NameValueParam(dictionary, DictionaryCatalog.DICTIONARY_FILE_TYPE_KEY, PrincetonObjectDictionaryFile.class.getCanonicalName()));
+        destinationFiles = new DictionaryCatalogSet<ObjectDictionaryFile>(dictionary, params, ObjectDictionaryFile.class);
     }
 
     /**
      * Converts the current Dictionary to a MapBackedDictionary.
      *
-     * @throws JWNLException
-     * @throws IOException
+     * @throws JWNLException JWNLException
+     * @throws IOException   IOException
      */
-    public void convert()
-            throws JWNLException, IOException {
-        _destinationFiles.open();
-        boolean canClearCache = (Dictionary.getInstance() instanceof AbstractCachingDictionary) && ((AbstractCachingDictionary) Dictionary.getInstance()).isCachingEnabled();
-        for (Iterator typeItr = DictionaryFileType.getAllDictionaryFileTypes().iterator(); typeItr.hasNext(); System.gc()) {
-            DictionaryFileType fileType = (DictionaryFileType) typeItr.next();
-            POS pos;
-            for (Iterator posItr = POS.getAllPOS().iterator(); posItr.hasNext(); serialize(pos, fileType)) {
-                pos = (POS) posItr.next();
-                System.out.println("Converting " + pos + " " + fileType + " file...");
+    public void convert() throws JWNLException, IOException {
+        destinationFiles.open();
+        boolean canClearCache = (dictionary instanceof AbstractCachingDictionary) && ((AbstractCachingDictionary) dictionary).isCachingEnabled();
+        for (DictionaryFileType fileType : DictionaryFileType.getAllDictionaryFileTypes()) {
+            for (POS pos : POS.getAllPOS()) {
+                System.out.println("Converting " + pos.getLabel() + " " + fileType.getName() + "...");
+                serialize(pos, fileType);
             }
 
             if (canClearCache) {
-                ((AbstractCachingDictionary) Dictionary.getInstance()).clearCache(fileType.getElementType());
+                ((AbstractCachingDictionary) dictionary).clearCache(fileType.getElementType());
             }
         }
 
-        _destinationFiles.close();
+        destinationFiles.close();
     }
 
-    private Iterator getIterator(POS pos, DictionaryFileType fileType)
-            throws JWNLException {
+    private Iterator<? extends DictionaryElement> getIterator(POS pos, DictionaryFileType fileType) throws JWNLException {
         if (fileType == DictionaryFileType.DATA) {
-            return Dictionary.getInstance().getSynsetIterator(pos);
+            return dictionary.getSynsetIterator(pos);
         }
         if (fileType == DictionaryFileType.INDEX) {
-            return Dictionary.getInstance().getIndexWordIterator(pos);
+            return dictionary.getIndexWordIterator(pos);
         }
         if (fileType == DictionaryFileType.EXCEPTION) {
-            return Dictionary.getInstance().getExceptionIterator(pos);
+            return dictionary.getExceptionIterator(pos);
         } else {
             throw new IllegalArgumentException();
         }
@@ -85,28 +91,26 @@ public class DictionaryToMap {
 
     private void serialize(POS pos, DictionaryFileType fileType)
             throws JWNLException, IOException {
-        ObjectDictionaryFile file = (ObjectDictionaryFile) _destinationFiles.getDictionaryFile(pos, fileType);
+        ObjectDictionaryFile file = destinationFiles.getDictionaryFile(pos, fileType);
         int count = 0;
-        for (Iterator itr = getIterator(pos, fileType); itr.hasNext(); itr.next()) {
+        for (Iterator<? extends DictionaryElement> itr = getIterator(pos, fileType); itr.hasNext(); itr.next()) {
             if (++count % 10000 == 0) {
                 System.out.println("Counted and cached word " + count + "...");
             }
         }
 
-        Map map = new HashMap((int) Math.ceil((float) count / 0.9F) + 1, 0.9F);
+        Map<Object, DictionaryElement> map = new HashMap<Object, DictionaryElement>((int) Math.ceil((float) count / 0.9F) + 1, 0.9F);
         DictionaryElement elt;
-        for (Iterator listItr = getIterator(pos, fileType); listItr.hasNext(); map.put(elt.getKey(), elt)) {
-            elt = (DictionaryElement) listItr.next();
+        for (Iterator<? extends DictionaryElement> listItr = getIterator(pos, fileType); listItr.hasNext(); map.put(elt.getKey(), elt)) {
+            elt = listItr.next();
         }
 
         file.writeObject(map);
         file.close();
-        map = null;
-        file = null;
         System.gc();
         Runtime rt = Runtime.getRuntime();
         System.out.println("total mem: " + rt.totalMemory() / 1024L + "K free mem: " + rt.freeMemory() / 1024L + "K");
-        System.out.println("Successfully serialized...");
+        System.out.println("Successfully serialized " + count + " elements...");
     }
 
     public static void main(String args[]) {
@@ -116,8 +120,8 @@ public class DictionaryToMap {
             destinationDirectory = args[0];
             propertyFile = args[1];
         } else {
-            System.out.println("java DictionaryToMap <destination directory> <properties file>");
-            System.exit(-1);
+            System.out.println("DictionaryToMap <destination directory> <properties file>");
+            System.exit(0);
         }
         try {
             (new DictionaryToMap(destinationDirectory, propertyFile)).convert();
@@ -126,6 +130,4 @@ public class DictionaryToMap {
             System.exit(-1);
         }
     }
-
-    private DictionaryCatalogSet _destinationFiles;
 }

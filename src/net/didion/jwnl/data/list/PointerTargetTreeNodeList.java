@@ -161,14 +161,14 @@ public class PointerTargetTreeNodeList extends PointerTargetNodeList {
      * Operation that is used for finding the specified node in a tree.
      */
     public static class FindNodeOperation implements Operation {
-        private PointerTargetTreeNode _node;
+        private PointerTargetTreeNode node;
 
         public FindNodeOperation(PointerTargetTreeNode node) {
-            _node = node;
+            this.node = node;
         }
 
         public Object execute(PointerTargetTreeNode testNode) {
-            if (_node.equals(testNode)) {
+            if (node.equals(testNode)) {
                 return testNode;
             }
             return null;
@@ -179,14 +179,14 @@ public class PointerTargetTreeNodeList extends PointerTargetNodeList {
      * Operation that is used for finding the node(s) in a tree that have the specified <code>PointerTarget</code>.
      */
     public static class FindTargetOperation implements Operation {
-        private PointerTarget _target;
+        private PointerTarget target;
 
         public FindTargetOperation(PointerTarget target) {
-            _target = target;
+            this.target = target;
         }
 
         public Object execute(PointerTargetTreeNode node) {
-            if (node.getPointerTarget().equals(_target)) {
+            if (node.getPointerTarget().equals(target)) {
                 return node;
             }
             return null;

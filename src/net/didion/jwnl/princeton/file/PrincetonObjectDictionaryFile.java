@@ -2,33 +2,49 @@ package net.didion.jwnl.princeton.file;
 
 import net.didion.jwnl.JWNLRuntimeException;
 import net.didion.jwnl.data.POS;
-import net.didion.jwnl.dictionary.file.DictionaryFile;
+import net.didion.jwnl.dictionary.Dictionary;
+import net.didion.jwnl.dictionary.file.DictionaryFileFactory;
 import net.didion.jwnl.dictionary.file.DictionaryFileType;
 import net.didion.jwnl.dictionary.file.ObjectDictionaryFile;
+import net.didion.jwnl.util.MessageLog;
+import net.didion.jwnl.util.MessageLogLevel;
+import net.didion.jwnl.util.factory.Param;
 
 import java.io.*;
+import java.util.Map;
 
 /**
  * <code>ObjectDictionaryFile</code> that accesses files names with the Princeton dictionary file naming convention.
+ *
+ * @author didion
+ * @author Aliaksandr Autayeu avtaev@gmail.com
  */
-public class PrincetonObjectDictionaryFile extends AbstractPrincetonDictionaryFile implements ObjectDictionaryFile {
-    private File _file = null;
-    private ObjectInputStream _in = null;
-    private ObjectOutputStream _out = null;
+public class PrincetonObjectDictionaryFile extends AbstractPrincetonDictionaryFile implements ObjectDictionaryFile, DictionaryFileFactory<PrincetonObjectDictionaryFile> {
 
-    public PrincetonObjectDictionaryFile() {
+    private static final MessageLog log = new MessageLog(PrincetonObjectDictionaryFile.class);
+
+    private File file = null;
+    private ObjectInputStream in = null;
+    private ObjectOutputStream out = null;
+
+    public PrincetonObjectDictionaryFile(Dictionary dictionary, Map<String, Param> params) {
+        super(dictionary, params);
     }
 
-    public DictionaryFile newInstance(String path, POS pos, DictionaryFileType fileType) {
-        return new PrincetonObjectDictionaryFile(path, pos, fileType);
+    public PrincetonObjectDictionaryFile(Dictionary dictionary, String path, POS pos, DictionaryFileType fileType, Map<String, Param> params) {
+        super(dictionary, path, pos, fileType, params);
     }
 
-    public PrincetonObjectDictionaryFile(String path, POS pos, DictionaryFileType fileType) {
-        super(path, pos, fileType);
+    public PrincetonObjectDictionaryFile newInstance(Dictionary dictionary, String path, POS pos, DictionaryFileType fileType) {
+        return new PrincetonObjectDictionaryFile(dictionary, path, pos, fileType, params);
     }
 
     public boolean isOpen() {
-        return (_file != null);
+        return (file != null);
+    }
+
+    public void save() {
+        //TODO save
     }
 
     public void close() {
@@ -39,11 +55,12 @@ public class PrincetonObjectDictionaryFile extends AbstractPrincetonDictionaryFi
             if (canWrite()) {
                 getOutputStream().close();
             }
-        } catch (Exception ex) {
+        } catch (Exception e) {
+            log.log(MessageLogLevel.ERROR, "EXCEPTION_001", e.getMessage(), e);
         } finally {
-            _in = null;
-            _out = null;
-            _file = null;
+            in = null;
+            out = null;
+            file = null;
         }
     }
 
@@ -60,33 +77,33 @@ public class PrincetonObjectDictionaryFile extends AbstractPrincetonDictionaryFi
     }
 
     private void openOutputStream() throws IOException {
-        _out = new ObjectOutputStream(new FileOutputStream(_file));
+        out = new ObjectOutputStream(new FileOutputStream(file));
     }
 
     private void openInputStream() throws IOException {
-        _in = new ObjectInputStream(new FileInputStream(_file));
+        in = new ObjectInputStream(new FileInputStream(file));
     }
 
     public ObjectInputStream getInputStream() throws IOException {
         if (!canRead()) {
             openInputStream();
         }
-        return _in;
+        return in;
     }
 
     public ObjectOutputStream getOutputStream() throws IOException {
         if (!canWrite()) {
             openOutputStream();
         }
-        return _out;
+        return out;
     }
 
     public boolean canRead() {
-        return _in != null;
+        return in != null;
     }
 
     public boolean canWrite() {
-        return _out != null;
+        return out != null;
     }
 
     public Object readObject() throws IOException, ClassNotFoundException {
@@ -113,9 +130,9 @@ public class PrincetonObjectDictionaryFile extends AbstractPrincetonDictionaryFi
      * open, you must do it explicitly by calling <code>openStreams</code>.
      */
     protected void openFile(File path) throws IOException {
-        _file = path;
-        if (!_file.exists()) {
-            _file.createNewFile();
+        file = path;
+        if (!file.exists()) {
+            file.createNewFile();
             openOutputStream();
         } else {
             openInputStream();

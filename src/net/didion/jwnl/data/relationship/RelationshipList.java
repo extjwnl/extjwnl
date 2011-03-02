@@ -11,11 +11,11 @@ public class RelationshipList extends TypeCheckingList {
     /**
      * The index of the shallowest relationship.
      */
-    private int _shallowestIndex = Integer.MAX_VALUE;
+    private int shallowestIndex = Integer.MAX_VALUE;
     /**
      * The index of the deepest relationship.
      */
-    private int _deepestIndex = -1;
+    private int deepestIndex = -1;
 
     public RelationshipList() {
         super(new ArrayList(), Relationship.class);
@@ -26,11 +26,11 @@ public class RelationshipList extends TypeCheckingList {
         boolean success = super.add(o);
         if (success) {
             Relationship r = (Relationship) o;
-            if (r.getDepth() < _shallowestIndex) {
-                _shallowestIndex = curSize;
+            if (r.getDepth() < shallowestIndex) {
+                shallowestIndex = curSize;
             }
-            if (r.getDepth() > _deepestIndex) {
-                _deepestIndex = curSize;
+            if (r.getDepth() > deepestIndex) {
+                deepestIndex = curSize;
             }
         }
         return success;
@@ -40,8 +40,8 @@ public class RelationshipList extends TypeCheckingList {
      * Return the shallowest Relationship in the list.
      */
     public synchronized Relationship getShallowest() {
-        if (_shallowestIndex >= 0) {
-            return (Relationship) get(_shallowestIndex);
+        if (shallowestIndex >= 0) {
+            return (Relationship) get(shallowestIndex);
         }
         return null;
     }
@@ -50,8 +50,8 @@ public class RelationshipList extends TypeCheckingList {
      * Return the deepest Relationship in the list.
      */
     public synchronized Relationship getDeepest() {
-        if (_deepestIndex >= 0) {
-            return (Relationship) get(_deepestIndex);
+        if (deepestIndex >= 0) {
+            return (Relationship) get(deepestIndex);
         }
         return null;
     }

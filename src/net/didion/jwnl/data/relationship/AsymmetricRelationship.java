@@ -18,18 +18,18 @@ public class AsymmetricRelationship extends Relationship {
      * The index of the node in the relationship that represents the point
      * at which the source and target nodes' ancestries diverge.
      */
-    private int _commonParentIndex;
-    private transient int _cachedRelativeTargetDepth = -1;
+    private int commonParentIndex;
+    private transient int cachedRelativeTargetDepth = -1;
 
     public AsymmetricRelationship(
             PointerType type, PointerTargetNodeList nodes, int commonParentIndex, Synset sourceSynset, Synset targetSynset) {
 
         super(type, nodes, sourceSynset, targetSynset);
-        _commonParentIndex = commonParentIndex;
+        this.commonParentIndex = commonParentIndex;
     }
 
     public int getCommonParentIndex() {
-        return _commonParentIndex;
+        return commonParentIndex;
     }
 
     /**
@@ -37,12 +37,12 @@ public class AsymmetricRelationship extends Relationship {
      * If both target and source are equidistant from the commonParentIndex, this method returns 0;
      */
     public int getRelativeTargetDepth() {
-        if (_cachedRelativeTargetDepth == -1) {
-            int distSourceToParent = _commonParentIndex;
-            int distParentToTarget = (getNodeList().size() - 1) - _commonParentIndex;
-            _cachedRelativeTargetDepth = distParentToTarget - distSourceToParent;
+        if (cachedRelativeTargetDepth == -1) {
+            int distSourceToParent = commonParentIndex;
+            int distParentToTarget = (getNodeList().size() - 1) - commonParentIndex;
+            cachedRelativeTargetDepth = distParentToTarget - distSourceToParent;
         }
-        return _cachedRelativeTargetDepth;
+        return cachedRelativeTargetDepth;
     }
 
     public Relationship reverse() throws CloneNotSupportedException {

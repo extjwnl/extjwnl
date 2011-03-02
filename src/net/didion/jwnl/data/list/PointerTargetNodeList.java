@@ -8,6 +8,7 @@ import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * A <code>PointerTargetNodeList</code> holds the results of a relationship method.
@@ -16,6 +17,7 @@ import java.util.LinkedList;
  * the source word.
  */
 public class PointerTargetNodeList extends TypeCheckingList {
+
     private static final NodePrinter PRINTER =
             new NodePrinter(System.out, 2) {
                 public void print(PrintStream stream, Node node, int indent, int indentIncrement) {
@@ -27,21 +29,21 @@ public class PointerTargetNodeList extends TypeCheckingList {
             };
 
     public PointerTargetNodeList() {
-        this(new LinkedList());
+        this(new LinkedList<PointerTarget>());
     }
 
-    public PointerTargetNodeList(LinkedList list) {
+    public PointerTargetNodeList(LinkedList<PointerTarget> list) {
         this(list, PointerTargetNode.class);
     }
 
-    public PointerTargetNodeList(PointerTarget[] targets) {
+    public PointerTargetNodeList(List<PointerTarget> targets) {
         this();
         for (PointerTarget target : targets) {
             add(target);
         }
     }
 
-    protected PointerTargetNodeList(LinkedList list, Class type) {
+    protected PointerTargetNodeList(LinkedList<PointerTarget> list, Class type) {
         super(list, type, PointerTargetNode.class);
     }
 

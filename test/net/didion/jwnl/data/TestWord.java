@@ -1,46 +1,45 @@
 package net.didion.jwnl.data;
 
-import junit.framework.TestCase;
+import net.didion.jwnl.JWNLException;
+import net.didion.jwnl.dictionary.Dictionary;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.io.IOException;
 
 /**
  * Tests the word functionality.
  *
  * @author bwalenz
+ * @author Aliaksandr Autayeu avtaev@gmail.com
  */
-public class TestWord extends TestCase {
+public class TestWord extends BaseDictionaryTest {
 
-    /**
-     * Test word.
-     */
-    Word word;
-    /**
-     * Default lemma.
-     */
+    private Word word;
+
     String lemma = "testLemma";
-    /**
-     * Notional index.
-     */
     int index = 1;
 
-    /**
-     * Creates a new word with no synset.
-     */
-    protected void setUp() throws Exception {
-        word = new Word(null, index, lemma);
+    @Before
+    public void setUp() throws JWNLException, IOException {
+        Dictionary dictionary = Dictionary.getInstance(getProperties());
+        word = new Word(dictionary, new Synset(dictionary, POS.NOUN), index, lemma);
     }
 
-    /**
-     * Tests getting the index.
-     */
+    @Test(expected = IllegalArgumentException.class)
+    public void testCreate() {
+        word = new Word(null, null, -1, null);
+
+    }
+
+    @Test
     public void testGetIndex() {
-        assertTrue(word.getIndex() == index);
+        Assert.assertEquals(index, word.getIndex());
     }
 
-    /**
-     * Tests getting the lemma.
-     */
+    @Test
     public void testGetLemma() {
-        assertTrue(word.getLemma().equals(lemma));
+        Assert.assertEquals(lemma, word.getLemma());
     }
-
 }

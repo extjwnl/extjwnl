@@ -11,8 +11,8 @@ import java.util.*;
  * fast if the argument is not of the correct type.
  */
 public class TypeCheckingList implements List, DeepCloneable {
-    private List _list;
-    private Class _type;
+    private List list;
+    private Class type;
 
     public TypeCheckingList(Class type) {
         this(new ArrayList(), type);
@@ -34,19 +34,19 @@ public class TypeCheckingList implements List, DeepCloneable {
     }
 
     private void init(List backingList, Class type) {
-        _type = type;
+        this.type = type;
         if (!backingList.isEmpty()) {
             checkType(backingList);
         }
-        _list = backingList;
+        list = backingList;
     }
 
     public Class getType() {
-        return _type;
+        return type;
     }
 
     private List getList() {
-        return _list;
+        return list;
     }
 
     public Object clone() throws CloneNotSupportedException {
@@ -61,7 +61,7 @@ public class TypeCheckingList implements List, DeepCloneable {
         try {
             Method cloneMethod = getList().getClass().getMethod("clone");
             return (List) cloneMethod.invoke(getList());
-        } catch (Exception ex) {
+        } catch (Exception c) {
             throw new CloneNotSupportedException();
         }
     }
@@ -102,7 +102,7 @@ public class TypeCheckingList implements List, DeepCloneable {
         try {
             checkType(o);
             return getList().contains(o);
-        } catch (Exception ex) {
+        } catch (Exception e) {
             return false;
         }
     }
@@ -111,7 +111,7 @@ public class TypeCheckingList implements List, DeepCloneable {
         try {
             checkType(c);
             return getList().containsAll(c);
-        } catch (Exception ex) {
+        } catch (Exception e) {
             return false;
         }
     }
@@ -125,7 +125,7 @@ public class TypeCheckingList implements List, DeepCloneable {
         try {
             checkType(o);
             return getList().indexOf(o);
-        } catch (Exception ex) {
+        } catch (Exception e) {
             return -1;
         }
     }
@@ -134,7 +134,7 @@ public class TypeCheckingList implements List, DeepCloneable {
         try {
             checkType(o);
             return getList().lastIndexOf(o);
-        } catch (Exception ex) {
+        } catch (Exception e) {
             return -1;
         }
     }
@@ -143,7 +143,7 @@ public class TypeCheckingList implements List, DeepCloneable {
         try {
             checkType(o);
             return getList().remove(o);
-        } catch (Exception ex) {
+        } catch (Exception e) {
             return false;
         }
     }
@@ -223,25 +223,25 @@ public class TypeCheckingList implements List, DeepCloneable {
         }
     }
 
-    private Collection _lastCheckedCollection = null;
+    private Collection lastCheckedCollection = null;
 
     private void checkType(Collection c) {
-        if (c != _lastCheckedCollection) {
+        if (c != lastCheckedCollection) {
             for (Object aC : c) {
                 checkType(aC);
             }
         }
-        _lastCheckedCollection = c;
+        lastCheckedCollection = c;
     }
 
-    public final class TypeCheckingListIterator implements ListIterator {
-        private ListIterator _itr;
+    public class TypeCheckingListIterator implements ListIterator {
+        private ListIterator itr;
 
         /**
          * Create a TypeCheckingListIterator from a ListIterator.
          */
         private TypeCheckingListIterator(ListIterator itr) {
-            _itr = itr;
+            this.itr = itr;
         }
 
         public Class getType() {
@@ -291,7 +291,7 @@ public class TypeCheckingList implements List, DeepCloneable {
         }
 
         private ListIterator getListIterator() {
-            return _itr;
+            return itr;
         }
     }
 }

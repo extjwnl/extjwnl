@@ -7,7 +7,7 @@
 
     <name>Extended Java WordNet Library</name>
 
-    <version>20110206</version>
+    <version>20110227</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -23,7 +23,14 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.1</version>
+            <version>4.8.2</version>
+        </dependency>
+
+        <dependency>
+            <scope>runtime</scope>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.15</version>
         </dependency>
     </dependencies>
 

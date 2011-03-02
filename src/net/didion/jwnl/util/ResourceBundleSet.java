@@ -6,8 +6,11 @@ import java.util.*;
  * A ResourceBundle that is a proxy to multiple ResourceBundles.
  */
 public class ResourceBundleSet extends ResourceBundle {
-    private Locale _locale = Locale.getDefault();
-    private List<String> _resources = new ArrayList<String>();
+
+    private static final MessageLog log = new MessageLog(ResourceBundleSet.class);
+
+    private Locale locale = Locale.getDefault();
+    private Set<String> resources = new HashSet<String>();
 
     public ResourceBundleSet(String resource) {
         addResource(resource);
@@ -20,56 +23,57 @@ public class ResourceBundleSet extends ResourceBundle {
     }
 
     public void addResource(String resource) {
-        _resources.add(resource);
+        resources.add(resource);
     }
 
     public String[] getResources() {
-        return _resources.toArray(new String[_resources.size()]);
+        return resources.toArray(new String[resources.size()]);
     }
 
     public void setLocale(Locale locale) {
-        _locale = locale;
+        this.locale = locale;
     }
 
     protected Object handleGetObject(String key) {
-        for (Object _resource : _resources) {
+        for (String resource : resources) {
             try {
-                ResourceBundle bundle = getBndl((String) _resource);
+                ResourceBundle bundle = getBndl(resource);
                 String msg = bundle.getString(key);
                 if (msg != null) {
                     return msg;
                 }
-            } catch (Exception ex) {
+            } catch (Exception e) {
+                //log.log(MessageLogLevel.ERROR, "EXCEPTION_001", e.getMessage(), e);
             }
         }
         return key;
     }
 
-    public Enumeration getKeys() {
-        return new Enumeration() {
-            private Iterator _itr = _resources.iterator();
-            private Enumeration _currentEnum;
+    public Enumeration<String> getKeys() {
+        return new Enumeration<String>() {
+            private Iterator<String> itr = resources.iterator();
+            private Enumeration<String> currentEnum;
 
             public boolean hasMoreElements() {
-                if (_currentEnum == null || !_currentEnum.hasMoreElements()) {
-                    if (_itr.hasNext()) {
-                        _currentEnum = getBndl((String) _itr.next()).getKeys();
+                if (currentEnum == null || !currentEnum.hasMoreElements()) {
+                    if (itr.hasNext()) {
+                        currentEnum = getBndl(itr.next()).getKeys();
                     }
                 }
-                if (_currentEnum != null) {
-                    return _currentEnum.hasMoreElements();
+                if (currentEnum != null) {
+                    return currentEnum.hasMoreElements();
                 }
                 return false;
             }
 
 
-            public Object nextElement() {
-                return _currentEnum.nextElement();
+            public String nextElement() {
+                return currentEnum.nextElement();
             }
         };
     }
 
     private ResourceBundle getBndl(String bundle) {
-        return ResourceBundle.getBundle(bundle, _locale);
+        return ResourceBundle.getBundle(bundle, locale);
     }
 }

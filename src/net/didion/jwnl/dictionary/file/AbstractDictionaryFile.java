@@ -1,41 +1,61 @@
 package net.didion.jwnl.dictionary.file;
 
 import net.didion.jwnl.data.POS;
+import net.didion.jwnl.dictionary.Dictionary;
+import net.didion.jwnl.util.factory.Param;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * Abstract implementation of <code>DictionaryFile</code>. This class
  * should be implemented for each file naming scheme used. It is assumed that each
  * file will be associated with both a POS and a file type (e.g. in the windows
  * naming scheme, the verb index file is called "verb.idx").
+ *
+ * @author didion
+ * @author Aliaksandr Autayeu avtaev@gmail.com
  */
 public abstract class AbstractDictionaryFile implements DictionaryFile {
-    private POS _pos;
+
+    protected Dictionary dictionary;
+    protected Map<String, Param> params;
+    private POS pos;
+
     /**
-     * The type of the file. For example, the default implementation defines the
-     * types INDEX, DATA, and EXCEPTION.
+     * The type of the file. For example, the default implementation defines the types INDEX, DATA, and EXCEPTION.
      */
-    private DictionaryFileType _fileType;
-    private File _file;
+    private DictionaryFileType fileType;
+    private File file;
 
     public AbstractDictionaryFile() {
     }
 
-    protected AbstractDictionaryFile(String path, POS pos, DictionaryFileType fileType) {
-        _pos = pos;
-        _fileType = fileType;
-        _file = new File(path, makeFilename());
+    public AbstractDictionaryFile(Dictionary dictionary, Map<String, Param> params) {
+        this.dictionary = dictionary;
+        this.params = params;
+    }
+
+    protected AbstractDictionaryFile(Dictionary dictionary, String path, POS pos, DictionaryFileType fileType, Map<String, Param> params) {
+        this(dictionary, params);
+        this.pos = pos;
+        this.fileType = fileType;
+        file = new File(path, makeFilename());
     }
 
     /**
-     * Build a filename from the part-of-speech and the file type.
+     * Returns a filename from the part-of-speech and the file type.
+     *
+     * @return a filename from the part-of-speech and the file type
      */
     protected abstract String makeFilename();
 
     /**
-     * Open the file at path <code>path</code>
+     * Opens the <var>file</var>.
+     *
+     * @param file the file to open
+     * @throws IOException IOException
      */
     protected abstract void openFile(File file) throws IOException;
 
@@ -43,26 +63,39 @@ public abstract class AbstractDictionaryFile implements DictionaryFile {
      * The POS associated with this file.
      */
     public POS getPOS() {
-        return _pos;
+        return pos;
     }
 
     public File getFile() {
-        return _file;
+        return file;
     }
 
     /**
      * The file type associated with this file.
      */
     public DictionaryFileType getFileType() {
-        return _fileType;
+        return fileType;
     }
 
     /**
-     * Open the file.
+     * Opens the file.
      */
     public void open() throws IOException {
         if (!isOpen()) {
-            openFile(_file);
+            openFile(file);
         }
+    }
+
+    public boolean delete() throws IOException {
+        close();
+        return file.delete();
+    }
+
+    public Dictionary getDictionary() {
+        return dictionary;
+    }
+
+    public void setDictionary(Dictionary dictionary) {
+        this.dictionary = dictionary;
     }
 }

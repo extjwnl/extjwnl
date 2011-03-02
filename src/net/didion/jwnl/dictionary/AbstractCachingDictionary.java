@@ -1,46 +1,45 @@
 package net.didion.jwnl.dictionary;
 
+import net.didion.jwnl.JWNLException;
 import net.didion.jwnl.JWNLRuntimeException;
 import net.didion.jwnl.data.*;
-import net.didion.jwnl.util.cache.Cache;
+import net.didion.jwnl.util.MessageLog;
+import net.didion.jwnl.util.MessageLogLevel;
 import net.didion.jwnl.util.cache.CacheSet;
-import net.didion.jwnl.util.cache.LRUCache;
+import net.didion.jwnl.util.cache.LRUCacheSet;
+import org.w3c.dom.Document;
 
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Observable;
-import java.util.Observer;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * Extends <code>Dictionary</code> to provide caching of elements.
+ *
+ * @author didion
+ * @author Aliaksandr Autayeu avtaev@gmail.com
  */
 public abstract class AbstractCachingDictionary extends Dictionary {
-    private DictionaryCacheSet _caches;
-    private boolean _isCachingEnabled;
 
-    protected AbstractCachingDictionary() {
-        this(false);
-    }
+    private static final MessageLog log = new MessageLog(AbstractCachingDictionary.class);
 
-    protected AbstractCachingDictionary(boolean enableCaching) {
-        setCachingEnabled(enableCaching);
-    }
+    private CacheSet<DictionaryElementType, POSKey, DictionaryElement> caches;
+    protected boolean isCachingEnabled;
 
-    protected AbstractCachingDictionary(MorphologicalProcessor morph) {
-        this(morph, false);
-    }
+    // stores max offset for each POS
+    private HashMap<POS, Long> maxOffset = new HashMap<POS, Long>(POS.getAllPOS().size());
 
-    protected AbstractCachingDictionary(MorphologicalProcessor morph, boolean enableCaching) {
-        super(morph);
-        setCachingEnabled(enableCaching);
+    protected AbstractCachingDictionary(Document doc) throws JWNLException {
+        super(doc);
+        isCachingEnabled = true;
     }
 
     public boolean isCachingEnabled() {
-        return _isCachingEnabled;
+        return isCachingEnabled;
     }
 
     public void setCachingEnabled(boolean cachingEnabled) {
-        _isCachingEnabled = cachingEnabled;
+        isCachingEnabled = cachingEnabled;
     }
 
     public int getCacheSizes(DictionaryElementType type) {
@@ -77,12 +76,22 @@ public abstract class AbstractCachingDictionary extends Dictionary {
         cache(DictionaryElementType.INDEX_WORD, key, word);
     }
 
+    protected void clearIndexWord(POSKey key) {
+        clear(DictionaryElementType.INDEX_WORD, key);
+    }
+
     protected IndexWord getCachedIndexWord(POSKey key) {
         return (IndexWord) getCached(DictionaryElementType.INDEX_WORD, key);
     }
 
-    protected void cacheSynset(POSKey key, Synset synset) {
+    //public access to allow synset to update cache on offset change without extra hassle
+    public void cacheSynset(POSKey key, Synset synset) {
         cache(DictionaryElementType.SYNSET, key, synset);
+    }
+
+    //public access to allow synset to update cache on offset change without extra hassle
+    public void clearSynset(POSKey key) {
+        clear(DictionaryElementType.SYNSET, key);
     }
 
     protected Synset getCachedSynset(POSKey key) {
@@ -93,120 +102,239 @@ public abstract class AbstractCachingDictionary extends Dictionary {
         cache(DictionaryElementType.EXCEPTION, key, exception);
     }
 
+    protected void clearException(POSKey key) {
+        clear(DictionaryElementType.EXCEPTION, key);
+    }
+
     protected Exc getCachedException(POSKey key) {
         return (Exc) getCached(DictionaryElementType.EXCEPTION, key);
     }
 
-    private DictionaryCacheSet getCaches() {
+    private CacheSet<DictionaryElementType, POSKey, DictionaryElement> getCaches() {
         if (!isCachingEnabled()) {
             throw new JWNLRuntimeException("DICTIONARY_EXCEPTION_022");
         }
-        if (_caches == null) {
-            _caches = new DictionaryCacheSet();
+        if (caches == null) {
+            caches = new LRUCacheSet<DictionaryElementType, POSKey, DictionaryElement>
+                    (DictionaryElementType.getAllDictionaryElementTypes().toArray(
+                            new DictionaryElementType[DictionaryElementType.getAllDictionaryElementTypes().size()]));
         }
-        return _caches;
+        return caches;
     }
 
-    private void cache(DictionaryElementType fileType, POSKey key, Object obj) {
+    private void cache(DictionaryElementType fileType, POSKey key, DictionaryElement obj) {
         if (isCachingEnabled()) {
             getCaches().cacheObject(fileType, key, obj);
         }
     }
 
-    private Object getCached(DictionaryElementType fileType, POSKey key) {
+    private void clear(DictionaryElementType fileType, POSKey key) {
+        if (isCachingEnabled()) {
+            getCaches().clearObject(fileType, key);
+        }
+    }
+
+    private DictionaryElement getCached(DictionaryElementType fileType, POSKey key) {
         if (isCachingEnabled()) {
             return getCaches().getCachedObject(fileType, key);
         }
         return null;
     }
 
-    private static final class DictionaryCacheSet extends CacheSet implements Observer {
-        private Map _lemmaToOffsetMaps;
+    private static final class DictionaryElementIterator implements Iterator<DictionaryElement> {
+        private Iterator<DictionaryElement> itr;
+        private POS pos;
+        private DictionaryElement start;
 
-        public DictionaryCacheSet() {
-            super(DictionaryElementType.getAllDictionaryElementTypes().toArray());
-            initLemmaToOffsetMaps();
+        public DictionaryElementIterator(Iterator<DictionaryElement> itr, POS pos, DictionaryElement start) {
+            this.itr = itr;
+            this.pos = pos;
+            this.start = start;
         }
 
-        public DictionaryCacheSet(int[] sizes) {
-            super(DictionaryElementType.getAllDictionaryElementTypes().toArray(), sizes);
-            initLemmaToOffsetMaps();
+        public boolean hasNext() {
+            return (start != null);
         }
 
-        public Object getCachedObject(DictionaryElementType fileType, Object key) {
-            if (((POSKey) key).isLemmaKey()) {
-                key = getMap(fileType).get(key);
-            }
-            return key == null ? null : super.getCachedObject(fileType, key);
-        }
-
-        public void cacheObject(DictionaryElementType fileType, Object key, Object value) {
-            if (value instanceof IndexWord) {
-                IndexWord word = (IndexWord) value;
-                getMap(DictionaryElementType.INDEX_WORD).put(new POSKey(word.getPOS(), word.getLemma()), key);
-            } else if (value instanceof Exc) {
-                Exc exc = (Exc) value;
-                getMap(DictionaryElementType.EXCEPTION).put(new POSKey(exc.getPOS(), exc.getLemma()), key);
-            }
-            super.cacheObject(fileType, key, value);
-        }
-
-        public void clearCache(DictionaryElementType fileType) {
-            Map m = getMap(fileType);
-            if (m != null) {
-                m.clear();
-            }
-            super.clearCache(fileType);
-        }
-
-        public void update(Observable obs, Object obj) {
-            if (obj instanceof IndexWord) {
-                IndexWord word = (IndexWord) obj;
-                removeLemma(DictionaryElementType.INDEX_WORD, word.getLemma(), word.getPOS());
-            } else if (obj instanceof Exc) {
-                Exc exc = (Exc) obj;
-                removeLemma(DictionaryElementType.EXCEPTION, exc.getLemma(), exc.getPOS());
+        public DictionaryElement next() {
+            if (hasNext()) {
+                DictionaryElement d = start;
+                start = null;
+                while (itr.hasNext()) {
+                    DictionaryElement n = itr.next();
+                    if (n.getPOS().equals(pos)) {
+                        start = n;
+                        break;
+                    }
+                }
+                return d;
+            } else {
+                throw new NoSuchElementException();
             }
         }
 
-        private void initLemmaToOffsetMaps() {
-            _lemmaToOffsetMaps = new HashMap(2);
-            _lemmaToOffsetMaps.put(DictionaryElementType.INDEX_WORD,
-                    new HashMap(getCache(DictionaryElementType.INDEX_WORD).getCapacity()));
-            _lemmaToOffsetMaps.put(DictionaryElementType.EXCEPTION,
-                    new HashMap(getCache(DictionaryElementType.EXCEPTION).getCapacity()));
-        }
-
-        private void removeLemma(DictionaryElementType fileType, String lemma, POS pos) {
-            ((Map) _lemmaToOffsetMaps.get(fileType)).remove(new POSKey(pos, lemma));
-        }
-
-        private Map getMap(DictionaryElementType fileType) {
-            return (Map) _lemmaToOffsetMaps.get(fileType);
-        }
-
-        protected Cache createCache(int size) {
-            ObservableCache cache = new ObservableCache(size);
-            cache.addObserver(this);
-            return cache;
+        public void remove() {
+            throw new UnsupportedOperationException();
         }
     }
 
-    private static final class ObservableCache extends LRUCache {
-        private Observable _observable = new Observable();
-
-        public ObservableCache(int capacity) {
-            super(capacity);
+    private static Iterator<DictionaryElement> getPOSIterator(POS pos, Iterator<DictionaryElement> iterator) {
+        DictionaryElement start = null;
+        while (iterator.hasNext()) {
+            DictionaryElement n = iterator.next();
+            if (n.getPOS().equals(pos)) {
+                start = n;
+                break;
+            }
         }
+        return new DictionaryElementIterator(iterator, pos, start);
 
-        public void addObserver(Observer obs) {
-            _observable.addObserver(obs);
-        }
+    }
 
-        public Object remove(Object key) {
-            Object obj = super.remove(key);
-            _observable.notifyObservers(obj);
-            return obj;
+    @Override
+    public Iterator<Exc> getExceptionIterator(POS pos) throws JWNLException {
+        @SuppressWarnings({"unchecked", "UnnecessaryLocalVariable"})
+        Iterator<Exc> result = (Iterator<Exc>) (Object) getPOSIterator(pos, caches.getCache(DictionaryElementType.EXCEPTION).values().iterator());
+        return result;
+    }
+
+    @Override
+    public Iterator<Synset> getSynsetIterator(POS pos) throws JWNLException {
+        @SuppressWarnings({"unchecked", "UnnecessaryLocalVariable"})
+        Iterator<Synset> result = (Iterator<Synset>) (Object) getPOSIterator(pos, caches.getCache(DictionaryElementType.SYNSET).values().iterator());
+        return result;
+    }
+
+    @Override
+    public Iterator<IndexWord> getIndexWordIterator(POS pos) throws JWNLException {
+        @SuppressWarnings({"unchecked", "UnnecessaryLocalVariable"})
+        Iterator<IndexWord> result = (Iterator<IndexWord>) (Object) getPOSIterator(pos, caches.getCache(DictionaryElementType.INDEX_WORD).values().iterator());
+        return result;
+    }
+
+    @Override
+    public Iterator<IndexWord> getIndexWordIterator(POS pos, String substring) throws JWNLException {
+        substring = prepareQueryString(substring);
+
+        final Iterator<IndexWord> itr = getIndexWordIterator(pos);
+        IndexWord start = null;
+        while (itr.hasNext()) {
+            IndexWord word = itr.next();
+            if (word.getLemma().indexOf(substring) != -1) {
+                start = word;
+                break;
+            }
         }
+        return new MapBackedDictionary.IndexWordIterator(itr, substring, start);
+    }
+
+    @Override
+    public void edit() throws JWNLException {
+        clearCache();
+        setCacheCapacity(Integer.MAX_VALUE);
+        super.edit();
+    }
+
+    @Override
+    public Synset createSynset(POS pos) throws JWNLException {
+        if (!isEditable()) {
+            throw new JWNLException("DICTIONARY_EXCEPTION_029");
+        }
+        return new Synset(this, pos, createNewOffset(pos));
+    }
+
+    @Override
+    public void addSynset(Synset synset) throws JWNLException {
+        super.addSynset(synset);
+        cacheSynset(new POSKey(synset.getPOS(), synset.getOffset()), synset);
+    }
+
+    @Override
+    public void removeSynset(Synset synset) throws JWNLException {
+        super.removeSynset(synset);
+        clearSynset(new POSKey(synset.getPOS(), synset.getOffset()));
+    }
+
+    @Override
+    public void addException(Exc exc) throws JWNLException {
+        super.addException(exc);
+        cacheException(new POSKey(exc.getPOS(), exc.getLemma()), exc);
+    }
+
+    @Override
+    public void removeException(Exc exc) throws JWNLException {
+        super.removeException(exc);
+        clearException(new POSKey(exc.getPOS(), exc.getLemma()));
+    }
+
+    @Override
+    public void addIndexWord(IndexWord indexWord) throws JWNLException {
+        super.addIndexWord(indexWord);
+        cacheIndexWord(new POSKey(indexWord.getPOS(), indexWord.getLemma()), indexWord);
+    }
+
+    @Override
+    public void removeIndexWord(IndexWord indexWord) throws JWNLException {
+        super.removeIndexWord(indexWord);
+        clearIndexWord(new POSKey(indexWord.getPOS(), indexWord.getLemma()));
+    }
+
+    private synchronized long createNewOffset(POS pos) {
+        long result = maxOffset.get(pos) + 1;
+        maxOffset.put(pos, result);
+        return result;
+    }
+
+    protected void cacheAll() throws JWNLException {
+        for (POS pos : POS.getAllPOS()) {
+            cachePOS(pos);
+        }
+    }
+
+    protected void cachePOS(POS pos) throws JWNLException {
+        log.log(MessageLogLevel.INFO, "DICTIONARY_INFO_003", pos.getLabel());
+        log.log(MessageLogLevel.INFO, "DICTIONARY_INFO_004");
+        int count = 0;
+        Iterator<IndexWord> ii = getIndexWordIterator(pos);
+        while (ii.hasNext()) {
+            if (count % 1000 == 0) {
+                log.log(MessageLogLevel.INFO, "DICTIONARY_INFO_005", count);
+            }
+            count++;
+            IndexWord iw = ii.next();
+            iw.getSenses();//resolve pointers
+        }
+        log.log(MessageLogLevel.INFO, "DICTIONARY_INFO_006", count);
+
+        log.log(MessageLogLevel.INFO, "DICTIONARY_INFO_007");
+        count = 0;
+        Iterator<Exc> ei = getExceptionIterator(pos);
+        while (ei.hasNext()) {
+            if (count % 1000 == 0) {
+                log.log(MessageLogLevel.INFO, "DICTIONARY_INFO_005" + count);
+            }
+            count++;
+            ei.next();
+        }
+        log.log(MessageLogLevel.INFO, "DICTIONARY_INFO_006", count);
+
+        log.log(MessageLogLevel.INFO, "DICTIONARY_INFO_008");
+        count = 0;
+        maxOffset.put(pos, 0L);
+        Iterator<Synset> si = getSynsetIterator(pos);
+        while (si.hasNext()) {
+            if (count % 1000 == 0) {
+                log.log(MessageLogLevel.INFO, "DICTIONARY_INFO_005" + count);
+            }
+            count++;
+            Synset s = si.next();
+            if (maxOffset.get(pos) < s.getOffset()) {
+                maxOffset.put(pos, s.getOffset());
+            }
+            for (Pointer p : s.getPointers()) {
+                p.getTarget();//resolve pointers
+            }
+        }
+        log.log(MessageLogLevel.INFO, "DICTIONARY_INFO_006", count);
     }
 }

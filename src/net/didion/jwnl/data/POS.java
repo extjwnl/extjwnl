@@ -12,14 +12,24 @@ import java.util.List;
  * Instances of this class enumerate the possible major syntactic categories, or
  * <b>P</b>art's <b>O</b>f <b>S</b>peech. Each <code>POS</code> has a human-readable
  * label that can be used to print it, and a key by which it can be looked up.
+ *
+ * @author didion
+ * @author Aliaksandr Autayeu avtaev@gmail.com
  */
-public final class POS implements Serializable {
-    static final long serialVersionUID = 4311120391558046419L;
+public class POS implements Serializable {
 
-    public static final POS NOUN = new POS("NOUN", "NOUN_KEY");
-    public static final POS VERB = new POS("VERB", "VERB_KEY");
-    public static final POS ADJECTIVE = new POS("ADJECTIVE", "ADJECTIVE_KEY");
-    public static final POS ADVERB = new POS("ADVERB", "ADVERB_KEY");
+    private static final long serialVersionUID = 4311120391558046411L;
+
+    private static final String NOUN_KEY = "n";
+    private static final String VERB_KEY = "v";
+    private static final String ADJECTIVE_KEY = "a";
+    private static final String ADVERB_KEY = "r";
+    private static final String ADJECTIVE_SATELLITE_KEY = "s";
+
+    public static final POS NOUN = new POS("NOUN", NOUN_KEY);
+    public static final POS VERB = new POS("VERB", VERB_KEY);
+    public static final POS ADJECTIVE = new POS("ADJECTIVE", ADJECTIVE_KEY);
+    public static final POS ADVERB = new POS("ADVERB", ADVERB_KEY);
 
     private static final List<POS> ALL_POS = Collections.unmodifiableList(Arrays.asList(NOUN, VERB, ADJECTIVE, ADVERB));
 
@@ -51,31 +61,36 @@ public final class POS implements Serializable {
      * @return POS
      */
     public static POS getPOSForKey(String key) {
-        for (POS pos : ALL_POS) {
-            if (pos.getKey().equals(key)) {
-                return pos;
-            }
+        if (NOUN_KEY.equals(key)) {
+            return POS.NOUN;
+        }
+        if (VERB_KEY.equals(key)) {
+            return POS.VERB;
+        }
+        if (ADJECTIVE_KEY.equals(key)) {
+            return POS.ADJECTIVE;
+        }
+        if (ADVERB_KEY.equals(key)) {
+            return POS.ADVERB;
+        }
+        if (ADJECTIVE_SATELLITE_KEY.equals(key)) {
+            return POS.ADJECTIVE;
         }
         return null;
     }
 
-    private Resolvable _label;
-    private Resolvable _key;
+    private Resolvable label;
+    private String key;
 
     private POS(String label, String key) {
-        _label = new Resolvable(label);
-        _key = new Resolvable(key);
+        this.label = new Resolvable(label);
+        this.key = key;
     }
 
     // Object methods
 
-    private transient String _cachedToString = null;
-
     public String toString() {
-        if (_cachedToString == null) {
-            _cachedToString = JWNL.resolveMessage("DATA_TOSTRING_010", getLabel());
-        }
-        return _cachedToString;
+        return JWNL.resolveMessage("DATA_TOSTRING_010", getLabel());
     }
 
     /**
@@ -84,7 +99,7 @@ public final class POS implements Serializable {
      * @return key hash code
      */
     public int hashCode() {
-        return _key.toString().hashCode();
+        return key.hashCode();
     }
 
     /**
@@ -97,7 +112,7 @@ public final class POS implements Serializable {
     public boolean equals(Object obj) {
         if (obj instanceof POS) {
             POS pos = (POS) obj;
-            return _key.toString().equals(pos.getKey());
+            return key.equals(pos.getKey());
         }
         return false;
     }
@@ -108,7 +123,7 @@ public final class POS implements Serializable {
      * @return a label intended for textual presentation
      */
     public String getLabel() {
-        return _label.toString();
+        return label.toString();
     }
 
     /**
@@ -117,6 +132,6 @@ public final class POS implements Serializable {
      * @return key for this POS
      */
     public String getKey() {
-        return _key.toString();
+        return key;
     }
 }

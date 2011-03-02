@@ -2,10 +2,14 @@ package net.didion.jwnl.data;
 
 import net.didion.jwnl.JWNL;
 import net.didion.jwnl.JWNLException;
+import net.didion.jwnl.dictionary.AbstractCachingDictionary;
+import net.didion.jwnl.dictionary.Dictionary;
+import net.didion.jwnl.dictionary.POSKey;
+import net.didion.jwnl.util.MessageLog;
+import net.didion.jwnl.util.MessageLogLevel;
 
 import java.io.IOException;
-import java.util.BitSet;
-import java.util.Collection;
+import java.util.*;
 
 /**
  * A <code>Synset</code>, or <b>syn</b>onym <b>set</b>, represents a
@@ -18,71 +22,580 @@ import java.util.Collection;
  * concepts; this is the <it>Net</it> in WordNet. {@link #getTargets getTargets}
  * retrieves the targets of these links, and {@link #getPointers getPointers}
  * retrieves the pointers themselves.
+ *
+ * @author didion
+ * @author Aliaksandr Autayeu avtaev@gmail.com
  */
 public class Synset extends PointerTarget implements DictionaryElement {
-    static final long serialVersionUID = 4038955719653496529L;
 
-    protected POS _pos;
-    protected Pointer[] _pointers;
-    protected final static Pointer[] _emptyPointers = new Pointer[0];
+    private static final long serialVersionUID = 4038955719653496521L;
+
+    private static final MessageLog log = new MessageLog(Synset.class);
+
+    protected POS pos;
+    protected PointerList pointers;
+
     /**
      * The offset of this synset in the data file.
      */
-    protected long _offset;
+    private long offset;
+
     /**
      * The words in this synset.
      */
-    protected Word[] _words;
-    protected final static Word[] _emptyWords = new Word[0];
+    private WordList words;
+
     /**
      * The text (definition, usage examples) associated with the synset.
      */
-    protected String _gloss;
-    protected BitSet _verbFrameFlags;
-    protected final static BitSet _emptyVerbFrameFlags = new BitSet();
+    private String gloss;
+    private BitSet verbFrameFlags;
+
     /**
      * for use only with WordNet 1.6 and earlier
      */
-    protected boolean _isAdjectiveCluster;
+    private boolean isAdjectiveCluster;
 
     /**
      * The lexicographer file name id.
      */
-    protected long lexFileNum;
+    private long lexFileNum;
 
-    public Synset() {
-        _pointers = _emptyPointers;
-        _words = _emptyWords;
-        _verbFrameFlags = _emptyVerbFrameFlags;
+    private static final String[] EMPTY_STRING_ARRAY = new String[0];
+    private static final BitSet EMPTY_BIT_SET = new BitSet();
+    private static final int[] EMPTY_INT_ARRAY = new int[0];
+
+    //for access control and updates
+    private class PointerList extends ArrayList<Pointer> {
+
+        private PointerList() {
+        }
+
+        @Override
+        public int size() {
+            checkPointers();
+            return super.size();
+        }
+
+        @Override
+        public boolean isEmpty() {
+            checkPointers();
+            return super.isEmpty();
+        }
+
+        @Override
+        public boolean contains(Object o) {
+            checkPointers();
+            return super.contains(o);
+        }
+
+        @Override
+        public int indexOf(Object o) {
+            checkPointers();
+            return super.indexOf(o);
+        }
+
+        @Override
+        public int lastIndexOf(Object o) {
+            checkPointers();
+            return super.lastIndexOf(o);
+        }
+
+        @Override
+        public Object clone() {
+            checkPointers();
+            return super.clone();
+        }
+
+        @Override
+        public Object[] toArray() {
+            checkPointers();
+            return super.toArray();
+        }
+
+        @Override
+        public <T> T[] toArray(T[] a) {
+            checkPointers();
+            return super.toArray(a);
+        }
+
+        @Override
+        public Pointer get(int index) {
+            checkPointers();
+            return super.get(index);
+        }
+
+        @Override
+        public Pointer set(int index, Pointer pointer) {
+            if (null == pointer) {
+                throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_043"));
+            }
+            Pointer result = super.set(index, pointer);
+            checkPointers();
+            return result;
+        }
+
+        @Override
+        public boolean add(Pointer pointer) {
+            if (null == pointer) {
+                throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_043"));
+            }
+            boolean result = false;
+            if (!super.contains(pointer)) {
+                result = super.add(pointer);
+
+                if (dictionary.isEditable()) {
+                    if (null != pointer.getType().getSymmetricType()) {
+                        pointer.getTarget().getSynset().getPointers().add(new Pointer(pointer.getType().getSymmetricType(), pointer.getTarget(), pointer.getSource()));
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        @Override
+        public void add(int index, Pointer pointer) {
+            if (null == pointer) {
+                throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_043"));
+            }
+            if (!super.contains(pointer)) {
+                super.add(index, pointer);
+
+                if (dictionary.isEditable()) {
+                    if (null != pointer.getType().getSymmetricType()) {
+                        pointer.getTarget().getSynset().getPointers().add(new Pointer(pointer.getType().getSymmetricType(), pointer.getTarget(), pointer.getSource()));
+                    }
+                }
+            }
+        }
+
+        @Override
+        public boolean addAll(Collection<? extends Pointer> c) {
+            boolean result = false;
+            for (Pointer p : c) {
+                if (add(p)) {
+                    result = true;
+                }
+            }
+            return result;
+        }
+
+        @Override
+        public boolean addAll(int index, Collection<? extends Pointer> c) {
+            boolean result = false;
+            for (Pointer pointer : c) {
+                if (add(pointer)) {
+                    result = true;
+                }
+            }
+            return result;
+        }
+
+        @Override
+        public Pointer remove(int index) {
+            Pointer result = super.remove(index);
+            if (dictionary.isEditable()) {
+                //delete symmetric pointer from the target
+                Pointer pointer = get(index);
+                if (null != pointer.getType().getSymmetricType()) {
+                    for (Pointer p : pointer.getTargetSynset().getPointers()) {
+                        if (offset == p.getTargetOffset() && pointer.getType().getSymmetricType().equals(p.getType())) {
+                            pointer.getTargetSynset().getPointers().remove(p);
+                            break;
+                        }
+                    }
+                }
+            }
+            return result;
+        }
+
+        @Override
+        public boolean remove(Object o) {
+            boolean result = super.remove(o);
+            if (dictionary.isEditable() && o instanceof Pointer) {
+                Pointer pointer = (Pointer) o;
+                //delete symmetric pointer from the target
+                if (null != pointer.getType().getSymmetricType()) {
+                    for (Pointer p : pointer.getTargetSynset().getPointers()) {
+                        if (offset == p.getTargetOffset() && pointer.getType().getSymmetricType().equals(p.getType())) {
+                            pointer.getTargetSynset().getPointers().remove(p);
+                            break;
+                        }
+                    }
+                }
+            }
+            return result;
+        }
+
+        @Override
+        public void clear() {
+            if (dictionary.isEditable()) {
+                List<Pointer> copy = new ArrayList<Pointer>(this);
+                super.clear();
+                for (Pointer pointer : copy) {
+                    //delete symmetric pointer from the target
+                    if (null != pointer.getType().getSymmetricType()) {
+                        for (Pointer p : pointer.getTargetSynset().getPointers()) {
+                            if (offset == p.getTargetOffset() && pointer.getType().getSymmetricType().equals(p.getType())) {
+                                pointer.getTargetSynset().getPointers().remove(p);
+                                break;
+                            }
+                        }
+                    }
+                }
+            } else {
+                super.clear();
+            }
+        }
+
+        @Override
+        protected void removeRange(int fromIndex, int toIndex) {
+            if (dictionary.isEditable()) {
+                List<Pointer> copy = new ArrayList<Pointer>(super.subList(fromIndex, toIndex));
+                super.removeRange(fromIndex, toIndex);
+                for (Pointer pointer : copy) {
+                    //delete symmetric pointer from the target
+                    if (null != pointer.getType().getSymmetricType()) {
+                        for (Pointer p : pointer.getTargetSynset().getPointers()) {
+                            if (offset == p.getTargetOffset() && pointer.getType().getSymmetricType().equals(p.getType())) {
+                                pointer.getTargetSynset().getPointers().remove(p);
+                                break;
+                            }
+                        }
+                    }
+                }
+            } else {
+                super.removeRange(fromIndex, toIndex);
+            }
+        }
+
+        @Override
+        public Iterator<Pointer> iterator() {
+            checkPointers();
+            return super.iterator();
+        }
+
+        @Override
+        public ListIterator<Pointer> listIterator() {
+            checkPointers();
+            return super.listIterator();
+        }
+
+        @Override
+        public ListIterator<Pointer> listIterator(int index) {
+            checkPointers();
+            return super.listIterator(index);
+        }
+
+        @Override
+        public List<Pointer> subList(int fromIndex, int toIndex) {
+            checkPointers();
+            return super.subList(fromIndex, toIndex);
+        }
+
+        @Override
+        public boolean containsAll(Collection<?> c) {
+            checkPointers();
+            return super.containsAll(c);
+        }
+
+        @Override
+        public boolean removeAll(Collection<?> c) {
+            if (dictionary.isEditable()) {
+                List<Pointer> copy = new ArrayList<Pointer>(this);
+                boolean result = super.removeAll(c);
+                for (Object object : c) {
+                    if (object instanceof Pointer) {
+                        Pointer pointer = (Pointer) object;
+                        if (copy.contains(pointer)) {
+                            //delete symmetric pointer from the target
+                            if (null != pointer.getType().getSymmetricType()) {
+                                for (Pointer p : pointer.getTargetSynset().getPointers()) {
+                                    if (offset == p.getTargetOffset() && pointer.getType().getSymmetricType().equals(p.getType())) {
+                                        pointer.getTargetSynset().getPointers().remove(p);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                return result;
+            } else {
+                return super.removeAll(c);
+            }
+        }
+
+        @Override
+        public boolean retainAll(Collection<?> c) {
+            if (dictionary.isEditable()) {
+                List<Pointer> copy = new ArrayList<Pointer>(this);
+                boolean result = super.retainAll(c);
+                for (Object object : c) {
+                    if (object instanceof Pointer) {
+                        Pointer pointer = (Pointer) object;
+                        if (!copy.contains(pointer)) {
+                            //delete symmetric pointer from the target
+                            if (null != pointer.getType().getSymmetricType()) {
+                                for (Pointer p : pointer.getTargetSynset().getPointers()) {
+                                    if (offset == p.getTargetOffset() && pointer.getType().getSymmetricType().equals(p.getType())) {
+                                        pointer.getTargetSynset().getPointers().remove(p);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                return result;
+            } else {
+                return super.retainAll(c);
+            }
+        }
+
+        private void checkPointers() {
+            if (dictionary.isEditable()) {
+                List<Pointer> external = null;
+                for (int i = 0; i < super.size(); i++) {
+                    Pointer pointer = super.get(i);
+                    if (dictionary != pointer.getSource().getDictionary() ||
+                            dictionary != pointer.getTarget().getDictionary()) {
+                        if (null == external) {
+                            external = new ArrayList<Pointer>(super.size());
+                        }
+                        external.add(pointer);
+                    }
+                }
+                if (null != external) {
+                    super.removeAll(external);
+                }
+            }
+        }
     }
 
-    public Synset(POS pos, long offset, Word[] words, Pointer[] pointers, String gloss, BitSet verbFrames) {
-        this(pos, offset, words, pointers, gloss, verbFrames, false);
+    private class WordList extends ArrayList<Word> {
+
+        private WordList() {
+        }
+
+        @Override
+        public Word set(int index, Word word) {
+            if (null == word) {
+                throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_044"));
+            }
+            if (Synset.this.dictionary != word.getDictionary()) {
+                throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_040"));
+            }
+            if (dictionary.isEditable()) {
+                if (!super.contains(word)) {
+                    Word result = super.set(index, word);
+                    if (null != result) {
+                        removeIndexWords(result);
+                    }
+                    addIndexWords(word);
+                    return result;
+                } else {
+                    return super.get(index);
+                }
+            } else {
+                return super.set(index, word);
+            }
+        }
+
+        @Override
+        public boolean add(Word word) {
+            if (dictionary.isEditable()) {
+                if (!super.contains(word)) {
+                    add(size(), word);
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                return super.add(word);
+            }
+        }
+
+        @Override
+        public void add(int index, Word word) {
+            if (null == word) {
+                throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_044"));
+            }
+            if (Synset.this.dictionary != word.getDictionary()) {
+                throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_040"));
+            }
+            if (dictionary.isEditable()) {
+                if (!super.contains(word)) {
+                    super.add(index, word);
+                    addIndexWords(word);
+                }
+            } else {
+                super.add(index, word);
+            }
+        }
+
+        @Override
+        public boolean addAll(Collection<? extends Word> c) {
+            if (dictionary.isEditable()) {
+                boolean result = false;
+                for (Word word : c) {
+                    if (add(word)) {
+                        result = true;
+                    }
+                }
+                return result;
+            } else {
+                return super.addAll(c);
+            }
+        }
+
+        @Override
+        public boolean addAll(int index, Collection<? extends Word> c) {
+            if (dictionary.isEditable()) {
+                boolean result = !super.containsAll(c);
+                for (Word word : c) {
+                    add(index, word);
+                    index++;
+                }
+                return result;
+            } else {
+                return super.addAll(index, c);
+            }
+        }
+
+        @Override
+        public Word remove(int index) {
+            if (dictionary.isEditable()) {
+                Word result = super.remove(index);
+                removeIndexWords(super.get(index));
+                return result;
+            } else {
+                return super.remove(index);
+            }
+        }
+
+        @Override
+        public boolean remove(Object o) {
+            if (dictionary.isEditable()) {
+                boolean result = super.remove(o);
+                if (o instanceof Word) {
+                    removeIndexWords((Word) o);
+                }
+                return result;
+            } else {
+                return super.remove(o);
+            }
+        }
+
+        @Override
+        public void clear() {
+            if (dictionary.isEditable()) {
+                List<Word> copy = new ArrayList<Word>(this);
+                super.clear();
+                for (Word word : copy) {
+                    removeIndexWords(word);
+                }
+            } else {
+                super.clear();
+            }
+        }
+
+        @Override
+        protected void removeRange(int fromIndex, int toIndex) {
+            if (dictionary.isEditable()) {
+                List<Word> copy = new ArrayList<Word>(subList(fromIndex, toIndex));
+                super.removeRange(fromIndex, toIndex);
+                for (Word word : copy) {
+                    removeIndexWords(word);
+                }
+            } else {
+                super.removeRange(fromIndex, toIndex);
+            }
+        }
+
+        private void removeIndexWords(Word word) {
+            if (dictionary.isEditable()) {
+                try {
+                    //take care of IndexWords
+                    IndexWord indexWord = dictionary.getIndexWord(getPOS(), word.getLemma());
+                    if (null != indexWord) {
+                        indexWord.getSenses().remove(Synset.this);
+                    }
+                } catch (JWNLException e) {
+                    log.log(MessageLogLevel.ERROR, "EXCEPTION_001", e.getMessage(), e);
+                }
+            }
+        }
+
+        private void addIndexWords(Word word) {
+            if (dictionary.isEditable()) {
+                try {
+                    //take care of IndexWords
+                    IndexWord iw = dictionary.getIndexWord(word.getPOS(), word.getLemma());
+                    if (null == iw) {
+                        dictionary.createIndexWord(word.getLemma(), word.getPOS(), Synset.this);
+                    } else {
+                        iw.getSenses().add(Synset.this);
+                    }
+                } catch (JWNLException e) {
+                    if (log.isLevelEnabled(MessageLogLevel.ERROR)) {
+                        log.log(MessageLogLevel.ERROR, "EXCEPTION_001", e.getMessage(), e);
+                    }
+                }
+            }
+        }
     }
 
-    public Synset(POS pos, long offset, Word[] words, Pointer[] pointers, String gloss,
-                  BitSet verbFrames, boolean isAdjectiveCluster) {
-        this();
-        _pos = pos;
-        if (null != pointers) {
-            _pointers = pointers;
+    public Synset(Dictionary dictionary, POS pos) throws JWNLException {
+        super(dictionary);
+        if (null == pos) {
+            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_041"));
         }
-        _offset = offset;
-        if (null != words) {
-            _words = words;
+        this.pos = pos;
+        pointers = new PointerList();
+        words = new WordList();
+        isAdjectiveCluster = false;
+
+        if (POS.VERB.equals(pos)) {
+            verbFrameFlags = new BitSet();
         }
-        _gloss = gloss;
-        if (null != verbFrames) {
-            _verbFrameFlags = verbFrames;
+
+        if (null != dictionary && dictionary.isEditable()) {
+            dictionary.addSynset(this);
         }
-        _isAdjectiveCluster = isAdjectiveCluster;
+    }
+
+    public Synset(Dictionary dictionary, POS pos, long offset) throws JWNLException {
+        super(dictionary);
+        if (null == pos) {
+            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_041"));
+        }
+        this.pos = pos;
+        pointers = new PointerList();
+        words = new WordList();
+        isAdjectiveCluster = false;
+
+        if (POS.VERB.equals(pos)) {
+            verbFrameFlags = new BitSet();
+        }
+        this.offset = offset;
+        if (null != dictionary && dictionary.isEditable()) {
+            dictionary.addSynset(this);
+        }
     }
 
     public DictionaryElementType getType() {
         return DictionaryElementType.SYNSET;
     }
 
-    // Object methods
+    public Object getKey() {
+        return getOffset();
+    }
+
+    public POS getPOS() {
+        return pos;
+    }
 
     /**
      * Two Synsets are equal if their POS's and offsets are equal
@@ -97,26 +610,21 @@ public class Synset extends PointerTarget implements DictionaryElement {
 
     public String toString() {
         StringBuilder words = new StringBuilder();
-        for (int i = 0; i < getWordsSize(); ++i) {
+        for (int i = 0; i < this.words.size(); ++i) {
             if (i > 0) {
                 words.append(", ");
             }
-            words.append(getWord(i).getLemma());
+            words.append(this.words.get(i).getLemma());
         }
 
         if (getGloss() != null) {
             words.append(" -- (").append(getGloss()).append(")");
         }
 
-
         return JWNL.resolveMessage("DATA_TOSTRING_009", new Object[]{getOffset(), getPOS(), words.toString()});
     }
 
     // Accessors
-
-    public POS getPOS() {
-        return _pos;
-    }
 
     @Override
     public Synset getSynset() {
@@ -128,177 +636,125 @@ public class Synset extends PointerTarget implements DictionaryElement {
         return 0;
     }
 
-    public void setPOS(POS pos) {
-        _pos = pos;
-    }
-
-    public Pointer[] getPointers() {
-        return _pointers;
-    }
-
-    public boolean addPointer(Pointer p) {
-        if (-1 == getPointerIndex(p)) {
-            Pointer[] newPointers = new Pointer[_pointers.length + 1];
-            System.arraycopy(_pointers, 0, newPointers, 0, _pointers.length);
-            newPointers[newPointers.length - 1] = p;
-            _pointers = newPointers;
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public int getPointerIndex(Pointer p) {
-        int result = -1;
-        for (int i = 0; i < _pointers.length; i++) {
-            if (p.equals(_pointers[i])) {
-                return i;
-            }
-        }
-        return result;
-    }
-
-    public int addPointers(Collection<Pointer> pointers) {
-        int equal = 0;
-        for (Pointer p : pointers) {
-            if (-1 < getPointerIndex(p)) {
-                equal++;
-            }
-        }
-        Pointer[] newPointers = new Pointer[_pointers.length + pointers.size() - equal];
-        System.arraycopy(_pointers, 0, newPointers, 0, _pointers.length);
-        int idx = _pointers.length;
-        for (Pointer p : pointers) {
-            if (-1 == getPointerIndex(p)) {
-                newPointers[idx] = p;
-                idx++;
-            }
-        }
-        _pointers = newPointers;
-        return pointers.size() - equal;
+    public List<Pointer> getPointers() {
+        return pointers;
     }
 
     public String getGloss() {
-        return _gloss;
+        return gloss;
     }
 
     public void setGloss(String gloss) {
-        _gloss = gloss;
-    }
-
-    public Word[] getWords() {
-        return _words;
-    }
-
-    public int getWordsSize() {
-        return getWords().length;
-    }
-
-    public Word getWord(int index) {
-        return _words[index];
-    }
-
-    public boolean addWord(Word w) {
-        if (-1 == getWordIndex(w)) {
-            Word[] newWords = new Word[_words.length + 1];
-            System.arraycopy(_words, 0, newWords, 0, _words.length);
-            newWords[newWords.length - 1] = w;
-            _words = newWords;
-            return true;
-        } else {
-            return false;
+        if (null == gloss) {
+            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_048"));
         }
+        this.gloss = gloss;
     }
 
-    public boolean addWords(Collection<Word> words) {
-        int equal = 0;
-        for (Word w : words) {
-            if (-1 < getWordIndex(w)) {
-                equal++;
-            }
-        }
-        Word[] newWords = new Word[_words.length + words.size() - equal];
-        System.arraycopy(_words, 0, newWords, 0, _words.length);
-        int idx = _words.length;
-        for (Word w : words) {
-            if (-1 == getWordIndex(w)) {
-                newWords[idx] = w;
-                idx++;
-            }
-        }
-        _words = newWords;
-        return equal < words.size();
-    }
-
-    public int getWordIndex(Word w) {
-        int result = -1;
-        for (int i = 0; i < _words.length; i++) {
-            if (w.equals(_words[i])) {
-                return i;
-            }
-        }
-        return result;
+    public List<Word> getWords() {
+        return words;
     }
 
     public long getOffset() {
-        return _offset;
+        return offset;
     }
 
     public void setOffset(long offset) {
-        _offset = offset;
-    }
-
-    public Object getKey() {
-        return getOffset();
+        if (dictionary instanceof AbstractCachingDictionary) {
+            AbstractCachingDictionary acd = (AbstractCachingDictionary) dictionary;
+            acd.clearSynset(new POSKey(pos, this.offset));
+            acd.cacheSynset(new POSKey(pos, offset), this);
+        }
+        this.offset = offset;
     }
 
     public boolean isAdjectiveCluster() {
-        return _isAdjectiveCluster;
+        return isAdjectiveCluster;
     }
 
     public void setIsAdjectiveCluster(boolean isAdjectiveCluster) {
-        _isAdjectiveCluster = isAdjectiveCluster;
+        this.isAdjectiveCluster = isAdjectiveCluster;
     }
 
     /**
-     * Returns all Verb Frames that are valid for all the words in this synset
+     * Returns all Verb Frames that are valid for all the words in this synset.
+     *
+     * @return all Verb Frames that are valid for all the words in this synset
      */
     public String[] getVerbFrames() {
-        return VerbFrame.getFrames(_verbFrameFlags);
+        if (POS.VERB.equals(pos)) {
+            return VerbFrame.getFrames(verbFrameFlags);
+        } else {
+            return EMPTY_STRING_ARRAY;
+        }
     }
 
     public BitSet getVerbFrameFlags() {
-        return _verbFrameFlags;
+        if (POS.VERB.equals(pos)) {
+            return verbFrameFlags;
+        } else {
+            return EMPTY_BIT_SET;
+        }
     }
 
     public void setVerbFrameFlags(BitSet verbFrameFlags) {
-        _verbFrameFlags = verbFrameFlags;
+        if (!POS.VERB.equals(pos)) {
+            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_049"));
+        }
+        if (null == verbFrameFlags) {
+            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_050"));
+        }
+        this.verbFrameFlags = verbFrameFlags;
     }
 
     public int[] getVerbFrameIndices() {
-        return VerbFrame.getVerbFrameIndices(_verbFrameFlags);
+        if (POS.VERB.equals(pos)) {
+            return VerbFrame.getVerbFrameIndices(verbFrameFlags);
+        } else {
+            return EMPTY_INT_ARRAY;
+        }
     }
 
     /**
-     * Returns true if <code>lemma</code> is one of the words contained in this synset.
+     * Returns true if <var>lemma</var> is one of the words contained in this synset.
+     *
+     * @param lemma lemma to check
+     * @return true if <var>lemma</var> is one of the words contained in this synset
      */
     public boolean containsWord(String lemma) {
-        for (int i = 0; i < getWordsSize(); i++) {
-            if (getWord(i).getLemma().equals(lemma)) {
+        if (null == lemma) {
+            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_046"));
+        }
+        lemma = lemma.replaceAll(" ", "_");
+        for (Word word : words) {
+            if (word.getLemma().equalsIgnoreCase(lemma)) {
                 return true;
             }
         }
         return false;
     }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
-        in.defaultReadObject();
-        // set POS to reference the static instance defined in the current runtime environment
-        _pos = POS.getPOSForKey(_pos.getKey());
+    /**
+     * Returns the index of the word which has the <var>lemma</var> or -1 if not found.
+     *
+     * @param lemma lemma to check
+     * @return true if <var>lemma</var> is one of the words contained in this synset
+     */
+    public int indexOfWord(String lemma) {
+        if (null == lemma) {
+            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_046"));
+        }
+        lemma = lemma.replaceAll(" ", "_");
+        for (int i = 0; i < words.size(); i++) {
+            if (words.get(i).getLemma().equalsIgnoreCase(lemma)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     /**
-     * Gets the lexicographer file name containing this synset.
+     * Returns the lexicographer file name containing this synset.
      *
      * @return two digit decimal integer
      */
@@ -309,29 +765,35 @@ public class Synset extends PointerTarget implements DictionaryElement {
     /**
      * Sets the lexicographer file name containing this synset.
      *
-     * @param lexFileId - the lexicographer file name id
+     * @param lexFileNum - the lexicographer file name number
      */
-    public void setLexFileNum(long lexFileId) {
-        this.lexFileNum = lexFileId;
+    public void setLexFileNum(long lexFileNum) {
+        if (!LexIdNameMap.getMap().containsKey(lexFileNum)) {
+            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_051"));
+        }
+        this.lexFileNum = lexFileNum;
     }
 
     /**
-     * Gets the lex file name.
+     * Returns the lexicographer file name.
      *
-     * @return lex file name
+     * @return lexicographer file name
      */
     public String getLexFileName() {
-        return LexFileIdMap.getFileName(lexFileNum);
+        return LexIdNameMap.getMap().get(lexFileNum);
     }
 
     /**
-     * Gets the sense key of a lemma. This will be refactored in 2.0 with
-     * the architecture reworking.
+     * Returns the sense key of a lemma.
      *
-     * @param lemma lemma sense to grab
+     * @param word word which lemma is in question
      * @return sense key for lemma
      */
-    public String getSenseKey(String lemma) {
+    public String getSenseKey(Word word) {
+        if (null == word) {
+            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_044"));
+        }
+
         int ss_type = 5;
         if (this.getPOS().equals(POS.NOUN)) {
             ss_type = 1;
@@ -347,29 +809,17 @@ public class Synset extends PointerTarget implements DictionaryElement {
             ss_type = 5;
         }
 
-        //find lex id
-        long lexId = -1;
-        for (int i = 0; i < this.getWords().length; i++) {
-            Word w = this.getWords()[i];
-            if (w.getLemma().equalsIgnoreCase(lemma)) {
-                lexId = w.getLexId();
-            }
-        }
+        long lexId = word.getLexId();
+        StringBuilder senseKey = new StringBuilder(String.format("%s%%%d:%02d:%02d:", word.getLemma().toLowerCase(), ss_type, getLexFileNum(), lexId));
 
-        StringBuilder senseKey = new StringBuilder(String.format("%s%%%d:%02d:%02d:", lemma.toLowerCase(), ss_type, getLexFileNum(), lexId));
-
-        if (ss_type == 5) {
-            try {
-                Pointer[] p = this.getPointers(PointerType.SIMILAR_TO);
-                if (p.length > 0) {
-                    Pointer headWord = p[0];
-                    Word[] words = headWord.getTargetSynset().getWords();
-                    if (words.length > 0) {
-                        senseKey.append(String.format("%s:%02d", words[0].getLemma().toLowerCase(), words[0].getLexId()));
-                    }
+        if (5 == ss_type) {
+            List<Pointer> p = getPointers(PointerType.SIMILAR_TO);
+            if (0 < p.size()) {
+                Pointer headWord = p.get(0);
+                List<Word> words = headWord.getTargetSynset().getWords();
+                if (0 < words.size()) {
+                    senseKey.append(String.format("%s:%02d", words.get(0).getLemma().toLowerCase(), words.get(0).getLexId()));
                 }
-            } catch (JWNLException e) {
-                e.printStackTrace();
             }
         } else {
             senseKey.append(":");
@@ -377,5 +827,12 @@ public class Synset extends PointerTarget implements DictionaryElement {
 
         return senseKey.toString();
 
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        // set POS to reference the static instance defined in the current runtime environment
+        pos = POS.getPOSForKey(pos.getKey());
+        dictionary = Dictionary.getRestoreDictionary();
     }
 }

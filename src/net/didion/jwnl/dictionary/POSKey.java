@@ -1,22 +1,21 @@
 package net.didion.jwnl.dictionary;
 
 import net.didion.jwnl.JWNL;
-import net.didion.jwnl.JWNLRuntimeException;
 import net.didion.jwnl.data.POS;
 
 /**
- * A cache key consists of a <code>POS</code> and an object
+ * A cache key consists of a <code>POS</code> and an object.
  */
 public class POSKey {
-    private POS _pos;
-    private Object _key;
+    private POS pos;
+    private Object key;
 
     private POSKey(POS pos, Object key) {
         if (pos == null || key == null) {
-            throw new JWNLRuntimeException("DICTIONARY_EXCEPTION_001");
+            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_001"));
         }
-        _pos = pos;
-        _key = key;
+        this.pos = pos;
+        this.key = key;
     }
 
     public POSKey(POS pos, String lemma) {
@@ -29,36 +28,31 @@ public class POSKey {
 
     public boolean equals(Object object) {
         return object instanceof POSKey
-                && ((POSKey) object)._pos.equals(_pos)
-                && ((POSKey) object)._key.equals(_key);
+                && ((POSKey) object).pos.equals(pos)
+                && ((POSKey) object).key.equals(key);
     }
 
     public POS getPOS() {
-        return _pos;
+        return pos;
     }
 
     public Object getKey() {
-        return _key;
+        return key;
     }
 
     public boolean isLemmaKey() {
-        return _key instanceof String;
+        return key instanceof String;
     }
 
     public boolean isOffsetKey() {
-        return _key instanceof Long;
+        return key instanceof Long;
     }
 
     public int hashCode() {
-        return _pos.hashCode() ^ _key.hashCode();
+        return pos.hashCode() ^ key.hashCode();
     }
 
-    private transient String _cachedToString = null;
-
     public String toString() {
-        if (_cachedToString == null) {
-            _cachedToString = JWNL.resolveMessage("DICTIONARY_TOSTRING_001", new Object[]{_pos, _key});
-        }
-        return _cachedToString;
+        return JWNL.resolveMessage("DICTIONARY_TOSTRING_001", new Object[]{pos, key});
     }
 }

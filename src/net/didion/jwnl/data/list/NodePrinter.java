@@ -10,23 +10,23 @@ import java.util.ListIterator;
  * A printer for displaying the contents of a node list.
  */
 public abstract class NodePrinter {
-    private PrintStream _defaultStream = System.out;
-    private int _defaultIndent = 0;
+    private PrintStream defaultStream = System.out;
+    private int defaultIndent = 0;
 
     public NodePrinter() {
     }
 
     public NodePrinter(int defaultIndent) {
-        _defaultIndent = defaultIndent;
+        this.defaultIndent = defaultIndent;
     }
 
     public NodePrinter(PrintStream defaultStream) {
-        _defaultStream = defaultStream;
+        this.defaultStream = defaultStream;
     }
 
     public NodePrinter(PrintStream defaultStream, int defaultIndent) {
-        _defaultStream = defaultStream;
-        _defaultIndent = defaultIndent;
+        this.defaultStream = defaultStream;
+        this.defaultIndent = defaultIndent;
     }
 
     /**
@@ -40,14 +40,14 @@ public abstract class NodePrinter {
      * Print the contents of <var>itr</var> using the default indent
      */
     public void print(TypeCheckingList.TypeCheckingListIterator itr) {
-        print(itr, _defaultStream);
+        print(itr, defaultStream);
     }
 
     /**
      * Print the contents of <var>itr</var> to the given stream
      */
     public void print(TypeCheckingList.TypeCheckingListIterator itr, PrintStream stream) {
-        print(itr, stream, _defaultIndent);
+        print(itr, stream, defaultIndent);
     }
 
     /**
@@ -70,7 +70,7 @@ public abstract class NodePrinter {
      * the previous level of nesting.
      */
     public void print(TypeCheckingList.TypeCheckingListIterator itr, int indent, int indentIncrement) {
-        print(itr, _defaultStream, indent, indentIncrement);
+        print(itr, defaultStream, indent, indentIncrement);
     }
 
     /**
@@ -96,38 +96,38 @@ public abstract class NodePrinter {
      * Wrapper for a NodeListIterator that allows the next pointer to be moved to any index.
      */
     private static final class NodeListIteratorWrapper {
-        private ListIterator _itr;
+        private ListIterator itr;
 
         public NodeListIteratorWrapper(TypeCheckingList.TypeCheckingListIterator itr) {
             if (!Node.class.isAssignableFrom(itr.getType())) {
                 throw new JWNLRuntimeException("DATA_EXCEPTION_003", new Object[]{Node.class, itr.getType()});
             }
-            _itr = itr;
+            this.itr = itr;
         }
 
         public Node nextNode() {
-            return (Node) _itr.next();
+            return (Node) itr.next();
         }
 
         public Node previousNode() {
-            return (Node) _itr.previous();
+            return (Node) itr.previous();
         }
 
         public int currentIndex() {
-            return _itr.nextIndex() - 1;
+            return itr.nextIndex() - 1;
         }
 
         /**
-         * Moves the iterator to a point in the iterator where the next index is <code>index</code>.
+         * Moves the iterator to a point in the iterator where the next index is <var>index</var>.
          */
         public int moveTo(int index) {
             if (currentIndex() < index) {
-                while (currentIndex() < index && _itr.hasNext()) {
-                    _itr.next();
+                while (currentIndex() < index && itr.hasNext()) {
+                    itr.next();
                 }
             } else if (currentIndex() > index) {
-                while (currentIndex() > index && _itr.hasPrevious()) {
-                    _itr.previous();
+                while (currentIndex() > index && itr.hasPrevious()) {
+                    itr.previous();
                 }
             }
             return currentIndex();

@@ -1,6 +1,7 @@
 package net.didion.jwnl.data;
 
-import net.didion.jwnl.JWNLException;
+import net.didion.jwnl.dictionary.Dictionary;
+import net.didion.jwnl.util.factory.Owned;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -10,16 +11,20 @@ import java.util.List;
  * A <code>PointerTarget</code> is the source or target of a <code>Pointer</code>.
  * The target of a semantic <code>PointerTarget</code> is a <code>Synset</code>;
  * the target of a lexical <code>PointerTarget</code> is a <code>Word</code>.
+ *
+ * @author didion
+ * @author Aliaksandr Autayeu avtaev@gmail.com
  */
-public abstract class PointerTarget implements Serializable {
-    static final long serialVersionUID = 3230195199146939027L;
+public abstract class PointerTarget implements Serializable, Owned {
 
-    protected PointerTarget() {
+    private static final long serialVersionUID = 3230195199146939027L;
+
+    protected transient Dictionary dictionary;
+
+    protected PointerTarget(Dictionary dictionary) {
+        this.dictionary = dictionary;
     }
 
-    /**
-     * Return this target's POS
-     */
     public abstract POS getPOS();
 
     public abstract Synset getSynset();
@@ -27,9 +32,11 @@ public abstract class PointerTarget implements Serializable {
     public abstract int getIndex();
 
     /**
-     * Return a list of Target's pointers
+     * Returns a list of Target's pointers.
+     *
+     * @return a list of Target's pointers
      */
-    public abstract Pointer[] getPointers();
+    public abstract List<Pointer> getPointers();
 
     public abstract String toString();
 
@@ -38,43 +45,61 @@ public abstract class PointerTarget implements Serializable {
     }
 
     /**
-     * Get all pointers of type <code>type</code>.
+     * Returns all pointers of type <var>type</var>.
+     *
+     * @param type pointer type
+     * @return all pointers of type <var>type</var>
      */
-    public Pointer[] getPointers(PointerType type) {
-        List<Pointer> list = new ArrayList<Pointer>();
-        Pointer[] pointers = getPointers();
-        for (Pointer pointer : pointers) {
+    public List<Pointer> getPointers(PointerType type) {
+        List<Pointer> result = new ArrayList<Pointer>();
+        for (Pointer pointer : getPointers()) {
             if (pointer.getType().equals(type)
                     || type.equals(PointerType.HYPERNYM) && pointer.getType().equals(PointerType.INSTANCE_HYPERNYM)
                     || type.equals(PointerType.HYPONYM) && pointer.getType().equals(PointerType.INSTANCES_HYPONYM)) {
-                list.add(pointer);
+                result.add(pointer);
             }
         }
-        return list.toArray(new Pointer[list.size()]);
+        return result;
     }
 
     /**
-     * Get all the pointer targets of this synset
+     * Returns all the pointer targets of this synset.
+     *
+     * @return all the pointer targets of this synset
      */
-    public PointerTarget[] getTargets() throws JWNLException {
+    public List<PointerTarget> getTargets() {
         return collectTargets(getPointers());
     }
 
     /**
-     * Get all the targets of the pointers of type <code>type</code>.
+     * Returns all the targets of the pointers of type <var>type</var>.
+     *
+     * @param type pointer type
+     * @return all the targets of the pointers of type <var>type</var>
      */
-    public PointerTarget[] getTargets(PointerType type) throws JWNLException {
+    public List<PointerTarget> getTargets(PointerType type) {
         return collectTargets(getPointers(type));
     }
 
     /**
-     * Get an array of all the targets of <code>pointers</code>.
+     * Returns of all the targets of <var>pointers</var>.
+     *
+     * @param pointers pointer to return targets of
+     * @return all the targets of <var>pointers</var>
      */
-    private PointerTarget[] collectTargets(Pointer[] pointers) throws JWNLException {
-        PointerTarget[] targets = new PointerTarget[pointers.length];
-        for (int i = 0; i < pointers.length; ++i) {
-            targets[i] = pointers[i].getTarget();
+    private List<PointerTarget> collectTargets(List<Pointer> pointers) {
+        List<PointerTarget> targets = new ArrayList<PointerTarget>(pointers.size());
+        for (Pointer pointer : pointers) {
+            targets.add(pointer.getTarget());
         }
         return targets;
+    }
+
+    public Dictionary getDictionary() {
+        return dictionary;
+    }
+
+    public void setDictionary(Dictionary dictionary) {
+        this.dictionary = dictionary;
     }
 }

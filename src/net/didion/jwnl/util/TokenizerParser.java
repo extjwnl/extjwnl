@@ -32,7 +32,7 @@ public class TokenizerParser extends StringTokenizer {
     }
 
     /**
-     * Convert the next token into an int with base <code>radix</code>
+     * Convert the next token into an int with base <var>radix</var>
      *
      * @param radix the base into which to convert the next token
      */

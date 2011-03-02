@@ -9,30 +9,30 @@ import java.util.List;
  * A group of possible base forms for a particular lemma
  */
 public class BaseFormSet {
-    private List _forms = new ArrayList();
-    private int _index = -1;
-    private boolean _allowDuplicates;
+    private List forms = new ArrayList();
+    private int index = -1;
+    private boolean allowDuplicates;
 
     public BaseFormSet() {
         this(false);
     }
 
     public BaseFormSet(boolean allowDuplicates) {
-        _allowDuplicates = allowDuplicates;
+        this.allowDuplicates = allowDuplicates;
     }
 
     public void add(String s) {
-        if (_allowDuplicates || !_forms.contains(s)) {
-            _forms.add(s);
+        if (allowDuplicates || !forms.contains(s)) {
+            forms.add(s);
         }
     }
 
     public void addAll(BaseFormSet forms) {
-        if (_allowDuplicates) {
-            _forms.addAll(forms._forms);
+        if (allowDuplicates) {
+            this.forms.addAll(forms.forms);
         } else {
-            for (int i = 0; i < forms._forms.size(); i++) {
-                add((String) forms._forms.get(i));
+            for (int i = 0; i < forms.forms.size(); i++) {
+                add((String) forms.forms.get(i));
             }
         }
     }
@@ -41,50 +41,50 @@ public class BaseFormSet {
         if (!isFormAvailable(index)) {
             throw new IllegalArgumentException(String.valueOf(index));
         }
-        return (String) _forms.get(index);
+        return (String) forms.get(index);
     }
 
     public List getForms() {
-        return _forms;
+        return forms;
     }
 
     public boolean isCurrentFormAvailable() {
-        return isFormAvailable(_index);
+        return isFormAvailable(index);
     }
 
     public String getCurrentForm() {
         if (!isCurrentFormAvailable()) {
             throw new JWNLRuntimeException("DICTIONARY_EXCEPTION_012");
         }
-        return getForm(_index);
+        return getForm(index);
     }
 
     public boolean isMoreFormsAvailable() {
-        return isFormAvailable(_index + 1);
+        return isFormAvailable(index + 1);
     }
 
     public String getNextForm() {
         if (!isMoreFormsAvailable()) {
             throw new JWNLRuntimeException("DICTIONARY_EXCEPTION_013");
         }
-        return getForm(++_index);
+        return getForm(++index);
     }
 
     public int getIndex() {
-        return _index;
+        return index;
     }
 
     public void setIndex(int index) {
-        if (index < _forms.size()) {
-            _index = index;
+        if (index < forms.size()) {
+            this.index = index;
         }
     }
 
     public int size() {
-        return _forms.size();
+        return forms.size();
     }
 
     private boolean isFormAvailable(int index) {
-        return (index >= 0 && index < _forms.size());
+        return (index >= 0 && index < forms.size());
     }
 }

@@ -6,13 +6,20 @@ import net.didion.jwnl.dictionary.Dictionary;
 
 import java.util.Map;
 
-public class LookupIndexWordOperation implements Operation {
-    public Object create(Map params) throws JWNLException {
-        return new LookupIndexWordOperation();
+/**
+ * Lookups up index words.
+ *
+ * @author didion
+ * @author Aliaksandr Autayeu avtaev@gmail.com
+ */
+public class LookupIndexWordOperation extends AbstractOperation {
+
+    public LookupIndexWordOperation(Dictionary dictionary, Map params) throws JWNLException {
+        super(dictionary);
     }
 
     public boolean execute(POS pos, String lemma, BaseFormSet baseForms) throws JWNLException {
-        if (Dictionary.getInstance().getIndexWord(pos, lemma) != null) {
+        if (dictionary.getIndexWord(pos, lemma) != null) {
             baseForms.add(lemma);
             return true;
         }

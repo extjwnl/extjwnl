@@ -1,79 +1,66 @@
 package net.didion.jwnl.data;
 
-import junit.framework.TestCase;
+import net.didion.jwnl.JWNLException;
+import net.didion.jwnl.dictionary.Dictionary;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.BitSet;
 
 /**
  * Tests Synset functionality by creating a mock synset.
  *
  * @author bwalenz
+ * @author Aliaksandr Autayeu avtaev@gmail.com
  */
-public class TestSynset extends TestCase {
+public class TestSynset extends BaseDictionaryTest {
 
-    /**
-     * Our test object.
-     */
-    Synset testObj;
+    private Synset testObj;
+    private final static String gloss = "testGloss";
+    private final static long offset = 4125;
 
-    /**
-     * A test gloss definition.
-     */
-    String gloss = "testGloss";
-
-    /**
-     * A notional offset.
-     */
-    long offset = 4125;
-
-    /**
-     * Creates a new Synset.
-     */
-    public void setUp() {
-        testObj = new Synset(POS.NOUN, offset, new Word[2], new Pointer[2], gloss,
-                new BitSet(), false);
+    @Before
+    public void setUp() throws JWNLException, IOException {
+        Dictionary dictionary = Dictionary.getInstance(getProperties());
+        testObj = new Synset(dictionary, POS.NOUN, offset);
+        testObj.setGloss(gloss);
     }
 
-    /**
-     * Tests getting the part of speech.
-     */
+    @Test(expected = JWNLException.class)
+    public void testConstructor() throws JWNLException {
+        testObj = new Synset(null, POS.NOUN, offset);
+    }
+
+    @Test
     public void testGetPOS() {
-        assertTrue(testObj.getPOS().equals(POS.NOUN));
+        Assert.assertEquals(POS.NOUN, testObj.getPOS());
     }
 
-    /**
-     * Tests getting the gloss.
-     */
+    @Test
     public void testGetGloss() {
-        assertTrue(testObj.getGloss().equals(gloss));
+        Assert.assertEquals(gloss, testObj.getGloss());
     }
 
-    /**
-     * Tests getting the verb frame flags.
-     */
+    @Test
     public void testGetVerbFrameFlags() {
-        assertTrue(testObj.getVerbFrameFlags().isEmpty());
+        Assert.assertTrue(testObj.getVerbFrameFlags().isEmpty());
     }
 
-    /**
-     * Tests getting the offset.
-     */
+    @Test
     public void testGetOffset() {
-        assertTrue(testObj.getOffset() == offset);
+        Assert.assertEquals(offset, testObj.getOffset());
     }
 
-    /**
-     * Tests getting the words size.
-     */
+    @Test
     public void testGetWordsSize() {
-        assertTrue(testObj.getWordsSize() == 2);
+        Assert.assertEquals(0, testObj.getWords().size());
     }
 
-    /**
-     * Tests getting the pointers size.
-     */
-    public void testGetPointersSize() {
-        assertTrue(testObj.getPointers().length == 2);
+    @Test
+    public void testGetPointersSize() throws JWNLException {
+        Assert.assertEquals(0, testObj.getPointers().size());
     }
-
 }

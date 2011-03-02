@@ -1,19 +1,26 @@
 package net.didion.jwnl.util.cache;
 
-public class LRUCacheSet extends CacheSet {
-    public LRUCacheSet(Object[] keys) {
+/**
+ * LeastRecentlyUsed cache set.
+ *
+ * @author didion
+ * @author Aliaksandr Autayeu avtaev@gmail.com
+ */
+public class LRUCacheSet<K, A, B> extends CacheSet<K, A, B> {
+
+    public LRUCacheSet(K[] keys) {
         super(keys);
     }
 
-    public LRUCacheSet(Object[] keys, int size) {
+    public LRUCacheSet(K[] keys, int size) {
         super(keys, size);
     }
 
-    public LRUCacheSet(Object[] keys, int[] sizes) {
+    public LRUCacheSet(K[] keys, int[] sizes) {
         super(keys, sizes);
     }
 
-    protected Cache createCache(int size) {
-        return new LRUCache(size);
+    protected Cache<A, B> createCache(int size) {
+        return new LRUCache<A, B>(size);
     }
 }

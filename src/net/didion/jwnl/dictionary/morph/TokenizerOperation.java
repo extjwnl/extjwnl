@@ -2,6 +2,7 @@ package net.didion.jwnl.dictionary.morph;
 
 import net.didion.jwnl.JWNLException;
 import net.didion.jwnl.data.POS;
+import net.didion.jwnl.dictionary.Dictionary;
 import net.didion.jwnl.util.factory.Param;
 import net.didion.jwnl.util.factory.ParamList;
 
@@ -9,6 +10,11 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Map;
 
+/**
+ * Tokenizer operation.
+ *
+ * @author Aliaksandr Autayeu avtaev@gmail.com
+ */
 public class TokenizerOperation extends AbstractDelegatingOperation {
     /**
      * Parameter that determines the operations this operation
@@ -26,27 +32,19 @@ public class TokenizerOperation extends AbstractDelegatingOperation {
      */
     public static final String DELIMITERS = "delimiters";
 
-    private String[] _delimiters;
+    private String[] delimiters;
 
-    public TokenizerOperation() {
-    }
-
-    public TokenizerOperation(String[] delimiters) {
-        _delimiters = delimiters;
-    }
-
-    protected AbstractDelegatingOperation getInstance(Map params) throws JWNLException {
+    public TokenizerOperation(Dictionary dictionary, Map<String, Param> params) throws JWNLException {
+        super(dictionary, params);
         ParamList delimiters = (ParamList) params.get(DELIMITERS);
-        String[] delimiterArray;
         if (delimiters == null || delimiters.getParams().size() == 0) {
-            delimiterArray = new String[]{" "};
+            this.delimiters = new String[]{" "};
         } else {
-            delimiterArray = new String[delimiters.getParams().size()];
+            this.delimiters = new String[delimiters.getParams().size()];
             for (int i = 0; i < delimiters.getParams().size(); i++) {
-                delimiterArray[i] = ((Param) delimiters.getParams().get(i)).getValue();
+                this.delimiters[i] = delimiters.getParams().get(i).getValue();
             }
         }
-        return new TokenizerOperation(delimiterArray);
     }
 
     protected String[] getKeys() {
@@ -58,10 +56,10 @@ public class TokenizerOperation extends AbstractDelegatingOperation {
         BaseFormSet[] tokenForms = new BaseFormSet[tokens.length];
 
         if (!hasDelegate(TOKEN_OPERATIONS)) {
-            addDelegate(TOKEN_OPERATIONS, new Operation[]{new LookupIndexWordOperation()});
+            addDelegate(TOKEN_OPERATIONS, new Operation[]{new LookupIndexWordOperation(dictionary, params)});
         }
         if (!hasDelegate(PHRASE_OPERATIONS)) {
-            addDelegate(PHRASE_OPERATIONS, new Operation[]{new LookupIndexWordOperation()});
+            addDelegate(PHRASE_OPERATIONS, new Operation[]{new LookupIndexWordOperation(dictionary, params)});
         }
 
         for (int i = 0; i < tokens.length; i++) {
@@ -98,8 +96,8 @@ public class TokenizerOperation extends AbstractDelegatingOperation {
             for (int i = 0; i < length; i++) {
                 tokens[i] = tokenForms[i + startIndex].getForm(indexArray[i]);
             }
-            for (String _delimiter : _delimiters) {
-                if (tryAllCombinations(pos, tokens, _delimiter, forms)) {
+            for (String delimiter : delimiters) {
+                if (tryAllCombinations(pos, tokens, delimiter, forms)) {
                     foundForms = true;
                 }
             }

@@ -2,7 +2,8 @@ package net.didion.jwnl.data;
 
 import net.didion.jwnl.JWNL;
 import net.didion.jwnl.JWNLException;
-import net.didion.jwnl.dictionary.Dictionary;
+import net.didion.jwnl.util.MessageLog;
+import net.didion.jwnl.util.MessageLogLevel;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -13,14 +14,18 @@ import java.io.Serializable;
  * are <it>directional</it>:  the two roles of a relationship are the <it>source</it> and <it>target</it>.
  * Relationships are <it>typed</it>: the type of a relationship is a {@link PointerType}, and can
  * be retrieved via {@link Pointer#getType getType}.
+ *
+ * @author didion
+ * @author Aliaksandr Autayeu avtaev@gmail.com
  */
 public class Pointer implements Serializable {
-    static final long serialVersionUID = -1275571290466732179L;
+    private static final long serialVersionUID = -1275571290466732171L;
 
-    private PointerType _pointerType;
+    private static final MessageLog log = new MessageLog(Pointer.class);
 
-    private TargetIndex _targetIndex;
+    private PointerType pointerType;
 
+    private TargetIndex targetIndex;
 
     /**
      * The source of this pointer. If the pointer applies to all words in the
@@ -28,118 +33,139 @@ public class Pointer implements Serializable {
      * otherwise <code>source</code> is the specific <code>Word</code> object that
      * this pointer applies to.
      */
-    private PointerTarget _source = null;
+    private PointerTarget source;
 
     /**
      * Cache for the target after it has been resolved.
      */
-    private transient PointerTarget _target = null;
+    private transient PointerTarget target;
 
     public Pointer(PointerTarget source, PointerType pointerType,
                    POS targetPOS, long targetOffset, int targetIndex) {
-        _source = source;
-        _pointerType = pointerType;
-        _targetIndex = new TargetIndex(targetPOS, targetOffset, targetIndex);
+        this.source = source;
+        this.pointerType = pointerType;
+        this.targetIndex = new TargetIndex(targetPOS, targetOffset, targetIndex);
+        this.target = null;
     }
 
     public Pointer(PointerType pointerType, PointerTarget source, PointerTarget target) {
-        _pointerType = pointerType;
-        _source = source;
-        _target = target;
+        this.pointerType = pointerType;
+        this.source = source;
+        this.target = target;
     }
 
     public String toString() {
-        String targetMsg = (_target == null) ? _targetIndex.toString() : _target.toString();
+        String targetMsg = (target == null) ? targetIndex.toString() : target.toString();
         return JWNL.resolveMessage("DATA_TOSTRING_012", new Object[]{getSourceIndex(), getSource(), targetMsg});
     }
 
     public int getSourceIndex() {
-        return _source.getIndex();
+        return source.getIndex();
     }
 
     public PointerType getType() {
-        return _pointerType;
+        return pointerType;
     }
 
     /**
-     * True if this pointer's source is a Word
+     * Returns whether this pointer's source is a Word.
+     *
+     * @return true if this pointer's source is a Word
      */
     public boolean isLexical() {
         return getSource() instanceof Word;
     }
 
     /**
-     * Get the source of this pointer.
+     * Returns the source of this pointer.
      *
      * @return source of this pointer
      */
     public PointerTarget getSource() {
-        return _source;
+        return source;
     }
 
     /**
-     * Get the actual target of this pointer.
+     * Returns the actual target of this pointer.
      *
      * @return actual target of this pointer
-     * @throws JWNLException JWNLException
      */
-    public PointerTarget getTarget() throws JWNLException {
-        if (null == _target) {
-            Dictionary dic = Dictionary.getInstance();
-            Synset syn = dic.getSynsetAt(_targetIndex._pos, _targetIndex._offset);
-            _target = (_targetIndex._index == 0) ? syn : syn.getWord(_targetIndex._index - 1);
+    public PointerTarget getTarget() {
+        try {
+            if (null == target) {
+                Synset syn = source.getDictionary().getSynsetAt(targetIndex.pos, targetIndex.offset);
+                target = (targetIndex.index == 0) ? syn : syn.getWords().get(targetIndex.index - 1);
+            }
+        } catch (JWNLException e) {
+            log.log(MessageLogLevel.ERROR, "EXCEPTION_001", e.getMessage(), e);
         }
-        return _target;
-    }
-
-    public void setTarget(PointerTarget target) {
-        _target = target;
-        _targetIndex = null;
+        return target;
     }
 
     /**
-     * Get the synset that is a) the target of this pointer, or b) the synset that contains the target of this pointer.
+     * Sets the actual target of this pointer.
+     *
+     * @param target actual target of this pointer
+     */
+    public void setTarget(PointerTarget target) {
+        this.target = target;
+        targetIndex = null;
+    }
+
+    /**
+     * Returns the synset that is a) the target of this pointer, or b) the synset that contains the target of this pointer.
      *
      * @return the synset that is a) the target of this pointer, or b) the synset that contains the target of this pointer.
-     * @throws JWNLException JWNLException
      */
-    public Synset getTargetSynset() throws JWNLException {
+    public Synset getTargetSynset() {
         return getTarget().getSynset();
     }
 
     /**
-     * Get the offset of the target synset.
+     * Returns the offset of the target synset.
      *
      * @return offset of the target synset
      */
     public long getTargetOffset() {
-        if (null == _target) {
-            return _targetIndex._offset;
+        if (null == target) {
+            if (source.getDictionary().isEditable()) {
+                return getTarget().getSynset().getOffset();
+            } else {
+                return targetIndex.offset;
+            }
         } else {
-            return _target.getSynset().getOffset();
+            return target.getSynset().getOffset();
         }
     }
 
     public int getTargetIndex() {
-        if (null == _target) {
-            return _targetIndex._index;
+        if (null == target) {
+            if (source.getDictionary().isEditable()) {
+                return getTarget().getIndex();
+            } else {
+                return targetIndex.index;
+            }
         } else {
-            return _target.getIndex();
+            return target.getIndex();
         }
     }
 
     public POS getTargetPOS() {
-        if (null == _target) {
-            return _targetIndex._pos;
+        if (null == target) {
+            if (source.getDictionary().isEditable()) {
+                return getTarget().getSynset().getPOS();
+            } else {
+                return targetIndex.pos;
+            }
         } else {
-            return _target.getSynset().getPOS();
+            return target.getSynset().getPOS();
         }
     }
 
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
         // set pointer type to reference the static instance defined in the current runtime environment
-        _pointerType = PointerType.getPointerTypeForKey(_pointerType.getKey());
+        pointerType = PointerType.getPointerTypeForKey(pointerType.getKey());
     }
 
     @Override
@@ -153,20 +179,20 @@ public class Pointer implements Serializable {
 
         Pointer pointer = (Pointer) o;
 
-        if (_pointerType != null ? !_pointerType.equals(pointer._pointerType) : pointer._pointerType != null) {
+        if (pointerType != null ? !pointerType.equals(pointer.pointerType) : pointer.pointerType != null) {
             return false;
         }
-        if (_source != null ? !_source.equals(pointer._source) : pointer._source != null) {
+        if (source != null ? !source.equals(pointer.source) : pointer.source != null) {
             return false;
         }
-        if (null == _target) {
-            if (_targetIndex != null ? !_targetIndex.equals(pointer._targetIndex) : pointer._targetIndex != null) {
+        if (null == target) {
+            if (targetIndex != null ? !targetIndex.equals(pointer.targetIndex) : pointer.targetIndex != null) {
                 return false;
             }
         } else {
-            if (!_target.getPOS().equals(pointer.getTargetPOS())
-                    || _target.getIndex() != pointer.getTargetIndex()
-                    || _target.getSynset().getOffset() != pointer.getTargetOffset()) {
+            if (!target.getPOS().equals(pointer.getTargetPOS())
+                    || target.getIndex() != pointer.getTargetIndex()
+                    || target.getSynset().getOffset() != pointer.getTargetOffset()) {
                 return false;
             }
         }
@@ -176,9 +202,9 @@ public class Pointer implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = _pointerType != null ? _pointerType.hashCode() : 0;
-        result = 31 * result + (_targetIndex != null ? _targetIndex.hashCode() : 0);
-        result = 31 * result + (_source != null ? _source.hashCode() : 0);
+        int result = pointerType != null ? pointerType.hashCode() : 0;
+        result = 31 * result + (targetIndex != null ? targetIndex.hashCode() : 0);
+        result = 31 * result + (source != null ? source.hashCode() : 0);
         return result;
     }
 
@@ -187,24 +213,24 @@ public class Pointer implements Serializable {
      * keeping a large portion of the database resident once the target has been queried.
      */
     private static class TargetIndex implements Serializable {
-        POS _pos;
-        long _offset;
-        int _index;
+        POS pos;
+        long offset;
+        int index;
 
         TargetIndex(POS pos, long offset, int index) {
-            _pos = pos;
-            _offset = offset;
-            _index = index;
+            this.pos = pos;
+            this.offset = offset;
+            this.index = index;
         }
 
         public String toString() {
-            return JWNL.resolveMessage("DATA_TOSTRING_013", new Object[]{_pos, _offset, _index});
+            return JWNL.resolveMessage("DATA_TOSTRING_013", new Object[]{pos, offset, index});
         }
 
         private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
             in.defaultReadObject();
             // set POS to reference the static instance defined in the current runtime environment
-            _pos = POS.getPOSForKey(_pos.getKey());
+            pos = POS.getPOSForKey(pos.getKey());
         }
 
         @Override
@@ -218,14 +244,14 @@ public class Pointer implements Serializable {
 
             TargetIndex that = (TargetIndex) o;
 
-            if (_index != that._index) {
+            if (index != that.index) {
                 return false;
             }
-            if (_offset != that._offset) {
+            if (offset != that.offset) {
                 return false;
             }
             //noinspection RedundantIfStatement
-            if (_pos != null ? !_pos.equals(that._pos) : that._pos != null) {
+            if (pos != null ? !pos.equals(that.pos) : that.pos != null) {
                 return false;
             }
 
@@ -234,9 +260,9 @@ public class Pointer implements Serializable {
 
         @Override
         public int hashCode() {
-            int result = _pos != null ? _pos.hashCode() : 0;
-            result = 31 * result + (int) (_offset ^ (_offset >>> 32));
-            result = 31 * result + _index;
+            int result = pos != null ? pos.hashCode() : 0;
+            result = 31 * result + (int) (offset ^ (offset >>> 32));
+            result = 31 * result + index;
             return result;
         }
     }

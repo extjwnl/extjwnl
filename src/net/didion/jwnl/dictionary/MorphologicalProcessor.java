@@ -3,7 +3,6 @@ package net.didion.jwnl.dictionary;
 import net.didion.jwnl.JWNLException;
 import net.didion.jwnl.data.IndexWord;
 import net.didion.jwnl.data.POS;
-import net.didion.jwnl.util.factory.Createable;
 
 import java.util.List;
 
@@ -12,7 +11,7 @@ import java.util.List;
  * the form that can be found in WordNet. For example, if one calls
  * lookupBaseForm(POS.VERB, "running"), the index word for "run" should be returned.
  */
-public interface MorphologicalProcessor extends Createable {
+public interface MorphologicalProcessor {
     /**
      * Try to turn <var>derivation</var> into a word that is found in the index file for <var>pos</var>.
      * If there is more than one possible base form, then the first call to this method should

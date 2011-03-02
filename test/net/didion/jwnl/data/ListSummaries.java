@@ -15,8 +15,7 @@ import java.util.Iterator;
  */
 public class ListSummaries {
     public static void main(String[] args) throws IOException, JWNLException {
-        JWNL.initialize(new FileInputStream("./config/file_properties.xml"));
-        Dictionary dic = Dictionary.getInstance();
+        Dictionary dic = Dictionary.getInstance(new FileInputStream("./config/file_properties.xml"));
 
         for (POS pos : POS.getAllPOS()) {
             Iterator iwi = dic.getIndexWordIterator(pos);

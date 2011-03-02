@@ -4,47 +4,59 @@ import java.io.IOException;
 
 /**
  * <code>DictionaryFile</code> that reads lines from a random-access text file.
+ *
+ * @author didion
+ * @author Aliaksandr Autayeu avtaev@gmail.com
  */
 public interface RandomAccessDictionaryFile extends DictionaryFile {
+
     /**
-     * Read a byte from the file
+     * Reads a byte from the file.
      */
     public int read() throws IOException;
 
     /**
-     * Read a line from the file
+     * Reads a line from the file.
      */
     public String readLine() throws IOException;
 
     /**
-     * Go to position <var>pos</var> in the file.
+     * Reads the first word from a file (ie offset, index word).
+     *
+     * @return the first word from a file (ie offset, index word)
+     * @throws IOException IOException
+     */
+    public String readLineWord() throws IOException;
+
+    /**
+     * Goes to position <var>pos</var> in the file.
      */
     public void seek(long pos) throws IOException;
 
     /**
-     * Get the current position of the file pointer.
+     * Returns the current position of the file pointer.
      */
     public long getFilePointer() throws IOException;
 
     /**
-     * Get the length, in bytes, of the file
+     * Returns the length, in bytes, of the file.
      */
     public long length() throws IOException;
 
     // Offset caching functions
 
     /**
-     * Move the file pointer so that its next line offset is <var>nextOffset</var>
+     * Moves the file pointer so that its next line offset is <var>nextOffset</var>
      */
     public void setNextLineOffset(long previousOffset, long nextOffset);
 
     /**
-     * Return true if <code>offset</code> is the previous offset.
+     * Returns true if <var>offset</var> is the previous offset.
      */
     public boolean isPreviousLineOffset(long offset);
 
     /**
-     * Get the byte offset of the next line (after the position of the file pointer)
+     * Returns the byte offset of the next line (after the position of the file pointer)
      */
     public long getNextLineOffset();
 }

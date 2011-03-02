@@ -12,23 +12,23 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class ConnectionManager {
-    private String _driverClass;
-    private String _url;
-    private String _userName;
-    private String _password;
-    private boolean _registered;
-    private DataSource _source = null;
-    private String _jndi;
+    private String driverClass;
+    private String url;
+    private String userName;
+    private String password;
+    private boolean registered;
+    private DataSource source = null;
+    private String jndi;
 
     public ConnectionManager(String driverClass, String url, String userName, String password) {
-        _driverClass = driverClass;
-        _url = url;
-        _userName = userName;
-        _password = password;
+        this.driverClass = driverClass;
+        this.url = url;
+        this.userName = userName;
+        this.password = password;
     }
 
     public ConnectionManager(String jndi) {
-        _jndi = jndi;
+        this.jndi = jndi;
     }
 
 
@@ -38,14 +38,14 @@ public class ConnectionManager {
 
     public Connection getConnection() throws SQLException, JWNLException {
 
-        if (_jndi != null) {
+        if (jndi != null) {
             try {
-                if (_source != null) {
-                    return _source.getConnection();
+                if (source != null) {
+                    return source.getConnection();
                 }
                 Context initContext = new InitialContext();
                 Context envContext = (Context) initContext.lookup("java:/comp/env");
-                DataSource ds = (DataSource) envContext.lookup(_jndi);
+                DataSource ds = (DataSource) envContext.lookup(jndi);
                 if (ds != null) {
                     return ds.getConnection();
                 }
@@ -54,24 +54,24 @@ public class ConnectionManager {
             }
         }
         registerDriver();
-        if (_userName == null) {
-            return DriverManager.getConnection(_url);
+        if (userName == null) {
+            return DriverManager.getConnection(url);
         } else {
             return DriverManager.getConnection(
-                    _url, _userName, (_password != null) ? _password : "");
+                    url, userName, (password != null) ? password : "");
         }
 
 
     }
 
     private void registerDriver() throws JWNLException {
-        if (!_registered) {
+        if (!registered) {
             try {
-                Driver driver = (Driver) Class.forName(_driverClass).newInstance();
+                Driver driver = (Driver) Class.forName(driverClass).newInstance();
                 DriverManager.registerDriver(driver);
-                _registered = true;
-            } catch (Exception ex) {
-                throw new JWNLException("DICTIONARY_EXCEPTION_024", ex);
+                registered = true;
+            } catch (Exception e) {
+                throw new JWNLException("DICTIONARY_EXCEPTION_024", e);
             }
         }
     }

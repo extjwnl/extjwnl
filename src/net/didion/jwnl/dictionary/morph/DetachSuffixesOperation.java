@@ -2,6 +2,7 @@ package net.didion.jwnl.dictionary.morph;
 
 import net.didion.jwnl.JWNLException;
 import net.didion.jwnl.data.POS;
+import net.didion.jwnl.dictionary.Dictionary;
 import net.didion.jwnl.util.factory.Param;
 
 import java.util.*;
@@ -10,28 +11,31 @@ import java.util.*;
  * Remove all applicable suffixes from the word(s) and do a look-up.
  * This class accepts parameters in the form of:
  * <pre>
- * <p/>
+ *
  *  <param name="{part-of-speech}" value="|{suffix}={stemmed suffix}|..."/>
- * <p/>
+ *
  * </pre>
  * where suffix is the {suffix} to convert from, and {stemmed suffix} is
  * the suffix to convert to.
+ *
+ * @author didion
+ * @author Aliaksandr Autayeu avtaev@gmail.com
  */
 public class DetachSuffixesOperation extends AbstractDelegatingOperation {
+
     public static final String OPERATIONS = "operations";
 
-    private Map<POS, String[][]> _suffixMap;
+    private Map<POS, String[][]> suffixMap;
 
-    protected AbstractDelegatingOperation getInstance(Map params) throws JWNLException {
-        Map<POS, String[][]> suffixMap = new HashMap<POS, String[][]>();
-        for (Object o : params.values()) {
-            Param p = (Param) o;
+    public DetachSuffixesOperation(Dictionary dictionary, Map<String, Param> params) throws JWNLException {
+        super(dictionary, params);
+        suffixMap = new HashMap<POS, String[][]>();
+        for (Param p : params.values()) {
             POS pos = POS.getPOSForLabel(p.getName());
             if (pos != null) {
                 suffixMap.put(pos, getSuffixArray(p.getValue()));
             }
         }
-        return new DetachSuffixesOperation(suffixMap);
     }
 
     private String[][] getSuffixArray(String suffixes) throws JWNLException {
@@ -58,27 +62,20 @@ public class DetachSuffixesOperation extends AbstractDelegatingOperation {
         return suffixList.toArray(new String[suffixList.size()][]);
     }
 
-    public DetachSuffixesOperation() {
-    }
-
-    public DetachSuffixesOperation(Map<POS, String[][]> suffixMap) {
-        _suffixMap = suffixMap;
-    }
-
     protected String[] getKeys() {
         return new String[]{OPERATIONS};
     }
 
     public Map<POS, String[][]> getSuffixMap() {
-        return _suffixMap;
+        return suffixMap;
     }
 
     public void setSuffixMap(Map<POS, String[][]> suffixMap) {
-        _suffixMap = suffixMap;
+        this.suffixMap = suffixMap;
     }
 
     public boolean execute(POS pos, String derivation, BaseFormSet forms) throws JWNLException {
-        String[][] suffixArray = _suffixMap.get(pos);
+        String[][] suffixArray = suffixMap.get(pos);
         if (suffixArray == null) {
             return false;
         }

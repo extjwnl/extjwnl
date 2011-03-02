@@ -1,6 +1,8 @@
 package net.didion.jwnl.princeton.data;
 
+import net.didion.jwnl.JWNLException;
 import net.didion.jwnl.data.*;
+import net.didion.jwnl.dictionary.Dictionary;
 import net.didion.jwnl.util.MessageLog;
 import net.didion.jwnl.util.MessageLogLevel;
 import net.didion.jwnl.util.TokenizerParser;
@@ -13,17 +15,23 @@ import java.util.StringTokenizer;
 /**
  * <code>FileDictionaryElementFactory</code> that parses lines from the dictionary files distributed by the
  * WordNet team at Princeton's Cognitive Science department.
+ *
+ * @author didion
+ * @author Aliaksandr Autayeu avtaev@gmail.com
  */
 public abstract class AbstractPrincetonFileDictionaryElementFactory implements FileDictionaryElementFactory {
-    private static final MessageLog _log = new MessageLog(AbstractPrincetonFileDictionaryElementFactory.class);
 
+    private static final MessageLog log = new MessageLog(AbstractPrincetonFileDictionaryElementFactory.class);
+    protected Dictionary dictionary;
 
-    protected AbstractPrincetonFileDictionaryElementFactory() {
+    protected AbstractPrincetonFileDictionaryElementFactory(Dictionary dictionary) {
+        this.dictionary = dictionary;
     }
 
-    public IndexWord createIndexWord(POS pos, String line) {
+    public IndexWord createIndexWord(POS pos, String line) throws JWNLException {
         TokenizerParser tokenizer = new TokenizerParser(line, " ");
-        String lemma = tokenizer.nextToken().replace('_', ' ');
+        //String lemma = tokenizer.nextToken().replace('_', ' ');
+        String lemma = tokenizer.nextToken();//keep lemmas with underscores everywhere
         tokenizer.nextToken(); // pos
         tokenizer.nextToken();    // poly_cnt
         int pointerCount = tokenizer.nextInt();
@@ -37,26 +45,24 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory implements F
         for (int i = 0; i < senseCount; i++) {
             synsetOffsets[i] = tokenizer.nextLong();
         }
-        if (_log.isLevelEnabled(MessageLogLevel.TRACE)) {
-            _log.log(MessageLogLevel.TRACE, "PRINCETON_INFO_003", new Object[]{lemma, pos});
+        if (log.isLevelEnabled(MessageLogLevel.TRACE)) {
+            log.log(MessageLogLevel.TRACE, "PRINCETON_INFO_003", new Object[]{lemma, pos});
         }
-        return new IndexWord(lemma, pos, synsetOffsets);
+        return new IndexWord(dictionary, lemma, pos, synsetOffsets);
     }
 
-    public Synset createSynset(POS pos, String line) {
+    public Synset createSynset(POS pos, String line) throws JWNLException {
         TokenizerParser tokenizer = new TokenizerParser(line, " ");
-        Synset synset = new Synset();
 
         long offset = tokenizer.nextLong();
-        synset.setOffset(offset);
-
         long lexFileNum = tokenizer.nextLong();
+        String synsetPOS = tokenizer.nextToken();
+
+        Synset synset = new Synset(dictionary, POS.getPOSForKey(synsetPOS), offset);
         synset.setLexFileNum(lexFileNum);
 
-        String synsetPOS = tokenizer.nextToken();
-        synset.setPOS(pos);
         boolean isAdjectiveCluster = false;
-        if (synsetPOS.equals("s")) {
+        if ("s".equals(synsetPOS)) {
             isAdjectiveCluster = true;
         }
         synset.setIsAdjectiveCluster(isAdjectiveCluster);
@@ -73,7 +79,7 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory implements F
             w.setLexId(lexId);
             words.add(w);
         }
-        synset.addWords(words);
+        synset.getWords().addAll(words);
 
         int pointerCount = tokenizer.nextInt();
         ArrayList<Pointer> pointers = new ArrayList<Pointer>(pointerCount);
@@ -85,12 +91,12 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory implements F
             int linkIndices = tokenizer.nextHexInt();
             int sourceIndex = linkIndices / 256;
             int targetIndex = linkIndices & 255;
-            PointerTarget source = (sourceIndex == 0) ? synset : synset.getWord(sourceIndex - 1);
+            PointerTarget source = (sourceIndex == 0) ? synset : synset.getWords().get(sourceIndex - 1);
 
             Pointer p = new Pointer(source, pointerType, targetPOS, targetOffset, targetIndex);
             pointers.add(p);
         }
-        synset.addPointers(pointers);
+        synset.getPointers().addAll(pointers);
 
         if (pos == POS.VERB) {
             BitSet verbFrames = new BitSet();
@@ -100,10 +106,10 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory implements F
                 int frameNumber = tokenizer.nextInt();
                 int wordIndex = tokenizer.nextHexInt();
                 if (wordIndex > 0) {
-                    ((MutableVerb) synset.getWord(wordIndex - 1)).setVerbFrameFlag(frameNumber);
+                    ((MutableVerb) synset.getWords().get(wordIndex - 1)).setVerbFrameFlag(frameNumber);
                 } else {
-                    for (int j = 0; j < synset.getWords().length; ++j) {
-                        ((MutableVerb) synset.getWord(j)).setVerbFrameFlag(frameNumber);
+                    for (Word w : synset.getWords()) {
+                        ((MutableVerb) w).setVerbFrameFlag(frameNumber);
                     }
                     verbFrames.set(frameNumber);
                 }
@@ -118,8 +124,8 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory implements F
         }
         synset.setGloss(gloss);
 
-        if (_log.isLevelEnabled(MessageLogLevel.TRACE)) {
-            _log.log(MessageLogLevel.TRACE, "PRINCETON_INFO_002", new Object[]{pos, offset});
+        if (log.isLevelEnabled(MessageLogLevel.TRACE)) {
+            log.log(MessageLogLevel.TRACE, "PRINCETON_INFO_002", new Object[]{pos, offset});
         }
         return synset;
     }
@@ -127,35 +133,40 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory implements F
     /**
      * Creates a word, also access the sense.idx file.
      *
-     * @param synset
-     * @param index
-     * @param lemma
-     * @return
+     * @param synset synset
+     * @param index  index
+     * @param lemma  lemma
+     * @return word
      */
     protected Word createWord(Synset synset, int index, String lemma) {
         Word word;
         if (synset.getPOS().equals(POS.VERB)) {
-            word = new MutableVerb(synset, index, lemma);
+            word = new MutableVerb(dictionary, synset, index, lemma);
         } else {
-            word = new Word(synset, index, lemma);
+            word = new Word(dictionary, synset, index, lemma);
         }
-
 
         return word;
     }
 
-    public Exc createExc(POS pos, String line) {
+    public Exc createExc(POS pos, String line) throws JWNLException {
         StringTokenizer st = new StringTokenizer(line);
         String lemma = st.nextToken().replace('_', ' ');
-        List exceptions = new ArrayList();
+        List<String> exceptions = new ArrayList<String>();
         while (st.hasMoreTokens()) {
             exceptions.add(st.nextToken().replace('_', ' '));
         }
-        if (_log.isLevelEnabled(MessageLogLevel.TRACE)) {
-            _log.log(MessageLogLevel.TRACE, "PRINCETON_INFO_001", new Object[]{pos, lemma});
+        if (log.isLevelEnabled(MessageLogLevel.TRACE)) {
+            log.log(MessageLogLevel.TRACE, "PRINCETON_INFO_001", new Object[]{pos, lemma});
         }
-        return new Exc(pos, lemma, exceptions);
+        return new Exc(dictionary, pos, lemma, exceptions);
     }
 
+    public Dictionary getDictionary() {
+        return dictionary;
+    }
 
+    public void setDictionary(Dictionary dictionary) {
+        this.dictionary = dictionary;
+    }
 }

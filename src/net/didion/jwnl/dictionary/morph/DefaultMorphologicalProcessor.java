@@ -21,8 +21,14 @@ import java.util.Map;
  * it processes). This is basically a stemmer that uses WordNet exception files instead
  * of complex stemming rules. It also tries to be intelligent by removing delimiters and
  * doing concatenation.
+ *
+ * @author didion
+ * @author Aliaksandr Autayeu avtaev@gmail.com
  */
 public class DefaultMorphologicalProcessor implements MorphologicalProcessor {
+
+    private Dictionary dictionary;
+
     /**
      * Parameter that determines the size of the base form cache
      */
@@ -34,35 +40,23 @@ public class DefaultMorphologicalProcessor implements MorphologicalProcessor {
 
     private static final int DEFAULT_CACHE_CAPACITY = 1000;
 
-    private Cache _lookupCache;
+    private Cache lookupCache;
 
-    private Operation[] _operations;
+    private Operation[] operations;
 
-    public DefaultMorphologicalProcessor() {
-    }
-
-    public DefaultMorphologicalProcessor(Operation[] operations) {
-        this(operations, DEFAULT_CACHE_CAPACITY);
-    }
-
-    public DefaultMorphologicalProcessor(Operation[] operations, int cacheCapacity) {
-        _lookupCache = new LRUCache(cacheCapacity);
-        _operations = operations;
-    }
-
-    public Object create(Map params) throws JWNLException {
+    public DefaultMorphologicalProcessor(Dictionary dictionary, Map<String, Param> params) throws JWNLException {
+        this.dictionary = dictionary;
         ParamList operationParams = (ParamList) params.get(OPERATIONS);
         if (operationParams == null) {
             throw new JWNLException("DICTIONARY_EXCEPTION_026");
         }
-        List operations = (List) operationParams.create();
-        Operation[] operationArray = (Operation[]) operations.toArray(new Operation[operations.size()]);
+        @SuppressWarnings("unchecked")
+        List<Operation> operations = (List<Operation>) operationParams.create();
+        this.operations = operations.toArray(new Operation[operations.size()]);
 
-        Param param = (Param) params.get(CACHE_CAPACITY);
-        int capacity = (param == null) ?
-                DEFAULT_CACHE_CAPACITY : Integer.parseInt(param.getValue());
-
-        return new DefaultMorphologicalProcessor(operationArray, capacity);
+        Param param = params.get(CACHE_CAPACITY);
+        int capacity = (param == null) ? DEFAULT_CACHE_CAPACITY : Integer.parseInt(param.getValue());
+        lookupCache = new LRUCache(capacity);
     }
 
     /**
@@ -82,18 +76,18 @@ public class DefaultMorphologicalProcessor implements MorphologicalProcessor {
         if (info != null && info.getBaseForms().isCurrentFormAvailable()) {
             // get the last base form we retrieved. if you want
             // the next possible base form, use lookupNextBaseForm
-            return Dictionary.getInstance().getIndexWord(pos, info.getBaseForms().getCurrentForm());
+            return dictionary.getIndexWord(pos, info.getBaseForms().getCurrentForm());
         } else {
             return lookupNextBaseForm(pos, derivation, info);
         }
     }
 
     private void cacheLookupInfo(POSKey key, LookupInfo info) {
-        _lookupCache.put(key, info);
+        lookupCache.put(key, info);
     }
 
     private LookupInfo getCachedLookupInfo(POSKey key) {
-        return (LookupInfo) _lookupCache.get(key);
+        return (LookupInfo) lookupCache.get(key);
     }
 
     /**
@@ -115,7 +109,7 @@ public class DefaultMorphologicalProcessor implements MorphologicalProcessor {
             POSKey key = new POSKey(pos, derivation);
             info = getCachedLookupInfo(key);
             if (info == null) {
-                info = new LookupInfo(pos, derivation, _operations);
+                info = new LookupInfo(pos, derivation, operations);
                 cacheLookupInfo(key, info);
             }
         }
@@ -131,13 +125,13 @@ public class DefaultMorphologicalProcessor implements MorphologicalProcessor {
             }
         }
 
-        return (str == null) ? null : Dictionary.getInstance().getIndexWord(pos, str);
+        return (str == null) ? null : dictionary.getIndexWord(pos, str);
     }
 
     public List lookupAllBaseForms(POS pos, String derivation) throws JWNLException {
         LookupInfo info = getCachedLookupInfo(new POSKey(pos, derivation));
         if (info == null) {
-            info = new LookupInfo(pos, derivation, _operations);
+            info = new LookupInfo(pos, derivation, operations);
             cacheLookupInfo(new POSKey(pos, derivation), info);
         }
         int index = info.getBaseForms().getIndex();
@@ -149,34 +143,38 @@ public class DefaultMorphologicalProcessor implements MorphologicalProcessor {
     }
 
     private class LookupInfo {
-        private POS _pos;
-        private String _derivation;
-        private BaseFormSet _baseForms;
-        private Operation[] _operations;
-        private int _currentOperation;
+        private POS pos;
+        private String derivation;
+        private BaseFormSet baseForms;
+        private Operation[] operations;
+        private int currentOperation;
 
         public LookupInfo(POS pos, String derivation, Operation[] operations) {
-            _pos = pos;
-            _derivation = derivation;
-            _operations = operations;
-            _baseForms = new BaseFormSet();
-            _currentOperation = -1;
+            this.pos = pos;
+            this.derivation = derivation;
+            this.operations = operations;
+            baseForms = new BaseFormSet();
+            currentOperation = -1;
         }
 
         public boolean isNextOperationAvailable() {
-            return _currentOperation + 1 < _operations.length;
+            return currentOperation + 1 < operations.length;
         }
 
         public boolean executeNextOperation() throws JWNLException {
             if (!isNextOperationAvailable()) {
                 throw new JWNLRuntimeException("DICTIONARY_EXCEPTION_027");
             }
-            Operation o = _operations[++_currentOperation];
-            return o.execute(_pos, _derivation, _baseForms);
+            Operation o = operations[++currentOperation];
+            return o.execute(pos, derivation, baseForms);
         }
 
         public BaseFormSet getBaseForms() {
-            return _baseForms;
+            return baseForms;
         }
+    }
+
+    public Dictionary getDictionary() {
+        return dictionary;
     }
 }
