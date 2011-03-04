@@ -8,20 +8,20 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
 /**
- * Tests editing the FileBackedDictionary.
+ * Tests dictionary editing.
  *
  * @author Aliaksandr Autayeu avtaev@gmail.com
  */
-public class TestFileBackedDictionaryCreate {
-
-    protected static final String properties = "./config/clean_properties.xml";
+public abstract class TestCreateDictionary {
 
     private final String entityGloss = "that which is perceived or known or inferred to have its own distinct existence (living or nonliving)";
     private final String entityLemma = "entity";
@@ -50,11 +50,13 @@ public class TestFileBackedDictionaryCreate {
     private Exc e2;
     private Exc e3;
 
+    protected abstract InputStream getProperties() throws FileNotFoundException;
+
     @Before
     public void setUp() throws IOException, JWNLException {
-        dictionary = Dictionary.getInstance(new FileInputStream(properties));
+        dictionary = Dictionary.getInstance(getProperties());
         dictionary.delete();
-        dictionary = Dictionary.getInstance(new FileInputStream(properties));
+        dictionary = Dictionary.getInstance(getProperties());
 
         synEntity = null;
         synsets = null;
@@ -75,7 +77,7 @@ public class TestFileBackedDictionaryCreate {
     public void tearDown() throws IOException, JWNLException {
         dictionary.close();
         //to ensure folder remains clean
-        dictionary = Dictionary.getInstance(new FileInputStream(properties));
+        dictionary = Dictionary.getInstance(getProperties());
         dictionary.delete();
     }
 
@@ -123,7 +125,7 @@ public class TestFileBackedDictionaryCreate {
         dictionary.save();
         dictionary.close();
 
-        dictionary = Dictionary.getInstance(new FileInputStream(properties));
+        dictionary = Dictionary.getInstance(getProperties());
 
         testThreeExceptions(dictionary);
     }
@@ -172,7 +174,7 @@ public class TestFileBackedDictionaryCreate {
         dictionary.save();
         dictionary.close();
 
-        dictionary = Dictionary.getInstance(new FileInputStream(properties));
+        dictionary = Dictionary.getInstance(getProperties());
         testTwoExceptions(dictionary);
         e3 = dictionary.getException(POS.NOUN, exception3[0]);
         Assert.assertNull(e3);
@@ -472,7 +474,7 @@ public class TestFileBackedDictionaryCreate {
 
         dictionary.save();
 
-        dictionary = Dictionary.getInstance(new FileInputStream(properties));
+        dictionary = Dictionary.getInstance(getProperties());
 
         testIWEntity(dictionary);
         testIWPEntity(dictionary);

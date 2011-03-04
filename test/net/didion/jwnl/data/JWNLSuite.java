@@ -18,7 +18,8 @@ import org.junit.runners.Suite;
         TestFileBackedDictionary.class,
 //        TestMapBackedDictionary.class,
 //        TestDatabaseBackedDictionary.class,
-        TestFileBackedDictionaryCreate.class,
+        TestCreateFileBackedDictionary.class,
+        TestCreateMapBackedDictionary.class,
         TestFileBackedDictionaryEdit.class
 })
 public class JWNLSuite {
@@ -33,7 +34,8 @@ public class JWNLSuite {
                 TestFileBackedDictionary.class,
 //                TestMapBackedDictionary.class,
 //                TestDatabaseBackedDictionary.class,
-                TestFileBackedDictionaryCreate.class,
+                TestCreateFileBackedDictionary.class,
+                TestCreateMapBackedDictionary.class,
                 TestFileBackedDictionaryEdit.class
         };
         String[] names = new String[classes.length];
