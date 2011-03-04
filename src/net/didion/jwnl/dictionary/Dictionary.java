@@ -428,6 +428,50 @@ public abstract class Dictionary {
     }
 
     /**
+     * Adds dictionary element to the dictionary.
+     *
+     * @param element element to add
+     * @throws JWNLException JWNLException
+     */
+    public void addElement(DictionaryElement element) throws JWNLException {
+        if (!isEditable()) {
+            throw new JWNLException("DICTIONARY_EXCEPTION_029");
+        }
+        if (this != element.getDictionary()) {
+            throw new JWNLException("DICTIONARY_EXCEPTION_040");
+        }
+        if (element instanceof Exc) {
+            addException((Exc) element);
+        } else if (element instanceof IndexWord) {
+            addIndexWord((IndexWord) element);
+        } else if (element instanceof Synset) {
+            addSynset((Synset) element);
+        }
+    }
+
+    /**
+     * Removes the dictionary <var>element</var> from the dictionary.
+     *
+     * @param element element to be removed
+     * @throws JWNLException JWNLException
+     */
+    public void removeElement(DictionaryElement element) throws JWNLException {
+        if (!isEditable()) {
+            throw new JWNLException("DICTIONARY_EXCEPTION_029");
+        }
+        if (this != element.getDictionary()) {
+            throw new JWNLException("DICTIONARY_EXCEPTION_040");
+        }
+        if (element instanceof Exc) {
+            removeException((Exc) element);
+        } else if (element instanceof IndexWord) {
+            removeIndexWord((IndexWord) element);
+        } else if (element instanceof Synset) {
+            removeSynset((Synset) element);
+        }
+    }
+
+    /**
      * Creates an exception in the dictionary.
      *
      * @param pos        exception part of speech
@@ -456,6 +500,7 @@ public abstract class Dictionary {
         if (this != exc.getDictionary()) {
             throw new JWNLException("DICTIONARY_EXCEPTION_040");
         }
+        exc.setDictionary(this);
     }
 
     /**
@@ -501,6 +546,7 @@ public abstract class Dictionary {
         if (this != synset.getDictionary()) {
             throw new JWNLException("DICTIONARY_EXCEPTION_040");
         }
+        synset.setDictionary(this);
     }
 
     /**
@@ -513,9 +559,11 @@ public abstract class Dictionary {
         if (!isEditable()) {
             throw new JWNLException("DICTIONARY_EXCEPTION_029");
         }
+        synset.setDictionary(null);
 
         //take care of indexwords
-        for (Word word : synset.getWords()) {
+        List<Word> copy = new ArrayList<Word>(synset.getWords());
+        for (Word word : copy) {
             IndexWord indexWord = getIndexWord(synset.getPOS(), word.getLemma());
             if (null != indexWord) {
                 indexWord.getSenses().remove(synset);
@@ -526,7 +574,6 @@ public abstract class Dictionary {
         //this will delete symmetric ones
         synset.getPointers().clear();
         //asymmetric ones will be checked by the synset on gets
-        synset.setDictionary(null);
     }
 
     /**
@@ -558,6 +605,7 @@ public abstract class Dictionary {
         if (this != indexWord.getDictionary()) {
             throw new JWNLException("DICTIONARY_EXCEPTION_040");
         }
+        indexWord.setDictionary(this);
     }
 
     /**
@@ -570,17 +618,19 @@ public abstract class Dictionary {
             throw new JWNLException("DICTIONARY_EXCEPTION_029");
         }
 
+        indexWord.setDictionary(null);
+
         //take care of words in synsets
-        for (Synset synset : indexWord.getSenses()) {
-            for (Word word : synset.getWords()) {
+        List<Synset> copy = new ArrayList<Synset>(indexWord.getSenses());
+        for (Synset synset : copy) {
+            List<Word> wordsCopy = new ArrayList<Word>(synset.getWords());
+            for (Word word : wordsCopy) {
                 if (word.getLemma().equalsIgnoreCase(indexWord.getLemma())) {
                     synset.getWords().remove(word);
                     break;
                 }
             }
         }
-
-        indexWord.setDictionary(null);
     }
 
     /**

@@ -12,7 +12,7 @@ import java.io.Serializable;
  */
 public class Resolvable implements Serializable {
 
-    private static final long serialVersionUID = 4753740475813500883L;
+    private static final long serialVersionUID = 1L;
 
     private String unresolved = null;
     private transient String resolved = null;

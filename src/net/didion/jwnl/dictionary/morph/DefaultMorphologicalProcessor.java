@@ -76,7 +76,7 @@ public class DefaultMorphologicalProcessor implements MorphologicalProcessor {
         if (info != null && info.getBaseForms().isCurrentFormAvailable()) {
             // get the last base form we retrieved. if you want
             // the next possible base form, use lookupNextBaseForm
-            return dictionary.getIndexWord(pos, info.getBaseForms().getCurrentForm());
+            return null == dictionary ? null : dictionary.getIndexWord(pos, info.getBaseForms().getCurrentForm());
         } else {
             return lookupNextBaseForm(pos, derivation, info);
         }
@@ -125,7 +125,7 @@ public class DefaultMorphologicalProcessor implements MorphologicalProcessor {
             }
         }
 
-        return (str == null) ? null : dictionary.getIndexWord(pos, str);
+        return (str == null) ? null : (null == dictionary ? null : dictionary.getIndexWord(pos, str));
     }
 
     public List lookupAllBaseForms(POS pos, String derivation) throws JWNLException {

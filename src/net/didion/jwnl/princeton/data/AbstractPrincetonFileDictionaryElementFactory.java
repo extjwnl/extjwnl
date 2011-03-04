@@ -30,8 +30,7 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory implements F
 
     public IndexWord createIndexWord(POS pos, String line) throws JWNLException {
         TokenizerParser tokenizer = new TokenizerParser(line, " ");
-        //String lemma = tokenizer.nextToken().replace('_', ' ');
-        String lemma = tokenizer.nextToken();//keep lemmas with underscores everywhere
+        String lemma = tokenizer.nextToken().replace('_', ' ');
         tokenizer.nextToken(); // pos
         tokenizer.nextToken();    // poly_cnt
         int pointerCount = tokenizer.nextInt();
@@ -70,7 +69,7 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory implements F
         int wordCount = tokenizer.nextHexInt();
         ArrayList<Word> words = new ArrayList<Word>(wordCount);
         for (int i = 0; i < wordCount; i++) {
-            String lemma = tokenizer.nextToken();
+            String lemma = tokenizer.nextToken().replace('_', ' ');
 
             int lexId = tokenizer.nextHexInt(); // lex id
 

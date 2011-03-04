@@ -26,7 +26,9 @@ public class TestFileBackedDictionaryCreate {
     private final String entityGloss = "that which is perceived or known or inferred to have its own distinct existence (living or nonliving)";
     private final String entityLemma = "entity";
     private final String physical_entityGloss = "an entity that has physical existence";
-    private final String physical_entityLemma = "physìcal_entìty";//ì to test encoding
+    private final String physical_entityLemma = "physìcal entìty";//ì to test encoding
+    private final String abstractionGloss = "a general concept formed by extracting common features from specific examples";
+    private final String[] abstractionWords = {"abstraction", "abstract entity"};
 
     private final String[] exception1 = {"alto-relievos", "alto-relievo", "alto-rilievo"};
     private final String[] exception2 = {"aìdes-de-camp", "aìde-de-camp"};//ì to test encoding
@@ -42,6 +44,8 @@ public class TestFileBackedDictionaryCreate {
     private Iterator<IndexWord> ii;
     private Synset synPEntity;
     private IndexWord iwPEntity;
+    private Synset synAbstraction;
+    private IndexWord[] iwAbstraction;
     private Exc e1;
     private Exc e2;
     private Exc e3;
@@ -63,6 +67,8 @@ public class TestFileBackedDictionaryCreate {
         e1 = null;
         e2 = null;
         e3 = null;
+        synAbstraction = null;
+        iwAbstraction = null;
     }
 
     @After
@@ -100,11 +106,11 @@ public class TestFileBackedDictionaryCreate {
     }
 
     @Test
-    public void TestExceptions() throws JWNLException {
+    public void TestExceptionsCreate() throws JWNLException {
         dictionary.edit();
 
         createExceptions(dictionary);
-        testExceptions(dictionary);
+        testThreeExceptions(dictionary);
     }
 
     @Test
@@ -112,19 +118,66 @@ public class TestFileBackedDictionaryCreate {
         dictionary.edit();
 
         createExceptions(dictionary);
-        testExceptions(dictionary);
+        testThreeExceptions(dictionary);
 
         dictionary.save();
         dictionary.close();
 
         dictionary = Dictionary.getInstance(new FileInputStream(properties));
 
-        e1 = dictionary.getException(POS.NOUN, exception1[0]);
-        e2 = dictionary.getException(POS.NOUN, exception1[0]);
-        e3 = dictionary.getException(POS.NOUN, exception1[0]);
-
-        testExceptions(dictionary);
+        testThreeExceptions(dictionary);
     }
+
+    @Test
+    public void TestExceptionsSetNull() throws JWNLException {
+        dictionary.edit();
+
+        createExceptions(dictionary);
+        testThreeExceptions(dictionary);
+
+        e3.setDictionary(null);
+
+        Assert.assertNull(e3.getDictionary());
+        testTwoExceptions(dictionary);
+    }
+
+    @Test
+    public void TestExceptionsRemove() throws JWNLException {
+        dictionary.edit();
+
+        createExceptions(dictionary);
+        testThreeExceptions(dictionary);
+
+        dictionary.removeException(e3);
+
+        Assert.assertNull(e3.getDictionary());
+        testTwoExceptions(dictionary);
+        e3 = dictionary.getException(POS.NOUN, exception3[0]);
+        Assert.assertNull(e3);
+    }
+
+    @Test
+    public void TestExceptionsRemoveRecreate() throws JWNLException, IOException {
+        dictionary.edit();
+
+        createExceptions(dictionary);
+        testThreeExceptions(dictionary);
+
+        dictionary.removeException(e3);
+        Assert.assertNull(e3.getDictionary());
+        testTwoExceptions(dictionary);
+        e3 = dictionary.getException(POS.NOUN, exception3[0]);
+        Assert.assertNull(e3);
+
+        dictionary.save();
+        dictionary.close();
+
+        dictionary = Dictionary.getInstance(new FileInputStream(properties));
+        testTwoExceptions(dictionary);
+        e3 = dictionary.getException(POS.NOUN, exception3[0]);
+        Assert.assertNull(e3);
+    }
+
 
     private void createExceptions(Dictionary dictionary) throws JWNLException {
         e1 = dictionary.createException(POS.NOUN, exception1[0], Arrays.asList(exception1[1], exception1[2]));
@@ -132,7 +185,11 @@ public class TestFileBackedDictionaryCreate {
         e3 = dictionary.createException(POS.NOUN, exception3[0], Arrays.asList(exception3[1]));
     }
 
-    private void testExceptions(Dictionary dictionary) throws JWNLException {
+    private void testThreeExceptions(Dictionary dictionary) throws JWNLException {
+        e1 = dictionary.getException(POS.NOUN, exception1[0]);
+        e2 = dictionary.getException(POS.NOUN, exception2[0]);
+        e3 = dictionary.getException(POS.NOUN, exception3[0]);
+
         Assert.assertNotNull(e1);
         Assert.assertEquals(exception1[0], e1.getLemma());
         Assert.assertEquals(2, e1.getExceptions().size());
@@ -152,6 +209,26 @@ public class TestFileBackedDictionaryCreate {
         Assert.assertTrue(exceptions.contains(e3));
     }
 
+    private void testTwoExceptions(Dictionary dictionary) throws JWNLException {
+        e1 = dictionary.getException(POS.NOUN, exception1[0]);
+        e2 = dictionary.getException(POS.NOUN, exception2[0]);
+
+        Assert.assertNotNull(e1);
+        Assert.assertEquals(exception1[0], e1.getLemma());
+        Assert.assertEquals(2, e1.getExceptions().size());
+        Assert.assertEquals(exception1[1], e1.getExceptions().get(0));
+        Assert.assertEquals(exception1[2], e1.getExceptions().get(1));
+        Assert.assertNotNull(e2);
+
+        List<Exc> exceptions = new ArrayList<Exc>(2);
+        Iterator<Exc> ei = dictionary.getExceptionIterator(POS.NOUN);
+        while (ei.hasNext()) {
+            exceptions.add(ei.next());
+        }
+        Assert.assertEquals(2, exceptions.size());
+        Assert.assertTrue(exceptions.contains(e1));
+        Assert.assertTrue(exceptions.contains(e2));
+    }
     @Test
     public void TestCreateEntitySynset() throws JWNLException {
         dictionary.edit();
@@ -213,6 +290,26 @@ public class TestFileBackedDictionaryCreate {
         Assert.assertTrue(indexWords.contains(iwEntity));
     }
 
+    private void createAndTestAbstractWords(Dictionary dictionary) throws JWNLException {
+        for (int i = 0; i < abstractionWords.length; i++) {
+            synAbstraction.getWords().add(new Word(dictionary, synAbstraction, i+1, abstractionWords[i]));
+        }
+        Assert.assertEquals(2, synAbstraction.getWords().size());
+
+        iwAbstraction = new IndexWord[2];
+        for (int i = 0; i < abstractionWords.length; i++) {
+            iwAbstraction[i] = dictionary.getIndexWord(POS.NOUN, abstractionWords[i]);
+            Assert.assertNotNull(iwAbstraction[i]);
+            Assert.assertEquals(1, iwAbstraction[i].getSenses().size());
+            Assert.assertEquals(synAbstraction, iwAbstraction[i].getSenses().get(0));
+            Assert.assertEquals(abstractionWords[i], iwAbstraction[i].getLemma());
+            Assert.assertEquals(POS.NOUN, iwAbstraction[i].getPOS());
+            Assert.assertNotNull(iwAbstraction[i].getSynsetOffsets());
+            Assert.assertEquals(1, iwAbstraction[i].getSynsetOffsets().length);
+            Assert.assertEquals(synAbstraction.getOffset(), iwAbstraction[i].getSynsetOffsets()[0]);
+        }
+    }
+
     @Test
     public void TestCreatePEntitySynset() throws JWNLException {
         dictionary.edit();
@@ -223,6 +320,14 @@ public class TestFileBackedDictionaryCreate {
         synPEntity = dictionary.createSynset(POS.NOUN);
         Assert.assertNotNull(synPEntity);
         synPEntity.setGloss(physical_entityGloss);
+    }
+
+    private void createAndTestAbstractSynset(Dictionary dictionary) throws JWNLException {
+        synAbstraction = dictionary.createSynset(POS.NOUN);
+        Assert.assertNotNull(synAbstraction);
+        synAbstraction.setGloss(abstractionGloss);
+        synAbstraction.getPointers().add(new Pointer(PointerType.HYPERNYM, synAbstraction, synEntity));
+        Assert.assertEquals(2, synEntity.getPointers().size());
     }
 
     @Test
@@ -287,6 +392,55 @@ public class TestFileBackedDictionaryCreate {
 
         createAndTestPEntityPointer(dictionary);
         testIterators(dictionary);
+    }
+
+    @Test
+    public void TestIndexWordRemove() throws IOException, JWNLException {
+        dictionary.edit();
+
+        createAndTestEntitySynset(dictionary);
+        createAndTestEntityWord(dictionary);
+
+        createAndTestPEntitySynset(dictionary);
+        createAndTestPEntityWord(dictionary);
+
+        createAndTestPEntityPointer(dictionary);
+        testIterators(dictionary);
+
+        createAndTestAbstractSynset(dictionary);
+        createAndTestAbstractWords(dictionary);
+
+        dictionary.removeIndexWord(iwAbstraction[1]);
+        iwAbstraction[1] = dictionary.getIndexWord(POS.NOUN, abstractionWords[1]);
+        Assert.assertNull(iwAbstraction[1]);
+        Assert.assertEquals(1, synAbstraction.getWords().size());
+    }
+
+    @Test
+    public void TestSynsetRemove() throws IOException, JWNLException {
+        dictionary.edit();
+
+        createAndTestEntitySynset(dictionary);
+        createAndTestEntityWord(dictionary);
+
+        createAndTestPEntitySynset(dictionary);
+        createAndTestPEntityWord(dictionary);
+
+        createAndTestPEntityPointer(dictionary);
+        testIterators(dictionary);
+
+        createAndTestAbstractSynset(dictionary);
+        createAndTestAbstractWords(dictionary);
+
+        dictionary.removeSynset(synAbstraction);
+        testIterators(dictionary);
+        Assert.assertEquals(1, synEntity.getPointers().size());
+        iwAbstraction = new IndexWord[2];
+        for (int i = 0; i < abstractionWords.length; i++) {
+            iwAbstraction[i] = dictionary.getIndexWord(POS.NOUN, abstractionWords[i]);
+            Assert.assertNull(iwAbstraction[i]);
+        }
+        testIndexWordIterator(dictionary);
     }
 
     @Test
@@ -356,6 +510,10 @@ public class TestFileBackedDictionaryCreate {
         Assert.assertTrue(synsets.contains(synEntity));
         Assert.assertTrue(synsets.contains(synPEntity));
 
+        testIndexWordIterator(dictionary);
+    }
+
+    private void testIndexWordIterator(Dictionary dictionary) throws JWNLException {
         indexWords = new ArrayList<IndexWord>();
         ii = dictionary.getIndexWordIterator(POS.NOUN);
         while (ii.hasNext()) {
@@ -364,6 +522,5 @@ public class TestFileBackedDictionaryCreate {
         Assert.assertEquals(2, indexWords.size());
         Assert.assertTrue(indexWords.contains(iwEntity));
         Assert.assertTrue(indexWords.contains(iwPEntity));
-
     }
 }

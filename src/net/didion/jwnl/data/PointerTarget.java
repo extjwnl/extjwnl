@@ -1,5 +1,6 @@
 package net.didion.jwnl.data;
 
+import net.didion.jwnl.JWNLException;
 import net.didion.jwnl.dictionary.Dictionary;
 import net.didion.jwnl.util.factory.Owned;
 
@@ -17,7 +18,7 @@ import java.util.List;
  */
 public abstract class PointerTarget implements Serializable, Owned {
 
-    private static final long serialVersionUID = 3230195199146939027L;
+    private static final long serialVersionUID = 1L;
 
     protected transient Dictionary dictionary;
 
@@ -99,7 +100,7 @@ public abstract class PointerTarget implements Serializable, Owned {
         return dictionary;
     }
 
-    public void setDictionary(Dictionary dictionary) {
+    public void setDictionary(Dictionary dictionary) throws JWNLException {
         this.dictionary = dictionary;
     }
 }

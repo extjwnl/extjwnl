@@ -14,7 +14,7 @@ import java.util.BitSet;
  */
 public class VerbFrame implements Serializable {
 
-    private static final long serialVersionUID = 1450633678809744261L;
+    private static final long serialVersionUID = 1L;
 
     private static VerbFrame[] verbFrames;
     private static boolean initialized = false;

@@ -6,8 +6,6 @@ import net.didion.jwnl.dictionary.file.DictionaryFileType;
 import net.didion.jwnl.dictionary.file.RandomAccessDictionaryFile;
 import net.didion.jwnl.util.factory.Param;
 
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
 import java.util.Map;
 
 /**

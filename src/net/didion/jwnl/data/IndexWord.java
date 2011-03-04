@@ -18,7 +18,7 @@ import java.util.*;
  */
 public class IndexWord extends BaseDictionaryElement {
 
-    private static final long serialVersionUID = -2136983562978852711L;
+    private static final long serialVersionUID = 1L;
 
     private static final MessageLog log = new MessageLog(IndexWord.class);
 
@@ -113,11 +113,11 @@ public class IndexWord extends BaseDictionaryElement {
                 throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_040"));
             }
             loadAllSynsets();
-            if (dictionary.isEditable()) {
+            if (null != dictionary && dictionary.isEditable()) {
                 if (!super.contains(synset)) {
                     Synset result = super.set(index, synset);
                     if (null != result) {
-                        removeWord(result, lemma);
+                        removeWordsFromSynset(result, lemma);
                     }
                     addWord(synset, lemma);
                     return result;
@@ -138,7 +138,7 @@ public class IndexWord extends BaseDictionaryElement {
                 throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_040"));
             }
             loadAllSynsets();
-            if (dictionary.isEditable()) {
+            if (null != dictionary && dictionary.isEditable()) {
                 if (!super.contains(synset)) {
                     boolean result = super.add(synset);
                     addWord(synset, lemma);
@@ -160,7 +160,7 @@ public class IndexWord extends BaseDictionaryElement {
                 throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_040"));
             }
             loadAllSynsets();
-            if (dictionary.isEditable()) {
+            if (null != dictionary && dictionary.isEditable()) {
                 if (!super.contains(synset)) {
                     super.add(index, synset);
                     addWord(synset, lemma);
@@ -173,10 +173,10 @@ public class IndexWord extends BaseDictionaryElement {
         @Override
         public Synset remove(int index) {
             loadAllSynsets();
-            if (dictionary.isEditable()) {
+            if (null != dictionary && dictionary.isEditable()) {
                 Synset result = super.remove(index);
                 if (null != result) {
-                    removeWord(result, lemma);
+                    removeWordsFromSynset(result, lemma);
                 }
                 if (0 == super.size()) {
                     try {
@@ -194,10 +194,10 @@ public class IndexWord extends BaseDictionaryElement {
         @Override
         public boolean remove(Object o) {
             loadAllSynsets();
-            if (dictionary.isEditable()) {
+            if (null != dictionary && dictionary.isEditable()) {
                 boolean result = super.remove(o);
                 if (o instanceof Synset) {
-                    removeWord((Synset) o, lemma);
+                    removeWordsFromSynset((Synset) o, lemma);
                 }
                 if (0 == size()) {
                     try {
@@ -215,12 +215,12 @@ public class IndexWord extends BaseDictionaryElement {
         @Override
         public void clear() {
             loadAllSynsets();
-            if (dictionary.isEditable()) {
+            if (null != dictionary && dictionary.isEditable()) {
                 List<Synset> copy = new ArrayList<Synset>(this);
                 super.clear();
                 for (Synset synset : copy) {
                     if (null != synset) {
-                        removeWord(synset, lemma);
+                        removeWordsFromSynset(synset, lemma);
                     }
                 }
             } else {
@@ -231,7 +231,7 @@ public class IndexWord extends BaseDictionaryElement {
         @Override
         public boolean addAll(Collection<? extends Synset> c) {
             loadAllSynsets();
-            if (dictionary.isEditable()) {
+            if (null != dictionary && dictionary.isEditable()) {
                 boolean result = false;
                 for (Synset synset : c) {
                     if (add(synset)) {
@@ -247,7 +247,7 @@ public class IndexWord extends BaseDictionaryElement {
         @Override
         public boolean addAll(int index, Collection<? extends Synset> c) {
             loadAllSynsets();
-            if (dictionary.isEditable()) {
+            if (null != dictionary && dictionary.isEditable()) {
                 boolean result = !super.containsAll(c);
                 for (Synset synset : c) {
                     add(index, synset);
@@ -262,11 +262,11 @@ public class IndexWord extends BaseDictionaryElement {
         @Override
         protected void removeRange(int fromIndex, int toIndex) {
             loadAllSynsets();
-            if (dictionary.isEditable()) {
+            if (null != dictionary && dictionary.isEditable()) {
                 List<Synset> copy = new ArrayList<Synset>(subList(fromIndex, toIndex));
                 super.removeRange(fromIndex, toIndex);
                 for (Synset synset : copy) {
-                    removeWord(synset, lemma);
+                    removeWordsFromSynset(synset, lemma);
                 }
             } else {
                 super.removeRange(fromIndex, toIndex);
@@ -306,14 +306,14 @@ public class IndexWord extends BaseDictionaryElement {
         @Override
         public boolean removeAll(Collection<?> c) {
             loadAllSynsets();
-            if (dictionary.isEditable()) {
+            if (null != dictionary && dictionary.isEditable()) {
                 List<Synset> copy = new ArrayList<Synset>(this);
                 boolean result = super.removeAll(c);
                 for (Object object : c) {
                     if (object instanceof Synset) {
                         Synset synset = (Synset) object;
                         if (copy.contains(synset)) {
-                            removeWord(synset, lemma);
+                            removeWordsFromSynset(synset, lemma);
                         }
                     }
                 }
@@ -334,12 +334,12 @@ public class IndexWord extends BaseDictionaryElement {
         @Override
         public boolean retainAll(Collection<?> c) {
             loadAllSynsets();
-            if (dictionary.isEditable()) {
+            if (null != dictionary && dictionary.isEditable()) {
                 List<Synset> copy = new ArrayList<Synset>(this);
                 boolean result = super.retainAll(c);
                 for (Synset synset : copy) {
                     if (!c.contains(synset)) {
-                        removeWord(synset, lemma);
+                        removeWordsFromSynset(synset, lemma);
                     }
                 }
 
@@ -357,16 +357,17 @@ public class IndexWord extends BaseDictionaryElement {
         }
 
         private void addWord(Synset synset, String lemma) {
-            if (dictionary.isEditable()) {
+            if (null != dictionary && dictionary.isEditable()) {
                 if (!synset.containsWord(lemma)) {
                     synset.getWords().add(new Word(IndexWord.this.dictionary, synset, synset.getWords().size() + 1, lemma));
                 }
             }
         }
 
-        private void removeWord(Synset synset, String lemma) {
-            if (dictionary.isEditable()) {
-                for (Word word : synset.getWords()) {
+        private void removeWordsFromSynset(Synset synset, String lemma) {
+            if (null != dictionary && dictionary.isEditable()) {
+                List<Word> copy = new ArrayList<Word>(synset.getWords());
+                for (Word word : copy) {
                     if (word.getLemma().equalsIgnoreCase(lemma)) {
                         synset.getWords().remove(word);
                         break;
@@ -386,7 +387,7 @@ public class IndexWord extends BaseDictionaryElement {
 
         private Synset loadSynset(long offset) {
             try {
-                return dictionary.getSynsetAt(pos, offset);
+                return null == dictionary ? null : dictionary.getSynsetAt(pos, offset);
             } catch (JWNLException e) {
                 log.log(MessageLogLevel.ERROR, "EXCEPTION_001", e.getMessage(), e);
             }
@@ -402,7 +403,7 @@ public class IndexWord extends BaseDictionaryElement {
         if (null == pos) {
             throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_041"));
         }
-        this.lemma = lemma.toLowerCase().replaceAll(" ", "_");
+        this.lemma = lemma.toLowerCase();
         this.pos = pos;
         if (null != dictionary && dictionary.isEditable()) {
             dictionary.addIndexWord(this);
@@ -466,9 +467,6 @@ public class IndexWord extends BaseDictionaryElement {
         return JWNL.resolveMessage("DATA_TOSTRING_002", new Object[]{getLemma(), getPOS()});
     }
 
-    // Accessors	//
-
-
     /**
      * Return the word's <it>lemma</it>.  Its lemma is its orthographic representation, for
      * example <code>"dog"</code> or <code>"get up"</code>.
@@ -480,7 +478,7 @@ public class IndexWord extends BaseDictionaryElement {
     }
 
     public long[] getSynsetOffsets() {
-        if (dictionary.isEditable() && null == synsetOffsets) {
+        if (null != dictionary && dictionary.isEditable() && null == synsetOffsets) {
             long[] result = new long[synsets.size()];
             for (int i = 0; i < synsets.size(); i++) {
                 result[i] = synsets.get(i).getOffset();

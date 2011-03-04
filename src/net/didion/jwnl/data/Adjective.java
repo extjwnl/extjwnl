@@ -19,7 +19,7 @@ import java.util.Map;
  */
 public class Adjective extends Word {
 
-    private static final long serialVersionUID = 937870634100403173L;
+    private static final long serialVersionUID = 1L;
 
     private static final String NONE_KEY = "none";
     private static final String AP_PREDICATIVE_KEY = "p";

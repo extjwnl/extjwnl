@@ -1,5 +1,6 @@
 package net.didion.jwnl.util.factory;
 
+import net.didion.jwnl.JWNLException;
 import net.didion.jwnl.dictionary.Dictionary;
 
 /**
@@ -21,5 +22,5 @@ public interface Owned {
      *
      * @param dictionary the dictionary this object belongs to
      */
-    void setDictionary(Dictionary dictionary);
+    void setDictionary(Dictionary dictionary) throws JWNLException;
 }

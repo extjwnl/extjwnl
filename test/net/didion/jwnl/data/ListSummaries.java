@@ -1,6 +1,5 @@
 package net.didion.jwnl.data;
 
-import net.didion.jwnl.JWNL;
 import net.didion.jwnl.JWNLException;
 import net.didion.jwnl.dictionary.Dictionary;
 
@@ -27,7 +26,7 @@ public class ListSummaries {
                 for (Synset ss : iw.getSenses()) {
                     String summary = "VOID";
                     for (Word w : ss.getWords()) {
-                        if (lemma.equals(w.getLemma().toLowerCase().replaceAll("_", " "))) {
+                        if (lemma.equals(w.getLemma().toLowerCase())) {
                             summary = w.getSummary();
                             break;
                         }

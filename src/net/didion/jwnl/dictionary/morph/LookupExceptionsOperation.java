@@ -21,7 +21,7 @@ public class LookupExceptionsOperation extends AbstractOperation {
     }
 
     public boolean execute(POS pos, String derivation, BaseFormSet form) throws JWNLException {
-        Exc exc = dictionary.getException(pos, derivation);
+        Exc exc = null == dictionary ? null : dictionary.getException(pos, derivation);
         if (null != exc) {
             for (String exception : exc.getExceptions()) {
                 form.add(exception);

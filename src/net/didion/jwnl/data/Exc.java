@@ -23,7 +23,7 @@ import java.util.List;
  */
 public class Exc extends BaseDictionaryElement {
 
-    private static final long serialVersionUID = -5792651340274489351L;
+    private static final long serialVersionUID = 1L;
 
     private POS pos;
 

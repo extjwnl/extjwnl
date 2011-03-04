@@ -18,7 +18,7 @@ import java.util.List;
  */
 public class POS implements Serializable {
 
-    private static final long serialVersionUID = 4311120391558046411L;
+    private static final long serialVersionUID = 1L;
 
     private static final String NOUN_KEY = "n";
     private static final String VERB_KEY = "v";

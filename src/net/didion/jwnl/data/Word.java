@@ -17,7 +17,7 @@ import java.util.*;
  */
 public class Word extends PointerTarget {
 
-    private static final long serialVersionUID = 8591237840924027711L;
+    private static final long serialVersionUID = 1L;
 
     /**
      * The Synset to which this word belongs.
@@ -87,7 +87,7 @@ public class Word extends PointerTarget {
         if (null == lemma || "".equals(lemma)) {
             throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_046"));
         }
-        this.lemma = lemma.replaceAll(" ", "_");
+        this.lemma = lemma;
     }
 
     /**
@@ -192,7 +192,7 @@ public class Word extends PointerTarget {
      * @throws JWNLException JWNLException
      */
     public String getSummary() throws JWNLException {
-        if (null == summary) {
+        if (null == summary && null != dictionary) {
             //across all POS
             //IndexWordSet iws = Dictionary.getInstance().lookupAllIndexWords(getLemma());
             //across current POS
@@ -369,7 +369,7 @@ public class Word extends PointerTarget {
         ArrayList<String> result = new ArrayList<String>();
 
         for (Word w : s.getWords()) {
-            result.add(w.getLemma().replaceAll("_", " "));
+            result.add(w.getLemma());
         }
 
         return result;

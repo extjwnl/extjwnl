@@ -19,7 +19,7 @@ import java.util.*;
  */
 public class PointerType implements Serializable {
 
-    private static final long serialVersionUID = 220886251671304251L;
+    private static final long serialVersionUID = 1L;
 
     // Flags for tagging a pointer type with the POS types it apples to.
     private static final int N = 1;

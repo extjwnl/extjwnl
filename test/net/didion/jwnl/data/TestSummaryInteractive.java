@@ -41,7 +41,7 @@ public class TestSummaryInteractive {
                     for (Synset ss : iw.getSenses()) {
                         String summary = "VOID";
                         for (Word w : ss.getWords()) {
-                            if (queryString.equals(w.getLemma().toLowerCase().replaceAll("_", " "))) {
+                            if (queryString.equals(w.getLemma().toLowerCase())) {
                                 summary = w.getSummary();
                                 break;
                             }

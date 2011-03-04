@@ -251,8 +251,8 @@ public abstract class AbstractCachingDictionary extends Dictionary {
 
     @Override
     public void removeSynset(Synset synset) throws JWNLException {
-        super.removeSynset(synset);
         clearSynset(new POSKey(synset.getPOS(), synset.getOffset()));
+        super.removeSynset(synset);
     }
 
     @Override
@@ -263,8 +263,8 @@ public abstract class AbstractCachingDictionary extends Dictionary {
 
     @Override
     public void removeException(Exc exc) throws JWNLException {
-        super.removeException(exc);
         clearException(new POSKey(exc.getPOS(), exc.getLemma()));
+        super.removeException(exc);
     }
 
     @Override
@@ -275,8 +275,8 @@ public abstract class AbstractCachingDictionary extends Dictionary {
 
     @Override
     public void removeIndexWord(IndexWord indexWord) throws JWNLException {
-        super.removeIndexWord(indexWord);
         clearIndexWord(new POSKey(indexWord.getPOS(), indexWord.getLemma()));
+        super.removeIndexWord(indexWord);
     }
 
     private synchronized long createNewOffset(POS pos) {

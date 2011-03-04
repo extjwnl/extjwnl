@@ -317,7 +317,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
         for (Word w : synset.getWords()) {
             //ASCII form of a word as entered in the synset by the lexicographer, with spaces replaced by underscore characters (_ ). The text of the word is case sensitive.
             //lex_id One digit hexadecimal integer that, when appended onto lemma , uniquely identifies a sense within a lexicographer file.
-            result.append(String.format("%s %x ", w.getLemma(), w.getLexId()));
+            result.append(String.format("%s %x ", w.getLemma().replace(' ', '_'), w.getLexId()));
         }
         //Three digit decimal integer indicating the number of pointers from this synset to other synsets. If p_cnt is 000 the synset has no pointers.
         result.append(String.format("%03d ", synset.getPointers().size()));
@@ -379,7 +379,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
 
     private String renderIndexWord(IndexWord indexWord) throws JWNLException {
         //lemma  pos  synset_cnt  p_cnt  [ptr_symbol...]  sense_cnt  tagsense_cnt   synset_offset  [synset_offset...]
-        StringBuilder result = new StringBuilder(indexWord.getLemma());
+        StringBuilder result = new StringBuilder(indexWord.getLemma().replace(' ', '_'));
         result.append(" ");
         result.append(indexWord.getPOS().getKey()).append(" ");//pos
         result.append(Integer.toString(indexWord.getSenses().size())).append(" ");//synset_cnt
@@ -408,7 +408,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
         StringBuilder result = new StringBuilder();
         result.append(exc.getLemma());
         for (String e : exc.getExceptions()) {
-            result.append(" ").append(e);
+            result.append(" ").append(e.replace(' ', '_'));
         }
         return result.toString();
     }

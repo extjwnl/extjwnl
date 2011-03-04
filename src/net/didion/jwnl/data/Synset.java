@@ -8,8 +8,10 @@ import net.didion.jwnl.dictionary.POSKey;
 import net.didion.jwnl.util.MessageLog;
 import net.didion.jwnl.util.MessageLogLevel;
 
+import java.awt.*;
 import java.io.IOException;
 import java.util.*;
+import java.util.List;
 
 /**
  * A <code>Synset</code>, or <b>syn</b>onym <b>set</b>, represents a
@@ -28,7 +30,7 @@ import java.util.*;
  */
 public class Synset extends PointerTarget implements DictionaryElement {
 
-    private static final long serialVersionUID = 4038955719653496521L;
+    private static final long serialVersionUID = 1L;
 
     private static final MessageLog log = new MessageLog(Synset.class);
 
@@ -65,8 +67,12 @@ public class Synset extends PointerTarget implements DictionaryElement {
     private static final BitSet EMPTY_BIT_SET = new BitSet();
     private static final int[] EMPTY_INT_ARRAY = new int[0];
 
+    private transient Dictionary settingDictionary;
+
     //for access control and updates
     private class PointerList extends ArrayList<Pointer> {
+
+        private boolean checkingPointers = false;
 
         private PointerList() {
         }
@@ -144,7 +150,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
             if (!super.contains(pointer)) {
                 result = super.add(pointer);
 
-                if (dictionary.isEditable()) {
+                if (null != dictionary && dictionary.isEditable()) {
                     if (null != pointer.getType().getSymmetricType()) {
                         pointer.getTarget().getSynset().getPointers().add(new Pointer(pointer.getType().getSymmetricType(), pointer.getTarget(), pointer.getSource()));
                     }
@@ -162,7 +168,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
             if (!super.contains(pointer)) {
                 super.add(index, pointer);
 
-                if (dictionary.isEditable()) {
+                if (null != dictionary && dictionary.isEditable()) {
                     if (null != pointer.getType().getSymmetricType()) {
                         pointer.getTarget().getSynset().getPointers().add(new Pointer(pointer.getType().getSymmetricType(), pointer.getTarget(), pointer.getSource()));
                     }
@@ -195,7 +201,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
         @Override
         public Pointer remove(int index) {
             Pointer result = super.remove(index);
-            if (dictionary.isEditable()) {
+            if (null != dictionary && dictionary.isEditable()) {
                 //delete symmetric pointer from the target
                 Pointer pointer = get(index);
                 if (null != pointer.getType().getSymmetricType()) {
@@ -213,7 +219,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
         @Override
         public boolean remove(Object o) {
             boolean result = super.remove(o);
-            if (dictionary.isEditable() && o instanceof Pointer) {
+            if (null != dictionary && dictionary.isEditable() && o instanceof Pointer) {
                 Pointer pointer = (Pointer) o;
                 //delete symmetric pointer from the target
                 if (null != pointer.getType().getSymmetricType()) {
@@ -230,7 +236,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
 
         @Override
         public void clear() {
-            if (dictionary.isEditable()) {
+            if (null != dictionary && dictionary.isEditable()) {
                 List<Pointer> copy = new ArrayList<Pointer>(this);
                 super.clear();
                 for (Pointer pointer : copy) {
@@ -251,7 +257,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
 
         @Override
         protected void removeRange(int fromIndex, int toIndex) {
-            if (dictionary.isEditable()) {
+            if (null != dictionary && dictionary.isEditable()) {
                 List<Pointer> copy = new ArrayList<Pointer>(super.subList(fromIndex, toIndex));
                 super.removeRange(fromIndex, toIndex);
                 for (Pointer pointer : copy) {
@@ -302,7 +308,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
 
         @Override
         public boolean removeAll(Collection<?> c) {
-            if (dictionary.isEditable()) {
+            if (null != dictionary && dictionary.isEditable()) {
                 List<Pointer> copy = new ArrayList<Pointer>(this);
                 boolean result = super.removeAll(c);
                 for (Object object : c) {
@@ -329,7 +335,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
 
         @Override
         public boolean retainAll(Collection<?> c) {
-            if (dictionary.isEditable()) {
+            if (null != dictionary && dictionary.isEditable()) {
                 List<Pointer> copy = new ArrayList<Pointer>(this);
                 boolean result = super.retainAll(c);
                 for (Object object : c) {
@@ -355,21 +361,26 @@ public class Synset extends PointerTarget implements DictionaryElement {
         }
 
         private void checkPointers() {
-            if (dictionary.isEditable()) {
-                List<Pointer> external = null;
-                for (int i = 0; i < super.size(); i++) {
-                    Pointer pointer = super.get(i);
-                    if (dictionary != pointer.getSource().getDictionary() ||
-                            dictionary != pointer.getTarget().getDictionary()) {
-                        if (null == external) {
-                            external = new ArrayList<Pointer>(super.size());
+            if (!checkingPointers) {
+                checkingPointers = true;
+                if (null != dictionary && dictionary.isEditable()) {
+                    List<Pointer> toDelete = null;
+                    for (int i = 0; i < super.size(); i++) {
+                        Pointer pointer = super.get(i);
+                        if (dictionary != pointer.getSource().getDictionary() ||  dictionary != pointer.getTarget().getDictionary()) {
+                            if (null == toDelete) {
+                                toDelete = new ArrayList<Pointer>(0);
+                            }
+                            toDelete.add(pointer);
                         }
-                        external.add(pointer);
+                    }
+                    if (null != toDelete) {
+                        for (Pointer pointer: toDelete) {
+                            remove(pointer);
+                        }
                     }
                 }
-                if (null != external) {
-                    super.removeAll(external);
-                }
+                checkingPointers = false;
             }
         }
     }
@@ -387,13 +398,13 @@ public class Synset extends PointerTarget implements DictionaryElement {
             if (Synset.this.dictionary != word.getDictionary()) {
                 throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_040"));
             }
-            if (dictionary.isEditable()) {
+            if (null != dictionary && dictionary.isEditable()) {
                 if (!super.contains(word)) {
                     Word result = super.set(index, word);
                     if (null != result) {
-                        removeIndexWords(result);
+                        removeFromIndexWords(result);
                     }
-                    addIndexWords(word);
+                    addToIndexWords(word);
                     return result;
                 } else {
                     return super.get(index);
@@ -405,7 +416,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
 
         @Override
         public boolean add(Word word) {
-            if (dictionary.isEditable()) {
+            if (null != dictionary && dictionary.isEditable()) {
                 if (!super.contains(word)) {
                     add(size(), word);
                     return true;
@@ -425,10 +436,10 @@ public class Synset extends PointerTarget implements DictionaryElement {
             if (Synset.this.dictionary != word.getDictionary()) {
                 throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_040"));
             }
-            if (dictionary.isEditable()) {
+            if (null != dictionary && dictionary.isEditable()) {
                 if (!super.contains(word)) {
                     super.add(index, word);
-                    addIndexWords(word);
+                    addToIndexWords(word);
                 }
             } else {
                 super.add(index, word);
@@ -437,7 +448,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
 
         @Override
         public boolean addAll(Collection<? extends Word> c) {
-            if (dictionary.isEditable()) {
+            if (null != dictionary && dictionary.isEditable()) {
                 boolean result = false;
                 for (Word word : c) {
                     if (add(word)) {
@@ -452,7 +463,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
 
         @Override
         public boolean addAll(int index, Collection<? extends Word> c) {
-            if (dictionary.isEditable()) {
+            if (null != dictionary && dictionary.isEditable()) {
                 boolean result = !super.containsAll(c);
                 for (Word word : c) {
                     add(index, word);
@@ -466,9 +477,9 @@ public class Synset extends PointerTarget implements DictionaryElement {
 
         @Override
         public Word remove(int index) {
-            if (dictionary.isEditable()) {
+            if (null != dictionary && dictionary.isEditable()) {
                 Word result = super.remove(index);
-                removeIndexWords(super.get(index));
+                removeFromIndexWords(super.get(index));
                 return result;
             } else {
                 return super.remove(index);
@@ -477,10 +488,10 @@ public class Synset extends PointerTarget implements DictionaryElement {
 
         @Override
         public boolean remove(Object o) {
-            if (dictionary.isEditable()) {
+            if (null != dictionary && dictionary.isEditable()) {
                 boolean result = super.remove(o);
                 if (o instanceof Word) {
-                    removeIndexWords((Word) o);
+                    removeFromIndexWords((Word) o);
                 }
                 return result;
             } else {
@@ -490,11 +501,11 @@ public class Synset extends PointerTarget implements DictionaryElement {
 
         @Override
         public void clear() {
-            if (dictionary.isEditable()) {
+            if (null != dictionary && dictionary.isEditable()) {
                 List<Word> copy = new ArrayList<Word>(this);
                 super.clear();
                 for (Word word : copy) {
-                    removeIndexWords(word);
+                    removeFromIndexWords(word);
                 }
             } else {
                 super.clear();
@@ -503,19 +514,19 @@ public class Synset extends PointerTarget implements DictionaryElement {
 
         @Override
         protected void removeRange(int fromIndex, int toIndex) {
-            if (dictionary.isEditable()) {
+            if (null != dictionary && dictionary.isEditable()) {
                 List<Word> copy = new ArrayList<Word>(subList(fromIndex, toIndex));
                 super.removeRange(fromIndex, toIndex);
                 for (Word word : copy) {
-                    removeIndexWords(word);
+                    removeFromIndexWords(word);
                 }
             } else {
                 super.removeRange(fromIndex, toIndex);
             }
         }
 
-        private void removeIndexWords(Word word) {
-            if (dictionary.isEditable()) {
+        private void removeFromIndexWords(Word word) {
+            if (null != dictionary && dictionary.isEditable()) {
                 try {
                     //take care of IndexWords
                     IndexWord indexWord = dictionary.getIndexWord(getPOS(), word.getLemma());
@@ -528,8 +539,8 @@ public class Synset extends PointerTarget implements DictionaryElement {
             }
         }
 
-        private void addIndexWords(Word word) {
-            if (dictionary.isEditable()) {
+        private void addToIndexWords(Word word) {
+            if (null != dictionary && dictionary.isEditable()) {
                 try {
                     //take care of IndexWords
                     IndexWord iw = dictionary.getIndexWord(word.getPOS(), word.getLemma());
@@ -549,6 +560,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
 
     public Synset(Dictionary dictionary, POS pos) throws JWNLException {
         super(dictionary);
+        this.settingDictionary = dictionary;
         if (null == pos) {
             throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_041"));
         }
@@ -568,6 +580,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
 
     public Synset(Dictionary dictionary, POS pos, long offset) throws JWNLException {
         super(dictionary);
+        this.settingDictionary = dictionary;
         if (null == pos) {
             throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_041"));
         }
@@ -623,8 +636,6 @@ public class Synset extends PointerTarget implements DictionaryElement {
 
         return JWNL.resolveMessage("DATA_TOSTRING_009", new Object[]{getOffset(), getPOS(), words.toString()});
     }
-
-    // Accessors
 
     @Override
     public Synset getSynset() {
@@ -725,7 +736,6 @@ public class Synset extends PointerTarget implements DictionaryElement {
         if (null == lemma) {
             throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_046"));
         }
-        lemma = lemma.replaceAll(" ", "_");
         for (Word word : words) {
             if (word.getLemma().equalsIgnoreCase(lemma)) {
                 return true;
@@ -744,7 +754,6 @@ public class Synset extends PointerTarget implements DictionaryElement {
         if (null == lemma) {
             throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_046"));
         }
-        lemma = lemma.replaceAll(" ", "_");
         for (int i = 0; i < words.size(); i++) {
             if (words.get(i).getLemma().equalsIgnoreCase(lemma)) {
                 return i;
@@ -827,6 +836,20 @@ public class Synset extends PointerTarget implements DictionaryElement {
 
         return senseKey.toString();
 
+    }
+
+    @Override
+    public void setDictionary(Dictionary dictionary) throws JWNLException {
+        if (settingDictionary != dictionary) {
+            settingDictionary = dictionary;
+            if (null != this.dictionary) {
+                this.dictionary.removeElement(this);
+            }
+            if (null != dictionary) {
+                dictionary.addElement(this);
+            }
+        }
+        super.setDictionary(dictionary);
     }
 
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {

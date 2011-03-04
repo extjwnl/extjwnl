@@ -19,7 +19,7 @@ import java.io.Serializable;
  * @author Aliaksandr Autayeu avtaev@gmail.com
  */
 public class Pointer implements Serializable {
-    private static final long serialVersionUID = -1275571290466732171L;
+    private static final long serialVersionUID = 1L;
 
     private static final MessageLog log = new MessageLog(Pointer.class);
 
