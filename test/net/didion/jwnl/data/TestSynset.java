@@ -29,7 +29,7 @@ public class TestSynset extends BaseDictionaryTest {
         testObj.setGloss(gloss);
     }
 
-    @Test(expected = JWNLException.class)
+    @Test
     public void testConstructor() throws JWNLException {
         testObj = new Synset(null, POS.NOUN, offset);
     }

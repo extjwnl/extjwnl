@@ -47,7 +47,7 @@ public class TestExc extends BaseDictionaryTest {
         Assert.assertEquals(exc2, testObj.getExceptions().get(1));
     }
 
-    @Test(expected = JWNLException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testConstructor() throws JWNLException {
         testObj = new Exc(null, null, null, null);
     }

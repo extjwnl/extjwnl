@@ -16,8 +16,8 @@ import org.junit.runners.Suite;
         TestDictionaryElementType.class,
         TestSummary.class,
         TestFileBackedDictionary.class,
-        TestMapBackedDictionary.class,
-        TestDatabaseBackedDictionary.class,
+//        TestMapBackedDictionary.class,
+//        TestDatabaseBackedDictionary.class,
         TestFileBackedDictionaryCreate.class,
         TestFileBackedDictionaryEdit.class
 })
@@ -31,8 +31,8 @@ public class JWNLSuite {
                 TestDictionaryElementType.class,
                 TestSummary.class,
                 TestFileBackedDictionary.class,
-                TestMapBackedDictionary.class,
-                TestDatabaseBackedDictionary.class,
+//                TestMapBackedDictionary.class,
+//                TestDatabaseBackedDictionary.class,
                 TestFileBackedDictionaryCreate.class,
                 TestFileBackedDictionaryEdit.class
         };

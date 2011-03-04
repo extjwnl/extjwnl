@@ -56,7 +56,7 @@ public abstract class DictionaryTester {
 
     String glossDefinition = "an enclosed armored military vehicle; has a cannon and moves on caterpillar treads";
 
-    protected List<String> lemmas = Arrays.asList("tank", "army_tank", "armored_combat_vehicle", "armoured_combat_vehicle");
+    protected List<String> lemmas = Arrays.asList("tank", "army tank", "armored combat vehicle", "armoured combat vehicle");
 
     protected Dictionary dictionary;
 
