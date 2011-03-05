@@ -1,14 +1,11 @@
 package net.didion.jwnl.data;
 
 import net.didion.jwnl.JWNLException;
-import net.didion.jwnl.dictionary.Dictionary;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.BitSet;
 
 /**
  * Tests Synset functionality by creating a mock synset.
@@ -24,7 +21,7 @@ public class TestSynset extends BaseDictionaryTest {
 
     @Before
     public void setUp() throws JWNLException, IOException {
-        Dictionary dictionary = Dictionary.getInstance(getProperties());
+        super.setUp();
         testObj = new Synset(dictionary, POS.NOUN, offset);
         testObj.setGloss(gloss);
     }

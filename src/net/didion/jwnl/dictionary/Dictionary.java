@@ -64,6 +64,9 @@ public abstract class Dictionary {
 
     private boolean editable;
 
+    // stores max offset for each POS
+    protected HashMap<POS, Long> maxOffset = new HashMap<POS, Long>(POS.getAllPOS().size());
+
     /**
      * Represents a version of WordNet.
      */
@@ -416,14 +419,15 @@ public abstract class Dictionary {
      * Saves the dictionary.
      *
      * @throws JWNLException JWNLException
+     * @throws IOException IOException
      */
-    public void save() throws JWNLException, IOException {
+    public void save() throws JWNLException {
         if (!isEditable()) {
             throw new JWNLException("DICTIONARY_EXCEPTION_029");
         }
     }
 
-    public void delete() throws IOException {
+    public void delete() throws JWNLException {
         //nop
     }
 
@@ -530,7 +534,7 @@ public abstract class Dictionary {
         if (!isEditable()) {
             throw new JWNLException("DICTIONARY_EXCEPTION_029");
         }
-        return new Synset(this, pos);
+        return new Synset(this, pos, createNewOffset(pos));
     }
 
     /**
@@ -579,13 +583,14 @@ public abstract class Dictionary {
     /**
      * Creates index word.
      *
-     * @param lemma  lemma
+     *
      * @param pos    part of speech
+     * @param lemma  lemma
      * @param synset synset
      * @return index word object
      * @throws JWNLException JWNLException
      */
-    public IndexWord createIndexWord(String lemma, POS pos, Synset synset) throws JWNLException {
+    public IndexWord createIndexWord(POS pos, String lemma, Synset synset) throws JWNLException {
         if (!isEditable()) {
             throw new JWNLException("DICTIONARY_EXCEPTION_029");
         }
@@ -690,5 +695,12 @@ public abstract class Dictionary {
             return new Locale(language, country);
         }
     }
+
+    private synchronized long createNewOffset(POS pos) {
+        long result = maxOffset.get(pos) + 1;
+        maxOffset.put(pos, result);
+        return result;
+    }
+
 
 }

@@ -26,7 +26,7 @@ public class TestExc extends BaseDictionaryTest {
 
     @Before
     public void setUp() throws JWNLException, IOException {
-        Dictionary dictionary = Dictionary.getInstance(getProperties());
+        super.setUp();
         testObj = new Exc(dictionary, pos, lemma, Arrays.asList(exc1, exc2));
     }
 

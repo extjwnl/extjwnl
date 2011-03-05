@@ -2,13 +2,10 @@ package net.didion.jwnl.dictionary.file;
 
 import net.didion.jwnl.JWNLException;
 import net.didion.jwnl.data.POS;
-import net.didion.jwnl.dictionary.Dictionary;
 import net.didion.jwnl.util.factory.Owned;
-import net.didion.jwnl.util.factory.Param;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
 
 /**
  * Represents a single dictionary file. Extensions or implementations of this interface should provide
@@ -65,4 +62,8 @@ public interface DictionaryFile extends Owned {
      */
     public void save() throws IOException, JWNLException;
 
+    /**
+     * Reopens file in write mode.
+     */
+    void edit() throws IOException;
 }

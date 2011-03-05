@@ -8,6 +8,7 @@ import net.didion.jwnl.util.MessageLogLevel;
 import net.didion.jwnl.util.factory.Param;
 import org.w3c.dom.Document;
 
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -31,7 +32,8 @@ public class MapBackedDictionary extends Dictionary {
      */
     private static final Random rand = new Random(new Date().getTime());
 
-    private Map<MapTableKey, Map<Object, ? extends DictionaryElement>> tableMap = new HashMap<MapTableKey, Map<Object, ? extends DictionaryElement>>();
+    private Map<MapTableKey, Map<Object, DictionaryElement>> tableMap = new HashMap<MapTableKey, Map<Object, DictionaryElement>>();
+    private DictionaryCatalogSet<ObjectDictionaryFile> files;
 
     public MapBackedDictionary(Document doc) throws JWNLException {
         super(doc);
@@ -42,32 +44,13 @@ public class MapBackedDictionary extends Dictionary {
         this.load();
     }
 
-    private void load() throws JWNLException {
-        DictionaryCatalogSet<ObjectDictionaryFile> files = new DictionaryCatalogSet<ObjectDictionaryFile>(this, params, ObjectDictionaryFile.class);
-        if (!files.isOpen()) {
-            try {
-                files.open();
-            } catch (Exception e) {
-                throw new JWNLException("DICTIONARY_EXCEPTION_019", e);
-            }
+    @Override
+    public void delete() throws JWNLException {
+        try {
+            files.delete();
+        } catch (IOException e) {
+            throw new JWNLException("EXCEPTION_001", e.getMessage(), e);
         }
-        // Load all the hash tables into memory
-        log.log(MessageLogLevel.INFO, "DICTIONARY_INFO_009");
-        if (log.isLevelEnabled(MessageLogLevel.TRACE)) {
-            log.log(MessageLogLevel.TRACE, "DICTIONARY_INFO_010", Runtime.getRuntime().freeMemory());
-        }
-
-        for (DictionaryFileType fileType : DictionaryFileType.getAllDictionaryFileTypes()) {
-            DictionaryCatalog<ObjectDictionaryFile> catalog = files.get(fileType);
-            for (POS pos : POS.getAllPOS()) {
-                log.log(MessageLogLevel.INFO, "DICTIONARY_INFO_011", new Object[]{pos.getLabel(), fileType.getName()});
-                putTable(pos, fileType, loadDictFile(catalog.get(pos)));
-                if (log.isLevelEnabled(MessageLogLevel.TRACE)) {
-                    log.log(MessageLogLevel.TRACE, "DICTIONARY_INFO_012", Runtime.getRuntime().freeMemory());
-                }
-            }
-        }
-        files.close();
     }
 
     public IndexWord getIndexWord(POS pos, String lemma) {
@@ -100,11 +83,11 @@ public class MapBackedDictionary extends Dictionary {
     // access to the underlying Entry array.
     public IndexWord getRandomIndexWord(POS pos) throws JWNLException {
         int index = rand.nextInt(getTable(pos, DictionaryFileType.INDEX).size());
-        Iterator itr = getIndexWordIterator(pos);
+        Iterator<IndexWord> itr = getIndexWordIterator(pos);
         for (int i = 0; i < index && itr.hasNext(); i++) {
             itr.next();
         }
-        return (itr.hasNext()) ? (IndexWord) itr.next() : null;
+        return itr.hasNext() ? itr.next() : null;
     }
 
     public Iterator<Synset> getSynsetIterator(POS pos) {
@@ -133,32 +116,80 @@ public class MapBackedDictionary extends Dictionary {
 
     public void close() {
         tableMap = null;
+        files.close();
     }
 
-    private synchronized Map<Object, ? extends DictionaryElement> loadDictFile(ObjectDictionaryFile file) throws JWNLException {
+    @Override
+    public void edit() throws JWNLException {
         try {
-            Dictionary.setRestoreDictionary(this);
-            @SuppressWarnings({"unchecked", "UnnecessaryLocalVariable"})
-            Map<Object, ? extends DictionaryElement> result = (Map<Object, ? extends DictionaryElement>) file.readObject();
-            return result;
-        } catch (Exception e) {
-            throw new JWNLException("DICTIONARY_EXCEPTION_020", file.getFile(), e);
+            files.edit();
+
+            //update max offsets for new synset creation
+            //iteration might take time
+            for (POS pos : POS.getAllPOS()) {
+                Long maxOff = 0L;
+                Iterator<Synset> si = getSynsetIterator(pos);
+                while (si.hasNext()) {
+                    Synset s = si.next();
+                    if (maxOff < s.getOffset()) {
+                        maxOff = s.getOffset();
+                    }
+                }
+                maxOffset.put(pos, maxOff);
+            }
+
+            super.edit();
+        } catch (IOException e) {
+            throw new JWNLException("EXCEPTION_001", e.getMessage(), e);
         }
     }
 
-    /**
-     * Use <var>table</var> for lookups to the file represented by <var>pos</var> and
-     * <var>fileType</var>.
-     *
-     * @param pos      POS
-     * @param fileType element type
-     * @param table    hashmap with elements
-     */
-    private void putTable(POS pos, DictionaryFileType fileType, Map<Object, ? extends DictionaryElement> table) {
-        tableMap.put(new MapTableKey(pos, fileType), table);
+    @Override
+    public void save() throws JWNLException {
+        try {
+            files.save();
+        } catch (IOException e) {
+            throw new JWNLException("EXCEPTION_001", e.getMessage(), e);
+        }
     }
 
-    private Map getTable(POS pos, DictionaryFileType fileType) {
+    @Override
+    public void addSynset(Synset synset) throws JWNLException {
+        super.addSynset(synset);
+        getTable(synset.getPOS(), DictionaryFileType.DATA).put(synset.getKey(), synset);
+    }
+
+    @Override
+    public void removeSynset(Synset synset) throws JWNLException {
+        getTable(synset.getPOS(), DictionaryFileType.DATA).remove(synset.getKey());
+        super.removeSynset(synset);
+    }
+
+    @Override
+    public void addException(Exc exc) throws JWNLException {
+        super.addException(exc);
+        getTable(exc.getPOS(), DictionaryFileType.EXCEPTION).put(exc.getKey(), exc);
+    }
+
+    @Override
+    public void removeException(Exc exc) throws JWNLException {
+        getTable(exc.getPOS(), DictionaryFileType.EXCEPTION).remove(exc.getKey());
+        super.removeException(exc);
+    }
+
+    @Override
+    public void addIndexWord(IndexWord indexWord) throws JWNLException {
+        super.addIndexWord(indexWord);
+        getTable(indexWord.getPOS(), DictionaryFileType.INDEX).put(indexWord.getKey(), indexWord);
+    }
+
+    @Override
+    public void removeIndexWord(IndexWord indexWord) throws JWNLException {
+        getTable(indexWord.getPOS(), DictionaryFileType.INDEX).remove(indexWord.getKey());
+        super.removeIndexWord(indexWord);
+    }
+
+    public Map<Object, DictionaryElement> getTable(POS pos, DictionaryFileType fileType) {
         return tableMap.get(new MapTableKey(pos, fileType));
     }
 
@@ -171,16 +202,23 @@ public class MapBackedDictionary extends Dictionary {
             this.fileType = fileType;
         }
 
+        @Override
         public int hashCode() {
             return pos.hashCode() ^ fileType.hashCode();
         }
 
+        @Override
         public boolean equals(Object obj) {
             if (obj instanceof MapTableKey) {
                 MapTableKey k = (MapTableKey) obj;
                 return pos.equals(k.pos) && fileType.equals(k.fileType);
             }
             return false;
+        }
+
+        @Override
+        public String toString() {
+            return pos.getLabel() + "." + fileType.getName();
         }
     }
 
@@ -221,25 +259,54 @@ public class MapBackedDictionary extends Dictionary {
         }
     }
 
-    /**
-     * Not implemented in Map yet.
-     *
-     * @param offset offset
-     * @param lemma  lemma
-     * @return usage count
-     */
-    public int getUsageCount(long offset, String lemma) {
-        return 0;
+    private void load() throws JWNLException {
+        files = new DictionaryCatalogSet<ObjectDictionaryFile>(this, params, ObjectDictionaryFile.class);
+        if (!files.isOpen()) {
+            try {
+                files.open();
+            } catch (Exception e) {
+                throw new JWNLException("DICTIONARY_EXCEPTION_019", e);
+            }
+        }
+        // Load all the hash tables into memory
+        log.log(MessageLogLevel.INFO, "DICTIONARY_INFO_009");
+        if (log.isLevelEnabled(MessageLogLevel.TRACE)) {
+            log.log(MessageLogLevel.TRACE, "DICTIONARY_INFO_010", Runtime.getRuntime().freeMemory());
+        }
+
+        for (DictionaryFileType fileType : DictionaryFileType.getAllDictionaryFileTypes()) {
+            DictionaryCatalog<ObjectDictionaryFile> catalog = files.get(fileType);
+            for (POS pos : POS.getAllPOS()) {
+                log.log(MessageLogLevel.INFO, "DICTIONARY_INFO_011", new Object[]{pos.getLabel(), fileType.getName()});
+                putTable(pos, fileType, loadDictFile(catalog.get(pos)));
+                if (log.isLevelEnabled(MessageLogLevel.TRACE)) {
+                    log.log(MessageLogLevel.TRACE, "DICTIONARY_INFO_012", Runtime.getRuntime().freeMemory());
+                }
+            }
+        }
+        files.close();
+    }
+
+    private synchronized Map<Object, DictionaryElement> loadDictFile(ObjectDictionaryFile file) throws JWNLException {
+        try {
+            Dictionary.setRestoreDictionary(this);
+            @SuppressWarnings({"unchecked", "UnnecessaryLocalVariable"})
+            Map<Object, DictionaryElement> result = (Map<Object, DictionaryElement>) file.readObject();
+            return result;
+        } catch (Exception e) {
+            throw new JWNLException("DICTIONARY_EXCEPTION_020", file.getFile(), e);
+        }
     }
 
     /**
-     * Not implemented in Map yet.
+     * Use <var>table</var> for lookups to the file represented by <var>pos</var> and
+     * <var>fileType</var>.
      *
-     * @param offset offset
-     * @param lemma  lemma
-     * @return sense key
+     * @param pos      POS
+     * @param fileType element type
+     * @param table    hashmap with elements
      */
-    public String getSenseKey(long offset, String lemma) {
-        return null;
+    private void putTable(POS pos, DictionaryFileType fileType, Map<Object, DictionaryElement> table) {
+        tableMap.put(new MapTableKey(pos, fileType), table);
     }
 }

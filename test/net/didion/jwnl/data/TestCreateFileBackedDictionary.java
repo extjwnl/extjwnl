@@ -9,7 +9,7 @@ import java.io.InputStream;
  *
  * @author Aliaksandr Autayeu avtaev@gmail.com
  */
-public class TestCreateFileBackedDictionary extends TestCreateDictionary{
+public class TestCreateFileBackedDictionary extends TestCreateDictionary {
 
     protected static final String properties = "./config/clean_file.xml";
 

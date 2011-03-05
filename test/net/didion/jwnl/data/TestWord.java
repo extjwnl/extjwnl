@@ -1,7 +1,6 @@
 package net.didion.jwnl.data;
 
 import net.didion.jwnl.JWNLException;
-import net.didion.jwnl.dictionary.Dictionary;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,12 +17,12 @@ public class TestWord extends BaseDictionaryTest {
 
     private Word word;
 
-    String lemma = "testLemma";
-    int index = 1;
+    private String lemma = "testLemma";
+    private int index = 1;
 
     @Before
     public void setUp() throws JWNLException, IOException {
-        Dictionary dictionary = Dictionary.getInstance(getProperties());
+        super.setUp();
         word = new Word(dictionary, new Synset(dictionary, POS.NOUN), index, lemma);
     }
 

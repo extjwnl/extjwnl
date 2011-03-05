@@ -11,7 +11,6 @@ import net.didion.jwnl.util.factory.Param;
 import org.w3c.dom.Document;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -103,8 +102,12 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
     }
 
     @Override
-    public void delete() throws IOException {
-        db.delete();
+    public void delete() throws JWNLException {
+        try {
+            db.delete();
+        } catch (IOException e) {
+            throw new JWNLException("EXCEPTION_001", e.getMessage(), e);
+        }
     }
 
     /**
@@ -407,11 +410,20 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
             throw new JWNLException("DICTIONARY_EXCEPTION_030");
         }
         cacheAll();
+        try {
+            db.edit();
+        } catch (IOException e) {
+            throw new JWNLException("EXCEPTION_001", e.getMessage(), e);
+        }
         super.edit();
     }
 
     @Override
-    public void save() throws JWNLException, IOException {
-        db.save();
+    public void save() throws JWNLException {
+        try {
+            db.save();
+        } catch (IOException e) {
+            throw new JWNLException("EXCEPTION_001", e.getMessage(), e);
+        }
     }
 }

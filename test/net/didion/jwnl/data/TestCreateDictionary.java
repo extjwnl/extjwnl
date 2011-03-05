@@ -7,7 +7,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -55,8 +54,6 @@ public abstract class TestCreateDictionary {
     @Before
     public void setUp() throws IOException, JWNLException {
         dictionary = Dictionary.getInstance(getProperties());
-        dictionary.delete();
-        dictionary = Dictionary.getInstance(getProperties());
 
         synEntity = null;
         synsets = null;
@@ -76,8 +73,6 @@ public abstract class TestCreateDictionary {
     @After
     public void tearDown() throws IOException, JWNLException {
         dictionary.close();
-        //to ensure folder remains clean
-        dictionary = Dictionary.getInstance(getProperties());
         dictionary.delete();
     }
 
@@ -231,6 +226,7 @@ public abstract class TestCreateDictionary {
         Assert.assertTrue(exceptions.contains(e1));
         Assert.assertTrue(exceptions.contains(e2));
     }
+
     @Test
     public void TestCreateEntitySynset() throws JWNLException {
         dictionary.edit();
@@ -294,7 +290,7 @@ public abstract class TestCreateDictionary {
 
     private void createAndTestAbstractWords(Dictionary dictionary) throws JWNLException {
         for (int i = 0; i < abstractionWords.length; i++) {
-            synAbstraction.getWords().add(new Word(dictionary, synAbstraction, i+1, abstractionWords[i]));
+            synAbstraction.getWords().add(new Word(dictionary, synAbstraction, i + 1, abstractionWords[i]));
         }
         Assert.assertEquals(2, synAbstraction.getWords().size());
 
@@ -471,8 +467,12 @@ public abstract class TestCreateDictionary {
 
         createAndTestPEntityPointer(dictionary);
         testIterators(dictionary);
+        testIWEntity(dictionary);
+        testIWPEntity(dictionary);
+
 
         dictionary.save();
+        dictionary.close();
 
         dictionary = Dictionary.getInstance(getProperties());
 

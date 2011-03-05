@@ -21,13 +21,14 @@ public abstract class AbstractDictionaryFile implements DictionaryFile {
 
     protected Dictionary dictionary;
     protected Map<String, Param> params;
+    protected File file;
     private POS pos;
 
     /**
      * The type of the file. For example, the default implementation defines the types INDEX, DATA, and EXCEPTION.
      */
     private DictionaryFileType fileType;
-    private File file;
+
 
     public AbstractDictionaryFile() {
     }
@@ -54,10 +55,9 @@ public abstract class AbstractDictionaryFile implements DictionaryFile {
     /**
      * Opens the <var>file</var>.
      *
-     * @param file the file to open
      * @throws IOException IOException
      */
-    protected abstract void openFile(File file) throws IOException;
+    protected abstract void openFile() throws IOException;
 
     /**
      * The POS associated with this file.
@@ -82,8 +82,11 @@ public abstract class AbstractDictionaryFile implements DictionaryFile {
      */
     public void open() throws IOException {
         if (!isOpen()) {
-            openFile(file);
+            openFile();
         }
+    }
+
+    public void close() {
     }
 
     public boolean delete() throws IOException {

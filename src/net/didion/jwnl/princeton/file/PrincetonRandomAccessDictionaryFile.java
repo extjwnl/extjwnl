@@ -10,7 +10,6 @@ import net.didion.jwnl.util.MessageLog;
 import net.didion.jwnl.util.MessageLogLevel;
 import net.didion.jwnl.util.factory.Param;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
@@ -44,7 +43,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
     /**
      * The random-access file.
      */
-    protected RandomAccessFile file = null;
+    protected RandomAccessFile raFile = null;
 
     private CharsetDecoder decoder;
 
@@ -70,7 +69,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
     public String readLine() throws IOException {
         if (isOpen()) {
             if (null == encoding) {
-                return file.readLine();
+                return raFile.readLine();
             } else {
                 int c = -1;
                 boolean eol = false;
@@ -131,14 +130,14 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
             if (null == encoding || getFileType().equals(DictionaryFileType.DATA)) {
                 StringBuffer input = new StringBuffer();
                 int c;
-                while (((c = file.read()) != -1) && c != '\n' && c != '\r' && c != ' ') {
+                while (((c = raFile.read()) != -1) && c != '\n' && c != '\r' && c != ' ') {
                     input.append((char) c);
                 }
                 return input.toString();
             } else {
                 int idx = 1;
                 int c;
-                while (((c = file.read()) != -1) && c != '\n' && c != '\r' && c != ' ') {
+                while (((c = raFile.read()) != -1) && c != '\n' && c != '\r' && c != ' ') {
                     lineArr[idx - 1] = (byte) c;
                     idx++;
                     if (LINE_MAX == idx) {
@@ -162,24 +161,27 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
     }
 
     public void seek(long pos) throws IOException {
-        file.seek(pos);
+        raFile.seek(pos);
     }
 
     public long getFilePointer() throws IOException {
-        return file.getFilePointer();
+        return raFile.getFilePointer();
     }
 
     public boolean isOpen() {
-        return file != null;
+        return raFile != null;
     }
 
     public void close() {
         try {
-            file.close();
+            if (null != raFile) {
+                raFile.close();
+            }
+            super.close();
         } catch (Exception e) {
             log.log(MessageLogLevel.ERROR, "EXCEPTION_001", e.getMessage(), e);
         } finally {
-            file = null;
+            raFile = null;
         }
     }
 
@@ -189,21 +191,27 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
      * to be creating it and writing to it, otherwise we assume that
      * we are going to be reading from it.
      */
-    protected void openFile(File path) throws IOException {
-        if (!path.exists()) {
-            file = new RandomAccessFile(path, READ_WRITE);
+    protected void openFile() throws IOException {
+        if (!file.exists()) {
+            raFile = new RandomAccessFile(file, READ_WRITE);
         } else {
-            file = new RandomAccessFile(path, READ_ONLY);
+            raFile = new RandomAccessFile(file, READ_ONLY);
         }
 
     }
 
+    public void edit() throws IOException {
+        raFile.close();
+        raFile = new RandomAccessFile(file, READ_WRITE);
+    }
+
+
     public long length() throws IOException {
-        return file.length();
+        return raFile.length();
     }
 
     public int read() throws IOException {
-        return file.read();
+        return raFile.read();
     }
 
     public void save() throws IOException, JWNLException {
@@ -217,7 +225,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
             log.log(MessageLogLevel.INFO, "PRINCETON_INFO_005", exceptions.size());
             Collections.sort(exceptions);
 
-            writeFile(exceptions, file);
+            writeFile(exceptions, raFile);
         } else if (DictionaryFileType.DATA.equals(getFileType())) {
             ArrayList<Synset> synsets = new ArrayList<Synset>();
             Iterator<Synset> si = dictionary.getSynsetIterator(getPOS());
@@ -234,7 +242,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
 
             dfOff = new DecimalFormat("00000000");//8 by default
             log.log(MessageLogLevel.INFO, "PRINCETON_INFO_006", synsets.size());
-            long offset = file.getFilePointer();
+            long offset = raFile.getFilePointer();
             for (Synset s : synsets) {
                 s.setOffset(offset);
                 if (null == encoding) {
@@ -257,11 +265,11 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                     log.log(MessageLogLevel.INFO, "PRINCETON_INFO_014", 100 * counter / total);
                 }
                 if (null == encoding) {
-                    file.write(renderSynset(synset).getBytes());
+                    raFile.write(renderSynset(synset).getBytes());
                 } else {
-                    file.write(renderSynset(synset).getBytes(encoding));
+                    raFile.write(renderSynset(synset).getBytes(encoding));
                 }
-                file.writeBytes("\n");
+                raFile.writeBytes("\n");
             }
             log.log(MessageLogLevel.INFO, "PRINCETON_INFO_009", makeFilename());
 
@@ -290,7 +298,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
             log.log(MessageLogLevel.INFO, "PRINCETON_INFO_005", indexes.size());
             Collections.sort(indexes);
 
-            writeFile(indexes, file);
+            writeFile(indexes, raFile);
         }
         log.log(MessageLogLevel.INFO, "PRINCETON_INFO_012", makeFilename());
     }

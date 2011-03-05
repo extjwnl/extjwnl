@@ -54,6 +54,10 @@ public class FileManagerImpl implements FileManager {
         files.delete();
     }
 
+    public void edit() throws IOException {
+        files.edit();
+    }
+
     /**
      * Gets the file from a part of speech and file type (ie data.noun).
      *

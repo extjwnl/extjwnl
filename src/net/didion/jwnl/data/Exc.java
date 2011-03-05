@@ -140,6 +140,5 @@ public class Exc extends BaseDictionaryElement {
         in.defaultReadObject();
         // set POS to reference the static instance defined in the current runtime environment
         pos = POS.getPOSForKey(pos.getKey());
-        dictionary = Dictionary.getRestoreDictionary();
     }
 }

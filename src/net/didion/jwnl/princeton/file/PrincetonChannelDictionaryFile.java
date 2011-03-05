@@ -7,7 +7,6 @@ import net.didion.jwnl.dictionary.file.DictionaryFileFactory;
 import net.didion.jwnl.dictionary.file.DictionaryFileType;
 import net.didion.jwnl.util.factory.Param;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.CharBuffer;
@@ -100,20 +99,27 @@ public class PrincetonChannelDictionaryFile extends AbstractPrincetonRandomAcces
     }
 
     public void save() {
-        //nop
+        throw new UnsupportedOperationException();
     }
 
     public void close() {
         try {
-            buffer = null;
-            channel.close();
+            if (null != channel) {
+                buffer = null;
+                channel.close();
+            }
         } catch (IOException ex) {
+            //nop
         } finally {
             channel = null;
         }
     }
 
-    protected void openFile(File file) throws IOException {
+    public void edit() throws IOException {
+        throw new UnsupportedOperationException();
+    }
+
+    protected void openFile() throws IOException {
         channel = new FileInputStream(file).getChannel();
         if (null != encoding) {
             buffer = Charset.forName(encoding).newDecoder().decode(channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size()));

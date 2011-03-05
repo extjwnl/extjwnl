@@ -504,6 +504,14 @@ public class IndexWord extends BaseDictionaryElement {
         in.defaultReadObject();
         // set POS to reference the static instance defined in the current runtime environment
         pos = POS.getPOSForKey(pos.getKey());
-        dictionary = Dictionary.getRestoreDictionary();
+    }
+
+    private void writeObject(java.io.ObjectOutputStream oos) throws IOException {
+        boolean synsetOffsetsNull = null == synsetOffsets;
+        synsetOffsets = getSynsetOffsets();
+        oos.defaultWriteObject();
+        if (synsetOffsetsNull) {
+            synsetOffsets = null;
+        }
     }
 }

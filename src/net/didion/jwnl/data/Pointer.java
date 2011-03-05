@@ -162,12 +162,6 @@ public class Pointer implements Serializable {
         }
     }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
-        in.defaultReadObject();
-        // set pointer type to reference the static instance defined in the current runtime environment
-        pointerType = PointerType.getPointerTypeForKey(pointerType.getKey());
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -265,5 +259,16 @@ public class Pointer implements Serializable {
             result = 31 * result + index;
             return result;
         }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        // set pointer type to reference the static instance defined in the current runtime environment
+        pointerType = PointerType.getPointerTypeForKey(pointerType.getKey());
+    }
+
+    private void writeObject(java.io.ObjectOutputStream oos) throws IOException {
+        this.targetIndex = new TargetIndex(getTargetPOS(), getTargetOffset(), getTargetIndex());
+        oos.defaultWriteObject();
     }
 }

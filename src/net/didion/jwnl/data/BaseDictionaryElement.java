@@ -3,6 +3,8 @@ package net.didion.jwnl.data;
 import net.didion.jwnl.JWNLException;
 import net.didion.jwnl.dictionary.Dictionary;
 
+import java.io.IOException;
+
 /**
  * Base class for dictionary elements.
  *
@@ -36,5 +38,10 @@ public abstract class BaseDictionaryElement implements DictionaryElement {
             }
         }
         this.dictionary = dictionary;
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        dictionary = Dictionary.getRestoreDictionary();
     }
 }

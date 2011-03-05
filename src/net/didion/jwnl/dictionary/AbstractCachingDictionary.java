@@ -9,7 +9,6 @@ import net.didion.jwnl.util.cache.CacheSet;
 import net.didion.jwnl.util.cache.LRUCacheSet;
 import org.w3c.dom.Document;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -25,9 +24,6 @@ public abstract class AbstractCachingDictionary extends Dictionary {
 
     private CacheSet<DictionaryElementType, POSKey, DictionaryElement> caches;
     protected boolean isCachingEnabled;
-
-    // stores max offset for each POS
-    private HashMap<POS, Long> maxOffset = new HashMap<POS, Long>(POS.getAllPOS().size());
 
     protected AbstractCachingDictionary(Document doc) throws JWNLException {
         super(doc);
@@ -236,14 +232,6 @@ public abstract class AbstractCachingDictionary extends Dictionary {
     }
 
     @Override
-    public Synset createSynset(POS pos) throws JWNLException {
-        if (!isEditable()) {
-            throw new JWNLException("DICTIONARY_EXCEPTION_029");
-        }
-        return new Synset(this, pos, createNewOffset(pos));
-    }
-
-    @Override
     public void addSynset(Synset synset) throws JWNLException {
         super.addSynset(synset);
         cacheSynset(new POSKey(synset.getPOS(), synset.getOffset()), synset);
@@ -277,12 +265,6 @@ public abstract class AbstractCachingDictionary extends Dictionary {
     public void removeIndexWord(IndexWord indexWord) throws JWNLException {
         clearIndexWord(new POSKey(indexWord.getPOS(), indexWord.getLemma()));
         super.removeIndexWord(indexWord);
-    }
-
-    private synchronized long createNewOffset(POS pos) {
-        long result = maxOffset.get(pos) + 1;
-        maxOffset.put(pos, result);
-        return result;
     }
 
     protected void cacheAll() throws JWNLException {

@@ -134,4 +134,10 @@ public class DictionaryCatalog<E extends DictionaryFile> implements Owned {
             itr.next().save();
         }
     }
+
+    public void edit() throws IOException {
+        for (Iterator<E> itr = getFileIterator(); itr.hasNext();) {
+            itr.next().edit();
+        }
+    }
 }

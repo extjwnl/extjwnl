@@ -365,6 +365,45 @@ public class Word extends PointerTarget {
         this.summary = summary;
     }
 
+    /**
+     * Returns the sense key of a lemma.
+     *
+     * @return sense key
+     */
+    public String getSenseKey() {
+        int ss_type = 5;
+        if (getPOS().equals(POS.NOUN)) {
+            ss_type = 1;
+        } else if (getPOS().equals(POS.VERB)) {
+            ss_type = 2;
+        } else if (getPOS().equals(POS.ADJECTIVE)) {
+            ss_type = 3;
+        } else if (getPOS().equals(POS.ADVERB)) {
+            ss_type = 4;
+        }
+
+        if (getSynset().isAdjectiveCluster()) {
+            ss_type = 5;
+        }
+
+        StringBuilder senseKey = new StringBuilder(String.format("%s%%%d:%02d:%02d:", lemma.toLowerCase(), ss_type, synset.getLexFileNum(), lexId));
+
+        if (5 == ss_type) {
+            List<Pointer> p = synset.getPointers(PointerType.SIMILAR_TO);
+            if (0 < p.size()) {
+                Pointer headWord = p.get(0);
+                List<Word> words = headWord.getTargetSynset().getWords();
+                if (0 < words.size()) {
+                    senseKey.append(String.format("%s:%02d", words.get(0).getLemma().toLowerCase(), words.get(0).getLexId()));
+                }
+            }
+        } else {
+            senseKey.append(":");
+        }
+
+        return senseKey.toString();
+    }
+
     private static ArrayList<String> getLemmasFromSynset(Synset s) throws JWNLException {
         ArrayList<String> result = new ArrayList<String>();
 

@@ -98,4 +98,10 @@ public class DictionaryCatalogSet<E extends DictionaryFile> implements Owned {
         catalogs.get(DictionaryFileType.DATA).save();
         catalogs.get(DictionaryFileType.INDEX).save();
     }
+
+    public void edit() throws IOException {
+        for (Iterator<DictionaryCatalog<E>> itr = getCatalogIterator(); itr.hasNext();) {
+            itr.next().edit();
+        }
+    }
 }

@@ -14,15 +14,14 @@ import java.io.IOException;
  */
 public class TestFileBackedDictionaryEdit {
 
-    protected String properties = "./config/clean_properties.xml";
+    protected String properties = "./config/clean_file.xml";
 
     @Test
     public void TestLoadEmptyDictionary() throws IOException, JWNLException {
         Dictionary dictionary = Dictionary.getInstance(new FileInputStream(properties));
         dictionary.edit();
         dictionary.save();
-
-        dictionary = Dictionary.getInstance(new FileInputStream(properties));
         dictionary.close();
+        dictionary.delete();
     }
 }

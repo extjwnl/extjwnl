@@ -267,18 +267,4 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
             return getException(getPOS(), derivation);
         }
     }
-
-    /**
-     * Not implemented in DB yet.
-     */
-    public int getUsageCount(long offset, String lemma) {
-        return 0;
-    }
-
-    /**
-     * Not implemented in DB yet.
-     */
-    public String getSenseKey(long offset, String lemma) {
-        return null;
-    }
 }

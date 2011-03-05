@@ -8,7 +8,6 @@ import net.didion.jwnl.dictionary.POSKey;
 import net.didion.jwnl.util.MessageLog;
 import net.didion.jwnl.util.MessageLogLevel;
 
-import java.awt.*;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
@@ -545,7 +544,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
                     //take care of IndexWords
                     IndexWord iw = dictionary.getIndexWord(word.getPOS(), word.getLemma());
                     if (null == iw) {
-                        dictionary.createIndexWord(word.getLemma(), word.getPOS(), Synset.this);
+                        dictionary.createIndexWord(word.getPOS(), word.getLemma(), Synset.this);
                     } else {
                         iw.getSenses().add(Synset.this);
                     }
@@ -790,52 +789,6 @@ public class Synset extends PointerTarget implements DictionaryElement {
      */
     public String getLexFileName() {
         return LexIdNameMap.getMap().get(lexFileNum);
-    }
-
-    /**
-     * Returns the sense key of a lemma.
-     *
-     * @param word word which lemma is in question
-     * @return sense key for lemma
-     */
-    public String getSenseKey(Word word) {
-        if (null == word) {
-            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_044"));
-        }
-
-        int ss_type = 5;
-        if (this.getPOS().equals(POS.NOUN)) {
-            ss_type = 1;
-        } else if (this.getPOS().equals(POS.VERB)) {
-            ss_type = 2;
-        } else if (this.getPOS().equals(POS.ADJECTIVE)) {
-            ss_type = 3;
-        } else if (this.getPOS().equals(POS.ADVERB)) {
-            ss_type = 4;
-        }
-
-        if (isAdjectiveCluster()) {
-            ss_type = 5;
-        }
-
-        long lexId = word.getLexId();
-        StringBuilder senseKey = new StringBuilder(String.format("%s%%%d:%02d:%02d:", word.getLemma().toLowerCase(), ss_type, getLexFileNum(), lexId));
-
-        if (5 == ss_type) {
-            List<Pointer> p = getPointers(PointerType.SIMILAR_TO);
-            if (0 < p.size()) {
-                Pointer headWord = p.get(0);
-                List<Word> words = headWord.getTargetSynset().getWords();
-                if (0 < words.size()) {
-                    senseKey.append(String.format("%s:%02d", words.get(0).getLemma().toLowerCase(), words.get(0).getLexId()));
-                }
-            }
-        } else {
-            senseKey.append(":");
-        }
-
-        return senseKey.toString();
-
     }
 
     @Override

@@ -65,7 +65,7 @@ public interface FileManager extends Owned {
 
 
     /**
-     * Shut down the file manager.
+     * Shuts down the file manager.
      */
     void close();
 
@@ -78,4 +78,9 @@ public interface FileManager extends Owned {
      * Deletes the dictionary.
      */
     void delete() throws IOException;
+
+    /**
+     * Reopens files for writing.
+     */
+    void edit() throws IOException;
 }

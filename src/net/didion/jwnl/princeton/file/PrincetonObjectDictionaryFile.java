@@ -1,8 +1,10 @@
 package net.didion.jwnl.princeton.file;
 
 import net.didion.jwnl.JWNLRuntimeException;
+import net.didion.jwnl.data.DictionaryElement;
 import net.didion.jwnl.data.POS;
 import net.didion.jwnl.dictionary.Dictionary;
+import net.didion.jwnl.dictionary.MapBackedDictionary;
 import net.didion.jwnl.dictionary.file.DictionaryFileFactory;
 import net.didion.jwnl.dictionary.file.DictionaryFileType;
 import net.didion.jwnl.dictionary.file.ObjectDictionaryFile;
@@ -11,6 +13,7 @@ import net.didion.jwnl.util.MessageLogLevel;
 import net.didion.jwnl.util.factory.Param;
 
 import java.io.*;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -23,9 +26,10 @@ public class PrincetonObjectDictionaryFile extends AbstractPrincetonDictionaryFi
 
     private static final MessageLog log = new MessageLog(PrincetonObjectDictionaryFile.class);
 
-    private File file = null;
     private ObjectInputStream in = null;
     private ObjectOutputStream out = null;
+    private FileInputStream fin = null;
+    private FileOutputStream fout = null;
 
     public PrincetonObjectDictionaryFile(Dictionary dictionary, Map<String, Param> params) {
         super(dictionary, params);
@@ -40,28 +44,47 @@ public class PrincetonObjectDictionaryFile extends AbstractPrincetonDictionaryFi
     }
 
     public boolean isOpen() {
-        return (file != null);
+        return (null != in || null != out);
     }
 
-    public void save() {
-        //TODO save
+    public void save() throws IOException {
+        if (dictionary instanceof MapBackedDictionary) {
+            MapBackedDictionary dic = (MapBackedDictionary) dictionary;
+            log.log(MessageLogLevel.INFO, "PRINCETON_INFO_004", makeFilename());
+            Map<Object, ? extends DictionaryElement> map = dic.getTable(getPOS(), getFileType());
+
+            getOutputStream().reset();
+            writeObject(map);
+
+            log.log(MessageLogLevel.INFO, "PRINCETON_INFO_012", makeFilename());
+        }
     }
 
     public void close() {
         try {
             if (canRead()) {
-                getInputStream().close();
+                in.close();
+                fin.close();
             }
             if (canWrite()) {
-                getOutputStream().close();
+                out.flush();
+                out.close();
+                fout.flush();
+                fout.close();
             }
+            super.close();
         } catch (Exception e) {
             log.log(MessageLogLevel.ERROR, "EXCEPTION_001", e.getMessage(), e);
         } finally {
             in = null;
+            fin = null;
             out = null;
-            file = null;
+            fout = null;
         }
+    }
+
+    public void edit() throws IOException {
+        openStreams();
     }
 
     /**
@@ -77,11 +100,13 @@ public class PrincetonObjectDictionaryFile extends AbstractPrincetonDictionaryFi
     }
 
     private void openOutputStream() throws IOException {
-        out = new ObjectOutputStream(new FileOutputStream(file));
+        fout = new FileOutputStream(getFile());
+        out = new ObjectOutputStream(fout);
     }
 
     private void openInputStream() throws IOException {
-        in = new ObjectInputStream(new FileInputStream(file));
+        fin = new FileInputStream(getFile());
+        in = new ObjectInputStream(fin);
     }
 
     public ObjectInputStream getInputStream() throws IOException {
@@ -107,8 +132,12 @@ public class PrincetonObjectDictionaryFile extends AbstractPrincetonDictionaryFi
     }
 
     public Object readObject() throws IOException, ClassNotFoundException {
-        if (isOpen() && canRead()) {
-            return getInputStream().readObject();
+        if (isOpen()) {
+            if (canRead()) {
+                return getInputStream().readObject();
+            } else {
+                return new HashMap<Object, DictionaryElement>();
+            }
         } else {
             throw new JWNLRuntimeException("PRINCETON_EXCEPTION_001");
         }
@@ -129,8 +158,7 @@ public class PrincetonObjectDictionaryFile extends AbstractPrincetonDictionaryFi
      * we are going to be reading from it. If you want the other stream
      * open, you must do it explicitly by calling <code>openStreams</code>.
      */
-    protected void openFile(File path) throws IOException {
-        file = path;
+    protected void openFile() throws IOException {
         if (!file.exists()) {
             file.createNewFile();
             openOutputStream();

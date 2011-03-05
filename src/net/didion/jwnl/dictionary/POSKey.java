@@ -3,6 +3,8 @@ package net.didion.jwnl.dictionary;
 import net.didion.jwnl.JWNL;
 import net.didion.jwnl.data.POS;
 
+import java.io.IOException;
+
 /**
  * A cache key consists of a <code>POS</code> and an object.
  */
@@ -54,5 +56,10 @@ public class POSKey {
 
     public String toString() {
         return JWNL.resolveMessage("DICTIONARY_TOSTRING_001", new Object[]{pos, key});
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        pos = POS.getPOSForKey(pos.getKey());
     }
 }

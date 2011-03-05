@@ -100,9 +100,10 @@ public class DictionaryToMap {
         }
 
         Map<Object, DictionaryElement> map = new HashMap<Object, DictionaryElement>((int) Math.ceil((float) count / 0.9F) + 1, 0.9F);
-        DictionaryElement elt;
-        for (Iterator<? extends DictionaryElement> listItr = getIterator(pos, fileType); listItr.hasNext(); map.put(elt.getKey(), elt)) {
-            elt = listItr.next();
+        Iterator<? extends DictionaryElement> listItr = getIterator(pos, fileType);
+        while (listItr.hasNext()) {
+            DictionaryElement elt = listItr.next();
+            map.put(elt.getKey(), elt);
         }
 
         file.writeObject(map);
