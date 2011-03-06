@@ -13,8 +13,8 @@ import java.util.Map;
 /**
  * Supports the wordnet 3.0 database, including sense key and usage count information.
  *
- * @author brett
- * @author Aliaksandr Autayeu avtaev@gmail.com
+ * @author Brett Walenz <bwalenz@users.sourceforge.net>
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class PrincetonWN30DatabaseDictionaryElementFactory extends AbstractPrincetonDatabaseDictionaryElementFactory {
 

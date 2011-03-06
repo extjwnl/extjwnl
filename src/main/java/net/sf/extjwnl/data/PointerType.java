@@ -14,8 +14,8 @@ import java.util.*;
  * parts-of-speech that it applies to, and a short string that represents it in
  * the dictionary files.
  *
- * @author didion
- * @author Aliaksandr Autayeu avtaev@gmail.com
+ * @author John Didion <jdidion@users.sourceforge.net>
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class PointerType implements Serializable {
 

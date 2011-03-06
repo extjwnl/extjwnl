@@ -19,8 +19,8 @@ import java.util.Random;
  * in order to eliminate the redundant IO activity that a naive implementation of these methods
  * would necessitate.
  *
- * @author didion
- * @author Aliaksandr Autayeu avtaev@gmail.com
+ * @author John Didion <jdidion@users.sourceforge.net>
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class FileManagerImpl implements FileManager {
 

@@ -18,6 +18,8 @@ import java.io.StringWriter;
  * <p/>
  * There are two types of relationships - {@link net.sf.extjwnl.data.relationship.SymmetricRelationship Symmetric}
  * and {@link net.sf.extjwnl.data.relationship.AsymmetricRelationship Asymmetric}.
+ *
+ * @author John Didion <jdidion@users.sourceforge.net>
  */
 public abstract class Relationship {
     /**

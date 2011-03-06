@@ -11,8 +11,8 @@ import java.util.Map;
 /**
  * Base class for random access files.
  *
- * @author didion
- * @author Aliaksandr Autayeu avtaev@gmail.com
+ * @author John Didion <jdidion@users.sourceforge.net>
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public abstract class AbstractPrincetonRandomAccessDictionaryFile extends AbstractPrincetonDictionaryFile
         implements RandomAccessDictionaryFile {

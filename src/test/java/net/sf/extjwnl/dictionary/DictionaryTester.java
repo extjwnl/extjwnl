@@ -18,8 +18,8 @@ import java.util.List;
  * but requires an implementation of a specific dictionary to
  * function.
  *
- * @author bwalenz
- * @author Aliaksandr Autayeu avtaev@gmail.com
+ * @author Brett Walenz <bwalenz@users.sourceforge.net>
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public abstract class DictionaryTester {
 

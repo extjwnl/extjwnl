@@ -5,6 +5,8 @@ package net.sf.extjwnl.util;
  * creating a copy of the object that contains references to the same
  * members as the original) or deeply (by creating a copy of the object
  * and of all it's member objects).
+ *
+ * @author John Didion <jdidion@users.sourceforge.net>
  */
 public interface DeepCloneable extends Cloneable {
     /**

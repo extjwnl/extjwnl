@@ -11,8 +11,8 @@ import java.util.Map;
 /**
  * Database Manager that handles the extended database containing sense key and usage statistics.
  *
- * @author brett
- * @author Aliaksandr Autayeu avtaev@gmail.com
+ * @author Brett Walenz <bwalenz@users.sourceforge.net>
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class SenseAndUsageDatabaseManager extends DatabaseManagerImpl implements Owned {
 

@@ -8,6 +8,8 @@ import java.util.List;
 
 /**
  * A container for the root node of a pointer target tree.
+ *
+ * @author John Didion <jdidion@users.sourceforge.net>
  */
 public class PointerTargetTree {
     private PointerTargetTreeNode rootNode;

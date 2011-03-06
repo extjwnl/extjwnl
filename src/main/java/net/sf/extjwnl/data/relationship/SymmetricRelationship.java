@@ -12,6 +12,8 @@ import net.sf.extjwnl.data.list.PointerTargetNodeList;
  * the source and target synsets. Another way of saying this is that the target synset will always been in
  * the source's ancestry, and vice versa. For this reason, symmetric relationships have no concept of a
  * common parent index.
+ *
+ * @author John Didion <jdidion@users.sourceforge.net>
  */
 public class SymmetricRelationship extends Relationship {
     public SymmetricRelationship(

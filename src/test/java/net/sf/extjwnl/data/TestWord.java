@@ -10,8 +10,8 @@ import java.io.IOException;
 /**
  * Tests the word functionality.
  *
- * @author bwalenz
- * @author Aliaksandr Autayeu avtaev@gmail.com
+ * @author Brett Walenz <bwalenz@users.sourceforge.net>
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class TestWord extends BaseDataTest {
 

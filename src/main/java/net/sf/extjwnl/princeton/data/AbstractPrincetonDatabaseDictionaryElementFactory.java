@@ -14,8 +14,8 @@ import java.util.List;
 /**
  * Base class for element factories.
  *
- * @author didion
- * @author Aliaksandr Autayeu avtaev@gmail.com
+ * @author John Didion <jdidion@users.sourceforge.net>
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public abstract class AbstractPrincetonDatabaseDictionaryElementFactory implements DatabaseDictionaryElementFactory {
 

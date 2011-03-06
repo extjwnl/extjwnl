@@ -12,6 +12,8 @@ import net.sf.extjwnl.data.list.PointerTargetNodeList;
  * For example, in finding a hypernym  relationship between dog and cat, the relationship is dog -> canine ->
  * carnivore -> feline -> cat. The ancestry of "dog" and the ancestry of "cat" diverge at "carnivore," so
  * the common parent index is thus 2.
+ *
+ * @author John Didion <jdidion@users.sourceforge.net>
  */
 public class AsymmetricRelationship extends Relationship {
     /**

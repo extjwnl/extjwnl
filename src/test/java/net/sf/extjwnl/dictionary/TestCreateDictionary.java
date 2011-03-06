@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * Tests dictionary editing.
  *
- * @author Aliaksandr Autayeu avtaev@gmail.com
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public abstract class TestCreateDictionary {
 

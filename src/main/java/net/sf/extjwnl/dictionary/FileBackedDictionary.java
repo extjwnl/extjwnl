@@ -18,8 +18,8 @@ import java.util.NoSuchElementException;
  * A <code>Dictionary</code> that retrieves objects from the text files
  * in the WordNet distribution directory.
  *
- * @author didion
- * @author Aliaksandr Autayeu avtaev@gmail.com
+ * @author John Didion <jdidion@users.sourceforge.net>
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class FileBackedDictionary extends AbstractCachingDictionary {
 

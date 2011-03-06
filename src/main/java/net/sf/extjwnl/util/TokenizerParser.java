@@ -4,6 +4,8 @@ import java.util.StringTokenizer;
 
 /**
  * A <code>StringTokenizer</code> with extensions to retrieve the values of numeric tokens, as well as strings.
+ *
+ * @author John Didion <jdidion@users.sourceforge.net>
  */
 public class TokenizerParser extends StringTokenizer {
     public TokenizerParser(String string, String delimiters) {

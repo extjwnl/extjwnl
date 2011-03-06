@@ -19,8 +19,8 @@ import java.util.Map;
 /**
  * <code>ObjectDictionaryFile</code> that accesses files names with the Princeton dictionary file naming convention.
  *
- * @author didion
- * @author Aliaksandr Autayeu avtaev@gmail.com
+ * @author John Didion <jdidion@users.sourceforge.net>
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class PrincetonObjectDictionaryFile extends AbstractPrincetonDictionaryFile implements ObjectDictionaryFile, DictionaryFileFactory<PrincetonObjectDictionaryFile> {
 

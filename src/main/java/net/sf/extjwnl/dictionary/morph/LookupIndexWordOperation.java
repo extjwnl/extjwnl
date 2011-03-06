@@ -9,8 +9,8 @@ import java.util.Map;
 /**
  * Lookups up index words.
  *
- * @author didion
- * @author Aliaksandr Autayeu avtaev@gmail.com
+ * @author John Didion <jdidion@users.sourceforge.net>
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class LookupIndexWordOperation extends AbstractOperation {
 

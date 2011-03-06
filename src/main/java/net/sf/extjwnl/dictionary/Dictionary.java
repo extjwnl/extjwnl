@@ -26,8 +26,8 @@ import java.util.*;
  * Abstract representation of a WordNet dictionary.
  * See the architecture documentation for information on subclassing Dictionary.
  *
- * @author didion
- * @author Aliaksandr Autayeu avtaev@gmail.com
+ * @author John Didion <jdidion@users.sourceforge.net>
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public abstract class Dictionary {
 

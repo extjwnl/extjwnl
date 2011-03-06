@@ -10,6 +10,8 @@ import java.util.List;
  * A <code>MorphologicalProcessor</code> tries to turn the inflected form of a word or phrase into
  * the form that can be found in WordNet. For example, if one calls
  * lookupBaseForm(POS.VERB, "running"), the index word for "run" should be returned.
+ *
+ * @author John Didion <jdidion@users.sourceforge.net>
  */
 public interface MorphologicalProcessor {
     /**

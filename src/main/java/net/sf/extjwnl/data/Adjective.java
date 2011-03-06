@@ -14,8 +14,8 @@ import java.util.Map;
  * <p/>
  * Note: Adjective positions are only supported through WordNet v1.5.
  *
- * @author didion
- * @author Aliaksandr Autayeu avtaev@gmail.com
+ * @author John Didion <jdidion@users.sourceforge.net>
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class Adjective extends Word {
 

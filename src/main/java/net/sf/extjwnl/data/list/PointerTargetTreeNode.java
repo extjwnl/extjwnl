@@ -14,6 +14,8 @@ import java.util.ListIterator;
  * target. Basically, this allows for a single tree supporting multiple relationships. For example, you
  * may have a ancestry tree, and each node, besides having links to its children, has links to the
  * synonyms of its target.
+ *
+ * @author John Didion <jdidion@users.sourceforge.net>
  */
 public class PointerTargetTreeNode extends PointerTargetNode {
     /**

@@ -9,8 +9,9 @@ import java.sql.SQLException;
 /**
  * Factory interface for creating WordNet objects from a database.
  *
- * @author brett, jdidion
- * @author Aliaksandr Autayeu avtaev@gmail.com
+ * @author Brett Walenz <bwalenz@users.sourceforge.net>
+ * @author John Didion <jdidion@users.sourceforge.net>
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public interface DatabaseDictionaryElementFactory extends Owned {
 

@@ -3,6 +3,8 @@ package net.sf.extjwnl;
 
 /**
  * Base level exception used by JWNL. Tries to resolve the message using JWNL.resolveMessage.
+ *
+ * @author John Didion <jdidion@users.sourceforge.net>
  */
 public class JWNLException extends Exception {
     public JWNLException(String key) {

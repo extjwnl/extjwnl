@@ -7,6 +7,8 @@ import java.util.List;
 
 /**
  * A group of possible base forms for a particular lemma
+ *
+ * @author John Didion <jdidion@users.sourceforge.net>
  */
 public class BaseFormSet {
     private List forms = new ArrayList();

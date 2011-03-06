@@ -8,6 +8,8 @@ import java.util.ListIterator;
 
 /**
  * A printer for displaying the contents of a node list.
+ *
+ * @author John Didion <jdidion@users.sourceforge.net>
  */
 public abstract class NodePrinter {
     private PrintStream defaultStream = System.out;

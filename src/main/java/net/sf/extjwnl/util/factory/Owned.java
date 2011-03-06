@@ -6,7 +6,7 @@ import net.sf.extjwnl.dictionary.Dictionary;
 /**
  * Supports ownership information.
  *
- * @author Aliaksandr Autayeu avtaev@gmail.com
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public interface Owned {
 

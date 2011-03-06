@@ -7,6 +7,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * Helper class to manage queries.
+ *
+ * @author John Didion <jdidion@users.sourceforge.net>
+ */
 public class Query {
     private Connection connection;
     private PreparedStatement statement;

@@ -12,8 +12,8 @@ import java.util.Map;
 /**
  * <code>FileDictionaryElementFactory</code> that produces elements for Princeton's release of WordNet v 1.6
  *
- * @author didion
- * @author Aliaksandr Autayeu avtaev@gmail.com
+ * @author John Didion <jdidion@users.sourceforge.net>
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class PrincetonWN16FileDictionaryElementFactory extends AbstractPrincetonFileDictionaryElementFactory {
 

@@ -13,8 +13,8 @@ import java.util.*;
  * An <code>IndexWord</code> represents a line of the <var>pos</var><code>.index</code> file.
  * An <code>IndexWord</code> is created or retrieved via {@link Dictionary#lookupIndexWord lookupIndexWord}.
  *
- * @author didion
- * @author Aliaksandr Autayeu avtaev@gmail.com
+ * @author John Didion <jdidion@users.sourceforge.net>
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class IndexWord extends BaseDictionaryElement {
 

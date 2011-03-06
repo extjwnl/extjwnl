@@ -6,8 +6,8 @@ import java.util.Map;
 /**
  * A set of </code>Caches</code>, indexed by <code>CacheKey</code>.
  *
- * @author didion
- * @author Aliaksandr Autayeu avtaev@gmail.com
+ * @author John Didion <jdidion@users.sourceforge.net>
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public abstract class CacheSet<K, A, B> {
     public static final int DEFAULT_CACHE_CAPACITY = 1000;

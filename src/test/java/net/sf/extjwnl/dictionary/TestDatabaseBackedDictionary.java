@@ -8,7 +8,7 @@ import java.io.IOException;
 /**
  * Creates a DatabaseBackedDictionary and creates all the test cases.
  *
- * @author Aliaksandr Autayeu avtaev@gmail.com
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class TestDatabaseBackedDictionary extends DictionaryTester {
 

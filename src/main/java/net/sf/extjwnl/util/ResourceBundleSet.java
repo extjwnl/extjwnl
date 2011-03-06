@@ -4,6 +4,8 @@ import java.util.*;
 
 /**
  * A ResourceBundle that is a proxy to multiple ResourceBundles.
+ *
+ * @author John Didion <jdidion@users.sourceforge.net>
  */
 public class ResourceBundleSet extends ResourceBundle {
 

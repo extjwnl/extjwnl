@@ -18,8 +18,8 @@ import java.io.FileInputStream;
 /**
  * A class to demonstrate the functionality of the JWNL package.
  *
- * @author didion
- * @author Aliaksandr Autayeu avtaev@gmail.com
+ * @author John Didion <jdidion@users.sourceforge.net>
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class Examples {
     private static final String USAGE = "java Examples <properties file>";

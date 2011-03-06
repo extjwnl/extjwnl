@@ -10,6 +10,8 @@ import java.util.ArrayList;
  * another connotes a relationship between those words. The type of the relationship is specified by the type
  * of pointer. See the WordNet documentation for information on pointer types. To avoid confusion with
  * the <code>Relationship</code> class, these relationships will be referred to as links.
+ *
+ * @author John Didion <jdidion@users.sourceforge.net>
  */
 public class PointerUtils {
     /**

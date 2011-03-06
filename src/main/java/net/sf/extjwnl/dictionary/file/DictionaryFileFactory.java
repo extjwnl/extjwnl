@@ -6,7 +6,7 @@ import net.sf.extjwnl.dictionary.Dictionary;
 /**
  * A dictionary file factory.
  *
- * @author Aliaksandr Autayeu avtaev@gmail.com
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public interface DictionaryFileFactory<E> {
 

@@ -15,6 +15,8 @@ import java.util.List;
  * Each node contains a <code>PointerTarget</code> (a synset or word) and the type of
  * relationship that the node has to the other elements in the list and/or to
  * the source word.
+ *
+ * @author John Didion <jdidion@users.sourceforge.net>
  */
 public class PointerTargetNodeList extends TypeCheckingList {
 

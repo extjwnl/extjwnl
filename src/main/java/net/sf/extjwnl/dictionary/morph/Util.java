@@ -4,6 +4,11 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 
+/**
+ * Utility class.
+ *
+ * @author John Didion <jdidion@users.sourceforge.net>
+ */
 public class Util {
     public static String getLemma(String[] tokens, BitSet bits, String delimiter) {
         StringBuffer buf = new StringBuffer();

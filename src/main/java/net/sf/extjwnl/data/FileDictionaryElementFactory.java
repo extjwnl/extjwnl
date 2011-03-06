@@ -7,6 +7,8 @@ import net.sf.extjwnl.util.factory.Owned;
  * Factory class for creating <code>DictionaryElement</code>s (<code>Synset</code>s, <code>Exception</codes,
  * and <code>IndexWord</code>s). Using a factory class rather than individual parsing methods in each class
  * facilitates using multiple versions of WordNet, or using a proprietary data format.
+ *
+ * @author John Didion <jdidion@users.sourceforge.net>
  */
 public interface FileDictionaryElementFactory extends Owned {
 

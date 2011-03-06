@@ -6,6 +6,8 @@ import java.util.ArrayList;
 
 /**
  * A list of <code>Relationship</code>s.
+ *
+ * @author John Didion <jdidion@users.sourceforge.net>
  */
 public class RelationshipList extends TypeCheckingList {
     /**

@@ -10,7 +10,8 @@ import java.util.List;
  * WordNet contains different file types, index, synset data, and exception files.
  * This class defines what the current dictionary is.
  *
- * @author brett
+ * @author Brett Walenz <bwalenz@users.sourceforge.net>
+ * @author John Didion <jdidion@users.sourceforge.net>
  */
 public class DictionaryElementType {
 

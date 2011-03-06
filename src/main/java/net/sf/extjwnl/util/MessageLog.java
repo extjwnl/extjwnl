@@ -4,6 +4,11 @@ import net.sf.extjwnl.JWNL;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+/**
+ * Message log that resolves messages.
+ *
+ * @author John Didion <jdidion@users.sourceforge.net>
+ */
 public class MessageLog {
     private Log log;
 

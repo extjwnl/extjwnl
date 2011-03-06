@@ -18,8 +18,8 @@ import java.util.List;
  * There is one exception list file for each syntactic category. From wndb.5WN
  * in WordNet base documentation.
  *
- * @author didion
- * @author Aliaksandr Autayeu avtaev@gmail.com
+ * @author John Didion <jdidion@users.sourceforge.net>
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class Exc extends BaseDictionaryElement {
 

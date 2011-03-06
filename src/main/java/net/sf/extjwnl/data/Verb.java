@@ -9,8 +9,8 @@ import java.util.BitSet;
  * A <code>Verb</code> is a subclass of <code>Word</code> that can have 1 or more
  * <code>VerbFrame</code>s (use cases of the verb).
  *
- * @author didion
- * @author Aliaksandr Autayeu avtaev@gmail.com
+ * @author John Didion <jdidion@users.sourceforge.net>
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class Verb extends Word {
     private static final long serialVersionUID = 1L;

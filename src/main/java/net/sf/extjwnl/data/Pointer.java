@@ -15,8 +15,8 @@ import java.io.Serializable;
  * Relationships are <it>typed</it>: the type of a relationship is a {@link PointerType}, and can
  * be retrieved via {@link Pointer#getType getType}.
  *
- * @author didion
- * @author Aliaksandr Autayeu avtaev@gmail.com
+ * @author John Didion <jdidion@users.sourceforge.net>
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class Pointer implements Serializable {
     private static final long serialVersionUID = 1L;

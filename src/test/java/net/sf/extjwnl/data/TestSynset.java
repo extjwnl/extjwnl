@@ -10,8 +10,8 @@ import java.io.IOException;
 /**
  * Tests Synset functionality by creating a mock synset.
  *
- * @author bwalenz
- * @author Aliaksandr Autayeu avtaev@gmail.com
+ * @author Brett Walenz <bwalenz@users.sourceforge.net>
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class TestSynset extends BaseDataTest {
 

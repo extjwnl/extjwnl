@@ -6,6 +6,9 @@ import java.util.Map;
 /**
  * A fixed-capacity <code>Cache</code> that stores the most recently used elements. Once the cache reaches
  * capacity, the least recently used elements will be removed.
+ *
+ * @author John Didion <jdidion@users.sourceforge.net>
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class LRUCache<K, V> extends LinkedHashMap<K, V> implements Cache<K, V> {
 

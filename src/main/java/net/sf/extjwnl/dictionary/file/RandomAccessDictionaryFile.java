@@ -5,8 +5,8 @@ import java.io.IOException;
 /**
  * <code>DictionaryFile</code> that reads lines from a random-access text file.
  *
- * @author didion
- * @author Aliaksandr Autayeu avtaev@gmail.com
+ * @author John Didion <jdidion@users.sourceforge.net>
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public interface RandomAccessDictionaryFile extends DictionaryFile {
 

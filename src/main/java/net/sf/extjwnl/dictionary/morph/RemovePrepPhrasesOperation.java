@@ -5,6 +5,8 @@ import net.sf.extjwnl.dictionary.Dictionary;
 
 /**
  * yet to be implemented
+ *
+ * @author John Didion <jdidion@users.sourceforge.net>
  */
 public class RemovePrepPhrasesOperation extends AbstractOperation {
 

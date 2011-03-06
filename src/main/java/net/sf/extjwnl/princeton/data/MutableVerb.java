@@ -7,8 +7,9 @@ import net.sf.extjwnl.dictionary.Dictionary;
 import java.util.BitSet;
 
 /**
- * Wrapper for a verb that allows the VerbFrame flags to be set after the Verb
- * is created.
+ * Wrapper for a verb that allows the VerbFrame flags to be set after the Verb is created.
+ *
+ * @author John Didion <jdidion@users.sourceforge.net>
  */
 class MutableVerb extends Verb {
     public MutableVerb(Dictionary dictionary, Synset synset, int index, String lemma) {

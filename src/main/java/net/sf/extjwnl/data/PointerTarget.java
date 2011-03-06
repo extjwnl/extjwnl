@@ -13,8 +13,8 @@ import java.util.List;
  * The target of a semantic <code>PointerTarget</code> is a <code>Synset</code>;
  * the target of a lexical <code>PointerTarget</code> is a <code>Word</code>.
  *
- * @author didion
- * @author Aliaksandr Autayeu avtaev@gmail.com
+ * @author John Didion <jdidion@users.sourceforge.net>
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public abstract class PointerTarget implements Serializable, Owned {
 

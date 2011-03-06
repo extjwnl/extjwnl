@@ -16,8 +16,8 @@ import java.util.StringTokenizer;
  * <code>FileDictionaryElementFactory</code> that parses lines from the dictionary files distributed by the
  * WordNet team at Princeton's Cognitive Science department.
  *
- * @author didion
- * @author Aliaksandr Autayeu avtaev@gmail.com
+ * @author John Didion <jdidion@users.sourceforge.net>
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public abstract class AbstractPrincetonFileDictionaryElementFactory implements FileDictionaryElementFactory {
 

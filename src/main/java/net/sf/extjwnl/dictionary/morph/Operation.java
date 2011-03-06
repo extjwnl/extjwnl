@@ -7,8 +7,8 @@ import net.sf.extjwnl.util.factory.Owned;
 /**
  * Base class for operations.
  *
- * @author didion
- * @author Aliaksandr Autayeu avtaev@gmail.com
+ * @author John Didion <jdidion@users.sourceforge.net>
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public interface Operation extends Owned {
     /**

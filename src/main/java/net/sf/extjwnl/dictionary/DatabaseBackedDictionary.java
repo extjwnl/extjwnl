@@ -12,6 +12,12 @@ import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+/**
+ * Database-backed dictionary.
+ *
+ * @author John Didion <jdidion@users.sourceforge.net>
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
+ */
 public class DatabaseBackedDictionary extends AbstractCachingDictionary {
     /**
      * <code>MorphologicalProcessor</code> class install parameter. The value should be the

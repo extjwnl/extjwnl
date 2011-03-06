@@ -11,8 +11,8 @@ import java.io.IOException;
  * <code>FileManager</code> defines the interface between the <code>FileBackedDictionary</code> and the file system.
  * Methods in this interface operate on and return offsets, which are indices into a dictionary file.
  *
- * @author didion
- * @author Aliaksandr Autayeu avtaev@gmail.com
+ * @author John Didion <jdidion@users.sourceforge.net>
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public interface FileManager extends Owned {
     /**

@@ -27,8 +27,8 @@ import java.util.Map;
  * using a high quantity of API calls to the JWNL library
  * (such as word sense disambiguation algorithms, or dictionary services).
  *
- * @author brett
- * @author Aliaksandr Autayeu avtaev@gmail.com
+ * @author Brett Walenz <bwalenz@users.sourceforge.net>
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class DictionaryToMap {
 

@@ -9,6 +9,11 @@ import net.sf.extjwnl.data.list.*;
 
 import java.util.List;
 
+/**
+ * Helper class to find relations.
+ *
+ * @author John Didion <jdidion@users.sourceforge.net>
+ */
 public class RelationshipFinder {
     private static final int DEFAULT_ASYMMETRIC_SEARCH_DEPTH = Integer.MAX_VALUE;
     private static final int DEFAULT_SYMMETRIC_SEARCH_DEPTH = 2;

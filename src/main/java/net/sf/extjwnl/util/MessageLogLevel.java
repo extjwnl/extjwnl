@@ -2,6 +2,11 @@ package net.sf.extjwnl.util;
 
 import net.sf.extjwnl.JWNL;
 
+/**
+ * Level of messages in a log.
+ *
+ * @author John Didion <jdidion@users.sourceforge.net>
+ */
 public class MessageLogLevel {
     public static final MessageLogLevel TRACE = new MessageLogLevel("TRACE");
     public static final MessageLogLevel DEBUG = new MessageLogLevel("DEBUG");

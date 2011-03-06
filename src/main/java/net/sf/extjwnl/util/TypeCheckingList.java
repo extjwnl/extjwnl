@@ -9,6 +9,8 @@ import java.util.*;
  * Wrapper for a list that checks the type of arguments before putting them in the list.
  * It also does type-checking on methods which iterate over the list so that they fail
  * fast if the argument is not of the correct type.
+ *
+ * @author John Didion <jdidion@users.sourceforge.net>
  */
 public class TypeCheckingList implements List, DeepCloneable {
     private List list;

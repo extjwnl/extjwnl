@@ -3,8 +3,8 @@ package net.sf.extjwnl.util.cache;
 /**
  * LeastRecentlyUsed cache set.
  *
- * @author didion
- * @author Aliaksandr Autayeu avtaev@gmail.com
+ * @author John Didion <jdidion@users.sourceforge.net>
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class LRUCacheSet<K, A, B> extends CacheSet<K, A, B> {
 

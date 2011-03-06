@@ -13,8 +13,8 @@ import java.util.ResourceBundle;
 /**
  * Contains system info as well as JWNL properties.
  *
- * @author didion
- * @author Aliaksandr Autayeu avtaev@gmail.com
+ * @author John Didion <jdidion@users.sourceforge.net>
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class JWNL {
     // OS types

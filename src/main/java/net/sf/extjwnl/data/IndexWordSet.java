@@ -12,8 +12,8 @@ import java.util.Set;
  * one part of speech of the same word. IndexWordSets are usually created by a
  * call to {@link net.sf.extjwnl.dictionary.Dictionary#lookupAllIndexWords Dictionary.lookupAllIndexWords}.
  *
- * @author didion
- * @author Aliaksandr Autayeu avtaev@gmail.com
+ * @author John Didion <jdidion@users.sourceforge.net>
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class IndexWordSet {
     /**

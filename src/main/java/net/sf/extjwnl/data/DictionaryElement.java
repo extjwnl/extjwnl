@@ -8,8 +8,8 @@ import java.io.Serializable;
  * Any class that represents an element contained in the dictionary (<code>IndexWord</code>s,
  * <code>Synset</code>s, and <code>Exc</code>eptions) must implement this interface.
  *
- * @author didion
- * @author Aliaksandr Autayeu avtaev@gmail.com
+ * @author John Didion <jdidion@users.sourceforge.net>
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public interface DictionaryElement extends Serializable, Owned {
 

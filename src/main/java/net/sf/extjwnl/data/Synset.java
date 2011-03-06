@@ -24,8 +24,8 @@ import java.util.List;
  * retrieves the targets of these links, and {@link #getPointers getPointers}
  * retrieves the pointers themselves.
  *
- * @author didion
- * @author Aliaksandr Autayeu avtaev@gmail.com
+ * @author John Didion <jdidion@users.sourceforge.net>
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class Synset extends PointerTarget implements DictionaryElement {
 

@@ -8,6 +8,8 @@ import java.util.*;
 
 /**
  * A list of <code>PointerTargetTreeNode</code>s.
+ *
+ * @author John Didion <jdidion@users.sourceforge.net>
  */
 public class PointerTargetTreeNodeList extends PointerTargetNodeList {
     private static final NodePrinter PRINTER =

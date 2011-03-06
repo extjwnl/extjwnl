@@ -9,8 +9,8 @@ import java.util.BitSet;
 /**
  * A <code>VerbFrame</code> is the frame of a sentence in which it is proper to use a given verb.
  *
- * @author didion
- * @author Aliaksandr Autayeu avtaev@gmail.com
+ * @author John Didion <jdidion@users.sourceforge.net>
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class VerbFrame implements Serializable {
 

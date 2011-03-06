@@ -8,7 +8,7 @@ import java.io.IOException;
 /**
  * Creates a MapBackedDictionary and creates all the test cases.
  *
- * @author Aliaksandr Autayeu avtaev@gmail.com
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class TestMapBackedDictionary extends DictionaryTester {
 

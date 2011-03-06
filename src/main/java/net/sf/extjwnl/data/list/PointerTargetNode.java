@@ -8,6 +8,8 @@ import net.sf.extjwnl.data.Word;
 
 /**
  * A node in a <code>PointerTargetNodeList</code>.
+ *
+ * @author John Didion <jdidion@users.sourceforge.net>
  */
 public class PointerTargetNode implements Node {
     /**
