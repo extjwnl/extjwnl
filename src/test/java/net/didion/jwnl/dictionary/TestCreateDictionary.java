@@ -1,7 +1,7 @@
-package net.didion.jwnl.data;
+package net.didion.jwnl.dictionary;
 
 import net.didion.jwnl.JWNLException;
-import net.didion.jwnl.dictionary.Dictionary;
+import net.didion.jwnl.data.*;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

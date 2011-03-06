@@ -1,7 +1,6 @@
 package net.didion.jwnl.data;
 
 import net.didion.jwnl.JWNLException;
-import net.didion.jwnl.dictionary.Dictionary;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,7 +14,7 @@ import java.util.Arrays;
  * @author bwalenz
  * @author Aliaksandr Autayeu avtaev@gmail.com
  */
-public class TestExc extends BaseDictionaryTest {
+public class TestExc extends BaseDataTest {
 
     private Exc testObj;
 

@@ -14,7 +14,7 @@ import java.io.InputStream;
  *
  * @author Aliaksandr Autayeu avtaev@gmail.com
  */
-public class BaseDictionaryTest {
+public class BaseDataTest {
 
     private final String properties = "./config/clean_file.xml";
 

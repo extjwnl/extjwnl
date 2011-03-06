@@ -1,7 +1,10 @@
-package net.didion.jwnl.data;
+package net.didion.jwnl.dictionary;
 
 import net.didion.jwnl.JWNLException;
-import net.didion.jwnl.dictionary.Dictionary;
+import net.didion.jwnl.data.IndexWord;
+import net.didion.jwnl.data.POS;
+import net.didion.jwnl.data.Synset;
+import net.didion.jwnl.data.Word;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

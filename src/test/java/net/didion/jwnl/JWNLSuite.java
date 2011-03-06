@@ -1,5 +1,10 @@
-package net.didion.jwnl.data;
+package net.didion.jwnl;
 
+import net.didion.jwnl.data.*;
+import net.didion.jwnl.dictionary.TestCreateFileBackedDictionary;
+import net.didion.jwnl.dictionary.TestCreateMapBackedDictionary;
+import net.didion.jwnl.dictionary.TestFileBackedDictionary;
+import net.didion.jwnl.dictionary.TestFileBackedDictionaryEdit;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 

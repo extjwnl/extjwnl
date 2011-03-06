@@ -1,7 +1,6 @@
-package net.didion.jwnl.data;
+package net.didion.jwnl.dictionary;
 
 import net.didion.jwnl.JWNLException;
-import net.didion.jwnl.dictionary.Dictionary;
 import org.junit.Test;
 
 import java.io.FileInputStream;

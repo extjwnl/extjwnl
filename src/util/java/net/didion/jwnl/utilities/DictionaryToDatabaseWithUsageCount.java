@@ -5,8 +5,6 @@ import net.didion.jwnl.data.Synset;
 import net.didion.jwnl.data.Word;
 import net.didion.jwnl.dictionary.Dictionary;
 import net.didion.jwnl.dictionary.database.ConnectionManager;
-import net.didion.jwnl.util.MessageLog;
-import net.didion.jwnl.util.MessageLogLevel;
 import net.didion.jwnl.util.TokenizerParser;
 
 import java.io.*;

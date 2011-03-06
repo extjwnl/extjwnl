@@ -13,7 +13,7 @@ import java.io.IOException;
  * @author bwalenz
  * @author Aliaksandr Autayeu avtaev@gmail.com
  */
-public class TestWord extends BaseDictionaryTest {
+public class TestWord extends BaseDataTest {
 
     private Word word;
 

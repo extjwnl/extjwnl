@@ -1,4 +1,4 @@
-package net.didion.jwnl.data;
+package net.didion.jwnl.dictionary;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
