@@ -1,8 +1,6 @@
 <assembly>
-    <id>release</id>
+    <id>all</id>
     <formats>
-        <format>tar.gz</format>
-        <format>tar.bz2</format>
         <format>zip</format>
     </formats>
     <fileSets>
@@ -10,8 +8,9 @@
             <directory>${project.basedir}</directory>
             <includes>
                 <include>license.txt</include>
+                <include>readme.txt</include>
             </includes>
-            <outputDirectory></outputDirectory>
+            <outputDirectory/>
         </fileSet>
 
         <fileSet>
@@ -23,11 +22,11 @@
         </fileSet>
 
         <fileSet>
-            <directory>${project.basedir}/sql</directory>
+            <directory>${project.basedir}/src</directory>
             <includes>
-                <include>*.sql</include>
+                <include>**</include>
             </includes>
-            <outputDirectory>sql</outputDirectory>
+            <outputDirectory>src</outputDirectory>
         </fileSet>
 
         <fileSet>
@@ -44,6 +43,14 @@
                 <include>*.jar</include>
             </includes>
             <outputDirectory>bin</outputDirectory>
+        </fileSet>
+
+        <fileSet>
+            <directory>${project.build.directory}/apidocs</directory>
+            <includes>
+                <include>*.*</include>
+            </includes>
+            <outputDirectory>doc/apidocs</outputDirectory>
         </fileSet>
     </fileSets>
 </assembly>

@@ -1,13 +1,54 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
-    <groupId>extjwnl</groupId>
+    <groupId>net.sf.extjwnl</groupId>
     <artifactId>extjwnl</artifactId>
+    <packaging>jar</packaging>
+    <version>1.5</version>
+    <name>extJWNL</name>
+    <description>extJWNL (Extended Java WordNet Library) is a Java API for creating, reading and updating dictionaries
+        in WordNet format
+    </description>
+    <url>http://extjwnl.sf.net</url>
+    <licenses>
+        <license>
+            <name>BSD License</name>
+            <url>http://extjwnl.sourceforge.net/license.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <developers>
+        <developer>
+            <id>autayeu</id>
+            <name>Aliaksandr Autayeu</name>
+            <email>avtaev@gmail.com</email>
+            <url>http://autayeu.com</url>
+            <timezone>+1</timezone>
+            <properties>
+                <picUrl>http://autayeu.com/img/photos/aliaksandr-autayeu.jpg</picUrl>
+            </properties>
+        </developer>
+    </developers>
+    <scm>
+        <connection>scm:git:git://extjwnl.git.sourceforge.net/gitroot/extjwnl/extjwnl</connection>
+        <developerConnection>scm:git:ssh://autayeu@extjwnl.git.sourceforge.net/gitroot/extjwnl/autayeu
+        </developerConnection>
+        <url>http://extjwnl.git.sourceforge.net</url>
+    </scm>
 
-    <name>Extended Java WordNet Library</name>
+    <mailingLists>
+        <mailingList>
+            <name>extjwnl-announce</name>
+            <subscribe>https://lists.sourceforge.net/lists/listinfo/extjwnl-announce</subscribe>
+            <unsubscribe>https://lists.sourceforge.net/lists/listinfo/extjwnl-announce</unsubscribe>
+            <archive>http://sourceforge.net/mailarchive/forum.php?forum_name=extjwnl-announce</archive>
+        </mailingList>
+    </mailingLists>
 
-    <version>20110227</version>
+    <issueManagement>
+        <system>Trac</system>
+        <url>http://sourceforge.net/apps/trac/extjwnl/</url>
+    </issueManagement>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -21,13 +62,14 @@
         </dependency>
 
         <dependency>
+            <scope>test</scope>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.8.2</version>
         </dependency>
 
         <dependency>
-            <scope>runtime</scope>
+            <scope>test</scope>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>5.1.15</version>
@@ -35,14 +77,15 @@
     </dependencies>
 
     <build>
-        <sourceDirectory>src</sourceDirectory>
-        <testSourceDirectory>test</testSourceDirectory>
+        <sourceDirectory>src/main/java</sourceDirectory>
+        <testSourceDirectory>src/test/java</testSourceDirectory>
         <outputDirectory>target/classes</outputDirectory>
         <testOutputDirectory>target/test</testOutputDirectory>
+        <directory>target</directory>
         <finalName>${project.artifactId}-${project.version}</finalName>
         <resources>
             <resource>
-                <directory>${project.basedir}/resources</directory>
+                <directory>src/main/resources</directory>
             </resource>
             <resource>
                 <directory>${project.basedir}</directory>
@@ -50,34 +93,23 @@
                     <include>license.txt</include>
                 </includes>
             </resource>
-
         </resources>
-
         <plugins>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <descriptors>
-                        <descriptor>release-descriptor.xml</descriptor>
-                    </descriptors>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>2.0.2</version>
                 <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
+                    <source>1.6</source>
+                    <target>1.6</target>
                 </configuration>
             </plugin>
         </plugins>
-
     </build>
 
     <profiles>
         <profile>
-            <id>release-profile</id>
+            <id>release</id>
 
             <activation>
                 <property>
@@ -89,9 +121,16 @@
             <build>
                 <plugins>
                     <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <version>2.3.1</version>
+                    </plugin>
+
+                    <plugin>
                         <inherited>true</inherited>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
+                        <version>2.1.2</version>
                         <executions>
                             <execution>
                                 <id>attach-sources</id>
@@ -105,6 +144,7 @@
                         <inherited>true</inherited>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>2.7</version>
                         <executions>
                             <execution>
                                 <id>attach-javadocs</id>
@@ -118,9 +158,28 @@
                         <inherited>true</inherited>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-deploy-plugin</artifactId>
+                        <version>2.5</version>
                         <configuration>
                             <updateReleaseInfo>true</updateReleaseInfo>
                         </configuration>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <version>2.2.1</version>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>src/main/assembly/assembly.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>make-assembly</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>
