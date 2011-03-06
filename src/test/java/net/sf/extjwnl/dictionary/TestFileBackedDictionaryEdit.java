@@ -13,7 +13,7 @@ import java.io.IOException;
  */
 public class TestFileBackedDictionaryEdit {
 
-    protected String properties = "./config/clean_file.xml";
+    protected String properties = "./src/main/config/clean_file.xml";
 
     @Test
     public void TestLoadEmptyDictionary() throws IOException, JWNLException {

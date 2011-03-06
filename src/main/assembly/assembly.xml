@@ -14,14 +14,6 @@
         </fileSet>
 
         <fileSet>
-            <directory>${project.basedir}/config</directory>
-            <includes>
-                <include>*.xml</include>
-            </includes>
-            <outputDirectory>config</outputDirectory>
-        </fileSet>
-
-        <fileSet>
             <directory>${project.basedir}/src</directory>
             <includes>
                 <include>**</include>
