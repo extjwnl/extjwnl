@@ -12,6 +12,7 @@ import java.util.List;
  *
  * @author Brett Walenz <bwalenz@users.sourceforge.net>
  * @author John Didion <jdidion@users.sourceforge.net>
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class DictionaryElementType {
 
@@ -43,9 +44,9 @@ public class DictionaryElementType {
 
 
     /**
-     * Gets all the dictionary types.
+     * Returns all the dictionary types.
      *
-     * @return
+     * @return all the dictionary types
      */
     public static List<DictionaryElementType> getAllDictionaryElementTypes() {
         return ALL_TYPES;
@@ -53,9 +54,9 @@ public class DictionaryElementType {
 
 
     /**
-     * Create a new DictionaryElementType.
+     * Creates a new DictionaryElementType.
      *
-     * @param name
+     * @param name name
      */
     private DictionaryElementType(String name) {
         this.name = name;
@@ -66,9 +67,9 @@ public class DictionaryElementType {
     }
 
     /**
-     * Gets the name of this DictionaryElementType.
+     * Returns the name of this DictionaryElementType.
      *
-     * @return
+     * @return the name of this DictionaryElementType
      */
     public String getName() {
         return name;
