@@ -32,7 +32,7 @@
         <fileSet>
             <directory>${project.basedir}/doc</directory>
             <includes>
-                <include>*.*</include>
+                <include>**</include>
             </includes>
             <outputDirectory>doc</outputDirectory>
         </fileSet>
@@ -40,7 +40,7 @@
         <fileSet>
             <directory>${project.build.directory}</directory>
             <includes>
-                <include>*.jar</include>
+                <include>${project.artifactId}-${project.version}.jar</include>
             </includes>
             <outputDirectory>bin</outputDirectory>
         </fileSet>
@@ -48,7 +48,7 @@
         <fileSet>
             <directory>${project.build.directory}/apidocs</directory>
             <includes>
-                <include>*.*</include>
+                <include>**</include>
             </includes>
             <outputDirectory>doc/apidocs</outputDirectory>
         </fileSet>
