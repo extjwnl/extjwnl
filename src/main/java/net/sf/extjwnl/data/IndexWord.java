@@ -1,0 +1,517 @@
+package net.sf.extjwnl.data;
+
+import net.sf.extjwnl.JWNL;
+import net.sf.extjwnl.JWNLException;
+import net.sf.extjwnl.dictionary.Dictionary;
+import net.sf.extjwnl.util.MessageLog;
+import net.sf.extjwnl.util.MessageLogLevel;
+
+import java.io.IOException;
+import java.util.*;
+
+/**
+ * An <code>IndexWord</code> represents a line of the <var>pos</var><code>.index</code> file.
+ * An <code>IndexWord</code> is created or retrieved via {@link Dictionary#lookupIndexWord lookupIndexWord}.
+ *
+ * @author didion
+ * @author Aliaksandr Autayeu avtaev@gmail.com
+ */
+public class IndexWord extends BaseDictionaryElement {
+
+    private static final long serialVersionUID = 1L;
+
+    private static final MessageLog log = new MessageLog(IndexWord.class);
+
+    /**
+     * This word's part-of-speech
+     */
+    private POS pos;
+    /**
+     * The string representation of this IndexWord
+     */
+    private String lemma;
+    /**
+     * senses are initially stored as offsets, and paged in on demand.
+     */
+    private long[] synsetOffsets;
+    /**
+     * This is null until getSenses has been called.
+     */
+    private transient SynsetList synsets = null;
+
+    private class SynsetList extends ArrayList<Synset> {
+        private SynsetList(int initialCapacity) {
+            super(initialCapacity);
+        }
+
+        @Override
+        public int size() {
+            if (null != synsetOffsets) {
+                return synsetOffsets.length;
+            } else {
+                return super.size();
+            }
+        }
+
+        @Override
+        public boolean isEmpty() {
+            if (null != synsetOffsets) {
+                return 0 == synsetOffsets.length;
+            } else {
+                return super.isEmpty();
+            }
+        }
+
+        @Override
+        public boolean contains(Object o) {
+            loadAllSynsets();
+            return super.contains(o);
+        }
+
+        @Override
+        public int indexOf(Object o) {
+            loadAllSynsets();
+            return super.indexOf(o);
+        }
+
+        @Override
+        public int lastIndexOf(Object o) {
+            loadAllSynsets();
+            return super.lastIndexOf(o);
+        }
+
+        @Override
+        public Object clone() {
+            loadAllSynsets();
+            return super.clone();
+        }
+
+        @Override
+        public Object[] toArray() {
+            loadAllSynsets();
+            return super.toArray();
+        }
+
+        @Override
+        public <T> T[] toArray(T[] a) {
+            loadAllSynsets();
+            return super.toArray(a);
+        }
+
+        @Override
+        public Synset get(int index) {
+            loadAllSynsets();
+            return super.get(index);
+        }
+
+        @Override
+        public Synset set(int index, Synset synset) {
+            if (null == synset) {
+                throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_042"));
+            }
+            if (IndexWord.this.dictionary != synset.getDictionary()) {
+                throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_040"));
+            }
+            loadAllSynsets();
+            if (null != dictionary && dictionary.isEditable()) {
+                if (!super.contains(synset)) {
+                    Synset result = super.set(index, synset);
+                    if (null != result) {
+                        removeWordsFromSynset(result, lemma);
+                    }
+                    addWord(synset, lemma);
+                    return result;
+                } else {
+                    return get(index);
+                }
+            } else {
+                return super.set(index, synset);
+            }
+        }
+
+        @Override
+        public boolean add(Synset synset) {
+            if (null == synset) {
+                throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_042"));
+            }
+            if (IndexWord.this.dictionary != synset.getDictionary()) {
+                throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_040"));
+            }
+            loadAllSynsets();
+            if (null != dictionary && dictionary.isEditable()) {
+                if (!super.contains(synset)) {
+                    boolean result = super.add(synset);
+                    addWord(synset, lemma);
+                    return result;
+                } else {
+                    return false;
+                }
+            } else {
+                return super.add(synset);
+            }
+        }
+
+        @Override
+        public void add(int index, Synset synset) {
+            if (null == synset) {
+                throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_042"));
+            }
+            if (IndexWord.this.dictionary != synset.getDictionary()) {
+                throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_040"));
+            }
+            loadAllSynsets();
+            if (null != dictionary && dictionary.isEditable()) {
+                if (!super.contains(synset)) {
+                    super.add(index, synset);
+                    addWord(synset, lemma);
+                }
+            } else {
+                super.add(index, synset);
+            }
+        }
+
+        @Override
+        public Synset remove(int index) {
+            loadAllSynsets();
+            if (null != dictionary && dictionary.isEditable()) {
+                Synset result = super.remove(index);
+                if (null != result) {
+                    removeWordsFromSynset(result, lemma);
+                }
+                if (0 == super.size()) {
+                    try {
+                        dictionary.removeIndexWord(IndexWord.this);
+                    } catch (JWNLException e) {
+                        log.log(MessageLogLevel.ERROR, "EXCEPTION_001", e.getMessage(), e);
+                    }
+                }
+                return result;
+            } else {
+                return super.remove(index);
+            }
+        }
+
+        @Override
+        public boolean remove(Object o) {
+            loadAllSynsets();
+            if (null != dictionary && dictionary.isEditable()) {
+                boolean result = super.remove(o);
+                if (o instanceof Synset) {
+                    removeWordsFromSynset((Synset) o, lemma);
+                }
+                if (0 == size()) {
+                    try {
+                        dictionary.removeIndexWord(IndexWord.this);
+                    } catch (JWNLException e) {
+                        log.log(MessageLogLevel.ERROR, "EXCEPTION_001", e.getMessage(), e);
+                    }
+                }
+                return result;
+            } else {
+                return super.remove(o);
+            }
+        }
+
+        @Override
+        public void clear() {
+            loadAllSynsets();
+            if (null != dictionary && dictionary.isEditable()) {
+                List<Synset> copy = new ArrayList<Synset>(this);
+                super.clear();
+                for (Synset synset : copy) {
+                    if (null != synset) {
+                        removeWordsFromSynset(synset, lemma);
+                    }
+                }
+            } else {
+                super.clear();
+            }
+        }
+
+        @Override
+        public boolean addAll(Collection<? extends Synset> c) {
+            loadAllSynsets();
+            if (null != dictionary && dictionary.isEditable()) {
+                boolean result = false;
+                for (Synset synset : c) {
+                    if (add(synset)) {
+                        result = true;
+                    }
+                }
+                return result;
+            } else {
+                return super.addAll(c);
+            }
+        }
+
+        @Override
+        public boolean addAll(int index, Collection<? extends Synset> c) {
+            loadAllSynsets();
+            if (null != dictionary && dictionary.isEditable()) {
+                boolean result = !super.containsAll(c);
+                for (Synset synset : c) {
+                    add(index, synset);
+                    index++;
+                }
+                return result;
+            } else {
+                return super.addAll(index, c);
+            }
+        }
+
+        @Override
+        protected void removeRange(int fromIndex, int toIndex) {
+            loadAllSynsets();
+            if (null != dictionary && dictionary.isEditable()) {
+                List<Synset> copy = new ArrayList<Synset>(subList(fromIndex, toIndex));
+                super.removeRange(fromIndex, toIndex);
+                for (Synset synset : copy) {
+                    removeWordsFromSynset(synset, lemma);
+                }
+            } else {
+                super.removeRange(fromIndex, toIndex);
+            }
+        }
+
+        @Override
+        public Iterator<Synset> iterator() {
+            loadAllSynsets();
+            return super.iterator();
+        }
+
+        @Override
+        public ListIterator<Synset> listIterator() {
+            loadAllSynsets();
+            return super.listIterator();
+        }
+
+        @Override
+        public ListIterator<Synset> listIterator(int index) {
+            loadAllSynsets();
+            return super.listIterator(index);
+        }
+
+        @Override
+        public List<Synset> subList(int fromIndex, int toIndex) {
+            loadAllSynsets();
+            return super.subList(fromIndex, toIndex);
+        }
+
+        @Override
+        public boolean containsAll(Collection<?> c) {
+            loadAllSynsets();
+            return super.containsAll(c);
+        }
+
+        @Override
+        public boolean removeAll(Collection<?> c) {
+            loadAllSynsets();
+            if (null != dictionary && dictionary.isEditable()) {
+                List<Synset> copy = new ArrayList<Synset>(this);
+                boolean result = super.removeAll(c);
+                for (Object object : c) {
+                    if (object instanceof Synset) {
+                        Synset synset = (Synset) object;
+                        if (copy.contains(synset)) {
+                            removeWordsFromSynset(synset, lemma);
+                        }
+                    }
+                }
+
+                if (0 == size()) {
+                    try {
+                        dictionary.removeIndexWord(IndexWord.this);
+                    } catch (JWNLException e) {
+                        log.log(MessageLogLevel.ERROR, "EXCEPTION_001", e.getMessage(), e);
+                    }
+                }
+                return result;
+            } else {
+                return super.removeAll(c);
+            }
+        }
+
+        @Override
+        public boolean retainAll(Collection<?> c) {
+            loadAllSynsets();
+            if (null != dictionary && dictionary.isEditable()) {
+                List<Synset> copy = new ArrayList<Synset>(this);
+                boolean result = super.retainAll(c);
+                for (Synset synset : copy) {
+                    if (!c.contains(synset)) {
+                        removeWordsFromSynset(synset, lemma);
+                    }
+                }
+
+                if (0 == size()) {
+                    try {
+                        dictionary.removeIndexWord(IndexWord.this);
+                    } catch (JWNLException e) {
+                        log.log(MessageLogLevel.ERROR, "EXCEPTION_001", e.getMessage(), e);
+                    }
+                }
+                return result;
+            } else {
+                return super.retainAll(c);
+            }
+        }
+
+        private void addWord(Synset synset, String lemma) {
+            if (null != dictionary && dictionary.isEditable()) {
+                if (!synset.containsWord(lemma)) {
+                    synset.getWords().add(new Word(IndexWord.this.dictionary, synset, synset.getWords().size() + 1, lemma));
+                }
+            }
+        }
+
+        private void removeWordsFromSynset(Synset synset, String lemma) {
+            if (null != dictionary && dictionary.isEditable()) {
+                List<Word> copy = new ArrayList<Word>(synset.getWords());
+                for (Word word : copy) {
+                    if (word.getLemma().equalsIgnoreCase(lemma)) {
+                        synset.getWords().remove(word);
+                        break;
+                    }
+                }
+            }
+        }
+
+        private void loadAllSynsets() {
+            if (null != synsetOffsets) {
+                for (long synsetOffset : synsetOffsets) {
+                    super.add(loadSynset(synsetOffset));
+                }
+                synsetOffsets = null;
+            }
+        }
+
+        private Synset loadSynset(long offset) {
+            try {
+                return null == dictionary ? null : dictionary.getSynsetAt(pos, offset);
+            } catch (JWNLException e) {
+                log.log(MessageLogLevel.ERROR, "EXCEPTION_001", e.getMessage(), e);
+            }
+            return null;
+        }
+    }
+
+    protected IndexWord(Dictionary dictionary, String lemma, POS pos) throws JWNLException {
+        super(dictionary);
+        if (null == lemma) {
+            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_046"));
+        }
+        if (null == pos) {
+            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_041"));
+        }
+        this.lemma = lemma.toLowerCase();
+        this.pos = pos;
+        if (null != dictionary && dictionary.isEditable()) {
+            dictionary.addIndexWord(this);
+        }
+    }
+
+    public IndexWord(Dictionary dictionary, String lemma, POS pos, Synset synset) throws JWNLException {
+        this(dictionary, lemma, pos);
+        if (null == synset) {
+            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_042"));
+        }
+        this.synsets = new SynsetList(1);
+        this.synsets.add(synset);
+    }
+
+    public IndexWord(Dictionary dictionary, String lemma, POS pos, long[] synsetOffsets) throws JWNLException {
+        this(dictionary, lemma, pos);
+        if (null == synsetOffsets || 0 == synsetOffsets.length) {
+            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_047"));
+        }
+        this.synsetOffsets = synsetOffsets;
+    }
+
+    public DictionaryElementType getType() {
+        return DictionaryElementType.INDEX_WORD;
+    }
+
+    /**
+     * Returns the lemma of this word.
+     *
+     * @return lemma
+     */
+    public Object getKey() {
+        return lemma;
+    }
+
+    /**
+     * Returns the word's part-of-speech.
+     *
+     * @return the word's part-of-speech
+     */
+    public POS getPOS() {
+        return pos;
+    }
+
+    // Object methods	//
+
+    /**
+     * Returns true if the lemma and the part of speech both match.
+     */
+    public boolean equals(Object object) {
+        return (object instanceof IndexWord)
+                && ((IndexWord) object).getLemma().equals(getLemma()) && ((IndexWord) object).getPOS().equals(getPOS());
+    }
+
+    public int hashCode() {
+        return getLemma().hashCode() ^ getPOS().hashCode();
+    }
+
+    public String toString() {
+        return JWNL.resolveMessage("DATA_TOSTRING_002", new Object[]{getLemma(), getPOS()});
+    }
+
+    /**
+     * Return the word's <it>lemma</it>.  Its lemma is its orthographic representation, for
+     * example <code>"dog"</code> or <code>"get up"</code>.
+     *
+     * @return the word's lemma
+     */
+    public String getLemma() {
+        return lemma;
+    }
+
+    public long[] getSynsetOffsets() {
+        if (null != dictionary && dictionary.isEditable() && null == synsetOffsets) {
+            long[] result = new long[synsets.size()];
+            for (int i = 0; i < synsets.size(); i++) {
+                result[i] = synsets.get(i).getOffset();
+            }
+            return result;
+        }
+        return synsetOffsets;
+    }
+
+    /**
+     * Returns the senses of this word.
+     *
+     * @return all the senses of this word
+     */
+    public List<Synset> getSenses() {
+        if (null == synsets) {
+            synsets = new SynsetList(synsetOffsets.length);
+        }
+        return synsets;
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        // set POS to reference the static instance defined in the current runtime environment
+        pos = POS.getPOSForKey(pos.getKey());
+    }
+
+    private void writeObject(java.io.ObjectOutputStream oos) throws IOException {
+        boolean synsetOffsetsNull = null == synsetOffsets;
+        synsetOffsets = getSynsetOffsets();
+        oos.defaultWriteObject();
+        if (synsetOffsetsNull) {
+            synsetOffsets = null;
+        }
+    }
+}
