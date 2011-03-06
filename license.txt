@@ -1,6 +1,6 @@
 License Information
 
-Copyright (C) 2010 the extJWNL development team (http://www.sourceforge.net/projects/extjwnl)
+Copyright (C) 2010-2011 the extJWNL development team (http://www.sourceforge.net/projects/extjwnl)
 Copyright (C) 2000-2007 the JWNL development team (http://www.sourceforge.net/projects/jwordnet)
 All rights reserved.
 
