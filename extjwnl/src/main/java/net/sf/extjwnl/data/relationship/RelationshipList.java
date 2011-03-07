@@ -1,15 +1,15 @@
 package net.sf.extjwnl.data.relationship;
 
-import net.sf.extjwnl.util.TypeCheckingList;
-
 import java.util.ArrayList;
 
 /**
  * A list of <code>Relationship</code>s.
  *
  * @author John Didion <jdidion@users.sourceforge.net>
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
-public class RelationshipList extends TypeCheckingList {
+public class RelationshipList extends ArrayList<Relationship> {
+
     /**
      * The index of the shallowest relationship.
      */
@@ -20,18 +20,17 @@ public class RelationshipList extends TypeCheckingList {
     private int deepestIndex = -1;
 
     public RelationshipList() {
-        super(new ArrayList(), Relationship.class);
+        super();
     }
 
-    public synchronized boolean add(Object o) {
+    public boolean add(Relationship relationship) {
         int curSize = size();
-        boolean success = super.add(o);
+        boolean success = super.add(relationship);
         if (success) {
-            Relationship r = (Relationship) o;
-            if (r.getDepth() < shallowestIndex) {
+            if (relationship.getDepth() < shallowestIndex) {
                 shallowestIndex = curSize;
             }
-            if (r.getDepth() > deepestIndex) {
+            if (relationship.getDepth() > deepestIndex) {
                 deepestIndex = curSize;
             }
         }
@@ -39,21 +38,25 @@ public class RelationshipList extends TypeCheckingList {
     }
 
     /**
-     * Return the shallowest Relationship in the list.
+     * Returns the shallowest relationship in the list.
+     *
+     * @return the shallowest Relationship in the list
      */
-    public synchronized Relationship getShallowest() {
+    public Relationship getShallowest() {
         if (shallowestIndex >= 0) {
-            return (Relationship) get(shallowestIndex);
+            return get(shallowestIndex);
         }
         return null;
     }
 
     /**
-     * Return the deepest Relationship in the list.
+     * Returns the deepest Relationship in the list.
+     *
+     * @return the deepest Relationship in the list
      */
-    public synchronized Relationship getDeepest() {
+    public Relationship getDeepest() {
         if (deepestIndex >= 0) {
-            return (Relationship) get(deepestIndex);
+            return get(deepestIndex);
         }
         return null;
     }

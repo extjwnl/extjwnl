@@ -16,6 +16,7 @@ import java.util.ListIterator;
  * synonyms of its target.
  *
  * @author John Didion <jdidion@users.sourceforge.net>
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class PointerTargetTreeNode extends PointerTargetNode {
     /**
@@ -111,7 +112,9 @@ public class PointerTargetTreeNode extends PointerTargetNode {
     }
 
     /**
-     * A valid childTreeList is one that is not null and not empty.
+     * Returns whether a childTreeList is not null and not empty.
+     *
+     * @return true if childTreeList is not null and not empty
      */
     public boolean hasValidChildTreeList() {
         return hasChildTreeList() && !getChildTreeList().isEmpty();
@@ -122,7 +125,9 @@ public class PointerTargetTreeNode extends PointerTargetNode {
     }
 
     /**
-     * A valid pointerTreeList is one that is not null and not empty.
+     * Returns whether pointerTreeList is not null and not empty.
+     *
+     * @return true if pointerTreeList is not null and not empty
      */
     public boolean hasValidPointerTreeList() {
         return hasPointerTreeList() && !getPointerTreeList().isEmpty();
@@ -133,41 +138,35 @@ public class PointerTargetTreeNode extends PointerTargetNode {
     }
 
     /**
-     * Convert this node into a list of PointerTargetList's, each representing a unique brance through the tree
+     * Convert this node into a list of PointerTargetNodeLists's, each representing a unique branch through the tree
+     *
+     * @param list list
+     * @return list of pointer targets
      */
-    public List toList(PointerTargetNodeList list) {
-        try {
+    public List<PointerTargetNodeList> toList(PointerTargetNodeList list) {
             list.add(getPointerTarget(), getType());
-            List l = new ArrayList();
+            List<PointerTargetNodeList> l = new ArrayList<PointerTargetNodeList>();
             if (hasValidChildTreeList()) {
                 PointerTargetTreeNodeList childTreeList = getChildTreeList();
                 ListIterator itr = childTreeList.listIterator();
                 while (itr.hasNext()) {
-                    l.addAll(((PointerTargetTreeNode) itr.next()).toList((PointerTargetNodeList) list.clone()));
+                    l.addAll(((PointerTargetTreeNode) itr.next()).toList(list.clone()));
                 }
             } else {
                 l.add(list);
             }
             return l;
-        } catch (CloneNotSupportedException ex) {
-            throw new UnsupportedOperationException();
-        }
     }
 
-    public Object clone() throws CloneNotSupportedException {
-        super.clone();
-        return new PointerTargetTreeNode(getPointerTarget(),
-                getChildTreeList(),
-                getPointerTreeList(),
-                getType(),
-                getParent());
+    public PointerTargetTreeNode clone() throws CloneNotSupportedException {
+        return (PointerTargetTreeNode) super.clone();
     }
 
-    public Object deepClone() throws UnsupportedOperationException {
+    public PointerTargetTreeNode deepClone() throws UnsupportedOperationException {
         return new PointerTargetTreeNode(getPointerTarget(),
-                (PointerTargetTreeNodeList) getChildTreeList().deepClone(),
-                (PointerTargetTreeNodeList) getPointerTreeList().deepClone(),
-                getType(), (PointerTargetTreeNode) getParent().deepClone());
+                getChildTreeList().deepClone(),
+                getPointerTreeList().deepClone(),
+                getType(), getParent().deepClone());
 
     }
 }

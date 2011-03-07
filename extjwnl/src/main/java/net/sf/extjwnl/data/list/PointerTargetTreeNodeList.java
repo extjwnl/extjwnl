@@ -2,6 +2,7 @@ package net.sf.extjwnl.data.list;
 
 import net.sf.extjwnl.data.PointerTarget;
 import net.sf.extjwnl.data.PointerType;
+import net.sf.extjwnl.util.DeepCloneable;
 
 import java.io.PrintStream;
 import java.util.*;
@@ -11,26 +12,26 @@ import java.util.*;
  *
  * @author John Didion <jdidion@users.sourceforge.net>
  */
-public class PointerTargetTreeNodeList extends PointerTargetNodeList {
-    private static final NodePrinter PRINTER =
-            new NodePrinter(2) {
-                public void print(PrintStream stream, Node node, int indent, int indentIncrement) {
-                    PointerTargetTreeNode n = (PointerTargetTreeNode) node;
+public class PointerTargetTreeNodeList extends LinkedList<PointerTargetTreeNode> implements DeepCloneable {
+
+    private static final NodePrinter<PointerTargetTreeNode> PRINTER =
+            new NodePrinter<PointerTargetTreeNode>(2) {
+                public void print(PrintStream stream, PointerTargetTreeNode node, int indent, int indentIncrement) {
                     char c[] = new char[indent >= 0 ? indent : 0];
                     Arrays.fill(c, ' ');
-                    stream.println(new String(c) + n);
-                    if (n.hasValidChildTreeList()) {
-                        n.getChildTreeList().print(stream, indent + indentIncrement, indentIncrement);
+                    stream.println(new String(c) + node);
+                    if (node.hasValidChildTreeList()) {
+                        node.getChildTreeList().print(stream, indent + indentIncrement, indentIncrement);
                     }
                 }
             };
 
     public PointerTargetTreeNodeList() {
-        this(new LinkedList());
+        super();
     }
 
-    public PointerTargetTreeNodeList(LinkedList list) {
-        super(list, PointerTargetTreeNode.class);
+    public PointerTargetTreeNodeList(LinkedList<PointerTargetTreeNode> list) {
+        super(list);
     }
 
     public void add(PointerTarget target) {
@@ -64,20 +65,23 @@ public class PointerTargetTreeNodeList extends PointerTargetNodeList {
         add(new PointerTargetTreeNode(target, childTreeList, pointerTreeList, type, parent));
     }
 
-    protected NodePrinter getNodePrinter() {
+    protected NodePrinter<PointerTargetTreeNode> getNodePrinter() {
         return PRINTER;
     }
 
     /**
-     * Walk the list and all the children of each node in the list and
-     * perform the operation <code>opr</code> on each node. Continues until
+     * Walks the list and all the children of each node in the list and
+     * performs the operation <code>opr</code> on each node. Continues until
      * either opr returns a non-null value, or it reaches the last node in the list.
+     *
+     * @param opr operation to execute
+     * @return operation result
      */
-    public Object getFirstMatch(Operation opr) {
-        ListIterator itr = listIterator();
-        for (Object obj = null; itr.hasNext() && obj == null;) {
-            PointerTargetTreeNode node = (PointerTargetTreeNode) itr.next();
-            obj = opr.execute(node);
+    public PointerTargetTreeNode getFirstMatch(Operation opr) {
+        ListIterator<PointerTargetTreeNode> itr = listIterator();
+        while (itr.hasNext()) {
+            PointerTargetTreeNode node = itr.next();
+            PointerTargetTreeNode obj = opr.execute(node);
             if (obj != null) {
                 return obj;
             } else if (node.hasValidChildTreeList()) {
@@ -88,23 +92,28 @@ public class PointerTargetTreeNodeList extends PointerTargetNodeList {
     }
 
     /**
-     * Walk the list and perform the operation <code>opr</code> on each node.
+     * Walks the list and performs the operation <code>opr</code> on each node.
      * Searches the list exhaustively and return a List containing all nodes
      * that are returned by <code>opr</code>.
+     * @param opr operation
+     * @return list of operation results
      */
-    public List getAllMatches(Operation opr) {
-        List list = new ArrayList();
+    public List<PointerTargetTreeNode> getAllMatches(Operation opr) {
+        List<PointerTargetTreeNode> list = new ArrayList<PointerTargetTreeNode>();
         getAllMatches(opr, list);
         return list;
     }
 
     /**
-     * Get all matches and add them to <var>matches</var>
+     * Gets all matches and adds them to <var>matches</var>
+     * @param opr operation
+     * @param matches list of matches
      */
-    public void getAllMatches(Operation opr, List matches) {
-        for (ListIterator itr = listIterator(); itr.hasNext();) {
-            PointerTargetTreeNode node = (PointerTargetTreeNode) itr.next();
-            Object obj = opr.execute(node);
+    public void getAllMatches(Operation opr, List<PointerTargetTreeNode> matches) {
+        ListIterator<PointerTargetTreeNode> itr = listIterator();
+        while (itr.hasNext()) {
+            PointerTargetTreeNode node = itr.next();
+            PointerTargetTreeNode obj = opr.execute(node);
             if (obj != null) {
                 matches.add(obj);
             }
@@ -115,36 +124,39 @@ public class PointerTargetTreeNodeList extends PointerTargetNodeList {
     }
 
     /**
-     * Find the first node in the list that is equal to <code>node</code>.
+     * Finds the first node in the list that is equal to <code>node</code>.
      * <code>node</code> is considered to match a node in the list
      * if they contain equal pointer targets and are of the same type.
+     * @param node node to search for
+     * @return the first node in the list that is equal to <code>node</code>
      */
     public PointerTargetTreeNode findFirst(PointerTargetTreeNode node) {
-        Object obj = getFirstMatch(new FindNodeOperation(node));
-        return obj == null ? null : (PointerTargetTreeNode) obj;
+        PointerTargetTreeNode obj = getFirstMatch(new FindNodeOperation(node));
+        return obj == null ? null : obj;
     }
 
     /**
-     * Find all occurrences of <code>node</code> within the list.
+     * Finds all occurrences of <code>node</code> within the list.
+     * @param node node to search for
+     * @return all occurrences of <code>node</code> within the list
      */
-    public PointerTargetTreeNode[] findAll(PointerTargetTreeNode node) {
-        List v = getAllMatches(new FindNodeOperation(node));
+    public List<PointerTargetTreeNode> findAll(PointerTargetTreeNode node) {
+        List<PointerTargetTreeNode> v = getAllMatches(new FindNodeOperation(node));
         if (v == null) {
             return null;
         } else {
-            return (PointerTargetTreeNode[]) v.toArray(new PointerTargetTreeNode[v.size()]);
+            return v;
         }
     }
 
-    public Object clone() throws CloneNotSupportedException {
-        super.clone();
-        return new PointerTargetTreeNodeList((LinkedList) copyBackingList());
+    public PointerTargetTreeNodeList clone() {
+        return (PointerTargetTreeNodeList) super.clone();
     }
 
-    public Object deepClone() throws UnsupportedOperationException {
+    public PointerTargetTreeNodeList deepClone() {
         PointerTargetTreeNodeList list = new PointerTargetTreeNodeList();
-        for (Object o : this) {
-            list.add(((PointerTargetTreeNode) o).deepClone());
+        for (PointerTargetTreeNode o : this) {
+            list.add(o.deepClone());
         }
         return list;
     }
@@ -153,10 +165,14 @@ public class PointerTargetTreeNodeList extends PointerTargetNodeList {
      * Operation that is performed on the nodes of a tree or list.
      */
     public interface Operation {
+
         /**
-         * Execute the operation on the given node
+         * Executes the operation on the given node.
+         *
+         * @param node operation target
+         * @return operation result
          */
-        public Object execute(PointerTargetTreeNode node);
+        public PointerTargetTreeNode execute(PointerTargetTreeNode node);
     }
 
     /**
@@ -169,7 +185,7 @@ public class PointerTargetTreeNodeList extends PointerTargetNodeList {
             this.node = node;
         }
 
-        public Object execute(PointerTargetTreeNode testNode) {
+        public PointerTargetTreeNode execute(PointerTargetTreeNode testNode) {
             if (node.equals(testNode)) {
                 return testNode;
             }
@@ -187,11 +203,19 @@ public class PointerTargetTreeNodeList extends PointerTargetNodeList {
             this.target = target;
         }
 
-        public Object execute(PointerTargetTreeNode node) {
+        public PointerTargetTreeNode execute(PointerTargetTreeNode node) {
             if (node.getPointerTarget().equals(target)) {
                 return node;
             }
             return null;
         }
+    }
+
+    protected void print() {
+        getNodePrinter().print(listIterator());
+    }
+
+    protected void print(PrintStream stream, int indent, int indentIncrement) {
+        getNodePrinter().print(listIterator(), stream, indent, indentIncrement);
     }
 }

@@ -7,10 +7,14 @@ package net.sf.extjwnl.util;
  * and of all it's member objects).
  *
  * @author John Didion <jdidion@users.sourceforge.net>
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public interface DeepCloneable extends Cloneable {
+
     /**
      * Create a shallow clone of the object.
+     *
+     * @throws CloneNotSupportedException CloneNotSupportedException
      */
     public Object clone() throws CloneNotSupportedException;
 
@@ -18,6 +22,7 @@ public interface DeepCloneable extends Cloneable {
      * Create a deep clone of the object.
      *
      * @return a deep clone of the object
+     * @throws CloneNotSupportedException CloneNotSupportedException
      */
     public Object deepClone() throws CloneNotSupportedException;
 }

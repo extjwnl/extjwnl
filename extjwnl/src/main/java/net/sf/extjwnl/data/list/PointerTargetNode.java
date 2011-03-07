@@ -10,6 +10,7 @@ import net.sf.extjwnl.data.Word;
  * A node in a <code>PointerTargetNodeList</code>.
  *
  * @author John Didion <jdidion@users.sourceforge.net>
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class PointerTargetNode implements Node {
     /**
@@ -99,12 +100,11 @@ public class PointerTargetNode implements Node {
         return getPointerTarget().hashCode() ^ getType().hashCode();
     }
 
-    public Object clone() throws CloneNotSupportedException {
-        super.clone();
-        return new PointerTargetNode(getPointerTarget(), getType());
+    public PointerTargetNode clone() throws CloneNotSupportedException {
+        return (PointerTargetNode) super.clone();
     }
 
-    public Object deepClone() throws UnsupportedOperationException {
+    public PointerTargetNode deepClone() throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
 }

@@ -2,7 +2,6 @@ package net.sf.extjwnl.data.relationship;
 
 import net.sf.extjwnl.data.PointerType;
 import net.sf.extjwnl.data.Synset;
-import net.sf.extjwnl.data.list.PointerTargetNode;
 import net.sf.extjwnl.data.list.PointerTargetNodeList;
 
 /**
@@ -14,6 +13,7 @@ import net.sf.extjwnl.data.list.PointerTargetNodeList;
  * the common parent index is thus 2.
  *
  * @author John Didion <jdidion@users.sourceforge.net>
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class AsymmetricRelationship extends Relationship {
     /**
@@ -35,8 +35,10 @@ public class AsymmetricRelationship extends Relationship {
     }
 
     /**
-     * Get the depth of the target, from the commonParentIndex, relative to the depth of the source.
+     * Gets the depth of the target, from the commonParentIndex, relative to the depth of the source.
      * If both target and source are equidistant from the commonParentIndex, this method returns 0;
+     *
+     * @return the depth of the target, from the commonParentIndex, relative to the depth of the source
      */
     public int getRelativeTargetDepth() {
         if (cachedRelativeTargetDepth == -1) {
@@ -48,11 +50,11 @@ public class AsymmetricRelationship extends Relationship {
     }
 
     public Relationship reverse() throws CloneNotSupportedException {
-        PointerTargetNodeList list = ((PointerTargetNodeList) getNodeList().deepClone()).reverse();
+        PointerTargetNodeList list = getNodeList().deepClone().reverse();
         int commonParentIndex = (list.size() - 1) - getCommonParentIndex();
         for (int i = 0; i < list.size(); i++) {
             if (i != commonParentIndex) {
-                ((PointerTargetNode) list.get(i)).setType(getType().getSymmetricType());
+                list.get(i).setType(getType().getSymmetricType());
             }
         }
         return new AsymmetricRelationship(getType(), list, commonParentIndex, getSourceSynset(), getTargetSynset());

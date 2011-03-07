@@ -10,8 +10,10 @@ import java.util.List;
  * A container for the root node of a pointer target tree.
  *
  * @author John Didion <jdidion@users.sourceforge.net>
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class PointerTargetTree {
+
     private PointerTargetTreeNode rootNode;
 
     public PointerTargetTree(PointerTargetTreeNode rootNode) {
@@ -35,12 +37,15 @@ public class PointerTargetTree {
     }
 
     /**
-     * Walk the tree and perform the operation <var>opr</var> on
+     * Walks the tree and performs the operation <var>opr</var> on
      * each node. Continues until either opr returns a non-null
      * value, or it reaches the last node in the tree.
+     *
+     * @param opr operation to execute
+     * @return operation result
      */
-    public Object getFirstMatch(PointerTargetTreeNodeList.Operation opr) {
-        Object obj = opr.execute(getRootNode());
+    public PointerTargetTreeNode getFirstMatch(PointerTargetTreeNodeList.Operation opr) {
+        PointerTargetTreeNode obj = opr.execute(getRootNode());
         if (obj == null && getRootNode().hasValidChildTreeList()) {
             obj = getRootNode().getChildTreeList().getFirstMatch(opr);
         }
@@ -48,12 +53,15 @@ public class PointerTargetTree {
     }
 
     /**
-     * Walk the tree and perform the operation <var>opr</var> on each node.
+     * Walks the tree and performs the operation <var>opr</var> on each node.
      * Searches the tree exhaustively and returns a List containing all nodes
      * that are returned by <var>opr</var>.
+     *
+     * @param opr operation to execute
+     * @return list of operation results
      */
-    public List getAllMatches(PointerTargetTreeNodeList.Operation opr) {
-        List list = new ArrayList();
+    public List<PointerTargetTreeNode> getAllMatches(PointerTargetTreeNodeList.Operation opr) {
+        List<PointerTargetTreeNode> list = new ArrayList<PointerTargetTreeNode>();
         if (opr.execute(getRootNode()) != null) {
             list.add(getRootNode());
         }
@@ -64,33 +72,39 @@ public class PointerTargetTree {
     }
 
     /**
-     * Find the first occurrence of <var>node</var> in the tree.
+     * Finds the first occurrence of <var>node</var> in the tree.
+     * @param node node to search for
+     * @return the first occurrence of <var>node</var> in the tree
      */
     public PointerTargetTreeNode findFirst(PointerTargetTreeNode node) {
-        return (PointerTargetTreeNode) getFirstMatch(new PointerTargetTreeNodeList.FindNodeOperation(node));
+        return getFirstMatch(new PointerTargetTreeNodeList.FindNodeOperation(node));
     }
 
     /**
-     * Find the first node in the tree whose target is <var>target</var>
+     * Finds the first node in the tree whose target is <var>target</var>.
+     * @param target target to search for
+     * @return the first node in the tree whose target is <var>target</var>
      */
     public PointerTargetTreeNode findFirst(PointerTarget target) {
-        return (PointerTargetTreeNode) getFirstMatch(new PointerTargetTreeNodeList.FindTargetOperation(target));
+        return getFirstMatch(new PointerTargetTreeNodeList.FindTargetOperation(target));
     }
 
     /**
-     * Find all occurrences of <var>node</var> in the tree.
+     * Finds all occurrences of <var>node</var> in the tree.
+     * @param node node to search for
+     * @return all occurrences of <var>node</var> in the tree
      */
-    public PointerTargetTreeNode[] findAll(PointerTargetTreeNode node) {
-        List list = getAllMatches(new PointerTargetTreeNodeList.FindNodeOperation(node));
-        return (PointerTargetTreeNode[]) list.toArray(new PointerTargetTreeNode[list.size()]);
+    public List<PointerTargetTreeNode> findAll(PointerTargetTreeNode node) {
+        return getAllMatches(new PointerTargetTreeNodeList.FindNodeOperation(node));
     }
 
     /**
-     * Find all  nodes in the tree whose target is <var>target</var>
+     * Finds all nodes in the tree whose target is <var>target</var>.
+     * @param target target to search for
+     * @return all nodes in the tree whose target is <var>target</var>
      */
-    public PointerTargetTreeNode[] findAll(PointerTarget target) {
-        List list = getAllMatches(new PointerTargetTreeNodeList.FindTargetOperation(target));
-        return (PointerTargetTreeNode[]) list.toArray(new PointerTargetTreeNode[list.size()]);
+    public List<PointerTargetTreeNode> findAll(PointerTarget target) {
+        return getAllMatches(new PointerTargetTreeNodeList.FindTargetOperation(target));
     }
 
     public void print() {
@@ -108,13 +122,14 @@ public class PointerTargetTree {
      * Reverse this tree. A reversal is done by converting this tree to lists
      * and then reversing each of the lists. The structure of the tree is
      * unaffected by this operation.
+     * @return reversed lists
      */
-    public PointerTargetNodeList[] reverse() {
-        List list = toList();
+    public List<PointerTargetNodeList> reverse() {
+        List<PointerTargetNodeList> list = toList();
         if (list != null) {
-            PointerTargetNodeList[] reversedLists = new PointerTargetNodeList[list.size()];
-            for (int i = 0; i < reversedLists.length; i++) {
-                reversedLists[i] = ((PointerTargetNodeList) list.get(i)).reverse();
+            List<PointerTargetNodeList> reversedLists = new ArrayList<PointerTargetNodeList>(list.size());
+            for (PointerTargetNodeList l : list) {
+                reversedLists.add(l.reverse());
             }
             return reversedLists;
         }
@@ -122,19 +137,20 @@ public class PointerTargetTree {
     }
 
     /**
-     * Convert this tree to an List of PointerTargetNodeLists. This creates one list for each
+     * Convert this tree to a list of PointerTargetNodeLists. This creates one list for each
      * unique path through the tree.
+     *
+     * @return list of PointerTargetNodeLists
      */
-    public List toList() {
-        List list = getRootNode().toList(new PointerTargetNodeList());
+    public List<PointerTargetNodeList> toList() {
+        List<PointerTargetNodeList> list = getRootNode().toList(new PointerTargetNodeList());
         // since the tree could have been made up of multiple types, we need to set the type of
         // the root node now that we're breaking the tree down into lists that can only be of
         // one type
-        for (Object aList : list) {
-            PointerTargetNodeList l = (PointerTargetNodeList) aList;
-            if (l.size() >= 2) {
-                PointerTargetNode root = (PointerTargetNode) l.get(0);
-                PointerTargetNode node = (PointerTargetNode) l.get(1);
+        for (PointerTargetNodeList aList : list) {
+            if (aList.size() >= 2) {
+                PointerTargetNode root = aList.get(0);
+                PointerTargetNode node = aList.get(1);
                 root.setType(node.getType());
             }
         }

@@ -77,36 +77,36 @@ public class Examples {
 
     private void demonstrateListOperation(IndexWord word) throws JWNLException {
         // Get all of the hypernyms (parents) of the first sense of <var>word</var>
-        PointerTargetNodeList hypernyms = PointerUtils.getInstance().getDirectHypernyms(word.getSenses().get(0));
+        PointerTargetNodeList hypernyms = PointerUtils.getDirectHypernyms(word.getSenses().get(0));
         System.out.println("Direct hypernyms of \"" + word.getLemma() + "\":");
         hypernyms.print();
     }
 
     private void demonstrateTreeOperation(IndexWord word) throws JWNLException {
         // Get all the hyponyms (children) of the first sense of <var>word</var>
-        PointerTargetTree hyponyms = PointerUtils.getInstance().getHyponymTree(word.getSenses().get(0));
+        PointerTargetTree hyponyms = PointerUtils.getHyponymTree(word.getSenses().get(0));
         System.out.println("Hyponyms of \"" + word.getLemma() + "\":");
         hyponyms.print();
     }
 
     private void demonstrateAsymmetricRelationshipOperation(IndexWord start, IndexWord end) throws JWNLException, CloneNotSupportedException {
         // Try to find a relationship between the first sense of <var>start</var> and the first sense of <var>end</var>
-        RelationshipList list = RelationshipFinder.getInstance().findRelationships(start.getSenses().get(0), end.getSenses().get(0), PointerType.HYPERNYM);
+        RelationshipList list = RelationshipFinder.findRelationships(start.getSenses().get(0), end.getSenses().get(0), PointerType.HYPERNYM);
         System.out.println("Hypernym relationship between \"" + start.getLemma() + "\" and \"" + end.getLemma() + "\":");
         for (Object aList : list) {
             ((Relationship) aList).getNodeList().print();
         }
         System.out.println("Common Parent Index: " + ((AsymmetricRelationship) list.get(0)).getCommonParentIndex());
-        System.out.println("Depth: " + ((Relationship) list.get(0)).getDepth());
+        System.out.println("Depth: " + list.get(0).getDepth());
     }
 
     private void demonstrateSymmetricRelationshipOperation(IndexWord start, IndexWord end) throws JWNLException, CloneNotSupportedException {
         // find all synonyms that <var>start</var> and <var>end</var> have in common
-        RelationshipList list = RelationshipFinder.getInstance().findRelationships(start.getSenses().get(0), end.getSenses().get(0), PointerType.SIMILAR_TO);
+        RelationshipList list = RelationshipFinder.findRelationships(start.getSenses().get(0), end.getSenses().get(0), PointerType.SIMILAR_TO);
         System.out.println("Synonym relationship between \"" + start.getLemma() + "\" and \"" + end.getLemma() + "\":");
         for (Object aList : list) {
             ((Relationship) aList).getNodeList().print();
         }
-        System.out.println("Depth: " + ((Relationship) list.get(0)).getDepth());
+        System.out.println("Depth: " + list.get(0).getDepth());
     }
 }

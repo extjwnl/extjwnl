@@ -1,8 +1,5 @@
 package net.sf.extjwnl.data.list;
 
-import net.sf.extjwnl.JWNLRuntimeException;
-import net.sf.extjwnl.util.TypeCheckingList;
-
 import java.io.PrintStream;
 import java.util.ListIterator;
 
@@ -10,8 +7,10 @@ import java.util.ListIterator;
  * A printer for displaying the contents of a node list.
  *
  * @author John Didion <jdidion@users.sourceforge.net>
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
-public abstract class NodePrinter {
+public abstract class NodePrinter<E extends Node> {
+
     private PrintStream defaultStream = System.out;
     private int defaultIndent = 0;
 
@@ -35,34 +34,51 @@ public abstract class NodePrinter {
      * Print the contents of the given node, indenting it <var>indent</var> spaces.
      * In each recursive call to print, <var>indent</var> should be incremented by
      * <var>indentIncrement</var>.
+     *
+     * @param stream          stream to print to
+     * @param node            node to print
+     * @param indent          indent
+     * @param indentIncrement indent increment
      */
-    protected abstract void print(PrintStream stream, Node node, int indent, int indentIncrement);
+    protected abstract void print(PrintStream stream, E node, int indent, int indentIncrement);
 
     /**
      * Print the contents of <var>itr</var> using the default indent
+     *
+     * @param itr iterator with nodes to print
      */
-    public void print(TypeCheckingList.TypeCheckingListIterator itr) {
+    public void print(ListIterator<E> itr) {
         print(itr, defaultStream);
     }
 
     /**
      * Print the contents of <var>itr</var> to the given stream
+     *
+     * @param stream stream to print to
+     * @param itr    iterator with nodes to print
      */
-    public void print(TypeCheckingList.TypeCheckingListIterator itr, PrintStream stream) {
+    public void print(ListIterator<E> itr, PrintStream stream) {
         print(itr, stream, defaultIndent);
     }
 
     /**
      * Print the contents of <var>itr</var> to the given stream indenting each line <var>indent</var> spaces.
+     *
+     * @param stream stream to print to
+     * @param indent indent
+     * @param itr    iterator with nodes to print
      */
-    public void print(TypeCheckingList.TypeCheckingListIterator itr, PrintStream stream, int indent) {
+    public void print(ListIterator<E> itr, PrintStream stream, int indent) {
         print(itr, stream, indent, indent);
     }
 
     /**
      * Print the contents of <var>itr</var> indenting each line <var>indent</var> spaces.
+     *
+     * @param indent indent
+     * @param itr    iterator with nodes to print
      */
-    public void print(TypeCheckingList.TypeCheckingListIterator itr, int indent) {
+    public void print(ListIterator<E> itr, int indent) {
         print(itr, indent, indent);
     }
 
@@ -70,8 +86,12 @@ public abstract class NodePrinter {
      * Print the contents of <var>itr</var> to the default stream. Indent the first line <var>indent</var>
      * spaces. Each level of nesting will be printed intended <var>indentIncrement</var> spaces more than
      * the previous level of nesting.
+     *
+     * @param indent          indent
+     * @param indentIncrement indent increment
+     * @param itr             iterator with nodes to print
      */
-    public void print(TypeCheckingList.TypeCheckingListIterator itr, int indent, int indentIncrement) {
+    public void print(ListIterator<E> itr, int indent, int indentIncrement) {
         print(itr, defaultStream, indent, indentIncrement);
     }
 
@@ -79,9 +99,14 @@ public abstract class NodePrinter {
      * Print the contents of <var>itr</var> to the given stream. Indent the first line <var>indent</var>
      * spaces. Each level of nesting will be printed intended <var>indentIncrement</var> spaces more than
      * the previous level of nesting.
+     *
+     * @param stream          stream to print to
+     * @param indent          indent
+     * @param indentIncrement indent increment
+     * @param itr             iterator with nodes to print
      */
-    public void print(TypeCheckingList.TypeCheckingListIterator itr, PrintStream stream, int indent, int indentIncrement) {
-        NodeListIteratorWrapper pItr = new NodeListIteratorWrapper(itr);
+    public void print(ListIterator<E> itr, PrintStream stream, int indent, int indentIncrement) {
+        NodeListIteratorWrapper<E> pItr = new NodeListIteratorWrapper<E>(itr);
         // Find out where we currently are in the iterator
         int curNode = pItr.currentIndex();
         // Move to the first node in the iterator
@@ -97,22 +122,19 @@ public abstract class NodePrinter {
     /**
      * Wrapper for a NodeListIterator that allows the next pointer to be moved to any index.
      */
-    private static final class NodeListIteratorWrapper {
-        private ListIterator itr;
+    private static final class NodeListIteratorWrapper<E extends Node> {
+        private ListIterator<E> itr;
 
-        public NodeListIteratorWrapper(TypeCheckingList.TypeCheckingListIterator itr) {
-            if (!Node.class.isAssignableFrom(itr.getType())) {
-                throw new JWNLRuntimeException("DATA_EXCEPTION_003", new Object[]{Node.class, itr.getType()});
-            }
+        public NodeListIteratorWrapper(ListIterator<E> itr) {
             this.itr = itr;
         }
 
-        public Node nextNode() {
-            return (Node) itr.next();
+        public E nextNode() {
+            return itr.next();
         }
 
-        public Node previousNode() {
-            return (Node) itr.previous();
+        public E previousNode() {
+            return itr.previous();
         }
 
         public int currentIndex() {
@@ -121,6 +143,9 @@ public abstract class NodePrinter {
 
         /**
          * Moves the iterator to a point in the iterator where the next index is <var>index</var>.
+         *
+         * @param index the next index
+         * @return current index
          */
         public int moveTo(int index) {
             if (currentIndex() < index) {
