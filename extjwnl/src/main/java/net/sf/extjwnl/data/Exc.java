@@ -109,6 +109,7 @@ public class Exc extends BaseDictionaryElement {
         if (!lemma.equals(exc.lemma)) {
             return false;
         }
+        //noinspection RedundantIfStatement
         if (!pos.equals(exc.pos)) {
             return false;
         }
