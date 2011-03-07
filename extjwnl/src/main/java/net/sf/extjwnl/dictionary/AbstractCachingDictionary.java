@@ -293,7 +293,7 @@ public abstract class AbstractCachingDictionary extends Dictionary {
         Iterator<Exc> ei = getExceptionIterator(pos);
         while (ei.hasNext()) {
             if (count % 1000 == 0) {
-                log.log(MessageLogLevel.INFO, "DICTIONARY_INFO_005" + count);
+                log.log(MessageLogLevel.INFO, "DICTIONARY_INFO_005", count);
             }
             count++;
             ei.next();
@@ -306,7 +306,7 @@ public abstract class AbstractCachingDictionary extends Dictionary {
         Iterator<Synset> si = getSynsetIterator(pos);
         while (si.hasNext()) {
             if (count % 1000 == 0) {
-                log.log(MessageLogLevel.INFO, "DICTIONARY_INFO_005" + count);
+                log.log(MessageLogLevel.INFO, "DICTIONARY_INFO_005", count);
             }
             count++;
             Synset s = si.next();
