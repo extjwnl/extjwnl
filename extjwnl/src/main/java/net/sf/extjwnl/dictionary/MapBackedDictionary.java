@@ -147,6 +147,7 @@ public class MapBackedDictionary extends Dictionary {
     @Override
     public void save() throws JWNLException {
         try {
+            super.save();
             files.save();
         } catch (IOException e) {
             throw new JWNLException("EXCEPTION_001", e.getMessage(), e);

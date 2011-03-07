@@ -50,11 +50,27 @@ public abstract class AbstractPrincetonDictionaryFile extends AbstractDictionary
     }
 
     protected String makeFilename() {
-        String posString = getExtension(getPOS());
-        if (getFileType() == DictionaryFileType.EXCEPTION || (JWNL.getOS().equals(JWNL.WINDOWS) && getDictionary().getVersion().getNumber() < 2.1)) {
-            return makeWindowsFilename(posString, getFileNames(getFileType()).windowsFileTypeName);
+        if (null != getPOS()) {
+            String posString = getExtension(getPOS());
+            if (getFileType() == DictionaryFileType.EXCEPTION || (JWNL.getOS().equals(JWNL.WINDOWS) && getDictionary().getVersion().getNumber() < 2.1)) {
+                return makeWindowsFilename(posString, getFileNames(getFileType()).windowsFileTypeName);
+            } else {
+                return makeNonWindowsFilename(posString, getFileNames(getFileType()).nonWindowsFileTypeName);
+            }
         } else {
-            return makeNonWindowsFilename(posString, getFileNames(getFileType()).nonWindowsFileTypeName);
+            if (DictionaryFileType.REVCNTLIST.equals(getFileType())) {
+                return "cntlist.rev";
+            } else if (DictionaryFileType.CNTLIST.equals(getFileType())) {
+                return "cntlist";
+            } else if (DictionaryFileType.INDEX.equals(getFileType())) {
+                if (JWNL.getOS().equals(JWNL.WINDOWS) && getDictionary().getVersion().getNumber() < 2.1) {
+                    return makeWindowsFilename("sense", getFileNames(getFileType()).windowsFileTypeName);
+                } else {
+                    return makeNonWindowsFilename("sense", getFileNames(getFileType()).nonWindowsFileTypeName);
+                }
+            } else {
+                throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_054", new Object[]{getPOS(), getFileType()}));
+            }
         }
     }
 

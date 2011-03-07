@@ -1,17 +1,21 @@
 package net.sf.extjwnl.dictionary.file_manager;
 
 import net.sf.extjwnl.JWNLException;
+import net.sf.extjwnl.JWNLRuntimeException;
+import net.sf.extjwnl.data.IndexWord;
 import net.sf.extjwnl.data.POS;
+import net.sf.extjwnl.data.Synset;
+import net.sf.extjwnl.data.Word;
 import net.sf.extjwnl.dictionary.Dictionary;
-import net.sf.extjwnl.dictionary.file.DictionaryCatalogSet;
-import net.sf.extjwnl.dictionary.file.DictionaryFileType;
-import net.sf.extjwnl.dictionary.file.RandomAccessDictionaryFile;
+import net.sf.extjwnl.dictionary.file.*;
+import net.sf.extjwnl.util.MessageLog;
+import net.sf.extjwnl.util.MessageLogLevel;
+import net.sf.extjwnl.util.TokenizerParser;
 import net.sf.extjwnl.util.factory.Param;
 
 import java.io.IOException;
-import java.util.Date;
-import java.util.Map;
-import java.util.Random;
+import java.text.DecimalFormat;
+import java.util.*;
 
 /**
  * An implementation of <code>FileManager</code> that reads files from the local file system.
@@ -24,7 +28,13 @@ import java.util.Random;
  */
 public class FileManagerImpl implements FileManager {
 
+    private static final MessageLog log = new MessageLog(DictionaryCatalogSet.class);
+
     private Dictionary dictionary;
+
+    private RandomAccessDictionaryFile revCntList;
+    private RandomAccessDictionaryFile cntList;
+    private RandomAccessDictionaryFile senseIndex;
 
     /**
      * Random number generator used by getRandomLineOffset().
@@ -41,6 +51,36 @@ public class FileManagerImpl implements FileManager {
             this.dictionary = dictionary;
             files = new DictionaryCatalogSet<RandomAccessDictionaryFile>(dictionary, params, RandomAccessDictionaryFile.class);
             files.open();
+
+            try {
+                Class fileClass;
+                try {
+                    fileClass = Class.forName(params.get(DictionaryCatalog.DICTIONARY_FILE_TYPE_KEY).getValue());
+                    if (!RandomAccessDictionaryFile.class.isAssignableFrom(fileClass)) {
+                        throw new JWNLRuntimeException("DICTIONARY_EXCEPTION_003", fileClass);
+                    }
+                } catch (ClassNotFoundException ex) {
+                    throw new JWNLRuntimeException("DICTIONARY_EXCEPTION_002", ex);
+                }
+
+                if (!params.containsKey(DictionaryCatalog.DICTIONARY_PATH_KEY)) {
+                    throw new JWNLException("DICTIONARY_EXCEPTION_052", DictionaryCatalog.DICTIONARY_PATH_KEY);
+                }
+                String path = params.get(DictionaryCatalog.DICTIONARY_PATH_KEY).getValue();
+
+                @SuppressWarnings("unchecked")
+                DictionaryFileFactory<RandomAccessDictionaryFile> factory = (DictionaryFileFactory<RandomAccessDictionaryFile>) params.get(DictionaryCatalog.DICTIONARY_FILE_TYPE_KEY).create();
+                revCntList = factory.newInstance(dictionary, path, null, DictionaryFileType.REVCNTLIST);
+                cntList = factory.newInstance(dictionary, path, null, DictionaryFileType.CNTLIST);
+                senseIndex = factory.newInstance(dictionary, path, null, DictionaryFileType.INDEX);
+
+                revCntList.open();
+                cntList.open();
+                senseIndex.open();
+            } catch (Exception e) {
+                throw new JWNLRuntimeException("DICTIONARY_EXCEPTION_018", DictionaryFileType.REVCNTLIST, e);
+            }
+
         } catch (IOException e) {
             throw new JWNLException("DICTIONARY_EXCEPTION_016", e);
         }
@@ -48,21 +88,30 @@ public class FileManagerImpl implements FileManager {
 
     public void close() {
         files.close();
+        cntList.close();
+        revCntList.close();
+        senseIndex.close();
     }
 
     public void delete() throws IOException {
         files.delete();
+        cntList.delete();
+        revCntList.delete();
+        senseIndex.delete();
     }
 
     public void edit() throws IOException {
         files.edit();
+        revCntList.edit();
+        cntList.edit();
+        senseIndex.edit();
     }
 
     /**
      * Gets the file from a part of speech and file type (ie data.noun).
      *
-     * @param pos      - the part of speech (NOUN, ADJ, VERB, ADV)
-     * @param fileType - the file type (data, index, exc)
+     * @param pos      - the part of speech (NOUN, ADJ, VERB, ADV) or null
+     * @param fileType - the file type (data, index, exc, cntlist)
      * @return - dictionary file
      */
     public RandomAccessDictionaryFile getFile(POS pos, DictionaryFileType fileType) {
@@ -89,7 +138,10 @@ public class FileManagerImpl implements FileManager {
     }
 
     public String readLineAt(POS pos, DictionaryFileType fileType, long offset) throws IOException {
-        RandomAccessDictionaryFile file = getFile(pos, fileType);
+        return fileReadLineAt(getFile(pos, fileType), offset);
+    }
+
+    public String fileReadLineAt(RandomAccessDictionaryFile file, long offset) throws IOException {
         synchronized (file) {
             file.seek(offset);
             String line = file.readLine();
@@ -145,7 +197,10 @@ public class FileManagerImpl implements FileManager {
      * by using an offset and string comparison algorithm.
      */
     public long getIndexedLinePointer(POS pos, DictionaryFileType fileType, String target) throws IOException {
-        RandomAccessDictionaryFile file = getFile(pos, fileType);
+        return fileGetIndexedLinePointer(getFile(pos, fileType), target);
+    }
+
+    private long fileGetIndexedLinePointer(RandomAccessDictionaryFile file, String target) throws IOException {
         if (file == null || file.length() == 0) {
             return -1;
         }
@@ -177,7 +232,7 @@ public class FileManagerImpl implements FileManager {
                 word = file.readLineWord();
                 compare = word.compareTo(target);
                 /**
-                 * Determines where to go within the file. 
+                 * Determines where to go within the file.
                  */
                 if (compare == 0) {
                     return offset;
@@ -224,5 +279,108 @@ public class FileManagerImpl implements FileManager {
         files.delete();
         files.open();
         files.save();
+
+        {
+            log.log(MessageLogLevel.INFO, "PRINCETON_INFO_008", revCntList.getFile().getName());
+            //cntlist.rev
+            Set<String> revCntListContent = new TreeSet<String>();
+            for (POS pos : POS.getAllPOS()) {
+                Iterator<IndexWord> ii = dictionary.getIndexWordIterator(pos);
+                while (ii.hasNext()) {
+                    IndexWord iw = ii.next();
+                    for (int i = 0; i < iw.getSenses().size(); i++) {
+                        for (Word w : iw.getSenses().get(i).getWords()) {
+                            if (0 < w.getUseCount()) {
+                                revCntListContent.add(w.getSenseKey() + " " + Integer.toString(i) + " " + w.getUseCount());
+                            }
+                        }
+                    }
+                }
+            }
+
+            revCntList.seek(0);
+            revCntList.writeStrings(revCntListContent);
+            log.log(MessageLogLevel.INFO, "PRINCETON_INFO_013", revCntList.getFile().getName());
+        }
+
+        {
+            log.log(MessageLogLevel.INFO, "PRINCETON_INFO_008", cntList.getFile().getName());
+            //cntlist.rev
+            Map<Integer, String> cntListMap = new HashMap<Integer, String>();
+            List<Integer> useCounts = new ArrayList<Integer>();
+            for (POS pos : POS.getAllPOS()) {
+                Iterator<IndexWord> ii = dictionary.getIndexWordIterator(pos);
+                while (ii.hasNext()) {
+                    IndexWord iw = ii.next();
+                    for (int i = 0; i < iw.getSenses().size(); i++) {
+                        for (Word w : iw.getSenses().get(i).getWords()) {
+                            String value = w.getSenseKey() + " " + Integer.toString(i);
+                            if (0 < w.getUseCount() && !cntListMap.containsValue(value)) {
+                                cntListMap.put(w.getUseCount(), value);
+                                useCounts.add(w.getUseCount());
+                            }
+                        }
+                    }
+                }
+            }
+            List<String> cntListContent = new ArrayList<String>();
+            Collections.sort(useCounts, Collections.<Integer>reverseOrder());
+            for (Integer i : useCounts) {
+                cntListContent.add(Integer.toString(i) + " " + cntListMap.get(i));
+            }
+            cntList.seek(0);
+            cntList.writeStrings(cntListContent);
+            log.log(MessageLogLevel.INFO, "PRINCETON_INFO_013", cntList.getFile().getName());
+        }
+
+
+        {
+            //find the largest offset over all POS
+            String decimalFormatString = "00000000";
+            for (POS pos : POS.getAllPOS()) {
+                for (DictionaryFileType dft : DictionaryFileType.getAllDictionaryFileTypes()) {
+                    RandomAccessDictionaryFile dictionaryFile = files.getDictionaryFile(pos, dft);
+                    if (decimalFormatString.length() < dictionaryFile.getOffsetFormatString().length()) {
+                        decimalFormatString = dictionaryFile.getOffsetFormatString();
+                    }
+                }
+            }
+            DecimalFormat dfOff = new DecimalFormat(decimalFormatString);
+            log.log(MessageLogLevel.INFO, "PRINCETON_INFO_008", senseIndex.getFile().getName());
+            Set<String> senseIndexContent = new TreeSet<String>();
+            for (POS pos : POS.getAllPOS()) {
+                Iterator<IndexWord> ii = dictionary.getIndexWordIterator(pos);
+                while (ii.hasNext()) {
+                    IndexWord iw = ii.next();
+                    for (int i = 0; i < iw.getSenses().size(); i++) {
+                        Synset synset = iw.getSenses().get(i);
+                        for (Word w : synset.getWords()) {
+                            //sense_key  synset_offset  sense_number  tag_cnt
+                            senseIndexContent.add(w.getSenseKey() + " " + dfOff.format(synset.getOffset()) + " " + Integer.toString(i) + " " + w.getUseCount());
+                        }
+                    }
+                }
+            }
+
+            senseIndex.seek(0);
+            senseIndex.writeStrings(senseIndexContent);
+            log.log(MessageLogLevel.INFO, "PRINCETON_INFO_013", senseIndex.getFile().getName());
+        }
+
+    }
+
+    @Override
+    public int getUseCount(String senseKey) throws IOException {
+        long offset = fileGetIndexedLinePointer(revCntList, senseKey);
+        if (-1 == offset) {
+            return 0;
+        } else {
+            String line = fileReadLineAt(revCntList, offset);
+            //sense_key  sense_number  tag_cnt
+            TokenizerParser tokenizer = new TokenizerParser(line, " ");
+            tokenizer.nextToken();//sense_key
+            tokenizer.nextToken();//sense_number
+            return tokenizer.nextInt();//tag_cnt
+        }
     }
 }

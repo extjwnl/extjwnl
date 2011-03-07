@@ -27,8 +27,8 @@ public class DictionaryCatalogSet<E extends DictionaryFile> implements Owned {
     /**
      * Creates a catalog set of the specified type of file using files in the specified dictionary directory.
      *
-     * @param dictionary dictionary
-     * @param params parameters
+     * @param dictionary                dictionary
+     * @param params                    parameters
      * @param desiredDictionaryFileType desiredDictionaryFileType
      * @throws JWNLException JWNLException
      */

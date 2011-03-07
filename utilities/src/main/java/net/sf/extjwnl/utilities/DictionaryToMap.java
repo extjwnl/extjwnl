@@ -1,6 +1,5 @@
 package net.sf.extjwnl.utilities;
 
-
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.data.DictionaryElement;
 import net.sf.extjwnl.data.POS;
@@ -20,12 +19,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-
 /**
  * DictionaryToMap allows you to populate and create an in-memory map of the WordNet
  * library. The goal of this utility is to provide a performance boost to applications
- * using a high quantity of API calls to the JWNL library
- * (such as word sense disambiguation algorithms, or dictionary services).
+ * using a high quantity of API calls to the extJWNL library
+ * (such as word sense disambiguation algorithms or dictionary services).
  *
  * @author Brett Walenz <bwalenz@users.sourceforge.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
@@ -38,13 +36,12 @@ public class DictionaryToMap {
     /**
      * Initialize with the given map destination directory, using the properties file(usually file_properties.xml)
      *
-     * @param destinationDirectory - destination directory for in-memory map files
-     * @param propFile             - properties file of file-based WordNet
+     * @param propFile             properties file
+     * @param destinationDirectory destination directory for in-memory map files
      * @throws JWNLException JWNLException
      * @throws IOException   IOException
      */
-    public DictionaryToMap(String destinationDirectory, String propFile)
-            throws JWNLException, IOException {
+    public DictionaryToMap(String propFile, String destinationDirectory) throws JWNLException, IOException {
         dictionary = Dictionary.getInstance(new FileInputStream(propFile));
         HashMap<String, Param> params = new HashMap<String, Param>();
         params.put(DictionaryCatalog.DICTIONARY_PATH_KEY, new NameValueParam(dictionary, DictionaryCatalog.DICTIONARY_PATH_KEY, destinationDirectory));
@@ -118,14 +115,14 @@ public class DictionaryToMap {
         String destinationDirectory = null;
         String propertyFile = null;
         if (args.length == 2) {
-            destinationDirectory = args[0];
-            propertyFile = args[1];
+            destinationDirectory = args[1];
+            propertyFile = args[0];
         } else {
-            System.out.println("DictionaryToMap <destination directory> <properties file>");
+            System.out.println("DictionaryToMap <properties file> <destination directory>");
             System.exit(0);
         }
         try {
-            (new DictionaryToMap(destinationDirectory, propertyFile)).convert();
+            (new DictionaryToMap(propertyFile, destinationDirectory)).convert();
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(-1);

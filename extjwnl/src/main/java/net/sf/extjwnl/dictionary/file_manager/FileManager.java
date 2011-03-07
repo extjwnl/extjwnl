@@ -83,6 +83,13 @@ public interface FileManager extends Owned {
      */
     long getFirstLinePointer(POS pos, DictionaryFileType fileType) throws IOException;
 
+    /**
+     * Returns the number of times the sense marked by <var>senseKey</var> occurs in a semantic concordance.
+     * @param senseKey sense key
+     * @return the number of times the sense marked by <var>senseKey</var> occurs in a semantic concordance
+     * @throws IOException IOException
+     */
+    int getUseCount(String senseKey) throws IOException;
 
     /**
      * Shuts down the file manager.

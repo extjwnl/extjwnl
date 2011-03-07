@@ -32,14 +32,19 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory implements F
         TokenizerParser tokenizer = new TokenizerParser(line, " ");
         String lemma = tokenizer.nextToken().replace('_', ' ');
         tokenizer.nextToken(); // pos
-        tokenizer.nextToken();    // poly_cnt
+        tokenizer.nextToken();    // sense_cnt
+
         int pointerCount = tokenizer.nextInt();
-        // TODO: can we do anything interesting with these?
         for (int i = 0; i < pointerCount; ++i) {
             tokenizer.nextToken();    // ptr_symbol
         }
+        //Same as sense_cnt above. This is redundant, but the field was preserved for compatibility reasons.
         int senseCount = tokenizer.nextInt();
+
+        //Number of senses of lemma that are ranked according to their
+        //frequency of occurrence in semantic concordance texts.
         tokenizer.nextInt(); // tagged sense count
+
         long[] synsetOffsets = new long[senseCount];
         for (int i = 0; i < senseCount; i++) {
             synsetOffsets[i] = tokenizer.nextLong();
@@ -67,7 +72,6 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory implements F
         synset.setIsAdjectiveCluster(isAdjectiveCluster);
 
         int wordCount = tokenizer.nextHexInt();
-        ArrayList<Word> words = new ArrayList<Word>(wordCount);
         for (int i = 0; i < wordCount; i++) {
             String lemma = tokenizer.nextToken().replace('_', ' ');
 
@@ -76,12 +80,10 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory implements F
             //NB index: Word numbers are assigned to the word fields in a synset, from left to right, beginning with 1
             Word w = createWord(synset, i + 1, lemma);
             w.setLexId(lexId);
-            words.add(w);
+            synset.getWords().add(w);
         }
-        synset.getWords().addAll(words);
 
         int pointerCount = tokenizer.nextInt();
-        ArrayList<Pointer> pointers = new ArrayList<Pointer>(pointerCount);
         for (int i = 0; i < pointerCount; i++) {
             String pt = tokenizer.nextToken();
             PointerType pointerType = PointerType.getPointerTypeForKey(pt);
@@ -93,9 +95,8 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory implements F
             PointerTarget source = (sourceIndex == 0) ? synset : synset.getWords().get(sourceIndex - 1);
 
             Pointer p = new Pointer(source, pointerType, targetPOS, targetOffset, targetIndex);
-            pointers.add(p);
+            synset.getPointers().add(p);
         }
-        synset.getPointers().addAll(pointers);
 
         if (pos == POS.VERB) {
             BitSet verbFrames = new BitSet();

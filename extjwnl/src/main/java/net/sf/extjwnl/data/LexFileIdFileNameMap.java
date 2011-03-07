@@ -9,12 +9,12 @@ import java.util.*;
  * @author Brett Walenz <bwalenz@users.sourceforge.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
-public class LexIdNameMap implements Map<Long, String>, Serializable {
+public class LexFileIdFileNameMap implements Map<Long, String>, Serializable {
 
     /**
      * A mapping of id's to files.
      */
-    private static Map<Long, String> lexIdName;
+    private static Map<Long, String> lexFileIdLexFileName;
 
     static {
         List<String> names = new ArrayList<String>();
@@ -64,74 +64,74 @@ public class LexIdNameMap implements Map<Long, String>, Serializable {
         names.add("verb.weather");
         names.add("adj.ppl");
 
-        lexIdName = new HashMap<Long, String>();
+        lexFileIdLexFileName = new HashMap<Long, String>();
         for (int i = 0; i < names.size(); i++) {
-            lexIdName.put((long) i, names.get(i));
+            lexFileIdLexFileName.put((long) i, names.get(i));
         }
-        lexIdName = Collections.unmodifiableMap(lexIdName);
+        lexFileIdLexFileName = Collections.unmodifiableMap(lexFileIdLexFileName);
     }
 
     public static Map<Long, String> getMap() {
-        return lexIdName;
+        return lexFileIdLexFileName;
     }
 
     public int size() {
-        return lexIdName.size();
+        return lexFileIdLexFileName.size();
     }
 
     public boolean equals(Object o) {
-        return lexIdName.equals(o);
+        return lexFileIdLexFileName.equals(o);
     }
 
     public int hashCode() {
-        return lexIdName.hashCode();
+        return lexFileIdLexFileName.hashCode();
     }
 
     public String toString() {
-        return lexIdName.toString();
+        return lexFileIdLexFileName.toString();
     }
 
     public boolean isEmpty() {
-        return lexIdName.isEmpty();
+        return lexFileIdLexFileName.isEmpty();
     }
 
     public String get(Object key) {
-        return lexIdName.get(key);
+        return lexFileIdLexFileName.get(key);
     }
 
     public boolean containsKey(Object key) {
-        return lexIdName.containsKey(key);
+        return lexFileIdLexFileName.containsKey(key);
     }
 
     public String put(Long key, String value) {
-        return lexIdName.put(key, value);
+        return lexFileIdLexFileName.put(key, value);
     }
 
     public void putAll(Map<? extends Long, ? extends String> m) {
-        lexIdName.putAll(m);
+        lexFileIdLexFileName.putAll(m);
     }
 
     public String remove(Object key) {
-        return lexIdName.remove(key);
+        return lexFileIdLexFileName.remove(key);
     }
 
     public void clear() {
-        lexIdName.clear();
+        lexFileIdLexFileName.clear();
     }
 
     public boolean containsValue(Object value) {
-        return lexIdName.containsValue(value);
+        return lexFileIdLexFileName.containsValue(value);
     }
 
     public Set<Long> keySet() {
-        return lexIdName.keySet();
+        return lexFileIdLexFileName.keySet();
     }
 
     public Collection<String> values() {
-        return lexIdName.values();
+        return lexFileIdLexFileName.values();
     }
 
     public Set<Map.Entry<Long, String>> entrySet() {
-        return lexIdName.entrySet();
+        return lexFileIdLexFileName.entrySet();
     }
 }

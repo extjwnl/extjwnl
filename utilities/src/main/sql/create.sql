@@ -20,7 +20,8 @@ CREATE TABLE SynsetWord (
   synset_word_id  integer(10),
   synset_id       integer(10),
   word            varchar(255),
-  word_index      integer(10)
+  word_index      integer(10),
+  usage_cnt	  integer(10)  
 );
 
 CREATE INDEX I_SynsetWord On SynsetWord (synset_id);

@@ -48,6 +48,13 @@ public abstract class Dictionary {
     private static final String PUBLISHER_ATTRIBUTE = "publisher";
     private static final String NUMBER_ATTRIBUTE = "number";
 
+    //warn about incompatible lex ids: lex_id is a two digit decimal integer
+    private static final String LEX_ID_WARN_KEY = "warnLexIds";
+    private static final String SKIP_LEX_ID_CHECK_KEY = "skipLexIdsCheck";
+
+    private boolean lexIdWarn = true;
+    private boolean skipLexIdCheck = false;
+
     /**
      * The singleton instance of the dictionary to be used throughout the system.
      */
@@ -118,6 +125,10 @@ public abstract class Dictionary {
         return dictionary;
     }
 
+    public static Dictionary createStaticInstance(InputStream propertiesStream) throws JWNLException {
+        return setInstance(getInstance(propertiesStream));
+    }
+
     /**
      * Parses a properties file and creates a dictionary.
      *
@@ -182,9 +193,10 @@ public abstract class Dictionary {
         return dictionary;
     }
 
-    private static void setInstance(Dictionary dictionary) {
+    private static Dictionary setInstance(Dictionary dictionary) {
         log.log(MessageLogLevel.INFO, "DICTIONARY_INFO_002", dictionary);
         Dictionary.dictionary = dictionary;
+        return dictionary;
     }
 
     public static void uninstall() {
@@ -254,7 +266,13 @@ public abstract class Dictionary {
             params.put(p.getName(), p);
         }
 
-        setInstance(this);
+        if (params.containsKey(LEX_ID_WARN_KEY)) {
+            lexIdWarn = Boolean.parseBoolean(params.get(LEX_ID_WARN_KEY).getValue());
+        }
+
+        if (params.containsKey(SKIP_LEX_ID_CHECK_KEY)) {
+            skipLexIdCheck = Boolean.parseBoolean(params.get(SKIP_LEX_ID_CHECK_KEY).getValue());
+        }
     }
 
     /**
@@ -372,7 +390,7 @@ public abstract class Dictionary {
      *
      * @param lemma the word for which to lookup senses
      * @return An array of IndexWords, each of which is a sense of <var>word</var>
-     * @throws net.sf.extjwnl.JWNLException JWNLException
+     * @throws JWNLException JWNLException
      */
     public IndexWordSet lookupAllIndexWords(String lemma) throws JWNLException {
         lemma = prepareQueryString(lemma);
@@ -419,11 +437,74 @@ public abstract class Dictionary {
      * Saves the dictionary.
      *
      * @throws JWNLException JWNLException
-     * @throws IOException IOException
      */
     public void save() throws JWNLException {
         if (!isEditable()) {
             throw new JWNLException("DICTIONARY_EXCEPTION_029");
+        }
+
+        if (!skipLexIdCheck) {
+            //lex ids
+            log.log(MessageLogLevel.INFO, "PRINCETON_INFO_015");
+            //fixing word lex ids
+            //lex ids should be unique within lex file name
+            //lemma -> lex file num -> words
+            HashMap<String, HashMap<Long, ArrayList<Word>>> lemmas = new HashMap<String, HashMap<Long, ArrayList<Word>>>();
+            for (POS pos : POS.getAllPOS()) {
+                Iterator<Synset> si = dictionary.getSynsetIterator(pos);
+                while (si.hasNext()) {
+                    Synset s = si.next();
+                    for (Word w : s.getWords()) {
+                        final String lemma = w.getLemma().toLowerCase();//like in index file
+                        HashMap<Long, ArrayList<Word>> lexWords = lemmas.get(lemma);
+                        if (null == lexWords) {
+                            lexWords = new HashMap<Long, ArrayList<Word>>();
+                            lemmas.put(lemma, lexWords);
+                        }
+                        ArrayList<Word> words = lexWords.get(w.getSynset().getLexFileNum());
+                        if (null == words) {
+                            words = new ArrayList<Word>();
+                            lexWords.put(w.getSynset().getLexFileNum(), words);
+                        }
+                        words.add(w);
+                    }
+                }
+                long counter = 0;
+                long total = lemmas.values().size();
+                long reportInt = (total / 20) + 1;//i.e. report every 5%
+                for (HashMap<Long, ArrayList<Word>> lexWords : lemmas.values()) {
+                    counter++;
+                    if (0 == (counter % reportInt)) {
+                        log.log(MessageLogLevel.INFO, "PRINCETON_INFO_014", 100 * counter / total);
+                    }
+                    for (ArrayList<Word> words : lexWords.values()) {
+                        long id = -1;//find max id
+                        Set<Long> lexIds = new HashSet<Long>(words.size());
+                        for (Word w : words) {
+                            if (id < w.getLexId()) {
+                                id = w.getLexId();
+                            }
+                            if (lexIds.contains(w.getLexId())) {
+                                w.setLexId(-1);
+                            } else {
+                                lexIds.add(w.getLexId());
+                            }
+                        }
+                        id++;
+                        for (Word w : words) {
+                            if (-1 == w.getLexId()) {
+                                if (lexIdWarn && (99 < id)) {//lex_id is a two digit decimal integer
+                                    log.log(MessageLogLevel.WARN, "PRINCETON_INFO_014", new Object[]{id, w});
+                                }
+                                w.setLexId(id);
+                                id++;
+                            }
+                        }
+                    }
+                }
+            }
+
+            log.log(MessageLogLevel.INFO, "PRINCETON_INFO_016");
         }
     }
 
@@ -583,7 +664,6 @@ public abstract class Dictionary {
     /**
      * Creates index word.
      *
-     *
      * @param pos    part of speech
      * @param lemma  lemma
      * @param synset synset
@@ -615,6 +695,7 @@ public abstract class Dictionary {
 
     /**
      * Removes <var>indexWord</var> from the dictionary.
+     *
      * @param indexWord index word to remove
      * @throws JWNLException JWNLException
      */
@@ -701,6 +782,4 @@ public abstract class Dictionary {
         maxOffset.put(pos, result);
         return result;
     }
-
-
 }

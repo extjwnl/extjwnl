@@ -44,6 +44,11 @@ public class IndexWord extends BaseDictionaryElement {
             super(initialCapacity);
         }
 
+        private void replaceSenses(Collection<Synset> senses) {
+            super.clear();
+            super.addAll(senses);
+        }
+
         @Override
         public int size() {
             if (null != synsetOffsets) {
@@ -478,7 +483,7 @@ public class IndexWord extends BaseDictionaryElement {
     }
 
     public long[] getSynsetOffsets() {
-        if (null != dictionary && dictionary.isEditable() && null == synsetOffsets) {
+        if (null != dictionary && null == synsetOffsets) {
             long[] result = new long[synsets.size()];
             for (int i = 0; i < synsets.size(); i++) {
                 result[i] = synsets.get(i).getOffset();
@@ -498,6 +503,68 @@ public class IndexWord extends BaseDictionaryElement {
             synsets = new SynsetList(synsetOffsets.length);
         }
         return synsets;
+    }
+
+    /**
+     * Sorts senses according to their use count.
+     *
+     * @return number of tagged senses (senses with non-zero use count)
+     */
+    public int sortSenses() {
+        int result = 0;
+        //sort senses and find out tagged sense count
+        List<Synset> ucSenses = new ArrayList<Synset>(getSenses().size());
+        List<Synset> nonUCSenses = new ArrayList<Synset>(getSenses().size());
+        for (Synset synset : getSenses()) {
+            if (0 < getMaxUseCount(synset)) {
+                ucSenses.add(synset);
+            } else {
+                nonUCSenses.add(synset);
+            }
+        }
+        Collections.sort(ucSenses, Collections.<Synset>reverseOrder(useCountComparator));
+
+        result = ucSenses.size();
+
+        //other synsets seems to be sorted by decreasing offsets
+        Collections.sort(nonUCSenses, Collections.<Synset>reverseOrder(synsetOffsetComparator));
+
+        ucSenses.addAll(nonUCSenses);
+
+        synsets.replaceSenses(ucSenses);
+
+        return result;
+    }
+
+    private static final Comparator<Synset> useCountComparator = new Comparator<Synset>() {
+        @Override
+        public int compare(Synset o1, Synset o2) {
+            return getMaxUseCount(o1) - getMaxUseCount(o2);
+        }
+    };
+
+    private static final Comparator<Synset> synsetOffsetComparator = new Comparator<Synset>() {
+        @Override
+        public int compare(Synset o1, Synset o2) {
+            long result = o1.getOffset() - o2.getOffset();
+            if (0 != result) {
+                //2 huge offsets might lead to integer overflow
+                return (int) (result / Math.abs(result));
+            } else {
+                return 0;
+            }
+        }
+    };
+
+
+    private static int getMaxUseCount(Synset synset) {
+        int result = 0;
+        for (Word w : synset.getWords()) {
+            if (result < w.getUseCount()) {
+                result = w.getUseCount();
+            }
+        }
+        return result;
     }
 
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {

@@ -21,6 +21,13 @@
             <artifactId>extjwnl</artifactId>
             <version>1.5</version>
         </dependency>
+
+        <dependency>
+            <scope>runtime</scope>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.15</version>
+        </dependency>
     </dependencies>
 
     <build>

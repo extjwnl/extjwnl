@@ -83,7 +83,7 @@ public abstract class DictionaryTester {
         for (Word w : synset.getWords()) {
             Assert.assertTrue("Synset word loading: " + w.getLemma(), lemmas.contains(w.getLemma()));
         }
-        //TODO test specific pointers
+        Assert.assertEquals("Use count testing", 7, synset.getWords().get(0).getUseCount());
     }
 
     @Test
@@ -98,6 +98,8 @@ public abstract class DictionaryTester {
             }
         }
         Assert.assertNotNull("Synset search", synset);
+        Assert.assertEquals("Words testing", 2, synset.getWords().size());
+        Assert.assertEquals("Use count testing", 52, synset.getWords().get(0).getUseCount());
         int[] indices = synset.getVerbFrameIndices();
         Assert.assertNotNull(indices);
         Assert.assertEquals("Verb synset frame size test", 2, indices.length);

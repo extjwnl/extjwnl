@@ -115,10 +115,6 @@ public class PrincetonChannelDictionaryFile extends AbstractPrincetonRandomAcces
         }
     }
 
-    public void edit() throws IOException {
-        throw new UnsupportedOperationException();
-    }
-
     protected void openFile() throws IOException {
         channel = new FileInputStream(file).getChannel();
         if (null != encoding) {

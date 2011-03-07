@@ -64,7 +64,6 @@ public class PointerType implements Serializable {
     public static final PointerType USAGE = new PointerType("USAGE_DOMAIN", USAGE_DOMAIN_KEY, N | V | ADJ | ADV | LEXICAL);
 
     // Nouns and Verbs
-
     public static final PointerType HYPERNYM = new PointerType("HYPERNYM", HYPERNYM_KEY, N | V);
     public static final PointerType HYPONYM = new PointerType("HYPONYM", HYPONYM_KEY, N | V);
     public static final PointerType NOMINALIZATION = new PointerType("NOMINALIZATION", NOMINALIZATION_KEY, N | V);
@@ -73,12 +72,10 @@ public class PointerType implements Serializable {
     public static final PointerType INSTANCES_HYPONYM = new PointerType("INSTANCES_HYPONYM", INSTANCES_HYPONYM_KEY, N | V);
 
     // Nouns and Adjectives
-
     public static final PointerType ATTRIBUTE = new PointerType("ATTRIBUTE", ATTRIBUTE_KEY, N | ADJ);
     public static final PointerType SEE_ALSO = new PointerType("ALSO_SEE", ALSO_SEE_KEY, N | V | ADJ | LEXICAL);
 
     // Nouns
-
     public static final PointerType MEMBER_HOLONYM = new PointerType("MEMBER_HOLONYM", MEMBER_HOLONYM_KEY, N);
     public static final PointerType SUBSTANCE_HOLONYM = new PointerType("SUBSTANCE_HOLONYM", SUBSTANCE_HOLONYM_KEY, N);
     public static final PointerType PART_HOLONYM = new PointerType("PART_HOLONYM", PART_HOLONYM_KEY, N);
@@ -90,7 +87,6 @@ public class PointerType implements Serializable {
     public static final PointerType USAGE_MEMBER = new PointerType("USAGE_MEMBER", USAGE_MEMBER_KEY, N);
 
     // Verbs
-
     public static final PointerType ENTAILMENT = new PointerType("ENTAILMENT", ENTAILMENT_KEY, V);
     public static final PointerType ENTAILED_BY = new PointerType("ENTAILED_BY", ENTAILED_BY_KEY, V);
     public static final PointerType CAUSE = new PointerType("CAUSE", CAUSE_KEY, V);
@@ -152,8 +148,10 @@ public class PointerType implements Serializable {
     }
 
     /**
-     * Returns true if <var>type</var> is a symmetric pointer type
-     * (it is its own symmetric type).
+     * Returns true if <var>type</var> is a symmetric pointer type (it is its own symmetric type).
+     *
+     * @param type pointer type
+     * @return if <var>type</var> is a symmetric pointer type
      */
     public static boolean isSymmetric(PointerType type) {
         return type.symmetricTo(type);
@@ -161,6 +159,9 @@ public class PointerType implements Serializable {
 
     /**
      * Return the <code>PointerType</code> whose key matches <var>key</var>.
+     *
+     * @param key pointer type key
+     * @return the <code>PointerType</code> whose key matches <var>key</var>
      */
     public static PointerType getPointerTypeForKey(String key) {
         return KEY_TO_POINTER_TYPE_MAP.get(key);
@@ -181,7 +182,10 @@ public class PointerType implements Serializable {
     }
 
     /**
-     * Set <var>a</var> as <var>b</var>'s symmetric type, and vice versa.
+     * Sets <var>a</var> as <var>b</var>'s symmetric type, and vice versa.
+     *
+     * @param a pointer type
+     * @param b pointer type
      */
     private static void setSymmetric(PointerType a, PointerType b) {
         a.symmetricType = b;
@@ -219,7 +223,10 @@ public class PointerType implements Serializable {
     }
 
     /**
-     * Whether or not this PointerType can be associated with <var>pos</var>
+     * Returns whether or not this PointerType can be associated with <var>pos</var>.
+     *
+     * @param pos part of speech
+     * @return true if this PointerType can be associated with <var>pos</var>
      */
     public boolean appliesTo(POS pos) {
         return (flags & getPOSMask(pos)) != 0;
@@ -231,6 +238,9 @@ public class PointerType implements Serializable {
 
     /**
      * Returns true if <var>type</var> is symmetric to this pointer type.
+     *
+     * @param type pointer type
+     * @return true if <var>type</var> is symmetric to this pointer type
      */
     public boolean symmetricTo(PointerType type) {
         return getSymmetricType() != null && getSymmetricType().equals(type);
@@ -238,6 +248,8 @@ public class PointerType implements Serializable {
 
     /**
      * Returns the pointer type that is symmetric to this type.
+     *
+     * @return the pointer type that is symmetric to this type
      */
     public PointerType getSymmetricType() {
         return symmetricType;

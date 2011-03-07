@@ -50,7 +50,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
             "SELECT is_adj_cluster, gloss FROM Synset WHERE pos = ? AND file_offset = ?";
 
     protected static final String SYNSET_WORD_SQL =
-            "SELECT sw.word, sw.word_index " +
+            "SELECT sw.word, sw.word_index, sw.usage_cnt " +
                     "FROM Synset s, SynsetWord sw " +
                     "WHERE s.synset_id = sw.synset_id AND s.pos = ? AND s.file_offset = ?";
 

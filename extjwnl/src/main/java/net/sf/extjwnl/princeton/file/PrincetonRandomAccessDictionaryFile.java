@@ -50,6 +50,9 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
     private int LINE_MAX = 1024;//1K buffer
     private byte[] lineArr = new byte[LINE_MAX];
 
+    private DecimalFormat dfOff;
+    private String decimalFormatString = "00000000";
+
     public PrincetonRandomAccessDictionaryFile(Dictionary dictionary, Map<String, Param> params) {
         super(dictionary, params);
     }
@@ -225,7 +228,8 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
             log.log(MessageLogLevel.INFO, "PRINCETON_INFO_005", exceptions.size());
             Collections.sort(exceptions);
 
-            writeFile(exceptions, raFile);
+            seek(0);
+            writeStrings(exceptions);
         } else if (DictionaryFileType.DATA.equals(getFileType())) {
             ArrayList<Synset> synsets = new ArrayList<Synset>();
             Iterator<Synset> si = dictionary.getSynsetIterator(getPOS());
@@ -252,13 +256,15 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                 }
             }
             //calculate offset length
-            dfOff = createDecimalFormat(offset);//there is a small chance it'll change after update
+            decimalFormatString = createOffsetFormatString(offset);
+            dfOff =  new DecimalFormat(decimalFormatString);//there is a small chance another update might be necessary
 
             log.log(MessageLogLevel.INFO, "PRINCETON_INFO_007", synsets.size());
             log.log(MessageLogLevel.INFO, "PRINCETON_INFO_008", makeFilename());
             long counter = 0;
             long total = synsets.size();
             long reportInt = (total / 20) + 1;//i.e. report every 5%
+            seek(0);
             for (Synset synset : synsets) {
                 counter++;
                 if (0 == (counter % reportInt)) {
@@ -276,8 +282,6 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
         } else if (DictionaryFileType.INDEX.equals(getFileType())) {
             ArrayList<String> indexes = new ArrayList<String>();
 
-            log.log(MessageLogLevel.INFO, "PRINCETON_INFO_010", getPOS().getLabel());
-            //find maxOffset to change formatter
             Iterator<IndexWord> ii = dictionary.getIndexWordIterator(getPOS());
             long maxOffset = 0;
             while (ii.hasNext()) {
@@ -287,7 +291,8 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                     }
                 }
             }
-            dfOff = createDecimalFormat(maxOffset);
+            decimalFormatString = createOffsetFormatString(maxOffset);
+            dfOff =  new DecimalFormat(decimalFormatString);
 
             log.log(MessageLogLevel.INFO, "PRINCETON_INFO_011", makeFilename());
             ii = dictionary.getIndexWordIterator(getPOS());
@@ -298,12 +303,38 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
             log.log(MessageLogLevel.INFO, "PRINCETON_INFO_005", indexes.size());
             Collections.sort(indexes);
 
-            writeFile(indexes, raFile);
+            seek(0);
+            writeStrings(indexes);
         }
         log.log(MessageLogLevel.INFO, "PRINCETON_INFO_012", makeFilename());
     }
 
-    private DecimalFormat createDecimalFormat(long offset) {
+    public void writeStrings(Collection<String> strings) throws IOException {
+        log.log(MessageLogLevel.INFO, "PRINCETON_INFO_008", makeFilename());
+        long counter = 0;
+        long total = strings.size();
+        long reportInt = (total / 20) + 1;//i.e. report every 5%
+        for (String s : strings) {
+            counter++;
+            if (0 == (counter % reportInt)) {
+                log.log(MessageLogLevel.INFO, "PRINCETON_INFO_014", 100 * counter / total);
+            }
+            if (null == encoding) {
+                raFile.write(s.getBytes());
+            } else {
+                raFile.write(s.getBytes(encoding));
+            }
+            raFile.writeBytes("\n");
+        }
+        log.log(MessageLogLevel.INFO, "PRINCETON_INFO_013", makeFilename());
+    }
+
+    @Override
+    public String getOffsetFormatString() {
+        return decimalFormatString;
+    }
+
+    private String createOffsetFormatString(long offset) {
         int offsetLength = 0;
         while (0 < offset) {
             offset = offset / 10;
@@ -315,7 +346,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
             formatString.append("0");
             offsetLength--;
         }
-        return new DecimalFormat(formatString.toString());
+        return formatString.toString();
     }
 
     private String renderSynset(Synset synset) throws JWNLException {
@@ -383,8 +414,6 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
         return result.toString();
     }
 
-    private DecimalFormat dfOff;
-
     private String renderIndexWord(IndexWord indexWord) throws JWNLException {
         //lemma  pos  synset_cnt  p_cnt  [ptr_symbol...]  sense_cnt  tagsense_cnt   synset_offset  [synset_offset...]
         StringBuilder result = new StringBuilder(indexWord.getLemma().replace(' ', '_'));
@@ -402,12 +431,15 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
             result.append(pt.getKey()).append(" ");
         }
         result.append(Integer.toString(indexWord.getSenses().size())).append(" ");//sense_cnt
-        int tagSenseCnt = 0;//TODO support usage count
+
+        //sort senses and find out tagged sense count
+        int tagSenseCnt = indexWord.sortSenses();
         result.append(Integer.toString(tagSenseCnt)).append(" ");//tagsense_cnt
-        //TODO sense order as in ExportWordNet
-        for (long l : indexWord.getSynsetOffsets()) {
-            result.append(dfOff.format(l)).append(" ");//synset_offset
+
+        for (Synset synset : indexWord.getSenses()) {
+            result.append(dfOff.format(synset.getOffset())).append(" ");//synset_offset
         }
+
         result.append(" ");
         return result.toString();
     }
@@ -419,25 +451,5 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
             result.append(" ").append(e.replace(' ', '_'));
         }
         return result.toString();
-    }
-
-    private void writeFile(ArrayList<String> strings, RandomAccessFile file) throws IOException {
-        log.log(MessageLogLevel.INFO, "PRINCETON_INFO_008", makeFilename());
-        long counter = 0;
-        long total = strings.size();
-        long reportInt = (total / 20) + 1;//i.e. report every 5%
-        for (String s : strings) {
-            counter++;
-            if (0 == (counter % reportInt)) {
-                log.log(MessageLogLevel.INFO, "PRINCETON_INFO_014", 100 * counter / total);
-            }
-            if (null == encoding) {
-                file.write(s.getBytes());
-            } else {
-                file.write(s.getBytes(encoding));
-            }
-            file.writeBytes("\n");
-        }
-        log.log(MessageLogLevel.INFO, "PRINCETON_INFO_013", makeFilename());
     }
 }

@@ -36,14 +36,22 @@ public class Word extends PointerTarget {
     private String lemma;
 
     /**
-     * The lexicographer id that identifies this lemma.
+     * The integer that, when appended onto lemma, uniquely identifies a sense within a lexicographer file.
+     * lex_id numbers usually start with 00, and are incremented as additional senses of the word are added
+     * to the same file, although there is no requirement that the numbers be consecutive or begin with 00.
+     * Note that a value of 00 is the default.
      */
-    private long lexId;
+    private long lexId = -1;//flag as not set
 
     /**
      * The summary of this word.
      */
     private String summary;
+
+    /**
+     * The number of times each tagged sense occurs in a semantic concordance.
+     */
+    private int useCount;
 
     private static final SenseWordCountComparator swcComp = new SenseWordCountComparator();
     private static final StringLengthComparator slComp = new StringLengthComparator();
@@ -170,6 +178,24 @@ public class Word extends PointerTarget {
      */
     public String getLemma() {
         return lemma;
+    }
+
+    /**
+     * Returns the number of times each tagged sense occurs in a semantic concordance.
+     *
+     * @return the number of times each tagged sense occurs in a semantic concordance
+     */
+    public int getUseCount() {
+        return useCount;
+    }
+
+    /**
+     * Sets the number of times each tagged sense occurs in a semantic concordance.
+     *
+     * @param useCount number of times each tagged sense occurs in a semantic concordance
+     */
+    public void setUseCount(int useCount) {
+        this.useCount = useCount;
     }
 
     /**
@@ -386,7 +412,7 @@ public class Word extends PointerTarget {
             ss_type = 5;
         }
 
-        StringBuilder senseKey = new StringBuilder(String.format("%s%%%d:%02d:%02d:", lemma.toLowerCase(), ss_type, synset.getLexFileNum(), lexId));
+        StringBuilder senseKey = new StringBuilder(String.format("%s%%%d:%02d:%02d:", lemma.toLowerCase().replace(' ', '_'), ss_type, synset.getLexFileNum(), lexId));
 
         if (5 == ss_type) {
             List<Pointer> p = synset.getPointers(PointerType.SIMILAR_TO);

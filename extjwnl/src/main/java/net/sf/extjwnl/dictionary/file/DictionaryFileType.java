@@ -18,11 +18,15 @@ public class DictionaryFileType {
     private static final String INDEX_KEY = "index";
     private static final String DATA_KEY = "data";
     private static final String EXCEPTION_KEY = "exception";
+    private static final String REVCNTLIST_KEY = "cntlist.rev";
+    private static final String CNTLIST_KEY = "cntlist";
 
     // File type constants
     public static final DictionaryFileType INDEX = new DictionaryFileType(INDEX_KEY, DictionaryElementType.INDEX_WORD);
     public static final DictionaryFileType DATA = new DictionaryFileType(DATA_KEY, DictionaryElementType.SYNSET);
     public static final DictionaryFileType EXCEPTION = new DictionaryFileType(EXCEPTION_KEY, DictionaryElementType.EXCEPTION);
+    public static final DictionaryFileType REVCNTLIST = new DictionaryFileType(REVCNTLIST_KEY, null);
+    public static final DictionaryFileType CNTLIST = new DictionaryFileType(CNTLIST_KEY, null);
 
     private static final List<DictionaryFileType> ALL_TYPES = Collections.unmodifiableList(Arrays.asList(INDEX, DATA, EXCEPTION));
 

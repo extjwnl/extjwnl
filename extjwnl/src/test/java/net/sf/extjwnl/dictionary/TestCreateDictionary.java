@@ -2,10 +2,7 @@ package net.sf.extjwnl.dictionary;
 
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.data.*;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -53,6 +50,10 @@ public abstract class TestCreateDictionary {
 
     @Before
     public void setUp() throws IOException, JWNLException {
+        dictionary = Dictionary.getInstance(getProperties());
+        dictionary.close();
+        dictionary.delete();
+
         dictionary = Dictionary.getInstance(getProperties());
 
         synEntity = null;
@@ -262,6 +263,7 @@ public abstract class TestCreateDictionary {
 
     private void createAndTestEntityWord(Dictionary dictionary) throws JWNLException {
         synEntity.getWords().add(new Word(dictionary, synEntity, 1, entityLemma));
+
         Assert.assertEquals(1, synEntity.getWords().size());
         Assert.assertNotNull(synEntity.getWords().get(0));
         Assert.assertEquals(entityLemma, synEntity.getWords().get(0).getLemma());
@@ -290,10 +292,16 @@ public abstract class TestCreateDictionary {
 
     private void createAndTestAbstractWords(Dictionary dictionary) throws JWNLException {
         for (int i = 0; i < abstractionWords.length; i++) {
-            synAbstraction.getWords().add(new Word(dictionary, synAbstraction, i + 1, abstractionWords[i]));
+            Word word = new Word(dictionary, synAbstraction, i + 1, abstractionWords[i]);
+            word.setUseCount(i + 1);
+            synAbstraction.getWords().add(word);
         }
         Assert.assertEquals(2, synAbstraction.getWords().size());
 
+        testAbstractWords(dictionary);
+    }
+
+    private void testAbstractWords(Dictionary dictionary) throws JWNLException {
         iwAbstraction = new IndexWord[2];
         for (int i = 0; i < abstractionWords.length; i++) {
             iwAbstraction[i] = dictionary.getIndexWord(POS.NOUN, abstractionWords[i]);
@@ -305,6 +313,10 @@ public abstract class TestCreateDictionary {
             Assert.assertNotNull(iwAbstraction[i].getSynsetOffsets());
             Assert.assertEquals(1, iwAbstraction[i].getSynsetOffsets().length);
             Assert.assertEquals(synAbstraction.getOffset(), iwAbstraction[i].getSynsetOffsets()[0]);
+        }
+        for (int i = 0; i < abstractionWords.length; i++) {
+            Word word = synAbstraction.getWords().get(synAbstraction.indexOfWord(abstractionWords[i]));
+            Assert.assertEquals(i + 1, word.getUseCount());
         }
     }
 
@@ -482,6 +494,27 @@ public abstract class TestCreateDictionary {
         testIterators(dictionary);
     }
 
+    @Test
+    public void TestEditSaveLoadUseCount() throws IOException, JWNLException {
+        dictionary.edit();
+        createAndTestEntitySynset(dictionary);
+        createAndTestEntityWord(dictionary);
+
+        createAndTestPEntitySynset(dictionary);
+        createAndTestPEntityWord(dictionary);
+
+        createAndTestPEntityPointer(dictionary);
+
+        createAndTestAbstractSynset(dictionary);
+        createAndTestAbstractWords(dictionary);
+
+        dictionary.save();
+        dictionary.close();
+
+        dictionary = Dictionary.getInstance(getProperties());
+        testAbstractWords(dictionary);
+    }
+
     private void testIWPEntity(Dictionary dictionary) throws JWNLException {
         iwPEntity = dictionary.getIndexWord(POS.NOUN, physical_entityLemma);
         Assert.assertNotNull(iwPEntity);
@@ -501,6 +534,17 @@ public abstract class TestCreateDictionary {
         synEntity = iwEntity.getSenses().get(0);
         Assert.assertNotNull(synEntity);
     }
+
+    private void testIWAbstract(Dictionary dictionary) throws JWNLException {
+        iwAbstraction[0] = dictionary.getIndexWord(POS.NOUN, entityLemma);
+        Assert.assertNotNull(iwEntity);
+        Assert.assertEquals(entityLemma, iwEntity.getLemma());
+        Assert.assertEquals(1, iwEntity.getSenses().size());
+
+        synEntity = iwEntity.getSenses().get(0);
+        Assert.assertNotNull(synEntity);
+    }
+
 
     private void testIterators(Dictionary dictionary) throws JWNLException {
         synsets = new ArrayList<Synset>();

@@ -65,7 +65,7 @@ public class JWNL {
      * @throws JWNLException various JWNL exceptions, depending on where this fails
      */
     public static void initialize(InputStream propertiesStream) throws JWNLException {
-        Dictionary.getInstance(propertiesStream);
+        Dictionary.createStaticInstance(propertiesStream);
     }
 
     /**

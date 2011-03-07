@@ -1,6 +1,7 @@
 package net.sf.extjwnl.dictionary.file;
 
 import java.io.IOException;
+import java.util.Collection;
 
 /**
  * <code>DictionaryFile</code> that reads lines from a random-access text file.
@@ -12,13 +13,19 @@ public interface RandomAccessDictionaryFile extends DictionaryFile {
 
     /**
      * Reads a byte from the file.
+     *
+     * @return a byte from the file
+     * @throws IOException IOException
      */
-    public int read() throws IOException;
+    int read() throws IOException;
 
     /**
      * Reads a line from the file.
+     *
+     * @return a line from the file
+     * @throws IOException IOException
      */
-    public String readLine() throws IOException;
+    String readLine() throws IOException;
 
     /**
      * Reads the first word from a file (ie offset, index word).
@@ -26,37 +33,67 @@ public interface RandomAccessDictionaryFile extends DictionaryFile {
      * @return the first word from a file (ie offset, index word)
      * @throws IOException IOException
      */
-    public String readLineWord() throws IOException;
+    String readLineWord() throws IOException;
 
     /**
      * Goes to position <var>pos</var> in the file.
+     *
+     * @param pos position <var>pos</var> in the file
+     * @throws IOException IOException
      */
-    public void seek(long pos) throws IOException;
+    void seek(long pos) throws IOException;
 
     /**
      * Returns the current position of the file pointer.
+     *
+     * @return the current position of the file pointer
+     * @throws IOException IOException
      */
-    public long getFilePointer() throws IOException;
+    long getFilePointer() throws IOException;
 
     /**
      * Returns the length, in bytes, of the file.
+     *
+     * @return the length, in bytes, of the file
+     * @throws IOException IOException
      */
-    public long length() throws IOException;
-
-    // Offset caching functions
+    long length() throws IOException;
 
     /**
-     * Moves the file pointer so that its next line offset is <var>nextOffset</var>
+     * Moves the file pointer so that its next line offset is <var>nextOffset</var>.
+     *
+     * @param previousOffset previous offset
+     * @param nextOffset     next offset
      */
-    public void setNextLineOffset(long previousOffset, long nextOffset);
+    void setNextLineOffset(long previousOffset, long nextOffset);
 
     /**
      * Returns true if <var>offset</var> is the previous offset.
+     *
+     * @param offset previous offset
+     * @return true if <var>offset</var> is the previous offset
      */
-    public boolean isPreviousLineOffset(long offset);
+    boolean isPreviousLineOffset(long offset);
 
     /**
-     * Returns the byte offset of the next line (after the position of the file pointer)
+     * Returns the byte offset of the next line (after the position of the file pointer).
+     *
+     * @return the byte offset of the next line
      */
-    public long getNextLineOffset();
+    long getNextLineOffset();
+
+    /**
+     * Writes strings in file.
+     *
+     * @param strings strings to write
+     * @throws IOException IOException
+     */
+    void writeStrings(Collection<String> strings) throws IOException;
+
+    /**
+     * Returns offset format string that accommodates largest offset.
+     *
+     * @return offset format string that accommodates largest offset
+     */
+    String getOffsetFormatString();
 }

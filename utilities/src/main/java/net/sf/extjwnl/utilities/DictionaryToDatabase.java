@@ -200,7 +200,7 @@ public class DictionaryToDatabase {
      */
     protected void storeSynsets(Iterator<Synset> itr) throws SQLException, JWNLException {
         PreparedStatement synsetStmt = connection.prepareStatement("INSERT INTO Synset VALUES(?,?,?,?,?)");
-        PreparedStatement synsetWordStmt = getSynsetWordStmt();
+        PreparedStatement synsetWordStmt = connection.prepareStatement("INSERT INTO SynsetWord VALUES(?,?,?,?,?)");
         PreparedStatement synsetPointerStmt = connection.prepareStatement("INSERT INTO SynsetPointer VALUES(?,?,?,?,?,?,?)");
         PreparedStatement synsetVerbFrameStmt = connection.prepareStatement("INSERT INTO SynsetVerbFrame VALUES(?,?,?,?)");
         System.out.println("storing synsets");
@@ -235,7 +235,9 @@ public class DictionaryToDatabase {
                 int wordId = nextId();
                 synsetWordStmt.setInt(1, wordId);
 
-                fillSynsetWordStmt(synsetWordStmt, synset, word);
+                synsetWordStmt.setString(3, word.getLemma());
+                synsetWordStmt.setInt(4, word.getIndex());
+                synsetWordStmt.setInt(5, word.getUseCount());
 
                 synsetWordStmt.execute();
                 if (word instanceof Verb) {
@@ -267,15 +269,6 @@ public class DictionaryToDatabase {
         System.out.println("stored synsets");
     }
 
-    protected void fillSynsetWordStmt(PreparedStatement synsetWordStmt, Synset synset, Word word) throws SQLException {
-        synsetWordStmt.setString(3, word.getLemma());
-        synsetWordStmt.setInt(4, word.getIndex());
-    }
-
-    protected PreparedStatement getSynsetWordStmt() throws SQLException {
-        return connection.prepareStatement("INSERT INTO SynsetWord VALUES(?,?,?,?)");
-    }
-
     /**
      * Store the index word synsets.
      *
@@ -284,7 +277,13 @@ public class DictionaryToDatabase {
     protected void storeIndexWordSynsets() throws SQLException {
         System.out.println("storing index word synsets");
         PreparedStatement iwsStmt = connection.prepareStatement("INSERT INTO IndexWordSynset VALUES(?,?,?)");
+        int count = 0;
         for (Map.Entry<Integer, long[]> entry : idToSynsetOffset.entrySet()) {
+            if (count % 1000 == 0) {
+                System.out.println("index word synset: " + count);
+            }
+            count++;
+
             int iwId = entry.getKey();
             iwsStmt.setInt(2, iwId);
             long offsets[] = entry.getValue();
@@ -295,6 +294,7 @@ public class DictionaryToDatabase {
                 iwsStmt.execute();
             }
         }
+        System.out.println("index word synset: " + count);
         System.out.println("stored index word synsets");
     }
 
@@ -318,5 +318,6 @@ public class DictionaryToDatabase {
                 exStmt.execute();
             }
         }
+        System.out.println("stored exceptions");
     }
 }

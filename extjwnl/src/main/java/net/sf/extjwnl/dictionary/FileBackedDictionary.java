@@ -58,7 +58,7 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
      */
     public static final String EXCEPTION_WORD_CACHE_SIZE = "exception_word_cache_size";
 
-    private FileManager db = null;
+    private FileManager fileManager = null;
     private FileDictionaryElementFactory factory = null;
 
     public FileBackedDictionary(Document doc) throws JWNLException {
@@ -75,7 +75,7 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
 
         this.setMorphologicalProcessor(morph);
         this.setCachingEnabled(enableCaching);
-        this.db = manager;
+        this.fileManager = manager;
         this.factory = factory;
 
         if (params.containsKey(CACHE_SIZE)) {
@@ -98,13 +98,13 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
 
     @Override
     public void close() {
-        db.close();
+        fileManager.close();
     }
 
     @Override
     public void delete() throws JWNLException {
         try {
-            db.delete();
+            fileManager.delete();
         } catch (IOException e) {
             throw new JWNLException("EXCEPTION_001", e.getMessage(), e);
         }
@@ -116,16 +116,12 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
      * @return the file manager that backs this database
      */
     protected FileManager getFileManager() {
-        return db;
+        return fileManager;
     }
 
     public FileDictionaryElementFactory getDictionaryElementFactory() {
         return factory;
     }
-
-    //
-    // IndexWord methods
-    //
 
     public Iterator<IndexWord> getIndexWordIterator(final POS pos) throws JWNLException {
         if (!isEditable()) {
@@ -142,7 +138,6 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
             return super.getIndexWordIterator(pos, substring);
         }
     }
-
 
     public IndexWord getIndexWord(POS pos, String lemma) throws JWNLException {
         lemma = prepareQueryString(lemma);
@@ -185,10 +180,6 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
         return word;
     }
 
-    //
-    // Synset methods
-    //
-
     public Iterator<Synset> getSynsetIterator(POS pos) throws JWNLException {
         if (!isEditable()) {
             return new FileLookaheadIterator<Synset>(pos, DictionaryFileType.DATA) {
@@ -218,7 +209,9 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
                     line = getFileManager().readLineAt(pos, DictionaryFileType.DATA, offset);
                 }
                 synset = factory.createSynset(pos, line);
-                synset.getWords();
+                for (Word w : synset.getWords()) {
+                    w.setUseCount(fileManager.getUseCount(w.getSenseKey()));
+                }
 
                 cacheSynset(key, synset);
             } catch (IOException e) {
@@ -227,10 +220,6 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
         }
         return synset;
     }
-
-    //
-    // Exception methods
-    //
 
     public Iterator<Exc> getExceptionIterator(POS pos) throws JWNLException {
         if (!isEditable()) {
@@ -304,7 +293,7 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
             this.pos = pos;
             this.fileType = fileType;
             try {
-                nextOffset = db.getFirstLinePointer(pos, fileType);
+                nextOffset = fileManager.getFirstLinePointer(pos, fileType);
                 nextLine();
             } catch (IOException ex) {
                 log.log(MessageLogLevel.WARN, "DICTIONARY_EXCEPTION_007", new Object[]{this.pos, this.fileType});
@@ -344,7 +333,7 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
          */
         protected final void nextLine() {
             try {
-                currentLine = db.readLineAt(pos, fileType, nextOffset);
+                currentLine = fileManager.readLineAt(pos, fileType, nextOffset);
                 if (currentLine != null) {
                     nextOffset();
                     return;
@@ -362,7 +351,7 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
 
         protected long getNextOffset(long currentOffset) throws JWNLException {
             try {
-                return db.getNextLinePointer(pos, fileType, currentOffset);
+                return fileManager.getNextLinePointer(pos, fileType, currentOffset);
             } catch (IOException ex) {
                 throw new JWNLException("DICTIONARY_EXCEPTION_008", new Object[]{pos, fileType}, ex);
             }
@@ -411,7 +400,7 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
         }
         cacheAll();
         try {
-            db.edit();
+            fileManager.edit();
         } catch (IOException e) {
             throw new JWNLException("EXCEPTION_001", e.getMessage(), e);
         }
@@ -421,7 +410,8 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
     @Override
     public void save() throws JWNLException {
         try {
-            db.save();
+            super.save();
+            fileManager.save();
         } catch (IOException e) {
             throw new JWNLException("EXCEPTION_001", e.getMessage(), e);
         }

@@ -6,6 +6,8 @@ import net.sf.extjwnl.dictionary.file.DictionaryFileType;
 import net.sf.extjwnl.dictionary.file.RandomAccessDictionaryFile;
 import net.sf.extjwnl.util.factory.Param;
 
+import java.io.IOException;
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -57,5 +59,20 @@ public abstract class AbstractPrincetonRandomAccessDictionaryFile extends Abstra
 
     public long getNextLineOffset() {
         return nextOffset;
+    }
+
+    @Override
+    public void edit() throws IOException {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void writeStrings(Collection<String> strings) throws IOException {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String getOffsetFormatString() {
+        throw new UnsupportedOperationException();
     }
 }

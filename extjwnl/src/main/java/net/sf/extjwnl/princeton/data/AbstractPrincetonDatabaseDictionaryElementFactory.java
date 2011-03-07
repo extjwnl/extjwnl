@@ -56,7 +56,9 @@ public abstract class AbstractPrincetonDatabaseDictionaryElementFactory implemen
         while (words.next()) {
             String lemma = words.getString(1);
             int index = words.getInt(2);
-            synset.getWords().add(createWord(synset, index, lemma));
+            Word word = createWord(synset, index, lemma);
+            word.setUseCount(words.getInt(3));
+            synset.getWords().add(word);
         }
 
         while (pointers.next()) {

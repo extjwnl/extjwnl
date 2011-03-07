@@ -9,6 +9,7 @@ import net.sf.extjwnl.util.factory.Owned;
  * facilitates using multiple versions of WordNet, or using a proprietary data format.
  *
  * @author John Didion <jdidion@users.sourceforge.net>
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public interface FileDictionaryElementFactory extends Owned {
 
@@ -18,6 +19,7 @@ public interface FileDictionaryElementFactory extends Owned {
      * @param pos  - the part of speech
      * @param line - unparsed line
      * @return exception
+     * @throws JWNLException JWNLException
      */
     public Exc createExc(POS pos, String line) throws JWNLException;
 
@@ -27,6 +29,7 @@ public interface FileDictionaryElementFactory extends Owned {
      * @param pos  - the part of speech
      * @param line - unparsed line
      * @return synset
+     * @throws JWNLException JWNLException
      */
     public Synset createSynset(POS pos, String line) throws JWNLException;
 
@@ -36,6 +39,7 @@ public interface FileDictionaryElementFactory extends Owned {
      * @param pos  - the part of speech
      * @param line - unparsed line
      * @return indexword
+     * @throws JWNLException JWNLException
      */
     public IndexWord createIndexWord(POS pos, String line) throws JWNLException;
 
