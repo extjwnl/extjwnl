@@ -22,7 +22,7 @@ import java.io.FileInputStream;
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class Examples {
-    private static final String USAGE = "java Examples <properties file>";
+    private static final String USAGE = "Usage: Examples <properties file>";
 
     public static void main(String[] args) {
         if (args.length != 1) {

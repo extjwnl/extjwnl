@@ -53,7 +53,7 @@ public class DictionaryToDatabase {
      */
     public static void main(String args[]) {
         if (args.length < 4) {
-            System.out.println("DictionaryToDatabase <property file> <create tables script> <driver class> <connection url> [username [password]]");
+            System.out.println("Usage: DictionaryToDatabase <property file> <create tables script> <driver class> <connection url> [username [password]]");
             System.exit(0);
         }
         Dictionary dictionary = null;

@@ -1,0 +1,24 @@
+<assembly>
+    <id>all</id>
+    <formats>
+        <format>zip</format>
+    </formats>
+    <fileSets>
+        <fileSet>
+            <directory>${project.build.directory}/dist</directory>
+            <includes/>
+            <excludes>
+                <exclude>**/maven-metadata-appassembler.xml</exclude>
+            </excludes>
+            <outputDirectory>/</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>${project.build.directory}/../..</directory>
+            <includes>
+                <include>README*</include>
+                <include>LICENSE*</include>
+            </includes>
+            <outputDirectory>/</outputDirectory>
+        </fileSet>
+    </fileSets>
+</assembly>

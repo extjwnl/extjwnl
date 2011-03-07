@@ -118,7 +118,7 @@ public class DictionaryToMap {
             destinationDirectory = args[1];
             propertyFile = args[0];
         } else {
-            System.out.println("DictionaryToMap <properties file> <destination directory>");
+            System.out.println("Usage: DictionaryToMap <properties file> <destination directory>");
             System.exit(0);
         }
         try {

@@ -9,14 +9,25 @@ http://extjwnl.sourceforge.net/
 2. Current Release
 
 This release is an upgrade form the last version of JWNL. It
-contains several improvements, such as generics, writing
-dictionaries, encodings (including UTF-8), huge dictionaries,
-loading several dictionaries simultaneously and using extJWNL
-with Maven.
+contains several improvements, such as:
+ * generics
+ * writing dictionaries
+ * encodings (including UTF-8)
+ * huge dictionaries
+ * instance dictionaries
+ * Maven
 
 3. Getting started
 
 extJWNL is contains Examples.java with examples of API use.
+
+4. Maven Support
+
+extJWNL supports Maven and makes available three artifacts in 
+the group net.sf.extjwnl:
+ * extjwnl
+ * extjwnl-utilities
+ * extjwnl-parent
 
 Resources
 ---------

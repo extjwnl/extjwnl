@@ -15,6 +15,15 @@
     <name>extJWNL Utilities</name>
     <description>Utilities for extJWNL library</description>
 
+    <!--
+    <distributionManagement>
+        <repository>
+            <id>extjwnl-frs</id>
+            <url>sftp://autayeu,extjwnl@frs.sourceforge.net:/home/frs/project/e/ex/extjwnl/</url>
+        </repository>
+    </distributionManagement>
+    -->
+
     <dependencies>
         <dependency>
             <groupId>net.sf.extjwnl</groupId>
@@ -35,5 +44,117 @@
         <outputDirectory>target/classes</outputDirectory>
         <directory>target</directory>
         <finalName>${project.artifactId}-${project.version}</finalName>
+
+        <!--
+        <extensions>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ssh</artifactId>
+                <version>1.0-beta-7</version>
+            </extension>
+        </extensions>
+        -->
     </build>
+
+    <profiles>
+        <profile>
+            <id>release</id>
+
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
+
+            <build>
+                <plugins>
+                    <!--
+                    <plugin>
+                        <artifactId>maven-deploy-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>deploy-extjwnl</id>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>deploy-file</goal>
+                                </goals>
+                                <configuration>
+                                    <repositoryId>extjwnl-frs</repositoryId>
+                                    <file>${project.build.directory}/extjwnl-${project.version}.zip</file>
+                                    <packaging>zip</packaging>
+                                    <generatePom>false</generatePom>
+                                    <url>sftp://autayeu,extjwnl@frs.sourceforge.net:/home/frs/project/e/ex/extjwnl/</url>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>${project.artifactId}</artifactId>
+                                    <version>${project.version}</version>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    -->
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>appassembler-maven-plugin</artifactId>
+                        <version>1.1.1</version>
+                        <executions>
+                            <execution>
+                                <id>appassembler</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>assemble</goal>
+                                </goals>
+                                <configuration>
+                                    <!-- set alternative assemble directory -->
+                                    <assembleDirectory>${project.build.directory}/dist</assembleDirectory>
+                                    <!-- Extra JVM arguments that will be included in the bin scripts -->
+                                    <extraJvmArguments>-Xmx512M</extraJvmArguments>
+                                    <includeConfigurationDirectoryInClasspath>false
+                                    </includeConfigurationDirectoryInClasspath>
+                                    <repositoryLayout>flat</repositoryLayout>
+                                    <repositoryName>lib</repositoryName>
+                                    <programs>
+                                        <program>
+                                            <mainClass>net.sf.extjwnl.utilities.DictionaryToDatabase</mainClass>
+                                            <name>dict2db</name>
+                                        </program>
+                                        <program>
+                                            <mainClass>net.sf.extjwnl.utilities.DictionaryToMap</mainClass>
+                                            <name>dict2map</name>
+                                        </program>
+                                        <program>
+                                            <mainClass>net.sf.extjwnl.utilities.Examples</mainClass>
+                                            <name>examples</name>
+                                        </program>
+                                    </programs>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <version>2.2.1</version>
+                        <executions>
+                            <execution>
+                                <id>all</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+
+                                <configuration>
+                                    <finalName>extjwnl-${project.version}</finalName>
+                                    <appendAssemblyId>false</appendAssemblyId>
+                                    <attach>false</attach>
+                                    <descriptors>
+                                        <descriptor>src/main/assembly/extjwnl-utilities.xml</descriptor>
+                                    </descriptors>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
