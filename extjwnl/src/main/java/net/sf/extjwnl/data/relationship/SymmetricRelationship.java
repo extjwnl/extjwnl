@@ -23,7 +23,7 @@ public class SymmetricRelationship extends Relationship {
     }
 
     public Relationship reverse() throws CloneNotSupportedException {
-        PointerTargetNodeList list = ((PointerTargetNodeList) getNodeList().deepClone()).reverse();
+        PointerTargetNodeList list = getNodeList().deepClone().reverse();
         for (Object aList : list) {
             ((PointerTargetNode) aList).setType(getType().getSymmetricType());
         }

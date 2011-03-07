@@ -127,7 +127,7 @@ public class POS implements Serializable {
     }
 
     /**
-     * Gets the key for this POS.
+     * Returns the key for this POS.
      *
      * @return key for this POS
      */

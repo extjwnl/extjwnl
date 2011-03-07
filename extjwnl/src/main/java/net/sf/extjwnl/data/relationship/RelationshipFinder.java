@@ -144,7 +144,7 @@ public class RelationshipFinder {
      * things like reversing the relationship (which just involves setting each node's
      * pointer type to the symmetric type of its current type.
      *
-     * @param sourceNodes  soruce nodes
+     * @param sourceNodes  source nodes
      * @param targetNodes  target nodes
      * @param type         pointer type
      * @param sourceSynset source synset

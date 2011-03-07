@@ -3,7 +3,6 @@ package net.sf.extjwnl.data.relationship;
 import net.sf.extjwnl.data.PointerTarget;
 import net.sf.extjwnl.data.PointerType;
 import net.sf.extjwnl.data.Synset;
-import net.sf.extjwnl.data.list.PointerTargetNode;
 import net.sf.extjwnl.data.list.PointerTargetNodeList;
 
 import java.io.IOException;
@@ -20,6 +19,7 @@ import java.io.StringWriter;
  * and {@link net.sf.extjwnl.data.relationship.AsymmetricRelationship Asymmetric}.
  *
  * @author John Didion <jdidion@users.sourceforge.net>
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public abstract class Relationship {
     /**
@@ -44,24 +44,30 @@ public abstract class Relationship {
     public abstract Relationship reverse() throws CloneNotSupportedException;
 
     /**
-     * Get the list that contains the nodes of this relationship.
+     * Returns the list that contains the nodes of this relationship.
+     *
+     * @return the list that contains the nodes of this relationship
      */
     public PointerTargetNodeList getNodeList() {
         return nodes;
     }
 
     /**
-     * Get the pointer target of the source node.
+     * Returns the pointer target of the source node.
+     *
+     * @return the pointer target of the source node
      */
     public PointerTarget getSourcePointerTarget() {
-        return ((PointerTargetNode) nodes.get(0)).getPointerTarget();
+        return nodes.get(0).getPointerTarget();
     }
 
     /**
-     * Get the pointer target of the target node.
+     * Returns the pointer target of the target node.
+     *
+     * @return the pointer target of the target node
      */
     public PointerTarget getTargetPointerTarget() {
-        return ((PointerTargetNode) nodes.get(nodes.size() - 1)).getPointerTarget();
+        return nodes.get(nodes.size() - 1).getPointerTarget();
     }
 
     public String toString() {
@@ -88,14 +94,18 @@ public abstract class Relationship {
     }
 
     /**
-     * Get the Synset that is the source of this relationship.
+     * Returns the synset that is the source of this relationship.
+     *
+     * @return synset that is the source of this relationship
      */
     public Synset getSourceSynset() {
         return sourceSynset;
     }
 
     /**
-     * Get the Synset that is the target of this relationship.
+     * Returns the synset that is the target of this relationship.
+     *
+     * @return synset that is the target of this relationship
      */
     public Synset getTargetSynset() {
         return targetSynset;
@@ -106,9 +116,11 @@ public abstract class Relationship {
     }
 
     /**
-     * Get the depth of this relationship. Depth is a concept that can be defined by each relationship type.
+     * Returns the depth of this relationship. Depth is a concept that can be defined by each relationship type.
      * The default notion of depth is the number of pointers that need to be traversed to go from the source
      * to target synset. This is basically getSize() - 1.
+     *
+     * @return the depth of this relationship
      */
     public int getDepth() {
         return getSize() - 1;

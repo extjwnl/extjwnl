@@ -62,6 +62,7 @@ public class ResourceBundleSet extends ResourceBundle {
                         currentEnum = getBndl(itr.next()).getKeys();
                     }
                 }
+                //noinspection SimplifiableIfStatement
                 if (currentEnum != null) {
                     return currentEnum.hasMoreElements();
                 }

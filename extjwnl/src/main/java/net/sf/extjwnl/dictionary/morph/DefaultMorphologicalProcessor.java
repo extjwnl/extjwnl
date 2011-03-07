@@ -97,7 +97,9 @@ public class DefaultMorphologicalProcessor implements MorphologicalProcessor {
      *
      * @param pos        the part-of-speech of the word to look up
      * @param derivation the word to look up
+     * @param info       lookup info
      * @return IndexWord the IndexWord found during lookup, or null if an IndexWord is not found
+     * @throws JWNLException JWNLException
      */
     private IndexWord lookupNextBaseForm(POS pos, String derivation, LookupInfo info) throws JWNLException {
         if (derivation == null || derivation.equals("")) {
@@ -128,7 +130,7 @@ public class DefaultMorphologicalProcessor implements MorphologicalProcessor {
         return (str == null) ? null : (null == dictionary ? null : dictionary.getIndexWord(pos, str));
     }
 
-    public List lookupAllBaseForms(POS pos, String derivation) throws JWNLException {
+    public List<String> lookupAllBaseForms(POS pos, String derivation) throws JWNLException {
         LookupInfo info = getCachedLookupInfo(new POSKey(pos, derivation));
         if (info == null) {
             info = new LookupInfo(pos, derivation, operations);

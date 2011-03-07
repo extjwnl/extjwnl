@@ -6,12 +6,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A group of possible base forms for a particular lemma
+ * A group of possible base forms for a particular lemma.
  *
  * @author John Didion <jdidion@users.sourceforge.net>
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class BaseFormSet {
-    private List forms = new ArrayList();
+    private List<String> forms = new ArrayList<String>();
     private int index = -1;
     private boolean allowDuplicates;
 
@@ -34,7 +35,7 @@ public class BaseFormSet {
             this.forms.addAll(forms.forms);
         } else {
             for (int i = 0; i < forms.forms.size(); i++) {
-                add((String) forms.forms.get(i));
+                add(forms.forms.get(i));
             }
         }
     }
@@ -43,10 +44,10 @@ public class BaseFormSet {
         if (!isFormAvailable(index)) {
             throw new IllegalArgumentException(String.valueOf(index));
         }
-        return (String) forms.get(index);
+        return forms.get(index);
     }
 
-    public List getForms() {
+    public List<String> getForms() {
         return forms;
     }
 

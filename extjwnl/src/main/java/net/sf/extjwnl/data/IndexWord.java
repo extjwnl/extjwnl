@@ -511,7 +511,7 @@ public class IndexWord extends BaseDictionaryElement {
      * @return number of tagged senses (senses with non-zero use count)
      */
     public int sortSenses() {
-        int result = 0;
+        int result;
         //sort senses and find out tagged sense count
         List<Synset> ucSenses = new ArrayList<Synset>(getSenses().size());
         List<Synset> nonUCSenses = new ArrayList<Synset>(getSenses().size());

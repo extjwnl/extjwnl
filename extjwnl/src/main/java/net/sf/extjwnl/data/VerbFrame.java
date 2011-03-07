@@ -46,17 +46,22 @@ public class VerbFrame implements Serializable {
     }
 
     /**
-     * Get frame at index <var>index</var>.
+     * Returns frame at index <var>index</var>.
+     * @param index index
+     * @return frame at index <var>index</var>
      */
     public static String getFrame(int index) {
         return verbFrames[index - 1].getFrame();
     }
 
     /**
-     * Get the frames at the indexes encoded in <var>l</var>.
+     * Returns the frames at the indexes encoded in <var>l</var>.
      * Verb Frames are encoded within <code>Word</code>s as a long. Each bit represents
      * the frame at its corresponding index. If the bit is set, that verb
      * frame is valid for the word.
+     *
+     * @param bits frame flags
+     * @return the frames at the indexes encoded in <var>l</var>
      */
     public static String[] getFrames(BitSet bits) {
         int[] indices = getVerbFrameIndices(bits);
@@ -68,7 +73,7 @@ public class VerbFrame implements Serializable {
     }
 
     /**
-     * Gets the verb frame indices for a synset. This is the collection
+     * Returns the verb frame indices for a synset. This is the collection
      * of f_num values for a synset definition. In the case of a synset, this
      * is only the values that are true for all words with the synset. In other
      * words, only the sentence frames that belong to all words.

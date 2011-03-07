@@ -45,7 +45,7 @@ public class IndexWordSet {
     }
 
     /**
-     * Gets the number of IndexWords in this set.
+     * Returns the number of IndexWords in this set.
      *
      * @return the number of IndexWords in this set
      */
@@ -54,7 +54,7 @@ public class IndexWordSet {
     }
 
     /**
-     * Gets the IndexWord associated with POS <var>p</var>.
+     * Returns the IndexWord associated with POS <var>p</var>.
      *
      * @param p POS
      * @return the IndexWord associated with POS <var>p</var>.
@@ -64,7 +64,7 @@ public class IndexWordSet {
     }
 
     /**
-     * Gets an array of the IndexWords in this set.
+     * Returns an array of the IndexWords in this set.
      *
      * @return an array of the IndexWords in this set
      */
@@ -74,7 +74,7 @@ public class IndexWordSet {
     }
 
     /**
-     * Gets a collection of the IndexWords in this set.
+     * Returns a collection of the IndexWords in this set.
      *
      * @return a collection of the IndexWords in this set
      */
@@ -83,7 +83,7 @@ public class IndexWordSet {
     }
 
     /**
-     * Gets a set of all the parts-of-speech for which there is an
+     * Returns a set of all the parts-of-speech for which there is an
      * IndexWord in this set.
      *
      * @return a set of all the parts-of-speech for which there is an IndexWord in this set

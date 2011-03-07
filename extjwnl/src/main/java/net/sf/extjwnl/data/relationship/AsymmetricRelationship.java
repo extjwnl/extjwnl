@@ -35,7 +35,7 @@ public class AsymmetricRelationship extends Relationship {
     }
 
     /**
-     * Gets the depth of the target, from the commonParentIndex, relative to the depth of the source.
+     * Returns the depth of the target, from the commonParentIndex, relative to the depth of the source.
      * If both target and source are equidistant from the commonParentIndex, this method returns 0;
      *
      * @return the depth of the target, from the commonParentIndex, relative to the depth of the source

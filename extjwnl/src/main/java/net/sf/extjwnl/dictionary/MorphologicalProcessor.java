@@ -12,6 +12,7 @@ import java.util.List;
  * lookupBaseForm(POS.VERB, "running"), the index word for "run" should be returned.
  *
  * @author John Didion <jdidion@users.sourceforge.net>
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public interface MorphologicalProcessor {
     /**
@@ -20,12 +21,21 @@ public interface MorphologicalProcessor {
      * return the first base form found. The return value for subsequent calls is undefined (it could
      * be the same base form, or the next base form - it is up to the implementer to decide, but the
      * decision should be noted.
+     *
+     * @param pos        part of speech
+     * @param derivation derivation
+     * @return index word of the base form of the derivation
+     * @throws JWNLException JWNLException
      */
-    public IndexWord lookupBaseForm(POS pos, String derivation) throws JWNLException;
+    IndexWord lookupBaseForm(POS pos, String derivation) throws JWNLException;
 
     /**
-     * Return all the base forms of <var>derivation</var>
+     * Return all the base forms of <var>derivation</var>.
+     *
+     * @param pos        part of speech
+     * @param derivation derivation
+     * @return all the base forms of <var>derivation</var>
+     * @throws JWNLException JWNLException
      */
-    public List lookupAllBaseForms(POS pos, String derivation) throws JWNLException;
+    List<String> lookupAllBaseForms(POS pos, String derivation) throws JWNLException;
 }
-

@@ -12,6 +12,12 @@ public interface DictionaryFileFactory<E> {
 
     /**
      * Creates a new instance of the dictionary file.
+     *
+     * @param dictionary owner dictionary
+     * @param path       path to dictionary files
+     * @param pos        part of speech
+     * @param fileType   file type
+     * @return a new instance of the dictionary file
      */
-    public E newInstance(Dictionary dictionary, String path, POS pos, DictionaryFileType fileType);
+    E newInstance(Dictionary dictionary, String path, POS pos, DictionaryFileType fileType);
 }

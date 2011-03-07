@@ -105,7 +105,7 @@ public class PointerTargetTreeNodeList extends LinkedList<PointerTargetTreeNode>
     }
 
     /**
-     * Gets all matches and adds them to <var>matches</var>
+     * Returns all matches and adds them to <var>matches</var>
      * @param opr operation
      * @param matches list of matches
      */
@@ -172,7 +172,7 @@ public class PointerTargetTreeNodeList extends LinkedList<PointerTargetTreeNode>
          * @param node operation target
          * @return operation result
          */
-        public PointerTargetTreeNode execute(PointerTargetTreeNode node);
+        PointerTargetTreeNode execute(PointerTargetTreeNode node);
     }
 
     /**

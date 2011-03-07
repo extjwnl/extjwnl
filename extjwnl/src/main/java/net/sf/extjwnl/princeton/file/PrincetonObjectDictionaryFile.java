@@ -89,6 +89,8 @@ public class PrincetonObjectDictionaryFile extends AbstractPrincetonDictionaryFi
 
     /**
      * Open the input and output streams.
+     *
+     * @throws IOException IOException
      */
     public void openStreams() throws IOException {
         if (!canWrite()) {

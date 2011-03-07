@@ -21,7 +21,7 @@ public interface FileDictionaryElementFactory extends Owned {
      * @return exception
      * @throws JWNLException JWNLException
      */
-    public Exc createExc(POS pos, String line) throws JWNLException;
+    Exc createExc(POS pos, String line) throws JWNLException;
 
     /**
      * Creates a synset from a line in a data file.
@@ -31,7 +31,7 @@ public interface FileDictionaryElementFactory extends Owned {
      * @return synset
      * @throws JWNLException JWNLException
      */
-    public Synset createSynset(POS pos, String line) throws JWNLException;
+    Synset createSynset(POS pos, String line) throws JWNLException;
 
     /**
      * Creates an IndexWord from a line in an index file.
@@ -41,6 +41,6 @@ public interface FileDictionaryElementFactory extends Owned {
      * @return indexword
      * @throws JWNLException JWNLException
      */
-    public IndexWord createIndexWord(POS pos, String line) throws JWNLException;
+    IndexWord createIndexWord(POS pos, String line) throws JWNLException;
 
 }

@@ -19,51 +19,63 @@ public interface DictionaryFile extends Owned {
     /**
      * Closes the file.
      */
-    public void close();
+    void close();
 
     /**
      * Returns true if the file is open.
+     *
+     * @return true if the file is open
      */
-    public boolean isOpen();
+    boolean isOpen();
 
     /**
      * Returns the POS associated with this file.
+     *
+     * @return the POS associated with this file
      */
-    public POS getPOS();
+    POS getPOS();
 
     /**
      * Returns the file.
      *
      * @return the file
      */
-    public File getFile();
+    File getFile();
 
     /**
      * Returns the file type associated with this file.
+     *
+     * @return the file type associated with this file
      */
-    public DictionaryFileType getFileType();
+    DictionaryFileType getFileType();
 
     /**
      * Opens the file.
+     *
+     * @throws IOException IOException
      */
-    public void open() throws IOException;
+    void open() throws IOException;
 
     /**
      * Deletes the file.
      *
+     * @return true if succeeded
      * @throws IOException IOException
      */
-    public boolean delete() throws IOException;
+    boolean delete() throws IOException;
 
     /**
      * Saves the file.
      *
-     * @throws IOException IOException
+     * @throws IOException   IOException
+     * @throws JWNLException JWNLException
      */
-    public void save() throws IOException, JWNLException;
+    void save() throws IOException, JWNLException;
 
     /**
      * Reopens file in write mode.
+     *
+     * @throws IOException IOException
      */
     void edit() throws IOException;
 }

@@ -349,7 +349,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
         return formatString.toString();
     }
 
-    private String renderSynset(Synset synset) throws JWNLException {
+    private String renderSynset(Synset synset)  {
         //synset_offset  lex_filenum  ss_type  w_cnt  word  lex_id  [word  lex_id...]  p_cnt  [ptr...]  [frames...]  |   gloss
         //w_cnt Two digit hexadecimal integer indicating the number of words in the synset.
         StringBuilder result = new StringBuilder(String.format("%s %02d %s %02x ", dfOff.format(synset.getOffset()), synset.getLexFileNum(), synset.getPOS().getKey(), synset.getWords().size()));
@@ -414,7 +414,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
         return result.toString();
     }
 
-    private String renderIndexWord(IndexWord indexWord) throws JWNLException {
+    private String renderIndexWord(IndexWord indexWord)  {
         //lemma  pos  synset_cnt  p_cnt  [ptr_symbol...]  sense_cnt  tagsense_cnt   synset_offset  [synset_offset...]
         StringBuilder result = new StringBuilder(indexWord.getLemma().replace(' ', '_'));
         result.append(" ");

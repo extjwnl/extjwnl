@@ -145,7 +145,7 @@ public class Word extends PointerTarget {
     /**
      * Returns the part of speech of this word.
      *
-     * @return pthe art of speech
+     * @return the part of speech
      */
     public POS getPOS() {
         return synset.getPOS();

@@ -16,7 +16,7 @@ public interface DeepCloneable extends Cloneable {
      *
      * @throws CloneNotSupportedException CloneNotSupportedException
      */
-    public Object clone() throws CloneNotSupportedException;
+    Object clone() throws CloneNotSupportedException;
 
     /**
      * Create a deep clone of the object.
@@ -24,5 +24,5 @@ public interface DeepCloneable extends Cloneable {
      * @return a deep clone of the object
      * @throws CloneNotSupportedException CloneNotSupportedException
      */
-    public Object deepClone() throws CloneNotSupportedException;
+    Object deepClone() throws CloneNotSupportedException;
 }

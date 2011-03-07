@@ -108,7 +108,7 @@ public class FileManagerImpl implements FileManager {
     }
 
     /**
-     * Gets the file from a part of speech and file type (ie data.noun).
+     * Returns the file from a part of speech and file type (ie data.noun).
      *
      * @param pos      - the part of speech (NOUN, ADJ, VERB, ADV) or null
      * @param fileType - the file type (data, index, exc, cntlist)
@@ -192,7 +192,7 @@ public class FileManagerImpl implements FileManager {
     }
 
     /**
-     * Get indexed line pointer is typically used to find a word within an index file matching a given part of speech.
+     * Returns indexed line pointer is typically used to find a word within an index file matching a given part of speech.
      * It first accesses the appropriate file (based on pos and dictionary type), then iterates through the file. Does so
      * by using an offset and string comparison algorithm.
      */
@@ -207,7 +207,7 @@ public class FileManagerImpl implements FileManager {
         synchronized (file) {
             long start = 0;
             long stop = file.length();
-            long offset = start, midpoint; //our current offset within the file
+            long offset, midpoint; //our current offset within the file
             int compare;
             String word; //current word at a line
             while (true) {

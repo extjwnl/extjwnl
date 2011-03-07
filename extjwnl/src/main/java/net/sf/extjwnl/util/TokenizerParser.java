@@ -6,6 +6,7 @@ import java.util.StringTokenizer;
  * A <code>StringTokenizer</code> with extensions to retrieve the values of numeric tokens, as well as strings.
  *
  * @author John Didion <jdidion@users.sourceforge.net>
+ * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class TokenizerParser extends StringTokenizer {
     public TokenizerParser(String string, String delimiters) {
@@ -13,44 +14,55 @@ public class TokenizerParser extends StringTokenizer {
     }
 
     /**
-     * Convert the next token into a byte
+     * Converts the next token into a byte
+     *
+     * @return next byte
      */
     public int nextByte() {
         return Byte.parseByte(nextToken());
     }
 
     /**
-     * Convert the next token into a short
+     * Converts the next token into a short
+     *
+     * @return next short
      */
     public int nextShort() {
         return Short.parseShort(nextToken());
     }
 
     /**
-     * Convert the next token into an int
+     * Converts the next token into an int
+     *
+     * @return next integer
      */
     public int nextInt() {
         return Integer.parseInt(nextToken());
     }
 
     /**
-     * Convert the next token into an int with base <var>radix</var>
+     * Converts the next token into an int with base <var>radix</var>
      *
      * @param radix the base into which to convert the next token
+     * @return integer with base <var>radix</var>
      */
     public int nextInt(int radix) {
         return Integer.parseInt(nextToken(), radix);
     }
 
     /**
-     * Convert the next token into a base 16 int
+     * Converts the next token into a base 16 int.
+     *
+     * @return int of a base 16
      */
     public int nextHexInt() {
         return nextInt(16);
     }
 
     /**
-     * Convert the next token into a long
+     * Converts the next token into a long
+     *
+     * @return next long
      */
     public long nextLong() {
         return Long.parseLong(nextToken());

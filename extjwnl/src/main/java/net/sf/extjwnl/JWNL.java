@@ -69,7 +69,7 @@ public class JWNL {
     }
 
     /**
-     * Get the current OS.
+     * Returns the current OS.
      *
      * @return the current OS
      */

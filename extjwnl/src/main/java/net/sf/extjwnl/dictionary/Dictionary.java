@@ -646,7 +646,7 @@ public abstract class Dictionary {
         }
         synset.setDictionary(null);
 
-        //take care of indexwords
+        //take care of index words
         List<Word> copy = new ArrayList<Word>(synset.getWords());
         for (Word word : copy) {
             IndexWord indexWord = getIndexWord(synset.getPOS(), word.getLemma());

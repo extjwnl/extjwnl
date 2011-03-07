@@ -21,6 +21,7 @@ public interface Owned {
      * Sets the dictionary this object belongs to.
      *
      * @param dictionary the dictionary this object belongs to
+     * @throws JWNLException JWNLException
      */
     void setDictionary(Dictionary dictionary) throws JWNLException;
 }

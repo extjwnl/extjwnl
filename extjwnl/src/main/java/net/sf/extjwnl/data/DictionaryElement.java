@@ -18,7 +18,7 @@ public interface DictionaryElement extends Serializable, Owned {
      *
      * @return a key that can be used to index this element
      */
-    public Object getKey();
+    Object getKey();
 
 
     /**
@@ -26,12 +26,12 @@ public interface DictionaryElement extends Serializable, Owned {
      *
      * @return the element's type
      */
-    public DictionaryElementType getType();
+    DictionaryElementType getType();
 
     /**
      * Returns element's part of speech.
      *
      * @return element's part of speech
      */
-    public POS getPOS();
+    POS getPOS();
 }

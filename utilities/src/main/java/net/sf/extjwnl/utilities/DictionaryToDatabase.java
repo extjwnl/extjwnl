@@ -196,9 +196,8 @@ public class DictionaryToDatabase {
      *
      * @param itr itr
      * @throws SQLException SQLException
-     * @throws JWNLException JWNLException
      */
-    protected void storeSynsets(Iterator<Synset> itr) throws SQLException, JWNLException {
+    protected void storeSynsets(Iterator<Synset> itr) throws SQLException {
         PreparedStatement synsetStmt = connection.prepareStatement("INSERT INTO Synset VALUES(?,?,?,?,?)");
         PreparedStatement synsetWordStmt = connection.prepareStatement("INSERT INTO SynsetWord VALUES(?,?,?,?,?)");
         PreparedStatement synsetPointerStmt = connection.prepareStatement("INSERT INTO SynsetPointer VALUES(?,?,?,?,?,?,?)");

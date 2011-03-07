@@ -8,6 +8,7 @@ import net.sf.extjwnl.JWNLException;
  * @author John Didion <jdidion@users.sourceforge.net>
  */
 public interface Param {
+
     String getName();
 
     String getValue();

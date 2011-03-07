@@ -14,7 +14,7 @@ import java.util.Map;
  */
 public class LookupIndexWordOperation extends AbstractOperation {
 
-    public LookupIndexWordOperation(Dictionary dictionary, Map params) throws JWNLException {
+    public LookupIndexWordOperation(Dictionary dictionary, Map params) {
         super(dictionary);
     }
 

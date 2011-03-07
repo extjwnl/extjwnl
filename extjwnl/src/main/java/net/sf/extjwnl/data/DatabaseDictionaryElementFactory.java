@@ -25,7 +25,7 @@ public interface DatabaseDictionaryElementFactory extends Owned {
      * @throws SQLException  SQLException
      * @throws JWNLException JWNLException
      */
-    public IndexWord createIndexWord(POS pos, String lemma, ResultSet rs) throws SQLException, JWNLException;
+    IndexWord createIndexWord(POS pos, String lemma, ResultSet rs) throws SQLException, JWNLException;
 
 
     /**
@@ -41,7 +41,7 @@ public interface DatabaseDictionaryElementFactory extends Owned {
      * @throws SQLException  SQLException
      * @throws JWNLException JWNLException
      */
-    public Synset createSynset(
+    Synset createSynset(
             POS pos, long offset, ResultSet synset, ResultSet words, ResultSet pointers, ResultSet verbFrames)
             throws SQLException, JWNLException;
 
@@ -56,5 +56,5 @@ public interface DatabaseDictionaryElementFactory extends Owned {
      * @throws SQLException  SQLException
      * @throws JWNLException JWNLException
      */
-    public Exc createExc(POS pos, String derivation, ResultSet rs) throws SQLException, JWNLException;
+    Exc createExc(POS pos, String derivation, ResultSet rs) throws SQLException, JWNLException;
 }

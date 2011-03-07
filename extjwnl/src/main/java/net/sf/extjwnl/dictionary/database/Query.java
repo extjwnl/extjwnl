@@ -55,6 +55,7 @@ public class Query {
                 results.close();
                 results = null;
             } catch (SQLException ex) {
+                //nop
             }
         }
         if (statement != null) {
@@ -62,6 +63,7 @@ public class Query {
                 statement.close();
                 statement = null;
             } catch (SQLException ex) {
+                //nop
             }
         }
         if (connection != null) {
@@ -69,6 +71,7 @@ public class Query {
                 connection.close();
                 connection = null;
             } catch (SQLException ex) {
+                //nop
             }
         }
     }
