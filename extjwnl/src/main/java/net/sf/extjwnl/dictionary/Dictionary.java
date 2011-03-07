@@ -451,7 +451,7 @@ public abstract class Dictionary {
             //lemma -> lex file num -> words
             HashMap<String, HashMap<Long, ArrayList<Word>>> lemmas = new HashMap<String, HashMap<Long, ArrayList<Word>>>();
             for (POS pos : POS.getAllPOS()) {
-                Iterator<Synset> si = dictionary.getSynsetIterator(pos);
+                Iterator<Synset> si = getSynsetIterator(pos);
                 while (si.hasNext()) {
                     Synset s = si.next();
                     for (Word w : s.getWords()) {
