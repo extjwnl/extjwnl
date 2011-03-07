@@ -5,12 +5,13 @@ import net.sf.extjwnl.data.POS;
 import net.sf.extjwnl.util.factory.Owned;
 
 /**
- * Base class for operations.
+ * Base class for morphological operations.
  *
  * @author John Didion <jdidion@users.sourceforge.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public interface Operation extends Owned {
+
     /**
      * Executes the operation.
      *

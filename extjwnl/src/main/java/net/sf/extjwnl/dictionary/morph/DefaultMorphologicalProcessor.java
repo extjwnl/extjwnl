@@ -40,7 +40,7 @@ public class DefaultMorphologicalProcessor implements MorphologicalProcessor {
 
     private static final int DEFAULT_CACHE_CAPACITY = 1000;
 
-    private Cache lookupCache;
+    private Cache<POSKey, LookupInfo> lookupCache;
 
     private Operation[] operations;
 
@@ -56,7 +56,7 @@ public class DefaultMorphologicalProcessor implements MorphologicalProcessor {
 
         Param param = params.get(CACHE_CAPACITY);
         int capacity = (param == null) ? DEFAULT_CACHE_CAPACITY : Integer.parseInt(param.getValue());
-        lookupCache = new LRUCache(capacity);
+        lookupCache = new LRUCache<POSKey, LookupInfo>(capacity);
     }
 
     /**
@@ -87,7 +87,7 @@ public class DefaultMorphologicalProcessor implements MorphologicalProcessor {
     }
 
     private LookupInfo getCachedLookupInfo(POSKey key) {
-        return (LookupInfo) lookupCache.get(key);
+        return lookupCache.get(key);
     }
 
     /**
@@ -120,10 +120,10 @@ public class DefaultMorphologicalProcessor implements MorphologicalProcessor {
         if (info.getBaseForms().isMoreFormsAvailable()) {
             str = info.getBaseForms().getNextForm();
         } else {
-            while (str == null && info.isNextOperationAvailable() && !info.executeNextOperation()) {
-            }
-            if (info.getBaseForms().isMoreFormsAvailable()) {
-                str = info.getBaseForms().getNextForm();
+            while (null == str && info.isNextOperationAvailable() && !info.executeNextOperation()) {
+                if (info.getBaseForms().isMoreFormsAvailable()) {
+                    str = info.getBaseForms().getNextForm();
+                }
             }
         }
 
