@@ -36,6 +36,10 @@ public class FileManagerImpl implements FileManager {
     private RandomAccessDictionaryFile cntList;
     private RandomAccessDictionaryFile senseIndex;
 
+    private static final String CACHE_USE_COUNT_KEY = "cache_use_count";
+    private boolean cacheUseCount = true;
+
+    private Map<String, Integer> useCountCache = new HashMap<String, Integer>();
     /**
      * Random number generator used by getRandomLineOffset().
      */
@@ -75,6 +79,15 @@ public class FileManagerImpl implements FileManager {
                 senseIndex = factory.newInstance(dictionary, path, null, DictionaryFileType.INDEX);
 
                 revCntList.open();
+
+                if (params.containsKey(CACHE_USE_COUNT_KEY)) {
+                    cacheUseCount = Boolean.parseBoolean(params.get(CACHE_USE_COUNT_KEY).getValue());
+                }
+
+                if (cacheUseCount) {
+                    cacheUseCounts();
+                }
+
                 cntList.open();
                 senseIndex.open();
             } catch (Exception e) {
@@ -84,6 +97,21 @@ public class FileManagerImpl implements FileManager {
         } catch (IOException e) {
             throw new JWNLException("DICTIONARY_EXCEPTION_016", e);
         }
+    }
+
+    private void cacheUseCounts() throws IOException {
+        log.log(MessageLogLevel.INFO, "PRINCETON_INFO_018");
+        String line = revCntList.readLine();
+        while (null != line && !"".equals(line)) {
+            //sense_key  sense_number  tag_cnt
+            TokenizerParser tokenizer = new TokenizerParser(line, " ");
+            String senseKey = tokenizer.nextToken();//sense_key
+            tokenizer.nextToken();//sense_number
+            Integer useCnt = tokenizer.nextInt();//tag_cnt
+            useCountCache.put(senseKey, useCnt);
+            line = revCntList.readLine();
+        }
+        log.log(MessageLogLevel.INFO, "PRINCETON_INFO_019");
     }
 
     public void close() {
@@ -366,21 +394,25 @@ public class FileManagerImpl implements FileManager {
             senseIndex.writeStrings(senseIndexContent);
             log.log(MessageLogLevel.INFO, "PRINCETON_INFO_013", senseIndex.getFile().getName());
         }
-
     }
 
     @Override
     public int getUseCount(String senseKey) throws IOException {
-        long offset = fileGetIndexedLinePointer(revCntList, senseKey);
-        if (-1 == offset) {
-            return 0;
+        if (cacheUseCount) {
+            Integer result = useCountCache.get(senseKey);
+            return null == result ? 0 : result;
         } else {
-            String line = fileReadLineAt(revCntList, offset);
-            //sense_key  sense_number  tag_cnt
-            TokenizerParser tokenizer = new TokenizerParser(line, " ");
-            tokenizer.nextToken();//sense_key
-            tokenizer.nextToken();//sense_number
-            return tokenizer.nextInt();//tag_cnt
+            long offset = fileGetIndexedLinePointer(revCntList, senseKey);
+            if (-1 == offset) {
+                return 0;
+            } else {
+                String line = fileReadLineAt(revCntList, offset);
+                //sense_key  sense_number  tag_cnt
+                TokenizerParser tokenizer = new TokenizerParser(line, " ");
+                tokenizer.nextToken();//sense_key
+                tokenizer.nextToken();//sense_number
+                return tokenizer.nextInt();//tag_cnt
+            }
         }
     }
 }

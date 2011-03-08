@@ -49,8 +49,8 @@ public abstract class Dictionary {
     private static final String NUMBER_ATTRIBUTE = "number";
 
     //warn about incompatible lex ids: lex_id is a two digit decimal integer
-    private static final String LEX_ID_WARN_KEY = "warnLexIds";
-    private static final String SKIP_LEX_ID_CHECK_KEY = "skipLexIdsCheck";
+    private static final String LEX_ID_WARN_KEY = "warn_lex_ids";
+    private static final String SKIP_LEX_ID_CHECK_KEY = "skip_lex_ids_check";
 
     private boolean lexIdWarn = true;
     private boolean skipLexIdCheck = false;
