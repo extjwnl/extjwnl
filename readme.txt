@@ -12,10 +12,13 @@ This release is an upgrade form the last version of JWNL. It
 contains several improvements, such as:
  * writing dictionaries
  * encodings (including UTF-8)
- * generics
+ * Java generics
  * huge dictionaries
  * instance dictionaries
  * Maven
+ * documentation improvements
+ * improved unit test coverage
+ * other improvements and fixes
 
 3. Getting started
 

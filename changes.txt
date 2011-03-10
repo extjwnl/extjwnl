@@ -1,3 +1,24 @@
+1.5
+
+- creating, updating and writing dictionaries
+- encodings (including UTF-8)
+- Java generics
+- huge dictionaries
+- instance dictionaries
+- Maven support
+- new unit tests
+- use counts
+- package changed to net.sf.extjwnl
+- index.sense, cntlist, cntlist.rev generation
+- resource bundles loading changed
+- fixed bugs in resources
+- logging changed
+- resolvable class removed
+- more transient fields
+- improved documentation
+- summary generation
+- removed toString caching
+
 1.4.1 rc2
 
 - fixed a bug which caused a file loading exception on Unix
