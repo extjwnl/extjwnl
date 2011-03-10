@@ -1,5 +1,6 @@
 package net.sf.extjwnl.utilities;
 
+import net.sf.extjwnl.JWNL;
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.data.IndexWord;
 import net.sf.extjwnl.data.POS;
@@ -32,7 +33,11 @@ public class Examples {
 
         String propsFile = args[0];
         try {
-            // initialize JWNL (this must be done before JWNL can be used)
+            //old-style, static singletone instance
+            //JWNL.initialize(new FileInputStream(propsFile));
+            //Dictionary dictionary = Dictionary.getInstance();
+
+            //new style, instance dictionary
             Dictionary dictionary = Dictionary.getInstance(new FileInputStream(propsFile));
             new Examples(dictionary).go();
         } catch (Exception e) {
