@@ -17,8 +17,8 @@
         <fileSet>
             <directory>${project.build.directory}/../..</directory>
             <includes>
-                <include>README*</include>
-                <include>LICENSE*</include>
+                <include>readme.txt</include>
+                <include>license.txt</include>
                 <include>changes.txt</include>
             </includes>
             <outputDirectory>/</outputDirectory>
