@@ -435,13 +435,15 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
             }
             writeLine(strings.get(i));
         }
-        String nextToLast = strings.get(strings.size() - 2);
-        String last = strings.get(strings.size() - 1);
-        while (nextToLast.length() <= last.length()) {
-            nextToLast = nextToLast + " ";
+        if (1 < strings.size()) {
+            String nextToLast = strings.get(strings.size() - 2);
+            String last = strings.get(strings.size() - 1);
+            while (nextToLast.length() <= last.length()) {
+                nextToLast = nextToLast + " ";
+            }
+            writeLine(nextToLast);
+            writeLine(last);
         }
-        writeLine(nextToLast);
-        writeLine(last);
         if (log.isInfoEnabled()) {
             log.info(JWNL.resolveMessage("PRINCETON_INFO_014", 100));
         }

@@ -20,9 +20,9 @@ public class TestDictionaryElementType {
     @Test
     public void testGetName() {
         List<String> types = new ArrayList<String>();
-        types.add("EXCEPTION");
-        types.add("INDEX_WORD");
-        types.add("SYNSET");
+        types.add("Exception");
+        types.add("IndexWord");
+        types.add("Synset");
 
         for (DictionaryElementType type : DictionaryElementType.getAllDictionaryElementTypes()) {
             Assert.assertTrue(types.contains(type.getName()));
