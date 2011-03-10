@@ -10,9 +10,9 @@ http://extjwnl.sourceforge.net/
 
 This release is an upgrade form the last version of JWNL. It
 contains several improvements, such as:
- * generics
  * writing dictionaries
  * encodings (including UTF-8)
+ * generics
  * huge dictionaries
  * instance dictionaries
  * Maven
