@@ -19,8 +19,6 @@ import java.util.List;
  */
 public abstract class AbstractPrincetonDatabaseDictionaryElementFactory extends AbstractPrincetonDictionaryElementFactory implements DatabaseDictionaryElementFactory {
 
-    protected Dictionary dictionary;
-
     public AbstractPrincetonDatabaseDictionaryElementFactory(Dictionary dictionary) {
         super(dictionary);
     }
@@ -95,13 +93,5 @@ public abstract class AbstractPrincetonDatabaseDictionaryElementFactory extends 
             exceptions.add(rs.getString(1));
         }
         return new Exc(dictionary, pos, derivation, exceptions);
-    }
-
-    public Dictionary getDictionary() {
-        return dictionary;
-    }
-
-    public void setDictionary(Dictionary dictionary) {
-        this.dictionary = dictionary;
     }
 }
