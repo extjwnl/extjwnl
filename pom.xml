@@ -103,6 +103,10 @@
         <profile>
             <id>release</id>
 
+            <properties>
+                <maven.test.skip>true</maven.test.skip>
+            </properties>
+
             <activation>
                 <property>
                     <name>performRelease</name>
