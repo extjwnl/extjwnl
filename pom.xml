@@ -101,6 +101,13 @@
 
     <profiles>
         <profile>
+            <id>sonatype-oss-release</id>
+            <properties>
+                <maven.test.skip>true</maven.test.skip>
+            </properties>
+        </profile>
+
+        <profile>
             <id>release</id>
 
             <properties>
