@@ -21,6 +21,9 @@ contains several improvements, such as:
 
 extJWNL is contains Examples.java with examples of API use.
 
+Run:
+bin\examples.bat src\extjwnl\main\config\file_properties.xml
+
 4. Maven Support
 
 extJWNL supports Maven and makes available three artifacts in 

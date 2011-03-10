@@ -19,8 +19,72 @@
             <includes>
                 <include>README*</include>
                 <include>LICENSE*</include>
+                <include>changes.txt</include>
             </includes>
             <outputDirectory>/</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>${project.build.directory}/../src/</directory>
+            <includes>
+                <include>**</include>
+            </includes>
+            <outputDirectory>/src/utilities</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>${project.build.directory}/../../extjwnl/src/</directory>
+            <includes>
+                <include>**</include>
+            </includes>
+            <outputDirectory>/src/extjwnl</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>${project.build.directory}/../doc/</directory>
+            <includes>
+                <include>**</include>
+            </includes>
+            <outputDirectory>/doc</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>${project.build.directory}/../../extjwnl/doc/</directory>
+            <includes>
+                <include>**</include>
+            </includes>
+            <outputDirectory>/doc</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>${project.build.directory}/../</directory>
+            <includes>
+                <include>pom.xml</include>
+            </includes>
+            <outputDirectory>/src/utilities</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>${project.build.directory}/../../extjwnl/</directory>
+            <includes>
+                <include>pom.xml</include>
+            </includes>
+            <outputDirectory>/src/extjwnl</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>${project.build.directory}/../../</directory>
+            <includes>
+                <include>pom.xml</include>
+            </includes>
+            <outputDirectory>/src/</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>${project.build.directory}/../../extjwnl/target/apidocs</directory>
+            <includes>
+                <include>**</include>
+            </includes>
+            <outputDirectory>/doc/apidocs/extjwnl</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>${project.build.directory}/apidocs</directory>
+            <includes>
+                <include>**</include>
+            </includes>
+            <outputDirectory>/doc/apidocs/utilities</outputDirectory>
         </fileSet>
     </fileSets>
 </assembly>

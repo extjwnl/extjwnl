@@ -14,16 +14,16 @@ The main benefit of using a database-backed dictionary is that the data is centr
 
 **Usage**
 
-Make sure you have your file-properties.xml file set up correctly. Also, if you are using a database that is not in-process, make sure to create a new database for the the WordNet data. For example:
+Make sure you have your file_properties.xml file set up correctly. Also, if you are using a database that is not in-process, make sure to create a new database for the the WordNet data. For example:
 
 create database jwnl;
 
 And then just call:
 
-java -cp jwnl.jar;utilities.jar;commons-logging.jar net.didion.jwnl.utilities.DictionaryToDatabase <property file> <create tables script> <driver class> <connection url> [username [password]]
+.\bin\dict2db.bat <property file> <create tables script> <driver class> <connection url> [username [password]]
 
 For example:
 
-java -cp jwnl.jar;utilities.jar;commons-logging.jar net.didion.jwnl.utilities.DictionaryToDatabase .\include\file-properties.xml .\include\create.sql com.mysql.jdbc.Driver jdbc:mysql://localhost/jwnl?user=jwnl&password=jwnl"
+.\bin\dict2db.bat .\src\extjwnl\main\config\file_properties.xml .\src\utilities\main\sql\create.sql com.mysql.jdbc.Driver jdbc:mysql://localhost/jwnl?user=jwnl&password=jwnl"
 
 Once you have loaded the data into the database, make sure you have configured database-properties.xml correctly and initialize JWNL using that file.

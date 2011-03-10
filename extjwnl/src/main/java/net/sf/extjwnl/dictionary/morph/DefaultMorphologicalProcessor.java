@@ -120,10 +120,10 @@ public class DefaultMorphologicalProcessor implements MorphologicalProcessor {
         if (info.getBaseForms().isMoreFormsAvailable()) {
             str = info.getBaseForms().getNextForm();
         } else {
-            while (null == str && info.isNextOperationAvailable() && !info.executeNextOperation()) {
-                if (info.getBaseForms().isMoreFormsAvailable()) {
-                    str = info.getBaseForms().getNextForm();
-                }
+            while (info.isNextOperationAvailable() && !info.executeNextOperation()) {
+            }
+            if (info.getBaseForms().isMoreFormsAvailable()) {
+                str = info.getBaseForms().getNextForm();
             }
         }
 

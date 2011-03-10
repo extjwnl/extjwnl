@@ -38,7 +38,11 @@
         <param name="dictionary_element_factory"
                value="net.sf.extjwnl.princeton.data.PrincetonWN17FileDictionaryElementFactory"/>
         <param name="file_manager" value="net.sf.extjwnl.dictionary.file_manager.FileManagerImpl">
-            <param name="file_type" value="net.sf.extjwnl.princeton.file.PrincetonRandomAccessDictionaryFile"/>
+            <param name="file_type" value="net.sf.extjwnl.princeton.file.PrincetonRandomAccessDictionaryFile">
+                <!--<param name="write_princeton_header" value="true"/>-->
+                <!--<param name="encoding" value="UTF-8"/>-->
+            </param>
+            <!--<param name="cache_use_count" value="true"/>-->
             <param name="dictionary_path" value="c:\program files\wordnet\3.0\dict"/>
         </param>
     </dictionary>
