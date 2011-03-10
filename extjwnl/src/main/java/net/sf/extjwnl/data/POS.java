@@ -1,7 +1,6 @@
 package net.sf.extjwnl.data;
 
 import net.sf.extjwnl.JWNL;
-import net.sf.extjwnl.util.Resolvable;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -13,10 +12,14 @@ import java.util.List;
  * <b>P</b>art's <b>O</b>f <b>S</b>peech. Each <code>POS</code> has a human-readable
  * label that can be used to print it, and a key by which it can be looked up.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class POS implements Serializable {
+
+    static {
+        JWNL.initialize();
+    }
 
     private static final long serialVersionUID = 1L;
 
@@ -30,6 +33,7 @@ public class POS implements Serializable {
     public static final POS VERB = new POS("VERB", VERB_KEY);
     public static final POS ADJECTIVE = new POS("ADJECTIVE", ADJECTIVE_KEY);
     public static final POS ADVERB = new POS("ADVERB", ADVERB_KEY);
+    public static final POS ADJECTIVE_SATELLITE = new POS("ADJECTIVE", ADJECTIVE_SATELLITE_KEY);
 
     private static final List<POS> ALL_POS = Collections.unmodifiableList(Arrays.asList(NOUN, VERB, ADJECTIVE, ADVERB));
 
@@ -79,15 +83,14 @@ public class POS implements Serializable {
         return null;
     }
 
-    private Resolvable label;
+    //serializables using pos should restore it to a static variable
+    private transient String label;
     private String key;
 
     private POS(String label, String key) {
-        this.label = new Resolvable(label);
+        this.label = JWNL.resolveMessage(label);
         this.key = key;
     }
-
-    // Object methods
 
     public String toString() {
         return JWNL.resolveMessage("DATA_TOSTRING_010", getLabel());
@@ -123,7 +126,7 @@ public class POS implements Serializable {
      * @return a label intended for textual presentation
      */
     public String getLabel() {
-        return label.toString();
+        return label;
     }
 
     /**

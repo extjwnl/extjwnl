@@ -1,7 +1,6 @@
 package net.sf.extjwnl.data;
 
 import net.sf.extjwnl.JWNL;
-import net.sf.extjwnl.util.Resolvable;
 
 import java.io.Serializable;
 import java.util.BitSet;
@@ -9,29 +8,29 @@ import java.util.BitSet;
 /**
  * A <code>VerbFrame</code> is the frame of a sentence in which it is proper to use a given verb.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class VerbFrame implements Serializable {
 
+    static {
+        JWNL.initialize();
+    }
+
     private static final long serialVersionUID = 1L;
 
     private static VerbFrame[] verbFrames;
-    private static boolean initialized = false;
 
-    public static void initialize() {
-        if (!initialized) {
-            int framesSize = Integer.parseInt(JWNL.resolveMessage("NUMBER_OF_VERB_FRAMES"));
-            verbFrames = new VerbFrame[framesSize];
-            for (int i = 1; i <= framesSize; i++) {
-                verbFrames[i - 1] = new VerbFrame(getKeyString(i), i);
-            }
-            initialized = true;
+    static {
+        int framesSize = Integer.parseInt(JWNL.resolveMessage("NUMBER_OF_VERB_FRAMES"));
+        verbFrames = new VerbFrame[framesSize];
+        for (int i = 1; i <= framesSize; i++) {
+            verbFrames[i - 1] = new VerbFrame(getKeyString(i), i);
         }
     }
 
     public static String getKeyString(int i) {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("VERB_FRAME_");
         int numZerosToAppend = 3 - String.valueOf(i).length();
         for (int j = 0; j < numZerosToAppend; j++) {
@@ -47,6 +46,7 @@ public class VerbFrame implements Serializable {
 
     /**
      * Returns frame at index <var>index</var>.
+     *
      * @param index index
      * @return frame at index <var>index</var>
      */
@@ -91,16 +91,16 @@ public class VerbFrame implements Serializable {
         return indices;
     }
 
-    private Resolvable frame;
+    private transient String frame;
     private int index;
 
     private VerbFrame(String frame, int index) {
-        this.frame = new Resolvable(frame);
+        this.frame = JWNL.resolveMessage(frame);
         this.index = index;
     }
 
     public String getFrame() {
-        return frame.toString();
+        return frame;
     }
 
     public int getIndex() {

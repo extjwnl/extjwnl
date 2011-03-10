@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * List of parameters.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class ParamList extends ArrayList<Param> implements Param {

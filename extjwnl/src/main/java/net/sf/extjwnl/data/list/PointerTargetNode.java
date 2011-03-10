@@ -9,7 +9,7 @@ import net.sf.extjwnl.data.Word;
 /**
  * A node in a <code>PointerTargetNodeList</code>.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class PointerTargetNode implements Node {

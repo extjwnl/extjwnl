@@ -10,7 +10,7 @@ import java.sql.SQLException;
 /**
  * Helper class to manage queries.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  */
 public class Query {
     private Connection connection;

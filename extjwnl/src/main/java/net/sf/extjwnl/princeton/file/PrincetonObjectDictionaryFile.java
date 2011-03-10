@@ -1,5 +1,6 @@
 package net.sf.extjwnl.princeton.file;
 
+import net.sf.extjwnl.JWNL;
 import net.sf.extjwnl.JWNLRuntimeException;
 import net.sf.extjwnl.data.DictionaryElement;
 import net.sf.extjwnl.data.POS;
@@ -8,9 +9,9 @@ import net.sf.extjwnl.dictionary.MapBackedDictionary;
 import net.sf.extjwnl.dictionary.file.DictionaryFileFactory;
 import net.sf.extjwnl.dictionary.file.DictionaryFileType;
 import net.sf.extjwnl.dictionary.file.ObjectDictionaryFile;
-import net.sf.extjwnl.util.MessageLog;
-import net.sf.extjwnl.util.MessageLogLevel;
 import net.sf.extjwnl.util.factory.Param;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.io.*;
 import java.util.HashMap;
@@ -19,12 +20,12 @@ import java.util.Map;
 /**
  * <code>ObjectDictionaryFile</code> that accesses files names with the Princeton dictionary file naming convention.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class PrincetonObjectDictionaryFile extends AbstractPrincetonDictionaryFile implements ObjectDictionaryFile, DictionaryFileFactory<PrincetonObjectDictionaryFile> {
 
-    private static final MessageLog log = new MessageLog(PrincetonObjectDictionaryFile.class);
+    private static final Log log = LogFactory.getLog(PrincetonObjectDictionaryFile.class);
 
     private ObjectInputStream in = null;
     private ObjectOutputStream out = null;
@@ -50,13 +51,17 @@ public class PrincetonObjectDictionaryFile extends AbstractPrincetonDictionaryFi
     public void save() throws IOException {
         if (dictionary instanceof MapBackedDictionary) {
             MapBackedDictionary dic = (MapBackedDictionary) dictionary;
-            log.log(MessageLogLevel.INFO, "PRINCETON_INFO_004", makeFilename());
+            if (log.isInfoEnabled()) {
+                log.info(JWNL.resolveMessage("PRINCETON_INFO_004", getFilename()));
+            }
             Map<Object, ? extends DictionaryElement> map = dic.getTable(getPOS(), getFileType());
 
             getOutputStream().reset();
             writeObject(map);
 
-            log.log(MessageLogLevel.INFO, "PRINCETON_INFO_012", makeFilename());
+            if (log.isInfoEnabled()) {
+                log.info(JWNL.resolveMessage("PRINCETON_INFO_012", getFilename()));
+            }
         }
     }
 
@@ -74,7 +79,9 @@ public class PrincetonObjectDictionaryFile extends AbstractPrincetonDictionaryFi
             }
             super.close();
         } catch (Exception e) {
-            log.log(MessageLogLevel.ERROR, "EXCEPTION_001", e.getMessage(), e);
+            if (log.isErrorEnabled()) {
+                log.error(JWNL.resolveMessage("EXCEPTION_001", e.getMessage()), e);
+            }
         } finally {
             in = null;
             fin = null;

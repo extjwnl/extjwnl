@@ -15,7 +15,7 @@ import java.util.NoSuchElementException;
 /**
  * Database-backed dictionary.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class DatabaseBackedDictionary extends AbstractCachingDictionary {

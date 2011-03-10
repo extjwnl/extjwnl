@@ -11,10 +11,14 @@ import java.util.List;
  * This class defines what the current dictionary is.
  *
  * @author Brett Walenz <bwalenz@users.sourceforge.net>
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class DictionaryElementType {
+
+    static {
+        JWNL.initialize();
+    }
 
     /**
      * Property to define an index file.
@@ -32,7 +36,7 @@ public class DictionaryElementType {
     public static final DictionaryElementType EXCEPTION = new DictionaryElementType("EXCEPTION");
 
     /**
-     * The name of the dictionary.
+     * The name of the dictionary element type.
      */
     private final String name;
 
@@ -59,7 +63,7 @@ public class DictionaryElementType {
      * @param name name
      */
     private DictionaryElementType(String name) {
-        this.name = name;
+        this.name = JWNL.resolveMessage(name);
     }
 
     public String toString() {

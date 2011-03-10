@@ -14,7 +14,7 @@ import java.util.Map;
  * Tokenizer operation.
  *
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  */
 public class TokenizerOperation extends AbstractDelegatingOperation {
     /**

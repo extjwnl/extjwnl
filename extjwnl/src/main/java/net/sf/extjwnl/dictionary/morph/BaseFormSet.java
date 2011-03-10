@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * A group of possible base forms for a particular lemma.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class BaseFormSet {

@@ -12,7 +12,7 @@ import net.sf.extjwnl.data.list.PointerTargetNodeList;
  * carnivore -> feline -> cat. The ancestry of "dog" and the ancestry of "cat" diverge at "carnivore," so
  * the common parent index is thus 2.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class AsymmetricRelationship extends Relationship {

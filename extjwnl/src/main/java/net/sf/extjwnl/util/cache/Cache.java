@@ -6,7 +6,7 @@ import java.util.Collection;
  * A <code>Cache</code> is a collection of values that are indexed by keys and that are stored for an
  * unspecified amount of time (which the implementor of <code>Cache</code> may further specify).
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public interface Cache<K, V> {

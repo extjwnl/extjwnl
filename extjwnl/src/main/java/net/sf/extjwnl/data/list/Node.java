@@ -5,7 +5,7 @@ import net.sf.extjwnl.util.DeepCloneable;
 /**
  * A node in a list.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  */
 public interface Node extends DeepCloneable {
 }

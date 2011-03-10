@@ -14,7 +14,7 @@ import java.sql.SQLException;
 /**
  * Connection manager for database-backed dictionaries.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  */
 public class ConnectionManager {
     private String driverClass;

@@ -1,7 +1,6 @@
 package net.sf.extjwnl.data;
 
 import net.sf.extjwnl.JWNL;
-import net.sf.extjwnl.util.Resolvable;
 
 import java.io.Serializable;
 import java.util.*;
@@ -14,10 +13,14 @@ import java.util.*;
  * parts-of-speech that it applies to, and a short string that represents it in
  * the dictionary files.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
-public class PointerType implements Serializable {
+public class PointerType implements Serializable, Comparable<PointerType> {
+
+    static {
+        JWNL.initialize();
+    }
 
     private static final long serialVersionUID = 1L;
 
@@ -28,13 +31,54 @@ public class PointerType implements Serializable {
     private static final int ADV = 8;
     private static final int LEXICAL = 16;
 
+//    from globals.c
+//    "!",			/* 1 ANTPTR (all) */
+//    "@",			/* 2 HYPERPTR (noun, verb) */
+//    "~",			/* 3 HYPOPTR (noun, verb) */
+//    "*",			/* 4 ENTAILPTR (verb) */
+//    "&",			/* 5 SIMPTR (adjective) */
+//    "#m",			/* 6 ISMEMBERPTR (noun) */
+//    "#s",			/* 7 ISSTUFFPTR (noun) */
+//    "#p",			/* 8 ISPARTPTR (noun) */
+//    "%m",			/* 9 HASMEMBERPTR (noun) */
+//    "%s",			/* 10 HASSTUFFPTR (noun) */
+//    "%p",			/* 11 HASPARTPTR (noun) */
+//    "#",			/* 12 MERONYM (noun) */
+//    "%",			/* 13 HOLONYM (noun) */
+//    ">",			/* 14 CAUSETO (verb) */
+//    "<",			/* 15 PPLPTR (adj) */
+//    "^",			/* 16 SEEALSOPTR (adjective, verb) */
+//    "\\",			/* 17 PERTAINSTO (adjective, noun, adverb) */
+//    "=",			/* 18 ATTRIBUTE (adjective, noun) */
+//    "$",			/* 19 VERBGROUP (verb) */
+//    "+",			/* 20 DERIVATION */
+//    ";",			/* 21 CLASSIFICATION (all) */
+//    "-",			/* 22 CLASS (all) */
+//    "",				/* 23 SYNS */
+//    "",				/* 24 FREQ */
+//    "",				/* 25 FRAMES */
+//    "",				/* 26 COORDS */
+//    "",				/* 27 RELATIVES */
+//    "",				/* 28 HMERONYM */
+//    "",				/* 29 HHOLONYM */
+//    "",				/* 30 WNGREP */
+//    "",				/* 31 OVERVIEW */
+//    ";c",			/* 32 classification CATEGORY */
+//    ";u",			/* 33 classification USAGE */
+//    ";r",			/* 34 classificaiton REGIONAL */
+//    "-c",			/* 35 class CATEGORY */
+//    "-u",			/* 36 class USAGE */
+//    "-r",			/* 37 class REGIONAL */
+//    "@i", 			/* 38 INSTANCE (noun) */
+//    "~i",			/* 39 INSTANCES (noun) */
+
+
     private static final String ANTONYM_KEY = "!";
     private static final String HYPERNYM_KEY = "@";
     private static final String HYPONYM_KEY = "~";
     private static final String ATTRIBUTE_KEY = "=";
     private static final String ALSO_SEE_KEY = "^";
     private static final String ENTAILMENT_KEY = "*";
-    private static final String ENTAILED_BY_KEY = "?";
     private static final String CAUSE_KEY = ">";
     private static final String VERB_GROUP_KEY = "$";
     private static final String MEMBER_HOLONYM_KEY = "#m";
@@ -45,7 +89,6 @@ public class PointerType implements Serializable {
     private static final String PART_MERONYM_KEY = "%p";
     private static final String SIMILAR_KEY = "&";
     private static final String PARTICIPLE_OF_KEY = "<";
-    private static final String DERIVED_KEY = "\\";
     private static final String PERTAINYM_KEY = "\\";
     private static final String NOMINALIZATION_KEY = "+";
     private static final String CATEGORY_DOMAIN_KEY = ";c";
@@ -56,79 +99,69 @@ public class PointerType implements Serializable {
     private static final String USAGE_MEMBER_KEY = "-u";
     private static final String INSTANCE_HYPERNYM_KEY = "@i";
     private static final String INSTANCES_HYPONYM_KEY = "~i";
+    private static final String DOMAIN_ALL_KEY = ";";
+    private static final String MEMBER_ALL_KEY = "-";
+
+    private static final Map<POS, Integer> POS_TO_MASK_MAP = new HashMap<POS, Integer>();
+    private static final Map<String, PointerType> KEY_TO_POINTER_TYPE_MAP = new HashMap<String, PointerType>();
+
+    static {
+        POS_TO_MASK_MAP.put(POS.NOUN, N);
+        POS_TO_MASK_MAP.put(POS.VERB, V);
+        POS_TO_MASK_MAP.put(POS.ADJECTIVE, ADJ);
+        POS_TO_MASK_MAP.put(POS.ADVERB, ADV);
+    }
 
     // All categories
-    public static final PointerType ANTONYM = new PointerType("ANTONYM", ANTONYM_KEY, N | V | ADJ | ADV | LEXICAL);
-    public static final PointerType CATEGORY = new PointerType("CATEGORY_DOMAIN", CATEGORY_DOMAIN_KEY, N | V | ADJ | ADV | LEXICAL);
-    public static final PointerType REGION = new PointerType("REGION_DOMAIN", REGION_DOMAIN_KEY, N | V | ADJ | ADV | LEXICAL);
-    public static final PointerType USAGE = new PointerType("USAGE_DOMAIN", USAGE_DOMAIN_KEY, N | V | ADJ | ADV | LEXICAL);
+    public static final PointerType ANTONYM = new PointerType(1, "ANTONYM", ANTONYM_KEY, N | V | ADJ | ADV | LEXICAL);
+    public static final PointerType CATEGORY = new PointerType(35, "CATEGORY_DOMAIN", CATEGORY_DOMAIN_KEY, N | V | ADJ | ADV | LEXICAL);
+    public static final PointerType REGION = new PointerType(37, "REGION_DOMAIN", REGION_DOMAIN_KEY, N | V | ADJ | ADV | LEXICAL);
+    public static final PointerType USAGE = new PointerType(36, "USAGE_DOMAIN", USAGE_DOMAIN_KEY, N | V | ADJ | ADV | LEXICAL);
+    public static final PointerType DOMAIN_ALL = new PointerType(21, "DOMAIN_ALL", DOMAIN_ALL_KEY, N | V | ADJ | ADV | LEXICAL);
 
     // Nouns and Verbs
-    public static final PointerType HYPERNYM = new PointerType("HYPERNYM", HYPERNYM_KEY, N | V);
-    public static final PointerType HYPONYM = new PointerType("HYPONYM", HYPONYM_KEY, N | V);
-    public static final PointerType NOMINALIZATION = new PointerType("NOMINALIZATION", NOMINALIZATION_KEY, N | V);
+    public static final PointerType HYPERNYM = new PointerType(2, "HYPERNYM", HYPERNYM_KEY, N | V);
+    public static final PointerType HYPONYM = new PointerType(3, "HYPONYM", HYPONYM_KEY, N | V);
+    public static final PointerType NOMINALIZATION = new PointerType(20, "NOMINALIZATION", NOMINALIZATION_KEY, N | V);
 
-    public static final PointerType INSTANCE_HYPERNYM = new PointerType("INSTANCE_HYPERNYM", INSTANCE_HYPERNYM_KEY, N | V);
-    public static final PointerType INSTANCES_HYPONYM = new PointerType("INSTANCES_HYPONYM", INSTANCES_HYPONYM_KEY, N | V);
+    public static final PointerType INSTANCE_HYPERNYM = new PointerType(38, "INSTANCE_HYPERNYM", INSTANCE_HYPERNYM_KEY, N | V);
+    public static final PointerType INSTANCES_HYPONYM = new PointerType(39, "INSTANCES_HYPONYM", INSTANCES_HYPONYM_KEY, N | V);
 
     // Nouns and Adjectives
-    public static final PointerType ATTRIBUTE = new PointerType("ATTRIBUTE", ATTRIBUTE_KEY, N | ADJ);
-    public static final PointerType SEE_ALSO = new PointerType("ALSO_SEE", ALSO_SEE_KEY, N | V | ADJ | LEXICAL);
+    public static final PointerType ATTRIBUTE = new PointerType(18, "ATTRIBUTE", ATTRIBUTE_KEY, N | ADJ);
+    public static final PointerType SEE_ALSO = new PointerType(16, "ALSO_SEE", ALSO_SEE_KEY, N | V | ADJ | LEXICAL);
 
     // Nouns
-    public static final PointerType MEMBER_HOLONYM = new PointerType("MEMBER_HOLONYM", MEMBER_HOLONYM_KEY, N);
-    public static final PointerType SUBSTANCE_HOLONYM = new PointerType("SUBSTANCE_HOLONYM", SUBSTANCE_HOLONYM_KEY, N);
-    public static final PointerType PART_HOLONYM = new PointerType("PART_HOLONYM", PART_HOLONYM_KEY, N);
-    public static final PointerType MEMBER_MERONYM = new PointerType("MEMBER_MERONYM", MEMBER_MERONYM_KEY, N);
-    public static final PointerType SUBSTANCE_MERONYM = new PointerType("SUBSTANCE_MERONYM", SUBSTANCE_MERONYM_KEY, N);
-    public static final PointerType PART_MERONYM = new PointerType("PART_MERONYM", PART_MERONYM_KEY, N);
-    public static final PointerType CATEGORY_MEMBER = new PointerType("CATEGORY_MEMBER", CATEGORY_MEMBER_KEY, N);
-    public static final PointerType REGION_MEMBER = new PointerType("REGION_MEMBER", REGION_MEMBER_KEY, N);
-    public static final PointerType USAGE_MEMBER = new PointerType("USAGE_MEMBER", USAGE_MEMBER_KEY, N);
+    public static final PointerType MEMBER_HOLONYM = new PointerType(6, "MEMBER_HOLONYM", MEMBER_HOLONYM_KEY, N);
+    public static final PointerType SUBSTANCE_HOLONYM = new PointerType(7, "SUBSTANCE_HOLONYM", SUBSTANCE_HOLONYM_KEY, N);
+    public static final PointerType PART_HOLONYM = new PointerType(8, "PART_HOLONYM", PART_HOLONYM_KEY, N);
+    public static final PointerType MEMBER_MERONYM = new PointerType(9, "MEMBER_MERONYM", MEMBER_MERONYM_KEY, N);
+    public static final PointerType SUBSTANCE_MERONYM = new PointerType(10, "SUBSTANCE_MERONYM", SUBSTANCE_MERONYM_KEY, N);
+    public static final PointerType PART_MERONYM = new PointerType(11, "PART_MERONYM", PART_MERONYM_KEY, N);
+    public static final PointerType CATEGORY_MEMBER = new PointerType(35, "CATEGORY_MEMBER", CATEGORY_MEMBER_KEY, N);
+    public static final PointerType REGION_MEMBER = new PointerType(37, "REGION_MEMBER", REGION_MEMBER_KEY, N);
+    public static final PointerType USAGE_MEMBER = new PointerType(36, "USAGE_MEMBER", USAGE_MEMBER_KEY, N);
+    public static final PointerType MEMBER_ALL = new PointerType(22, "MEMBER_ALL", MEMBER_ALL_KEY, N);
 
     // Verbs
-    public static final PointerType ENTAILMENT = new PointerType("ENTAILMENT", ENTAILMENT_KEY, V);
-    public static final PointerType ENTAILED_BY = new PointerType("ENTAILED_BY", ENTAILED_BY_KEY, V);
-    public static final PointerType CAUSE = new PointerType("CAUSE", CAUSE_KEY, V);
-    public static final PointerType VERB_GROUP = new PointerType("VERB_GROUP", VERB_GROUP_KEY, V);
+    public static final PointerType ENTAILMENT = new PointerType(4, "ENTAILMENT", ENTAILMENT_KEY, V);
+    public static final PointerType CAUSE = new PointerType(14, "CAUSE", CAUSE_KEY, V);
+    public static final PointerType VERB_GROUP = new PointerType(19, "VERB_GROUP", VERB_GROUP_KEY, V);
 
     // Adjectives
-    public static final PointerType SIMILAR_TO = new PointerType("SIMILAR", SIMILAR_KEY, ADJ);
-    public static final PointerType PARTICIPLE_OF = new PointerType("PARTICIPLE_OF", PARTICIPLE_OF_KEY, ADJ | LEXICAL);
-    public static final PointerType PERTAINYM = new PointerType("PERTAINYM", PERTAINYM_KEY, ADJ | LEXICAL);
-
-    // Adverbs
-    public static final PointerType DERIVED = new PointerType("DERIVED", DERIVED_KEY, ADV);
+    public static final PointerType SIMILAR_TO = new PointerType(5, "SIMILAR", SIMILAR_KEY, ADJ);
+    public static final PointerType PARTICIPLE_OF = new PointerType(15, "PARTICIPLE_OF", PARTICIPLE_OF_KEY, ADJ | LEXICAL);
+    public static final PointerType PERTAINYM = new PointerType(17, "PERTAINYM", PERTAINYM_KEY, ADJ | ADV | LEXICAL);
 
     /**
      * A list of all <code>PointerType</code>s.
      */
     private static final List<PointerType> ALL_TYPES = Collections.unmodifiableList(Arrays.asList(
-            ANTONYM, HYPERNYM, HYPONYM, ATTRIBUTE, SEE_ALSO, ENTAILMENT, ENTAILED_BY, CAUSE, VERB_GROUP,
+            ANTONYM, HYPERNYM, HYPONYM, ATTRIBUTE, SEE_ALSO, ENTAILMENT, CAUSE, VERB_GROUP,
             MEMBER_MERONYM, SUBSTANCE_MERONYM, PART_MERONYM, MEMBER_HOLONYM, SUBSTANCE_HOLONYM, PART_HOLONYM,
-            SIMILAR_TO, PARTICIPLE_OF, DERIVED, NOMINALIZATION, CATEGORY, REGION, USAGE, CATEGORY_MEMBER,
-            REGION_MEMBER, USAGE_MEMBER, INSTANCE_HYPERNYM, INSTANCES_HYPONYM
+            SIMILAR_TO, PARTICIPLE_OF, NOMINALIZATION, CATEGORY, REGION, USAGE, CATEGORY_MEMBER,
+            REGION_MEMBER, USAGE_MEMBER, INSTANCE_HYPERNYM, INSTANCES_HYPONYM, DOMAIN_ALL, MEMBER_ALL
     ));
-
-    private static final Map<POS, Integer> POS_TO_MASK_MAP = new HashMap<POS, Integer>();
-    private static final Map<String, PointerType> KEY_TO_POINTER_TYPE_MAP = new HashMap<String, PointerType>();
-
-    private static boolean initialized = false;
-
-    public static void initialize() {
-        if (!initialized) {
-            POS_TO_MASK_MAP.put(POS.NOUN, N);
-            POS_TO_MASK_MAP.put(POS.VERB, V);
-            POS_TO_MASK_MAP.put(POS.ADJECTIVE, ADJ);
-            POS_TO_MASK_MAP.put(POS.ADVERB, ADV);
-
-            for (PointerType pt : ALL_TYPES) {
-                KEY_TO_POINTER_TYPE_MAP.put(pt.getKey(), pt);
-            }
-
-            initialized = true;
-        }
-    }
 
     static {
         setSymmetric(ANTONYM, ANTONYM);
@@ -139,7 +172,6 @@ public class PointerType implements Serializable {
         setSymmetric(SIMILAR_TO, SIMILAR_TO);
         setSymmetric(ATTRIBUTE, ATTRIBUTE);
         setSymmetric(VERB_GROUP, VERB_GROUP);
-        setSymmetric(ENTAILMENT, ENTAILED_BY);
         setSymmetric(CATEGORY, CATEGORY_MEMBER);
         setSymmetric(REGION, REGION_MEMBER);
         setSymmetric(USAGE, USAGE_MEMBER);
@@ -158,7 +190,7 @@ public class PointerType implements Serializable {
     }
 
     /**
-     * Return the <code>PointerType</code> whose key matches <var>key</var>.
+     * Return the <code>PointerType</code> whose key matches <var>key</var> and applies to <var>pos</var>.
      *
      * @param key pointer type key
      * @return the <code>PointerType</code> whose key matches <var>key</var>
@@ -196,18 +228,24 @@ public class PointerType implements Serializable {
         return POS_TO_MASK_MAP.get(pos);
     }
 
-    private Resolvable label;
+    //serializables using pointer type should restore it to a static variable
+    //establishes order to sort pointer keys for index files
+    private transient int id;
+    private transient String label;
+    private transient int flags;
     private String key;
-    private int flags;
+
     /**
      * The PointerType that is the revers of this PointerType
      */
-    private PointerType symmetricType;
+    private transient PointerType symmetricType;
 
-    private PointerType(String label, String key, int flags) {
-        this.label = new Resolvable(label);
+    private PointerType(int id, String label, String key, int flags) {
+        this.id = id;
+        this.label = JWNL.resolveMessage(label);
         this.key = key;
         this.flags = flags;
+        KEY_TO_POINTER_TYPE_MAP.put(key, this);
     }
 
     public String toString() {
@@ -219,7 +257,7 @@ public class PointerType implements Serializable {
     }
 
     public String getLabel() {
-        return label.toString();
+        return label;
     }
 
     /**
@@ -255,8 +293,21 @@ public class PointerType implements Serializable {
         return symmetricType;
     }
 
+    public int getFlags() {
+        return flags;
+    }
+
+    public int getId() {
+        return id;
+    }
+
     public int hashCode() {
         return getLabel().hashCode();
+    }
+
+    @Override
+    public int compareTo(PointerType o) {
+        return this.id - o.getId();
     }
 
     private String flagStringCache = null;

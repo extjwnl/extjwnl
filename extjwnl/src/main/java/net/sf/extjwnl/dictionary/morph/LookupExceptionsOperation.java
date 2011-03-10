@@ -9,9 +9,9 @@ import net.sf.extjwnl.util.factory.Param;
 import java.util.Map;
 
 /**
- * Lookup the word in the exceptions file of the given part-of-speech.
+ * Looks up the word in the exceptions file of the given part-of-speech.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class LookupExceptionsOperation extends AbstractOperation {

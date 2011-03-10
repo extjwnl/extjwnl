@@ -1,6 +1,5 @@
 package net.sf.extjwnl.data;
 
-import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -9,7 +8,7 @@ import java.util.*;
  * @author Brett Walenz <bwalenz@users.sourceforge.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
-public class LexFileIdFileNameMap implements Map<Long, String>, Serializable {
+public class LexFileIdFileNameMap implements Map<Long, String> {
 
     /**
      * A mapping of id's to files.

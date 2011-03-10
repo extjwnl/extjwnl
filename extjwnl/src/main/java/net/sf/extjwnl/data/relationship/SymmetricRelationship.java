@@ -13,7 +13,7 @@ import net.sf.extjwnl.data.list.PointerTargetNodeList;
  * the source's ancestry, and vice versa. For this reason, symmetric relationships have no concept of a
  * common parent index.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  */
 public class SymmetricRelationship extends Relationship {
     public SymmetricRelationship(

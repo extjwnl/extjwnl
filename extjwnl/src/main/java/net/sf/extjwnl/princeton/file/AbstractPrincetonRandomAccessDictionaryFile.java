@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * Base class for random access files.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public abstract class AbstractPrincetonRandomAccessDictionaryFile extends AbstractPrincetonDictionaryFile
@@ -73,6 +73,11 @@ public abstract class AbstractPrincetonRandomAccessDictionaryFile extends Abstra
 
     @Override
     public String getOffsetFormatString() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void writeLine(String line) throws IOException {
         throw new UnsupportedOperationException();
     }
 }

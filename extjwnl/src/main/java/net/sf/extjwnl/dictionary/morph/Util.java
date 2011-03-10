@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Utility class.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  */
 public class Util {
     public static String getLemma(String[] tokens, BitSet bits, String delimiter) {

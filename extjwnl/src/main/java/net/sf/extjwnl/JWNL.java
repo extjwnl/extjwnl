@@ -1,8 +1,5 @@
 package net.sf.extjwnl;
 
-import net.sf.extjwnl.data.Adjective;
-import net.sf.extjwnl.data.PointerType;
-import net.sf.extjwnl.data.VerbFrame;
 import net.sf.extjwnl.dictionary.Dictionary;
 import net.sf.extjwnl.util.ResourceBundleSet;
 
@@ -13,7 +10,7 @@ import java.util.ResourceBundle;
 /**
  * Contains system info as well as JWNL properties.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class JWNL {
@@ -31,24 +28,28 @@ public class JWNL {
     private static ResourceBundleSet bundle;
     private static OS currentOS = UNDEFINED;
 
+    private static boolean initialized = false;
+
     static {
-        bundle = new ResourceBundleSet(CORE_RESOURCE);
-        // set the locale
-        //bundle.setLocale(Locale.getDefault());//enable when enough translations will be available.
-        bundle.setLocale(new Locale("en", ""));
+        initialize();
+    }
 
-        // set the OS
-        String os = System.getProperty(OS_PROPERTY_NAME);
-        for (OS definedOS : DEFINED_OS_ARRAY) {
-            if (definedOS.matches(os)) {
-                currentOS = definedOS;
+    public static void initialize() {
+        if (!initialized) {
+            bundle = new ResourceBundleSet(CORE_RESOURCE);
+            // set the locale
+            //bundle.setLocale(Locale.getDefault());//enable when enough translations will be available.
+            bundle.setLocale(new Locale("en", ""));
+
+            // set the OS
+            String os = System.getProperty(OS_PROPERTY_NAME);
+            for (OS definedOS : DEFINED_OS_ARRAY) {
+                if (definedOS.matches(os)) {
+                    currentOS = definedOS;
+                }
             }
+            initialized = true;
         }
-
-        // initialize bundle-dependant resources
-        PointerType.initialize();
-        Adjective.initialize();
-        VerbFrame.initialize();
     }
 
     /**
@@ -149,6 +150,7 @@ public class JWNL {
         /**
          * Returns true if <var>testOS</var> is a version of this OS. For example, calling
          * WINDOWS.matches("Windows 95") returns true.
+         *
          * @param testOS OS string
          * @return true if <var>testOS</var> is a version of this OS
          */

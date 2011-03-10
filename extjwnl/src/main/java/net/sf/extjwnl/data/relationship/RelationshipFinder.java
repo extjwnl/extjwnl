@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Helper class to find relations.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class RelationshipFinder {

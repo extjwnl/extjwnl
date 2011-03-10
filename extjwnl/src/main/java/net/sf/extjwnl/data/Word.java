@@ -12,7 +12,7 @@ import java.util.*;
  * {@link #getTargets getTargets} retrieves the targets of these links, and
  * {@link Word#getPointers getPointers} retrieves the pointers themselves.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class Word extends PointerTarget {
@@ -346,8 +346,8 @@ public class Word extends PointerTarget {
                                 summary = lastSummary;
                             }
                         } else if (POS.ADVERB.equals(getSynset().getPOS())) {
-                            //try DERIVED
-                            List<Pointer> pointers = ss.getPointers(PointerType.DERIVED);
+                            //try PERTAINYM (former DERIVED)
+                            List<Pointer> pointers = ss.getPointers(PointerType.PERTAINYM);
                             summary = getShortestLemma(getLemmasFromPointers(pointers), summaries);
                             lastSummary = summary;
                             if ((0 == pointers.size()) || summaries.contains(summary)) {
@@ -391,45 +391,6 @@ public class Word extends PointerTarget {
         this.summary = summary;
     }
 
-    /**
-     * Returns the sense key of a lemma.
-     *
-     * @return sense key
-     */
-    public String getSenseKey() {
-        int ss_type = 5;
-        if (getPOS().equals(POS.NOUN)) {
-            ss_type = 1;
-        } else if (getPOS().equals(POS.VERB)) {
-            ss_type = 2;
-        } else if (getPOS().equals(POS.ADJECTIVE)) {
-            ss_type = 3;
-        } else if (getPOS().equals(POS.ADVERB)) {
-            ss_type = 4;
-        }
-
-        if (getSynset().isAdjectiveCluster()) {
-            ss_type = 5;
-        }
-
-        StringBuilder senseKey = new StringBuilder(String.format("%s%%%d:%02d:%02d:", lemma.toLowerCase().replace(' ', '_'), ss_type, synset.getLexFileNum(), lexId));
-
-        if (5 == ss_type) {
-            List<Pointer> p = synset.getPointers(PointerType.SIMILAR_TO);
-            if (0 < p.size()) {
-                Pointer headWord = p.get(0);
-                List<Word> words = headWord.getTargetSynset().getWords();
-                if (0 < words.size()) {
-                    senseKey.append(String.format("%s:%02d", words.get(0).getLemma().toLowerCase(), words.get(0).getLexId()));
-                }
-            }
-        } else {
-            senseKey.append(":");
-        }
-
-        return senseKey.toString();
-    }
-
     private static ArrayList<String> getLemmasFromSynset(Synset s) throws JWNLException {
         ArrayList<String> result = new ArrayList<String>();
 
@@ -469,4 +430,92 @@ public class Word extends PointerTarget {
 
         return shortest;
     }
+
+    /**
+     * Returns the sense key of a lemma.
+     *
+     * @return sense key
+     */
+    public String getSenseKey() {
+        int ss_type = 5;
+        if (getPOS().equals(POS.NOUN)) {
+            ss_type = 1;
+        } else if (getPOS().equals(POS.VERB)) {
+            ss_type = 2;
+        } else if (getPOS().equals(POS.ADJECTIVE)) {
+            ss_type = 3;
+        } else if (getPOS().equals(POS.ADVERB)) {
+            ss_type = 4;
+        }
+
+        if (getSynset().isAdjectiveCluster()) {
+            ss_type = 5;
+        }
+
+        StringBuilder senseKey = new StringBuilder(String.format("%s%%%d:%02d:%02d:", lemma.toLowerCase().replace(' ', '_'), ss_type, synset.getLexFileNum(), lexId));
+
+        if (5 == ss_type) {
+            List<Pointer> p = synset.getPointers(PointerType.SIMILAR_TO);
+            if (0 < p.size()) {
+                Pointer headWord = p.get(0);
+                List<Word> words = headWord.getTargetSynset().getWords();
+                if (0 < words.size()) {
+                    Word word = words.get(0);
+                    senseKey.append(String.format("%s:%02d", word.getLemma().toLowerCase().replace(' ', '_'), word.getLexId()));
+                }
+            }
+        } else {
+            senseKey.append(":");
+        }
+
+        return senseKey.toString();
+    }
+
+    /**
+     * Returns the sense key of a lemma, taking into account adjective class (position).
+     *
+     * @return sense key
+     */
+    public String getSenseKeyWithAdjClass() {
+        int ss_type = 5;
+        if (getPOS().equals(POS.NOUN)) {
+            ss_type = 1;
+        } else if (getPOS().equals(POS.VERB)) {
+            ss_type = 2;
+        } else if (getPOS().equals(POS.ADJECTIVE)) {
+            ss_type = 3;
+        } else if (getPOS().equals(POS.ADVERB)) {
+            ss_type = 4;
+        }
+
+        if (getSynset().isAdjectiveCluster()) {
+            ss_type = 5;
+        }
+
+        StringBuilder senseKey = new StringBuilder(String.format("%s%%%d:%02d:%02d:", lemma.toLowerCase().replace(' ', '_'), ss_type, synset.getLexFileNum(), lexId));
+
+        if (5 == ss_type) {
+            List<Pointer> p = synset.getPointers(PointerType.SIMILAR_TO);
+            if (0 < p.size()) {
+                Pointer headWord = p.get(0);
+                List<Word> words = headWord.getTargetSynset().getWords();
+                if (0 < words.size()) {
+                    Word word = words.get(0);
+                    String lemma = word.getLemma().toLowerCase().replace(' ', '_');
+                    if (word instanceof Adjective) {
+                        Adjective a = (Adjective) word;
+                        if (!Adjective.NONE.equals(a.getAdjectivePosition())) {
+                            lemma = lemma + "(" + a.getAdjectivePosition().getKey() + ")";
+                        }
+                    }
+                    senseKey.append(String.format("%s:%02d", lemma, word.getLexId()));
+                }
+            }
+        } else {
+            senseKey.append(":");
+        }
+
+        return senseKey.toString();
+    }
+
 }

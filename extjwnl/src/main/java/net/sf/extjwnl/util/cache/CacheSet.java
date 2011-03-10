@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * A set of </code>Caches</code>, indexed by <code>CacheKey</code>.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public abstract class CacheSet<K, A, B> {

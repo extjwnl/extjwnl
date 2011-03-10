@@ -5,11 +5,9 @@ import java.util.*;
 /**
  * A ResourceBundle that is a proxy to multiple ResourceBundles.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  */
 public class ResourceBundleSet extends ResourceBundle {
-
-    private static final MessageLog log = new MessageLog(ResourceBundleSet.class);
 
     private Locale locale = Locale.getDefault();
     private Set<String> resources = new HashSet<String>();
@@ -38,14 +36,9 @@ public class ResourceBundleSet extends ResourceBundle {
 
     protected Object handleGetObject(String key) {
         for (String resource : resources) {
-            try {
-                ResourceBundle bundle = getBndl(resource);
-                String msg = bundle.getString(key);
-                if (msg != null) {
-                    return msg;
-                }
-            } catch (Exception e) {
-                //log.log(MessageLogLevel.ERROR, "EXCEPTION_001", e.getMessage(), e);
+            ResourceBundle bundle = getBndl(resource);
+            if (bundle.containsKey(key)) {
+                return bundle.getString(key);
             }
         }
         return key;

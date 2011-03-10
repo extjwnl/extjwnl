@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * A container for the root node of a pointer target tree.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class PointerTargetTree {
@@ -73,6 +73,7 @@ public class PointerTargetTree {
 
     /**
      * Finds the first occurrence of <var>node</var> in the tree.
+     *
      * @param node node to search for
      * @return the first occurrence of <var>node</var> in the tree
      */
@@ -82,6 +83,7 @@ public class PointerTargetTree {
 
     /**
      * Finds the first node in the tree whose target is <var>target</var>.
+     *
      * @param target target to search for
      * @return the first node in the tree whose target is <var>target</var>
      */
@@ -91,6 +93,7 @@ public class PointerTargetTree {
 
     /**
      * Finds all occurrences of <var>node</var> in the tree.
+     *
      * @param node node to search for
      * @return all occurrences of <var>node</var> in the tree
      */
@@ -100,6 +103,7 @@ public class PointerTargetTree {
 
     /**
      * Finds all nodes in the tree whose target is <var>target</var>.
+     *
      * @param target target to search for
      * @return all nodes in the tree whose target is <var>target</var>
      */
@@ -122,6 +126,7 @@ public class PointerTargetTree {
      * Reverse this tree. A reversal is done by converting this tree to lists
      * and then reversing each of the lists. The structure of the tree is
      * unaffected by this operation.
+     *
      * @return reversed lists
      */
     public List<PointerTargetNodeList> reverse() {

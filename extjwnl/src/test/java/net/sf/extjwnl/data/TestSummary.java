@@ -117,9 +117,9 @@ public class TestSummary {
         Assert.assertNotNull(iw);
         {
             String[] tests = {"example", "event", "suit", "fact", "container", "soul", "subject", "problem", "argument", "caseful",
-            "grammatical case", "state of mind", "type", "font", "sheath", "shell", "casing", "compositor's case", "slip", "vitrine"};
+                    "grammatical case", "state of mind", "type", "font", "sheath", "shell", "casing", "compositor's case", "slip", "vitrine"};
             int[][] indices = {{0, 0}, {1, 1}, {2, 2}, {3, 0}, {4, 0}, {5, 0}, {6, 1}, {7, 0}, {8, 0}, {9, 0},
-            {10, 0}, {11, 0}, {12, 3}, {13, 4}, {14, 1}, {15, 1}, {16, 1}, {17, 0}, {18, 0}, {19, 0}};
+                    {10, 0}, {11, 0}, {12, 3}, {13, 4}, {14, 1}, {15, 1}, {16, 1}, {17, 0}, {18, 0}, {19, 0}};
             for (int i = 0; i < tests.length; i++) {
                 Assert.assertEquals(tests[i], iw.getSenses().get(indices[i][0]).getWords().get(indices[i][1]).getSummary());
             }

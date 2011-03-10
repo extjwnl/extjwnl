@@ -13,7 +13,7 @@ import java.util.*;
  * relationship that the node has to the other elements in the list and/or to
  * the source word.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class PointerTargetNodeList extends LinkedList<PointerTargetNode> implements DeepCloneable {

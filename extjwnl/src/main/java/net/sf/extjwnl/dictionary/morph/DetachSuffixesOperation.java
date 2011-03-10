@@ -18,7 +18,7 @@ import java.util.*;
  * where suffix is the {suffix} to convert from, and {stemmed suffix} is
  * the suffix to convert to.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class DetachSuffixesOperation extends AbstractDelegatingOperation {

@@ -10,7 +10,7 @@ import java.util.ArrayList;
  * of pointer. See the WordNet documentation for information on pointer types. To avoid confusion with
  * the <code>Relationship</code> class, these relationships will be referred to as links.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  */
 public class PointerUtils {
 
@@ -93,8 +93,8 @@ public class PointerUtils {
      */
     public static PointerTargetNodeList getCoordinateTerms(Synset synset) {
         PointerTargetNodeList list = new PointerTargetNodeList();
-        for (Object o : getDirectHypernyms(synset)) {
-            list.addAll(getPointerTargets(((PointerTargetNode) o).getSynset(), PointerType.HYPONYM));
+        for (PointerTargetNode o : getDirectHypernyms(synset)) {
+            list.addAll(getPointerTargets(o.getSynset(), PointerType.HYPONYM));
         }
         return list;
     }
@@ -508,37 +508,6 @@ public class PointerUtils {
     }
 
     /**
-     * Finds direct entailed bys of <code>synset</code>.
-     *
-     * @param synset synset
-     * @return direct entailed bys of <code>synset</code>
-     */
-    public static PointerTargetNodeList getEntailedBy(Synset synset) {
-        return getPointerTargets(synset, PointerType.ENTAILED_BY);
-    }
-
-    /**
-     * Finds all entailed bys of <code>synset</code>.
-     *
-     * @param synset synset
-     * @return all entailed bys of <code>synset</code>
-     */
-    public static PointerTargetTree getEntailedByTree(Synset synset) {
-        return getEntailedByTree(synset, INFINITY);
-    }
-
-    /**
-     * Finds all entailed bys of <code>synset</code> to depth <code>depth</code>.
-     *
-     * @param synset synset
-     * @param depth  depth
-     * @return all entailed bys of <code>synset</code> to depth <code>depth</code>
-     */
-    public static PointerTargetTree getEntailedByTree(Synset synset, int depth) {
-        return new PointerTargetTree(synset, makePointerTargetTreeList(synset, PointerType.ENTAILED_BY, depth));
-    }
-
-    /**
      * Finds direct cause links of <code>synset</code>.
      *
      * @param synset synset
@@ -607,16 +576,6 @@ public class PointerUtils {
      */
     public static PointerTargetNodeList getParticipleOf(Synset synset) {
         return getPointerTargets(synset, PointerType.PARTICIPLE_OF);
-    }
-
-    /**
-     * Finds derived links of <code>synset</code>.
-     *
-     * @param synset synset
-     * @return derived links of <code>synset</code>
-     */
-    public static PointerTargetNodeList getDerived(Synset synset) {
-        return getPointerTargets(synset, PointerType.DERIVED);
     }
 
     /**

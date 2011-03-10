@@ -16,7 +16,7 @@ import java.util.Map;
  * A container for the files associated with a catalog (the index, data, and exception
  * files associated with a POS).
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class DictionaryCatalog<E extends DictionaryFile> implements Owned {

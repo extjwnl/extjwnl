@@ -1,11 +1,12 @@
 package net.sf.extjwnl.princeton.data;
 
+import net.sf.extjwnl.JWNL;
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.data.*;
 import net.sf.extjwnl.dictionary.Dictionary;
-import net.sf.extjwnl.util.MessageLog;
-import net.sf.extjwnl.util.MessageLogLevel;
 import net.sf.extjwnl.util.TokenizerParser;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -16,16 +17,15 @@ import java.util.StringTokenizer;
  * <code>FileDictionaryElementFactory</code> that parses lines from the dictionary files distributed by the
  * WordNet team at Princeton's Cognitive Science department.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
-public abstract class AbstractPrincetonFileDictionaryElementFactory implements FileDictionaryElementFactory {
+public abstract class AbstractPrincetonFileDictionaryElementFactory extends AbstractPrincetonDictionaryElementFactory implements FileDictionaryElementFactory {
 
-    private static final MessageLog log = new MessageLog(AbstractPrincetonFileDictionaryElementFactory.class);
-    protected Dictionary dictionary;
+    private static final Log log = LogFactory.getLog(AbstractPrincetonFileDictionaryElementFactory.class);
 
     protected AbstractPrincetonFileDictionaryElementFactory(Dictionary dictionary) {
-        this.dictionary = dictionary;
+        super(dictionary);
     }
 
     public IndexWord createIndexWord(POS pos, String line) throws JWNLException {
@@ -49,8 +49,8 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory implements F
         for (int i = 0; i < senseCount; i++) {
             synsetOffsets[i] = tokenizer.nextLong();
         }
-        if (log.isLevelEnabled(MessageLogLevel.TRACE)) {
-            log.log(MessageLogLevel.TRACE, "PRINCETON_INFO_003", new Object[]{lemma, pos});
+        if (log.isTraceEnabled()) {
+            log.trace(JWNL.resolveMessage("PRINCETON_INFO_003", new Object[]{lemma, pos}));
         }
         return new IndexWord(dictionary, lemma, pos, synsetOffsets);
     }
@@ -120,33 +120,16 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory implements F
         String gloss = null;
         int index = line.indexOf('|');
         if (index > 0) {
-            gloss = line.substring(index + 2).trim();
+            //do not use trim, because some glosses have space before or space after
+            //which changes offsets on load\save even without editing
+            gloss = line.substring(index + 2, line.length() - 2);
         }
         synset.setGloss(gloss);
 
-        if (log.isLevelEnabled(MessageLogLevel.TRACE)) {
-            log.log(MessageLogLevel.TRACE, "PRINCETON_INFO_002", new Object[]{pos, offset});
+        if (log.isTraceEnabled()) {
+            log.trace(JWNL.resolveMessage("PRINCETON_INFO_002", new Object[]{pos, offset}));
         }
         return synset;
-    }
-
-    /**
-     * Creates a word, also access the sense.idx file.
-     *
-     * @param synset synset
-     * @param index  index
-     * @param lemma  lemma
-     * @return word
-     */
-    protected Word createWord(Synset synset, int index, String lemma) {
-        Word word;
-        if (synset.getPOS().equals(POS.VERB)) {
-            word = new MutableVerb(dictionary, synset, index, lemma);
-        } else {
-            word = new Word(dictionary, synset, index, lemma);
-        }
-
-        return word;
     }
 
     public Exc createExc(POS pos, String line) throws JWNLException {
@@ -156,17 +139,9 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory implements F
         while (st.hasMoreTokens()) {
             exceptions.add(st.nextToken().replace('_', ' '));
         }
-        if (log.isLevelEnabled(MessageLogLevel.TRACE)) {
-            log.log(MessageLogLevel.TRACE, "PRINCETON_INFO_001", new Object[]{pos, lemma});
+        if (log.isTraceEnabled()) {
+            log.trace(JWNL.resolveMessage("PRINCETON_INFO_001", new Object[]{pos, lemma}));
         }
         return new Exc(dictionary, pos, lemma, exceptions);
-    }
-
-    public Dictionary getDictionary() {
-        return dictionary;
-    }
-
-    public void setDictionary(Dictionary dictionary) {
-        this.dictionary = dictionary;
     }
 }

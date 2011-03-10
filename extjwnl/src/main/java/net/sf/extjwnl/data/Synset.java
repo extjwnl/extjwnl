@@ -5,12 +5,11 @@ import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.dictionary.AbstractCachingDictionary;
 import net.sf.extjwnl.dictionary.Dictionary;
 import net.sf.extjwnl.dictionary.POSKey;
-import net.sf.extjwnl.util.MessageLog;
-import net.sf.extjwnl.util.MessageLogLevel;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.List;
 
 /**
  * A <code>Synset</code>, or <b>syn</b>onym <b>set</b>, represents a
@@ -24,14 +23,14 @@ import java.util.List;
  * retrieves the targets of these links, and {@link #getPointers getPointers}
  * retrieves the pointers themselves.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class Synset extends PointerTarget implements DictionaryElement {
 
     private static final long serialVersionUID = 1L;
 
-    private static final MessageLog log = new MessageLog(Synset.class);
+    private static final Log log = LogFactory.getLog(Synset.class);
 
     protected POS pos;
     protected PointerList pointers;
@@ -62,11 +61,11 @@ public class Synset extends PointerTarget implements DictionaryElement {
      */
     private long lexFileNum;
 
+    private transient Dictionary settingDictionary;
+
     private static final String[] EMPTY_STRING_ARRAY = new String[0];
     private static final BitSet EMPTY_BIT_SET = new BitSet();
     private static final int[] EMPTY_INT_ARRAY = new int[0];
-
-    private transient Dictionary settingDictionary;
 
     //for access control and updates
     private class PointerList extends ArrayList<Pointer> {
@@ -146,7 +145,11 @@ public class Synset extends PointerTarget implements DictionaryElement {
                 throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_043"));
             }
             boolean result = false;
-            if (!super.contains(pointer)) {
+            //WN TRICK
+            //!dictionary.isEditable() because WN contains duplicates:
+            //04639371 07 n 02 sternness 0 strictness 1 008 @ 04639113 n 0000 + 02436995 a 0202 + 02436995 a 0202
+            //                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            if ((null != dictionary && !dictionary.isEditable()) || !super.contains(pointer)) {
                 result = super.add(pointer);
 
                 if (null != dictionary && dictionary.isEditable()) {
@@ -366,7 +369,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
                     List<Pointer> toDelete = null;
                     for (int i = 0; i < super.size(); i++) {
                         Pointer pointer = super.get(i);
-                        if (dictionary != pointer.getSource().getDictionary() ||  dictionary != pointer.getTarget().getDictionary()) {
+                        if (dictionary != pointer.getSource().getDictionary() || dictionary != pointer.getTarget().getDictionary()) {
                             if (null == toDelete) {
                                 toDelete = new ArrayList<Pointer>(0);
                             }
@@ -374,7 +377,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
                         }
                     }
                     if (null != toDelete) {
-                        for (Pointer pointer: toDelete) {
+                        for (Pointer pointer : toDelete) {
                             remove(pointer);
                         }
                     }
@@ -533,7 +536,9 @@ public class Synset extends PointerTarget implements DictionaryElement {
                         indexWord.getSenses().remove(Synset.this);
                     }
                 } catch (JWNLException e) {
-                    log.log(MessageLogLevel.ERROR, "EXCEPTION_001", e.getMessage(), e);
+                    if (log.isErrorEnabled()) {
+                        log.error(JWNL.resolveMessage("EXCEPTION_001", e.getMessage()), e);
+                    }
                 }
             }
         }
@@ -549,8 +554,10 @@ public class Synset extends PointerTarget implements DictionaryElement {
                         iw.getSenses().add(Synset.this);
                     }
                 } catch (JWNLException e) {
-                    if (log.isLevelEnabled(MessageLogLevel.ERROR)) {
-                        log.log(MessageLogLevel.ERROR, "EXCEPTION_001", e.getMessage(), e);
+                    if (log.isErrorEnabled()) {
+                        if (log.isErrorEnabled()) {
+                            log.error(JWNL.resolveMessage("EXCEPTION_001", e.getMessage()), e);
+                        }
                     }
                 }
             }

@@ -1,14 +1,15 @@
 package net.sf.extjwnl.princeton.file;
 
+import net.sf.extjwnl.JWNL;
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.JWNLRuntimeException;
 import net.sf.extjwnl.data.*;
 import net.sf.extjwnl.dictionary.Dictionary;
 import net.sf.extjwnl.dictionary.file.DictionaryFileFactory;
 import net.sf.extjwnl.dictionary.file.DictionaryFileType;
-import net.sf.extjwnl.util.MessageLog;
-import net.sf.extjwnl.util.MessageLogLevel;
 import net.sf.extjwnl.util.factory.Param;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -24,12 +25,45 @@ import java.util.*;
  * A <code>RandomAccessDictionaryFile</code> that accesses files
  * named with Princeton's dictionary file naming convention.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandomAccessDictionaryFile implements DictionaryFileFactory<PrincetonRandomAccessDictionaryFile> {
 
-    private static final MessageLog log = new MessageLog(PrincetonRandomAccessDictionaryFile.class);
+    private static final Log log = LogFactory.getLog(PrincetonRandomAccessDictionaryFile.class);
+
+    private static final String PRINCETON_HEADER = "  1 This software and database is being provided to you, the LICENSEE, by  \n" +
+            "  2 Princeton University under the following license.  By obtaining, using  \n" +
+            "  3 and/or copying this software and database, you agree that you have  \n" +
+            "  4 read, understood, and will comply with these terms and conditions.:  \n" +
+            "  5   \n" +
+            "  6 Permission to use, copy, modify and distribute this software and  \n" +
+            "  7 database and its documentation for any purpose and without fee or  \n" +
+            "  8 royalty is hereby granted, provided that you agree to comply with  \n" +
+            "  9 the following copyright notice and statements, including the disclaimer,  \n" +
+            "  10 and that the same appear on ALL copies of the software, database and  \n" +
+            "  11 documentation, including modifications that you make for internal  \n" +
+            "  12 use or for distribution.  \n" +
+            "  13   \n" +
+            "  14 WordNet 3.0 Copyright 2006 by Princeton University.  All rights reserved.  \n" +
+            "  15   \n" +
+            "  16 THIS SOFTWARE AND DATABASE IS PROVIDED \"AS IS\" AND PRINCETON  \n" +
+            "  17 UNIVERSITY MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR  \n" +
+            "  18 IMPLIED.  BY WAY OF EXAMPLE, BUT NOT LIMITATION, PRINCETON  \n" +
+            "  19 UNIVERSITY MAKES NO REPRESENTATIONS OR WARRANTIES OF MERCHANT-  \n" +
+            "  20 ABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE USE  \n" +
+            "  21 OF THE LICENSED SOFTWARE, DATABASE OR DOCUMENTATION WILL NOT  \n" +
+            "  22 INFRINGE ANY THIRD PARTY PATENTS, COPYRIGHTS, TRADEMARKS OR  \n" +
+            "  23 OTHER RIGHTS.  \n" +
+            "  24   \n" +
+            "  25 The name of Princeton University or Princeton may not be used in  \n" +
+            "  26 advertising or publicity pertaining to distribution of the software  \n" +
+            "  27 and/or database.  Title to copyright in this software, database and  \n" +
+            "  28 any associated documentation shall at all times remain with  \n" +
+            "  29 Princeton University and LICENSEE agrees to preserve same.  \n";
+
+    private static final String WRITE_PRINCETON_HEADER_KEY = "write_princeton_header";
+    private boolean writePrincetonHeader = false;
 
     /**
      * Read-only file permission.
@@ -62,6 +96,9 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
         if (null != encoding) {
             Charset charset = Charset.forName(encoding);
             decoder = charset.newDecoder();
+        }
+        if (params.containsKey(WRITE_PRINCETON_HEADER_KEY)) {
+            writePrincetonHeader = Boolean.parseBoolean(params.get(WRITE_PRINCETON_HEADER_KEY).getValue());
         }
     }
 
@@ -182,7 +219,9 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
             }
             super.close();
         } catch (Exception e) {
-            log.log(MessageLogLevel.ERROR, "EXCEPTION_001", e.getMessage(), e);
+            if (log.isErrorEnabled()) {
+                log.error(JWNL.resolveMessage("EXCEPTION_001", e.getMessage()), e);
+            }
         } finally {
             raFile = null;
         }
@@ -218,14 +257,18 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
     }
 
     public void save() throws IOException, JWNLException {
-        log.log(MessageLogLevel.INFO, "PRINCETON_INFO_004", makeFilename());
+        if (log.isInfoEnabled()) {
+            log.info(JWNL.resolveMessage("PRINCETON_INFO_004", getFilename()));
+        }
         if (DictionaryFileType.EXCEPTION.equals(getFileType())) {
             ArrayList<String> exceptions = new ArrayList<String>();
             Iterator<Exc> ei = dictionary.getExceptionIterator(getPOS());
             while (ei.hasNext()) {
                 exceptions.add(renderException(ei.next()));
             }
-            log.log(MessageLogLevel.INFO, "PRINCETON_INFO_005", exceptions.size());
+            if (log.isInfoEnabled()) {
+                log.info(JWNL.resolveMessage("PRINCETON_INFO_005", exceptions.size()));
+            }
             Collections.sort(exceptions);
 
             seek(0);
@@ -237,7 +280,9 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                 synsets.add(si.next());
             }
 
-            log.log(MessageLogLevel.INFO, "PRINCETON_INFO_005", synsets.size());
+            if (log.isInfoEnabled()) {
+                log.info(JWNL.resolveMessage("PRINCETON_INFO_005", synsets.size()));
+            }
             Collections.sort(synsets, new Comparator<Synset>() {
                 public int compare(Synset o1, Synset o2) {
                     return (int) Math.signum(o1.getOffset() - o2.getOffset());
@@ -245,8 +290,13 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
             });
 
             dfOff = new DecimalFormat("00000000");//8 by default
-            log.log(MessageLogLevel.INFO, "PRINCETON_INFO_006", synsets.size());
-            long offset = raFile.getFilePointer();
+            if (log.isInfoEnabled()) {
+                log.info(JWNL.resolveMessage("PRINCETON_INFO_006", synsets.size()));
+            }
+            long offset = 0;
+            if (writePrincetonHeader) {
+                offset = offset + PRINCETON_HEADER.length();
+            }
             for (Synset s : synsets) {
                 s.setOffset(offset);
                 if (null == encoding) {
@@ -257,18 +307,30 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
             }
             //calculate offset length
             decimalFormatString = createOffsetFormatString(offset);
-            dfOff =  new DecimalFormat(decimalFormatString);//there is a small chance another update might be necessary
+            dfOff = new DecimalFormat(decimalFormatString);//there is a small chance another update might be necessary
 
-            log.log(MessageLogLevel.INFO, "PRINCETON_INFO_007", synsets.size());
-            log.log(MessageLogLevel.INFO, "PRINCETON_INFO_008", makeFilename());
+            if (log.isInfoEnabled()) {
+                log.info(JWNL.resolveMessage("PRINCETON_INFO_007", synsets.size()));
+            }
+            if (log.isInfoEnabled()) {
+                log.info(JWNL.resolveMessage("PRINCETON_INFO_008", getFilename()));
+            }
             long counter = 0;
             long total = synsets.size();
             long reportInt = (total / 20) + 1;//i.e. report every 5%
             seek(0);
+            if (writePrincetonHeader) {
+                if (log.isInfoEnabled()) {
+                    log.info(JWNL.resolveMessage("PRINCETON_INFO_020", getFilename()));
+                }
+                raFile.writeBytes(PRINCETON_HEADER);
+            }
             for (Synset synset : synsets) {
                 counter++;
                 if (0 == (counter % reportInt)) {
-                    log.log(MessageLogLevel.INFO, "PRINCETON_INFO_014", 100 * counter / total);
+                    if (log.isInfoEnabled()) {
+                        log.info(JWNL.resolveMessage("PRINCETON_INFO_014", 100 * counter / total));
+                    }
                 }
                 if (null == encoding) {
                     raFile.write(renderSynset(synset).getBytes());
@@ -277,7 +339,9 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                 }
                 raFile.writeBytes("\n");
             }
-            log.log(MessageLogLevel.INFO, "PRINCETON_INFO_009", makeFilename());
+            if (log.isInfoEnabled()) {
+                log.info(JWNL.resolveMessage("PRINCETON_INFO_009", getFilename()));
+            }
 
         } else if (DictionaryFileType.INDEX.equals(getFileType())) {
             ArrayList<String> indexes = new ArrayList<String>();
@@ -285,49 +349,107 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
             Iterator<IndexWord> ii = dictionary.getIndexWordIterator(getPOS());
             long maxOffset = 0;
             while (ii.hasNext()) {
-                for (Synset synset : ii.next().getSenses()) {
+                IndexWord indexWord = ii.next();
+                for (Synset synset : indexWord.getSenses()) {
                     if (maxOffset < synset.getOffset()) {
                         maxOffset = synset.getOffset();
                     }
                 }
             }
             decimalFormatString = createOffsetFormatString(maxOffset);
-            dfOff =  new DecimalFormat(decimalFormatString);
+            dfOff = new DecimalFormat(decimalFormatString);
 
-            log.log(MessageLogLevel.INFO, "PRINCETON_INFO_011", makeFilename());
+            if (log.isInfoEnabled()) {
+                log.info(JWNL.resolveMessage("PRINCETON_INFO_011", getFilename()));
+            }
             ii = dictionary.getIndexWordIterator(getPOS());
             while (ii.hasNext()) {
                 indexes.add(renderIndexWord(ii.next()));
             }
 
-            log.log(MessageLogLevel.INFO, "PRINCETON_INFO_005", indexes.size());
+            if (log.isInfoEnabled()) {
+                log.info(JWNL.resolveMessage("PRINCETON_INFO_005", indexes.size()));
+            }
             Collections.sort(indexes);
 
             seek(0);
-            writeStrings(indexes);
+            if (writePrincetonHeader) {
+                raFile.writeBytes(PRINCETON_HEADER);
+            }
+            writeIndexStrings(indexes);
         }
-        log.log(MessageLogLevel.INFO, "PRINCETON_INFO_012", makeFilename());
+        if (log.isInfoEnabled()) {
+            log.info(JWNL.resolveMessage("PRINCETON_INFO_012", getFilename()));
+        }
+    }
+
+    @Override
+    public void writeLine(String line) throws IOException {
+        if (null == encoding) {
+            raFile.write(line.getBytes());
+        } else {
+            raFile.write(line.getBytes(encoding));
+        }
+        raFile.writeBytes("\n");
+
     }
 
     public void writeStrings(Collection<String> strings) throws IOException {
-        log.log(MessageLogLevel.INFO, "PRINCETON_INFO_008", makeFilename());
+        if (log.isInfoEnabled()) {
+            log.info(JWNL.resolveMessage("PRINCETON_INFO_008", getFilename()));
+        }
         long counter = 0;
         long total = strings.size();
         long reportInt = (total / 20) + 1;//i.e. report every 5%
         for (String s : strings) {
             counter++;
             if (0 == (counter % reportInt)) {
-                log.log(MessageLogLevel.INFO, "PRINCETON_INFO_014", 100 * counter / total);
+                if (log.isInfoEnabled()) {
+                    log.info(JWNL.resolveMessage("PRINCETON_INFO_014", 100 * counter / total));
+                }
             }
-            if (null == encoding) {
-                raFile.write(s.getBytes());
-            } else {
-                raFile.write(s.getBytes(encoding));
-            }
-            raFile.writeBytes("\n");
+            writeLine(s);
         }
-        log.log(MessageLogLevel.INFO, "PRINCETON_INFO_013", makeFilename());
+        if (log.isInfoEnabled()) {
+            log.info(JWNL.resolveMessage("PRINCETON_INFO_013", getFilename()));
+        }
     }
+
+    public void writeIndexStrings(ArrayList<String> strings) throws IOException {
+        if (log.isInfoEnabled()) {
+            log.info(JWNL.resolveMessage("PRINCETON_INFO_008", getFilename()));
+        }
+        long counter = 0;
+        long total = strings.size();
+        long reportInt = (total / 20) + 1;//i.e. report every 5%
+        //see makedb.c FixLastRecord
+        /* Funky routine to pad the second to the last record of the
+           index file to be longer than the last record so the binary
+           search in the search code works properly. */
+        for (int i = 0; i < strings.size() - 2; i++) {
+            counter++;
+            if (0 == (counter % reportInt)) {
+                if (log.isInfoEnabled()) {
+                    log.info(JWNL.resolveMessage("PRINCETON_INFO_014", 100 * counter / total));
+                }
+            }
+            writeLine(strings.get(i));
+        }
+        String nextToLast = strings.get(strings.size() - 2);
+        String last = strings.get(strings.size() - 1);
+        while (nextToLast.length() <= last.length()) {
+            nextToLast = nextToLast + " ";
+        }
+        writeLine(nextToLast);
+        writeLine(last);
+        if (log.isInfoEnabled()) {
+            log.info(JWNL.resolveMessage("PRINCETON_INFO_014", 100));
+        }
+        if (log.isInfoEnabled()) {
+            log.info(JWNL.resolveMessage("PRINCETON_INFO_013", getFilename()));
+        }
+    }
+
 
     @Override
     public String getOffsetFormatString() {
@@ -349,14 +471,25 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
         return formatString.toString();
     }
 
-    private String renderSynset(Synset synset)  {
+    private String renderSynset(Synset synset) {
         //synset_offset  lex_filenum  ss_type  w_cnt  word  lex_id  [word  lex_id...]  p_cnt  [ptr...]  [frames...]  |   gloss
         //w_cnt Two digit hexadecimal integer indicating the number of words in the synset.
-        StringBuilder result = new StringBuilder(String.format("%s %02d %s %02x ", dfOff.format(synset.getOffset()), synset.getLexFileNum(), synset.getPOS().getKey(), synset.getWords().size()));
+        String posKey = synset.getPOS().getKey();
+        if (synset.isAdjectiveCluster()) {
+            posKey = POS.ADJECTIVE_SATELLITE.getKey();
+        }
+        StringBuilder result = new StringBuilder(String.format("%s %02d %s %02x ", dfOff.format(synset.getOffset()), synset.getLexFileNum(), posKey, synset.getWords().size()));
         for (Word w : synset.getWords()) {
             //ASCII form of a word as entered in the synset by the lexicographer, with spaces replaced by underscore characters (_ ). The text of the word is case sensitive.
             //lex_id One digit hexadecimal integer that, when appended onto lemma , uniquely identifies a sense within a lexicographer file.
-            result.append(String.format("%s %x ", w.getLemma().replace(' ', '_'), w.getLexId()));
+            String lemma = w.getLemma().replace(' ', '_');
+            if (w instanceof Adjective) {
+                Adjective a = (Adjective) w;
+                if (!Adjective.NONE.equals(a.getAdjectivePosition())) {
+                    lemma = lemma + "(" + a.getAdjectivePosition().getKey() + ")";
+                }
+            }
+            result.append(String.format("%s %x ", lemma, w.getLexId()));
         }
         //Three digit decimal integer indicating the number of pointers from this synset to other synsets. If p_cnt is 000 the synset has no pointers.
         result.append(String.format("%03d ", synset.getPointers().size()));
@@ -379,6 +512,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
             // Word numbers are assigned to the word fields in a synset, from left to right, beginning with 1 .
             result.append(String.format("%02x%02x ", p.getSourceIndex(), p.getTargetIndex()));
         }
+
         //frames In data.verb only
         if (POS.VERB.equals(synset.getPOS())) {
             BitSet verbFrames = synset.getVerbFrameFlags();
@@ -387,6 +521,11 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                 if (word instanceof Verb) {
                     BitSet bits = ((Verb) word).getVerbFrameFlags();
                     for (int i = bits.nextSetBit(0); i >= 0; i = bits.nextSetBit(i + 1)) {
+                        //WN TRICK - there are duplicates in data
+                        //02593551 41 v 04 lord_it_over 0 queen_it_over 0 put_on_airs 0 act_superior 0 001 @ 02367363 v 0000
+                        // 09 + 02 00 + 02 04 + 22 04 + 02 03 + 22 03 + 08 02 + 09 02 + 08 01 + 09 01 | act like the master of; "He is lording it over the students"
+                        // + 02 04 and + 02 03 duplicate + 02 00
+                        // it is the only one, but it causes offsets to differ on WN30 rewrite
                         if (!verbFrames.get(i)) {
                             verbFramesCount++;
                         }
@@ -414,22 +553,38 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
         return result.toString();
     }
 
-    private String renderIndexWord(IndexWord indexWord)  {
+    private String renderIndexWord(IndexWord indexWord) {
         //lemma  pos  synset_cnt  p_cnt  [ptr_symbol...]  sense_cnt  tagsense_cnt   synset_offset  [synset_offset...]
         StringBuilder result = new StringBuilder(indexWord.getLemma().replace(' ', '_'));
         result.append(" ");
         result.append(indexWord.getPOS().getKey()).append(" ");//pos
         result.append(Integer.toString(indexWord.getSenses().size())).append(" ");//synset_cnt
-        Set<PointerType> pointerTypes = new HashSet<PointerType>();
+        ArrayList<PointerType> pointerTypes = new ArrayList<PointerType>();
+        //find all the pointers that come from this word
         for (Synset synset : indexWord.getSenses()) {
             for (Pointer pointer : synset.getPointers()) {
-                pointerTypes.add(pointer.getType());
+                if (pointer.isLexical() && !indexWord.getLemma().equals(((Word) pointer.getSource()).getLemma().toLowerCase())) {
+                    continue;
+                }
+                //WN TRICK
+                //see makedb.c line 370
+                PointerType pt = pointer.getType();
+                char c = pointer.getType().getKey().charAt(0);
+                if (';' == c || '-' == c || '@' == c || '~' == c) {
+                    pt = PointerType.getPointerTypeForKey(Character.toString(c));
+                }
+                if (!pointerTypes.contains(pt)) {
+                    pointerTypes.add(pt);
+                }
             }
         }
+
+        Collections.sort(pointerTypes);
         result.append(Integer.toString(pointerTypes.size())).append(" ");//p_cnt
-        for (PointerType pt : pointerTypes) {
-            result.append(pt.getKey()).append(" ");
+        for (PointerType pointerType : pointerTypes) {
+            result.append(pointerType.getKey()).append(" ");
         }
+
         result.append(Integer.toString(indexWord.getSenses().size())).append(" ");//sense_cnt
 
         //sort senses and find out tagged sense count
@@ -446,7 +601,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
 
     private String renderException(Exc exc) {
         StringBuilder result = new StringBuilder();
-        result.append(exc.getLemma());
+        result.append(exc.getLemma().replace(' ', '_'));
         for (String e : exc.getExceptions()) {
             result.append(" ").append(e.replace(' ', '_'));
         }

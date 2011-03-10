@@ -14,7 +14,7 @@ import java.util.Map;
  * file will be associated with both a POS and a file type (e.g. in the windows
  * naming scheme, the verb index file is called "verb.idx").
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public abstract class AbstractDictionaryFile implements DictionaryFile {
@@ -42,7 +42,7 @@ public abstract class AbstractDictionaryFile implements DictionaryFile {
         this(dictionary, params);
         this.pos = pos;
         this.fileType = fileType;
-        file = new File(path, makeFilename());
+        file = new File(path, getFilename());
     }
 
     /**
@@ -50,7 +50,7 @@ public abstract class AbstractDictionaryFile implements DictionaryFile {
      *
      * @return a filename from the part-of-speech and the file type
      */
-    protected abstract String makeFilename();
+    protected abstract String getFilename();
 
     /**
      * Opens the <var>file</var>.

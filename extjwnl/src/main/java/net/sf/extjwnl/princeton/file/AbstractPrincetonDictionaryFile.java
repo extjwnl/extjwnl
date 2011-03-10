@@ -16,7 +16,7 @@ import java.util.Map;
  * WINDOWS: <noun, verb, adj, adv>.<idx, dat, exc>
  * MAC, UNIX: <index, data>.<noun, verb, adj, adv>, <noun, verb, adj, adv>.exc
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public abstract class AbstractPrincetonDictionaryFile extends AbstractDictionaryFile {
@@ -49,7 +49,7 @@ public abstract class AbstractPrincetonDictionaryFile extends AbstractDictionary
         super(dictionary, path, pos, fileType, params);
     }
 
-    protected String makeFilename() {
+    protected String getFilename() {
         if (null != getPOS()) {
             String posString = getExtension(getPOS());
             if (getFileType() == DictionaryFileType.EXCEPTION || (JWNL.getOS().equals(JWNL.WINDOWS) && getDictionary().getVersion().getNumber() < 2.1)) {

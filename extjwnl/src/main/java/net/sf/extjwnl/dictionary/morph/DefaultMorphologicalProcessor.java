@@ -22,7 +22,7 @@ import java.util.Map;
  * of complex stemming rules. It also tries to be intelligent by removing delimiters and
  * doing concatenation.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class DefaultMorphologicalProcessor implements MorphologicalProcessor {

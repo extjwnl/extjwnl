@@ -12,17 +12,17 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Base class for element factories.
+ * Base class for database element factories.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
-public abstract class AbstractPrincetonDatabaseDictionaryElementFactory implements DatabaseDictionaryElementFactory {
+public abstract class AbstractPrincetonDatabaseDictionaryElementFactory extends AbstractPrincetonDictionaryElementFactory implements DatabaseDictionaryElementFactory {
 
     protected Dictionary dictionary;
 
     public AbstractPrincetonDatabaseDictionaryElementFactory(Dictionary dictionary) {
-        this.dictionary = dictionary;
+        super(dictionary);
     }
 
     public IndexWord createIndexWord(POS pos, String lemma, ResultSet rs) throws SQLException, JWNLException {
@@ -87,14 +87,6 @@ public abstract class AbstractPrincetonDatabaseDictionaryElementFactory implemen
             synset.setVerbFrameFlags(vFrames);
         }
         return synset;
-    }
-
-    protected Word createWord(Synset synset, int index, String lemma) {
-        if (synset.getPOS().equals(POS.VERB)) {
-            return new MutableVerb(dictionary, synset, index, lemma);
-        } else {
-            return new Word(dictionary, synset, index, lemma);
-        }
     }
 
     public Exc createExc(POS pos, String derivation, ResultSet rs) throws SQLException, JWNLException {

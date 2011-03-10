@@ -7,9 +7,9 @@ import net.sf.extjwnl.dictionary.Dictionary;
 import java.util.Map;
 
 /**
- * Lookups up index words.
+ * Looks up index words.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class LookupIndexWordOperation extends AbstractOperation {

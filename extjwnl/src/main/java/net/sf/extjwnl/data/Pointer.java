@@ -2,8 +2,8 @@ package net.sf.extjwnl.data;
 
 import net.sf.extjwnl.JWNL;
 import net.sf.extjwnl.JWNLException;
-import net.sf.extjwnl.util.MessageLog;
-import net.sf.extjwnl.util.MessageLogLevel;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -15,13 +15,14 @@ import java.io.Serializable;
  * Relationships are <it>typed</it>: the type of a relationship is a {@link PointerType}, and can
  * be retrieved via {@link Pointer#getType getType}.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class Pointer implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
-    private static final MessageLog log = new MessageLog(Pointer.class);
+    private static final Log log = LogFactory.getLog(Pointer.class);
 
     private PointerType pointerType;
 
@@ -97,7 +98,9 @@ public class Pointer implements Serializable {
                 target = (targetIndex.index == 0) ? syn : syn.getWords().get(targetIndex.index - 1);
             }
         } catch (JWNLException e) {
-            log.log(MessageLogLevel.ERROR, "EXCEPTION_001", e.getMessage(), e);
+            if (log.isErrorEnabled()) {
+                log.error(JWNL.resolveMessage("EXCEPTION_001", e.getMessage()), e);
+            }
         }
         return target;
     }

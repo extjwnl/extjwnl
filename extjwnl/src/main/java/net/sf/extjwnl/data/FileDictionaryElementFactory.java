@@ -8,7 +8,7 @@ import net.sf.extjwnl.util.factory.Owned;
  * and <code>IndexWord</code>s). Using a factory class rather than individual parsing methods in each class
  * facilitates using multiple versions of WordNet, or using a proprietary data format.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public interface FileDictionaryElementFactory extends Owned {

@@ -1,5 +1,6 @@
 package net.sf.extjwnl.dictionary.file_manager;
 
+import net.sf.extjwnl.JWNL;
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.JWNLRuntimeException;
 import net.sf.extjwnl.data.IndexWord;
@@ -8,10 +9,10 @@ import net.sf.extjwnl.data.Synset;
 import net.sf.extjwnl.data.Word;
 import net.sf.extjwnl.dictionary.Dictionary;
 import net.sf.extjwnl.dictionary.file.*;
-import net.sf.extjwnl.util.MessageLog;
-import net.sf.extjwnl.util.MessageLogLevel;
 import net.sf.extjwnl.util.TokenizerParser;
 import net.sf.extjwnl.util.factory.Param;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -23,12 +24,12 @@ import java.util.*;
  * in order to eliminate the redundant IO activity that a naive implementation of these methods
  * would necessitate.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class FileManagerImpl implements FileManager {
 
-    private static final MessageLog log = new MessageLog(DictionaryCatalogSet.class);
+    private static final Log log = LogFactory.getLog(DictionaryCatalogSet.class);
 
     private Dictionary dictionary;
 
@@ -37,7 +38,7 @@ public class FileManagerImpl implements FileManager {
     private RandomAccessDictionaryFile senseIndex;
 
     private static final String CACHE_USE_COUNT_KEY = "cache_use_count";
-    private boolean cacheUseCount = true;
+    private boolean cacheUseCount = false;
 
     private Map<String, Integer> useCountCache = new HashMap<String, Integer>();
     /**
@@ -100,7 +101,9 @@ public class FileManagerImpl implements FileManager {
     }
 
     private void cacheUseCounts() throws IOException {
-        log.log(MessageLogLevel.INFO, "PRINCETON_INFO_018");
+        if (log.isInfoEnabled()) {
+            log.info(JWNL.resolveMessage("PRINCETON_INFO_018"));
+        }
         String line = revCntList.readLine();
         while (null != line && !"".equals(line)) {
             //sense_key  sense_number  tag_cnt
@@ -111,7 +114,9 @@ public class FileManagerImpl implements FileManager {
             useCountCache.put(senseKey, useCnt);
             line = revCntList.readLine();
         }
-        log.log(MessageLogLevel.INFO, "PRINCETON_INFO_019");
+        if (log.isInfoEnabled()) {
+            log.info(JWNL.resolveMessage("PRINCETON_INFO_019"));
+        }
     }
 
     public void close() {
@@ -309,60 +314,96 @@ public class FileManagerImpl implements FileManager {
         files.save();
 
         {
-            log.log(MessageLogLevel.INFO, "PRINCETON_INFO_008", revCntList.getFile().getName());
+            if (log.isInfoEnabled()) {
+                log.info(JWNL.resolveMessage("PRINCETON_INFO_004", revCntList.getFile().getName()));
+            }
             //cntlist.rev
-            Set<String> revCntListContent = new TreeSet<String>();
+            ArrayList<Word> toRender = new ArrayList<Word>();
+            Set<String> renderedKeys = new HashSet<String>();
             for (POS pos : POS.getAllPOS()) {
                 Iterator<IndexWord> ii = dictionary.getIndexWordIterator(pos);
                 while (ii.hasNext()) {
                     IndexWord iw = ii.next();
                     for (int i = 0; i < iw.getSenses().size(); i++) {
                         for (Word w : iw.getSenses().get(i).getWords()) {
-                            if (0 < w.getUseCount()) {
-                                revCntListContent.add(w.getSenseKey() + " " + Integer.toString(i) + " " + w.getUseCount());
+                            String key = w.getSenseKeyWithAdjClass();
+                            if (0 < w.getUseCount() && !renderedKeys.contains(key)) {
+                                renderedKeys.add(key);
                             }
                         }
                     }
                 }
             }
+
+            //sort by key
+            Collections.sort(toRender, new Comparator<Word>() {
+                @Override
+                public int compare(Word o1, Word o2) {
+                    return o1.getSenseKeyWithAdjClass().compareTo(o2.getSenseKeyWithAdjClass());
+                }
+            });
 
             revCntList.seek(0);
-            revCntList.writeStrings(revCntListContent);
-            log.log(MessageLogLevel.INFO, "PRINCETON_INFO_013", revCntList.getFile().getName());
-        }
-
-        {
-            log.log(MessageLogLevel.INFO, "PRINCETON_INFO_008", cntList.getFile().getName());
-            //cntlist.rev
-            Map<Integer, String> cntListMap = new HashMap<Integer, String>();
-            List<Integer> useCounts = new ArrayList<Integer>();
-            for (POS pos : POS.getAllPOS()) {
-                Iterator<IndexWord> ii = dictionary.getIndexWordIterator(pos);
-                while (ii.hasNext()) {
-                    IndexWord iw = ii.next();
-                    for (int i = 0; i < iw.getSenses().size(); i++) {
-                        for (Word w : iw.getSenses().get(i).getWords()) {
-                            String value = w.getSenseKey() + " " + Integer.toString(i);
-                            if (0 < w.getUseCount() && !cntListMap.containsValue(value)) {
-                                cntListMap.put(w.getUseCount(), value);
-                                useCounts.add(w.getUseCount());
-                            }
-                        }
+            if (log.isInfoEnabled()) {
+                log.info(JWNL.resolveMessage("PRINCETON_INFO_008", revCntList.getFile().getName()));
+            }
+            long counter = 0;
+            long total = toRender.size();
+            long reportInt = (total / 20) + 1;//i.e. report every 5%
+            for (Word word : toRender) {
+                counter++;
+                if (0 == (counter % reportInt)) {
+                    if (log.isInfoEnabled()) {
+                        log.info(JWNL.resolveMessage("PRINCETON_INFO_014", 100 * counter / total));
                     }
                 }
+                revCntList.writeLine(word.getSenseKeyWithAdjClass() + " " + word.getIndex() + " " + word.getUseCount());
             }
-            List<String> cntListContent = new ArrayList<String>();
-            Collections.sort(useCounts, Collections.<Integer>reverseOrder());
-            for (Integer i : useCounts) {
-                cntListContent.add(Integer.toString(i) + " " + cntListMap.get(i));
+            if (log.isInfoEnabled()) {
+                log.info(JWNL.resolveMessage("PRINCETON_INFO_013", revCntList.getFile().getName()));
             }
+            if (log.isInfoEnabled()) {
+                log.info(JWNL.resolveMessage("PRINCETON_INFO_012", revCntList.getFile().getName()));
+            }
+
+
+            //sort by count
+            Collections.sort(toRender, new Comparator<Word>() {
+                @Override
+                public int compare(Word o1, Word o2) {
+                    return o1.getUseCount() - o2.getUseCount();
+                }
+            });
+
             cntList.seek(0);
-            cntList.writeStrings(cntListContent);
-            log.log(MessageLogLevel.INFO, "PRINCETON_INFO_013", cntList.getFile().getName());
+            if (log.isInfoEnabled()) {
+                log.info(JWNL.resolveMessage("PRINCETON_INFO_008", cntList.getFile().getName()));
+            }
+            counter = 0;
+            total = toRender.size();
+            reportInt = (total / 20) + 1;//i.e. report every 5%
+            for (Word word : toRender) {
+                counter++;
+                if (0 == (counter % reportInt)) {
+                    if (log.isInfoEnabled()) {
+                        log.info(JWNL.resolveMessage("PRINCETON_INFO_014", 100 * counter / total));
+                    }
+                }
+                cntList.writeLine(word.getUseCount() + " " + word.getSenseKeyWithAdjClass() + " " + word.getIndex());
+            }
+            if (log.isInfoEnabled()) {
+                log.info(JWNL.resolveMessage("PRINCETON_INFO_013", cntList.getFile().getName()));
+            }
+            if (log.isInfoEnabled()) {
+                log.info(JWNL.resolveMessage("PRINCETON_INFO_012", cntList.getFile().getName()));
+            }
+
         }
 
 
         {
+            //sense index
+
             //find the largest offset over all POS
             String decimalFormatString = "00000000";
             for (POS pos : POS.getAllPOS()) {
@@ -374,7 +415,9 @@ public class FileManagerImpl implements FileManager {
                 }
             }
             DecimalFormat dfOff = new DecimalFormat(decimalFormatString);
-            log.log(MessageLogLevel.INFO, "PRINCETON_INFO_008", senseIndex.getFile().getName());
+            if (log.isInfoEnabled()) {
+                log.info(JWNL.resolveMessage("PRINCETON_INFO_004", senseIndex.getFile().getName()));
+            }
             Set<String> senseIndexContent = new TreeSet<String>();
             for (POS pos : POS.getAllPOS()) {
                 Iterator<IndexWord> ii = dictionary.getIndexWordIterator(pos);
@@ -383,8 +426,10 @@ public class FileManagerImpl implements FileManager {
                     for (int i = 0; i < iw.getSenses().size(); i++) {
                         Synset synset = iw.getSenses().get(i);
                         for (Word w : synset.getWords()) {
-                            //sense_key  synset_offset  sense_number  tag_cnt
-                            senseIndexContent.add(w.getSenseKey() + " " + dfOff.format(synset.getOffset()) + " " + Integer.toString(i) + " " + w.getUseCount());
+                            if (w.getLemma().equalsIgnoreCase(iw.getLemma())) {
+                                //sense_key  synset_offset  sense_number  tag_cnt
+                                senseIndexContent.add(w.getSenseKey() + " " + dfOff.format(synset.getOffset()) + " " + Integer.toString(i + 1) + " " + w.getUseCount());
+                            }
                         }
                     }
                 }
@@ -392,7 +437,9 @@ public class FileManagerImpl implements FileManager {
 
             senseIndex.seek(0);
             senseIndex.writeStrings(senseIndexContent);
-            log.log(MessageLogLevel.INFO, "PRINCETON_INFO_013", senseIndex.getFile().getName());
+            if (log.isInfoEnabled()) {
+                log.info(JWNL.resolveMessage("PRINCETON_INFO_012", senseIndex.getFile().getName()));
+            }
         }
     }
 

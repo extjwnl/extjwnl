@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Param with name and value.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class NameValueParam extends AbstractValueParam {

@@ -1,13 +1,14 @@
 package net.sf.extjwnl.dictionary;
 
+import net.sf.extjwnl.JWNL;
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.JWNLRuntimeException;
 import net.sf.extjwnl.data.*;
 import net.sf.extjwnl.dictionary.file.DictionaryFileType;
 import net.sf.extjwnl.dictionary.file_manager.FileManager;
-import net.sf.extjwnl.util.MessageLog;
-import net.sf.extjwnl.util.MessageLogLevel;
 import net.sf.extjwnl.util.factory.Param;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 
 import java.io.IOException;
@@ -18,12 +19,12 @@ import java.util.NoSuchElementException;
  * A <code>Dictionary</code> that retrieves objects from the text files
  * in the WordNet distribution directory.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class FileBackedDictionary extends AbstractCachingDictionary {
 
-    private static final MessageLog log = new MessageLog(FileBackedDictionary.class);
+    private static final Log log = LogFactory.getLog(FileBackedDictionary.class);
     /**
      * Morphological processor class install parameter. The value should be the
      * class of MorphologicalProcessor to use.
@@ -119,10 +120,6 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
         return fileManager;
     }
 
-    public FileDictionaryElementFactory getDictionaryElementFactory() {
-        return factory;
-    }
-
     public Iterator<IndexWord> getIndexWordIterator(final POS pos) throws JWNLException {
         if (!isEditable()) {
             return new IndexFileLookaheadIterator(pos);
@@ -210,7 +207,7 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
                 }
                 synset = factory.createSynset(pos, line);
                 for (Word w : synset.getWords()) {
-                    w.setUseCount(fileManager.getUseCount(w.getSenseKey()));
+                    w.setUseCount(fileManager.getUseCount(w.getSenseKeyWithAdjClass()));
                 }
 
                 cacheSynset(key, synset);
@@ -296,7 +293,9 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
                 nextOffset = fileManager.getFirstLinePointer(pos, fileType);
                 nextLine();
             } catch (IOException ex) {
-                log.log(MessageLogLevel.WARN, "DICTIONARY_EXCEPTION_007", new Object[]{this.pos, this.fileType});
+                if (log.isWarnEnabled()) {
+                    log.warn(JWNL.resolveMessage("DICTIONARY_EXCEPTION_007", new Object[]{this.pos, this.fileType}));
+                }
             }
         }
 
@@ -339,7 +338,9 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
                     return;
                 }
             } catch (Exception e) {
-                log.log(MessageLogLevel.ERROR, "EXCEPTION_001", e.getMessage(), e);
+                if (log.isErrorEnabled()) {
+                    log.error(JWNL.resolveMessage("EXCEPTION_001", e.getMessage()), e);
+                }
             }
             more = false;
         }
@@ -398,13 +399,12 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
         if (!isCachingEnabled()) {
             throw new JWNLException("DICTIONARY_EXCEPTION_030");
         }
-        cacheAll();
+        super.edit();
         try {
             fileManager.edit();
         } catch (IOException e) {
             throw new JWNLException("EXCEPTION_001", e.getMessage(), e);
         }
-        super.edit();
     }
 
     @Override

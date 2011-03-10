@@ -5,8 +5,8 @@ import net.sf.extjwnl.data.*;
 import net.sf.extjwnl.dictionary.AbstractCachingDictionary;
 import net.sf.extjwnl.dictionary.Dictionary;
 import net.sf.extjwnl.dictionary.database.ConnectionManager;
-import net.sf.extjwnl.util.MessageLog;
-import net.sf.extjwnl.util.MessageLogLevel;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -25,7 +25,7 @@ import java.util.*;
  */
 public class DictionaryToDatabase {
 
-    private static final MessageLog log = new MessageLog(DictionaryToDatabase.class);
+    private static final Log log = LogFactory.getLog(DictionaryToDatabase.class);
 
     protected static int INTERNAL_ID = 0;
     protected static long TIME = 0L;
@@ -88,7 +88,7 @@ public class DictionaryToDatabase {
 
     protected static synchronized int nextId() {
         INTERNAL_ID++;
-        if (log.isLevelEnabled(MessageLogLevel.DEBUG) && INTERNAL_ID % 1000 == 0) {
+        if (log.isDebugEnabled() && INTERNAL_ID % 1000 == 0) {
             long temp = System.currentTimeMillis();
             System.out.println("inserted " + INTERNAL_ID + "th entry");
             System.out.println("free memory: " + Runtime.getRuntime().freeMemory());

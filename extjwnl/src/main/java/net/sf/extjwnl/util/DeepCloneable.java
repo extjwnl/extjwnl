@@ -6,7 +6,7 @@ package net.sf.extjwnl.util;
  * members as the original) or deeply (by creating a copy of the object
  * and of all it's member objects).
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public interface DeepCloneable extends Cloneable {

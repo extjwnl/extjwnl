@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Instances of this class specify the different types of dictionary files (the different classes of dictionary files.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class DictionaryFileType {

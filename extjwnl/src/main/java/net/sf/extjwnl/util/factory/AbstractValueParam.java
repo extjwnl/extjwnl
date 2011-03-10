@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * Base class for configuration parameters.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public abstract class AbstractValueParam implements Param {

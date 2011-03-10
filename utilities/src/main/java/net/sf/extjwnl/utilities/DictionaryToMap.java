@@ -57,6 +57,7 @@ public class DictionaryToMap {
      */
     public void convert() throws JWNLException, IOException {
         destinationFiles.open();
+        destinationFiles.edit();
         boolean canClearCache = (dictionary instanceof AbstractCachingDictionary) && ((AbstractCachingDictionary) dictionary).isCachingEnabled();
         for (DictionaryFileType fileType : DictionaryFileType.getAllDictionaryFileTypes()) {
             for (POS pos : POS.getAllPOS()) {

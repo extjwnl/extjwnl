@@ -9,7 +9,7 @@ import java.io.InputStream;
  *
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
-public class TestCreateMapBackedDictionary extends TestCreateDictionary{
+public class TestCreateMapBackedDictionary extends TestCreateDictionary {
 
     protected static final String properties = "./src/main/config/clean_map.xml";
 

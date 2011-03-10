@@ -1,10 +1,9 @@
 package net.sf.extjwnl;
 
-
 /**
  * Base level exception used by JWNL. Tries to resolve the message using JWNL.resolveMessage.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  */
 public class JWNLException extends Exception {
     public JWNLException(String key) {

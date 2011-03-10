@@ -6,7 +6,7 @@ import java.util.Collection;
 /**
  * <code>DictionaryFile</code> that reads lines from a random-access text file.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public interface RandomAccessDictionaryFile extends DictionaryFile {
@@ -26,6 +26,14 @@ public interface RandomAccessDictionaryFile extends DictionaryFile {
      * @throws IOException IOException
      */
     String readLine() throws IOException;
+
+    /**
+     * Writes a line to the file.
+     *
+     * @param line a line to write
+     * @throws IOException IOException
+     */
+    void writeLine(String line) throws IOException;
 
     /**
      * Reads the first word from a file (ie offset, index word).

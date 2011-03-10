@@ -3,8 +3,8 @@ package net.sf.extjwnl.data;
 import net.sf.extjwnl.JWNL;
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.dictionary.Dictionary;
-import net.sf.extjwnl.util.MessageLog;
-import net.sf.extjwnl.util.MessageLogLevel;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
 import java.util.*;
@@ -13,14 +13,14 @@ import java.util.*;
  * An <code>IndexWord</code> represents a line of the <var>pos</var><code>.index</code> file.
  * An <code>IndexWord</code> is created or retrieved via {@link Dictionary#lookupIndexWord lookupIndexWord}.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class IndexWord extends BaseDictionaryElement {
 
     private static final long serialVersionUID = 1L;
 
-    private static final MessageLog log = new MessageLog(IndexWord.class);
+    private static final Log log = LogFactory.getLog(IndexWord.class);
 
     /**
      * This word's part-of-speech
@@ -187,7 +187,9 @@ public class IndexWord extends BaseDictionaryElement {
                     try {
                         dictionary.removeIndexWord(IndexWord.this);
                     } catch (JWNLException e) {
-                        log.log(MessageLogLevel.ERROR, "EXCEPTION_001", e.getMessage(), e);
+                        if (log.isErrorEnabled()) {
+                            log.error(JWNL.resolveMessage("EXCEPTION_001", e.getMessage()), e);
+                        }
                     }
                 }
                 return result;
@@ -208,7 +210,9 @@ public class IndexWord extends BaseDictionaryElement {
                     try {
                         dictionary.removeIndexWord(IndexWord.this);
                     } catch (JWNLException e) {
-                        log.log(MessageLogLevel.ERROR, "EXCEPTION_001", e.getMessage(), e);
+                        if (log.isErrorEnabled()) {
+                            log.error(JWNL.resolveMessage("EXCEPTION_001", e.getMessage()), e);
+                        }
                     }
                 }
                 return result;
@@ -327,7 +331,9 @@ public class IndexWord extends BaseDictionaryElement {
                     try {
                         dictionary.removeIndexWord(IndexWord.this);
                     } catch (JWNLException e) {
-                        log.log(MessageLogLevel.ERROR, "EXCEPTION_001", e.getMessage(), e);
+                        if (log.isErrorEnabled()) {
+                            log.error(JWNL.resolveMessage("EXCEPTION_001", e.getMessage()), e);
+                        }
                     }
                 }
                 return result;
@@ -352,7 +358,9 @@ public class IndexWord extends BaseDictionaryElement {
                     try {
                         dictionary.removeIndexWord(IndexWord.this);
                     } catch (JWNLException e) {
-                        log.log(MessageLogLevel.ERROR, "EXCEPTION_001", e.getMessage(), e);
+                        if (log.isErrorEnabled()) {
+                            log.error(JWNL.resolveMessage("EXCEPTION_001", e.getMessage()), e);
+                        }
                     }
                 }
                 return result;
@@ -394,7 +402,9 @@ public class IndexWord extends BaseDictionaryElement {
             try {
                 return null == dictionary ? null : dictionary.getSynsetAt(pos, offset);
             } catch (JWNLException e) {
-                log.log(MessageLogLevel.ERROR, "EXCEPTION_001", e.getMessage(), e);
+                if (log.isErrorEnabled()) {
+                    log.error(JWNL.resolveMessage("EXCEPTION_001", e.getMessage()), e);
+                }
             }
             return null;
         }
@@ -512,36 +522,45 @@ public class IndexWord extends BaseDictionaryElement {
      */
     public int sortSenses() {
         int result;
+
         //sort senses and find out tagged sense count
         List<Synset> ucSenses = new ArrayList<Synset>(getSenses().size());
         List<Synset> nonUCSenses = new ArrayList<Synset>(getSenses().size());
         for (Synset synset : getSenses()) {
-            if (0 < getMaxUseCount(synset)) {
+            if (0 < getUseCount(synset, lemma)) {
                 ucSenses.add(synset);
             } else {
                 nonUCSenses.add(synset);
             }
         }
-        Collections.sort(ucSenses, Collections.<Synset>reverseOrder(useCountComparator));
+        Collections.sort(ucSenses, Collections.<Synset>reverseOrder(new Comparator<Synset>() {
+            @Override
+            public int compare(Synset o1, Synset o2) {
+                return getUseCount(o1, lemma) - getUseCount(o2, lemma);
+            }
+        }));
 
         result = ucSenses.size();
 
         //other synsets seems to be sorted by decreasing offsets
         Collections.sort(nonUCSenses, Collections.<Synset>reverseOrder(synsetOffsetComparator));
 
+        //if ADJ, output cluster heads, then fans
+        if (POS.ADJECTIVE.equals(getPOS())) {
+            int i = 0;
+            while (i < nonUCSenses.size()) {
+                if (!nonUCSenses.get(i).isAdjectiveCluster()) {
+                    ucSenses.add(nonUCSenses.remove(i));
+                } else {
+                    i++;
+                }
+            }
+        }
         ucSenses.addAll(nonUCSenses);
-
         synsets.replaceSenses(ucSenses);
 
         return result;
     }
-
-    private static final Comparator<Synset> useCountComparator = new Comparator<Synset>() {
-        @Override
-        public int compare(Synset o1, Synset o2) {
-            return getMaxUseCount(o1) - getMaxUseCount(o2);
-        }
-    };
 
     private static final Comparator<Synset> synsetOffsetComparator = new Comparator<Synset>() {
         @Override
@@ -551,20 +570,30 @@ public class IndexWord extends BaseDictionaryElement {
                 //2 huge offsets might lead to integer overflow
                 return (int) (result / Math.abs(result));
             } else {
-                return 0;
+                if (POS.ADJECTIVE.equals(o1.getPOS()) && POS.ADJECTIVE.equals(o2.getPOS())) {
+                    if (o1.isAdjectiveCluster() && !o2.isAdjectiveCluster()) {
+                        return 1;
+                    } else if (o2.isAdjectiveCluster() && !o1.isAdjectiveCluster()) {
+                        return -1;
+                    } else {
+                        return 0;
+                    }
+                } else {
+                    return 0;
+                }
             }
         }
     };
 
-
-    private static int getMaxUseCount(Synset synset) {
-        int result = 0;
+    private static int getUseCount(Synset synset, String lemma) {
         for (Word w : synset.getWords()) {
-            if (result < w.getUseCount()) {
-                result = w.getUseCount();
+            if (w.getLemma().equalsIgnoreCase(lemma)) {
+                if (0 < w.getUseCount()) {
+                    return w.getUseCount();
+                }
             }
         }
-        return result;
+        return 0;
     }
 
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
@@ -574,7 +603,7 @@ public class IndexWord extends BaseDictionaryElement {
     }
 
     private void writeObject(java.io.ObjectOutputStream oos) throws IOException {
-        boolean synsetOffsetsNull = null == synsetOffsets;
+        boolean synsetOffsetsNull = (null == synsetOffsets);
         synsetOffsets = getSynsetOffsets();
         oos.defaultWriteObject();
         if (synsetOffsetsNull) {

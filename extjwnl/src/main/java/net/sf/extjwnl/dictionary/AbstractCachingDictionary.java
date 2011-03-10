@@ -1,12 +1,13 @@
 package net.sf.extjwnl.dictionary;
 
+import net.sf.extjwnl.JWNL;
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.JWNLRuntimeException;
 import net.sf.extjwnl.data.*;
-import net.sf.extjwnl.util.MessageLog;
-import net.sf.extjwnl.util.MessageLogLevel;
 import net.sf.extjwnl.util.cache.CacheSet;
 import net.sf.extjwnl.util.cache.LRUCacheSet;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 
 import java.util.Iterator;
@@ -15,12 +16,12 @@ import java.util.NoSuchElementException;
 /**
  * Extends <code>Dictionary</code> to provide caching of elements.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public abstract class AbstractCachingDictionary extends Dictionary {
 
-    private static final MessageLog log = new MessageLog(AbstractCachingDictionary.class);
+    private static final Log log = LogFactory.getLog(AbstractCachingDictionary.class);
 
     private CacheSet<DictionaryElementType, POSKey, DictionaryElement> caches;
     protected boolean isCachingEnabled;
@@ -226,8 +227,8 @@ public abstract class AbstractCachingDictionary extends Dictionary {
 
     @Override
     public void edit() throws JWNLException {
-        clearCache();
         setCacheCapacity(Integer.MAX_VALUE);
+        cacheAll();
         super.edit();
     }
 
@@ -274,49 +275,77 @@ public abstract class AbstractCachingDictionary extends Dictionary {
     }
 
     protected void cachePOS(POS pos) throws JWNLException {
-        log.log(MessageLogLevel.INFO, "DICTIONARY_INFO_003", pos.getLabel());
-        log.log(MessageLogLevel.INFO, "DICTIONARY_INFO_004");
-        int count = 0;
-        Iterator<IndexWord> ii = getIndexWordIterator(pos);
-        while (ii.hasNext()) {
-            if (count % 1000 == 0) {
-                log.log(MessageLogLevel.INFO, "DICTIONARY_INFO_005", count);
-            }
-            count++;
-            IndexWord iw = ii.next();
-            iw.getSenses();//resolve pointers
+        if (log.isInfoEnabled()) {
+            log.info(JWNL.resolveMessage("DICTIONARY_INFO_003", pos.getLabel()));
         }
-        log.log(MessageLogLevel.INFO, "DICTIONARY_INFO_006", count);
 
-        log.log(MessageLogLevel.INFO, "DICTIONARY_INFO_007");
-        count = 0;
-        Iterator<Exc> ei = getExceptionIterator(pos);
-        while (ei.hasNext()) {
-            if (count % 1000 == 0) {
-                log.log(MessageLogLevel.INFO, "DICTIONARY_INFO_005", count);
+        {
+            if (log.isInfoEnabled()) {
+                log.info(JWNL.resolveMessage("DICTIONARY_INFO_007"));
             }
-            count++;
-            ei.next();
+            int count = 0;
+            Iterator<Exc> ei = getExceptionIterator(pos);
+            while (ei.hasNext()) {
+                if (count % 1000 == 0) {
+                    if (log.isInfoEnabled()) {
+                        log.info(JWNL.resolveMessage("DICTIONARY_INFO_005", count));
+                    }
+                }
+                count++;
+                ei.next();
+            }
+            if (log.isInfoEnabled()) {
+                log.info(JWNL.resolveMessage("DICTIONARY_INFO_006", count));
+            }
         }
-        log.log(MessageLogLevel.INFO, "DICTIONARY_INFO_006", count);
 
-        log.log(MessageLogLevel.INFO, "DICTIONARY_INFO_008");
-        count = 0;
-        maxOffset.put(pos, 0L);
-        Iterator<Synset> si = getSynsetIterator(pos);
-        while (si.hasNext()) {
-            if (count % 1000 == 0) {
-                log.log(MessageLogLevel.INFO, "DICTIONARY_INFO_005", count);
+        {
+            if (log.isInfoEnabled()) {
+                log.info(JWNL.resolveMessage("DICTIONARY_INFO_008"));
             }
-            count++;
-            Synset s = si.next();
-            if (maxOffset.get(pos) < s.getOffset()) {
-                maxOffset.put(pos, s.getOffset());
+            int count = 0;
+            maxOffset.put(pos, 0L);
+            Iterator<Synset> si = getSynsetIterator(pos);
+            while (si.hasNext()) {
+                if (count % 1000 == 0) {
+                    if (log.isInfoEnabled()) {
+                        log.info(JWNL.resolveMessage("DICTIONARY_INFO_005", count));
+                    }
+                }
+                count++;
+                Synset s = si.next();
+                if (maxOffset.get(pos) < s.getOffset()) {
+                    maxOffset.put(pos, s.getOffset());
+                }
+                for (Pointer p : s.getPointers()) {
+                    p.getTarget();//resolve pointers
+                }
             }
-            for (Pointer p : s.getPointers()) {
-                p.getTarget();//resolve pointers
+            if (log.isInfoEnabled()) {
+                log.info(JWNL.resolveMessage("DICTIONARY_INFO_006", count));
+            }
+
+        }
+
+        {
+            if (log.isInfoEnabled()) {
+                log.info(JWNL.resolveMessage("DICTIONARY_INFO_004"));
+            }
+            int count = 0;
+            Iterator<IndexWord> ii = getIndexWordIterator(pos);
+            while (ii.hasNext()) {
+                if (count % 1000 == 0) {
+                    if (log.isInfoEnabled()) {
+                        log.info(JWNL.resolveMessage("DICTIONARY_INFO_005", count));
+                    }
+                }
+                count++;
+                IndexWord iw = ii.next();
+                iw.getSenses().iterator();//resolve pointers
+            }
+            if (log.isInfoEnabled()) {
+                log.info(JWNL.resolveMessage("DICTIONARY_INFO_006", count));
             }
         }
-        log.log(MessageLogLevel.INFO, "DICTIONARY_INFO_006", count);
     }
 }

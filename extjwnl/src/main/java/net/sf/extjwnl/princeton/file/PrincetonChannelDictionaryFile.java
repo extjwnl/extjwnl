@@ -18,7 +18,7 @@ import java.util.Map;
  * A <code>RandomAccessDictionaryFile</code> that accesses files named with Princeton's dictionary file naming convention.
  * Uses java.nio.channels.FileChannel for file access.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class PrincetonChannelDictionaryFile extends AbstractPrincetonRandomAccessDictionaryFile implements DictionaryFileFactory<PrincetonChannelDictionaryFile> {

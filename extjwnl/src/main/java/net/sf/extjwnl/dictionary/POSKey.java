@@ -8,7 +8,7 @@ import java.io.IOException;
 /**
  * A cache key consists of a <code>POS</code> and an object.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  */
 public class POSKey {
     private POS pos;

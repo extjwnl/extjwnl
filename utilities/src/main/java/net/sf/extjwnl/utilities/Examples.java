@@ -18,7 +18,7 @@ import java.io.FileInputStream;
 /**
  * A class to demonstrate the functionality of the JWNL package.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class Examples {

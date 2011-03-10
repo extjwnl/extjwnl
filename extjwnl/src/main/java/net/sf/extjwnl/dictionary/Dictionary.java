@@ -3,12 +3,12 @@ package net.sf.extjwnl.dictionary;
 import net.sf.extjwnl.JWNL;
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.data.*;
-import net.sf.extjwnl.util.MessageLog;
-import net.sf.extjwnl.util.MessageLogLevel;
 import net.sf.extjwnl.util.factory.NameValueParam;
 import net.sf.extjwnl.util.factory.Param;
 import net.sf.extjwnl.util.factory.ParamList;
 import net.sf.extjwnl.util.factory.ValueParam;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -26,12 +26,16 @@ import java.util.*;
  * Abstract representation of a WordNet dictionary.
  * See the architecture documentation for information on subclassing Dictionary.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public abstract class Dictionary {
 
-    private static final MessageLog log = new MessageLog(Dictionary.class);
+    static {
+        JWNL.initialize();
+    }
+
+    private static final Log log = LogFactory.getLog(Dictionary.class);
 
     // tag names
     private static final String VERSION_TAG = "version";
@@ -194,7 +198,9 @@ public abstract class Dictionary {
     }
 
     private static Dictionary setInstance(Dictionary dictionary) {
-        log.log(MessageLogLevel.INFO, "DICTIONARY_INFO_002", dictionary);
+        if (log.isInfoEnabled()) {
+            log.info(JWNL.resolveMessage("DICTIONARY_INFO_002", dictionary));
+        }
         Dictionary.dictionary = dictionary;
         return dictionary;
     }
@@ -444,29 +450,45 @@ public abstract class Dictionary {
         }
 
         if (!skipLexIdCheck) {
-            //lex ids
-            log.log(MessageLogLevel.INFO, "PRINCETON_INFO_015");
             //fixing word lex ids
             //lex ids should be unique within lex file name
             //lemma -> lex file num -> words
             HashMap<String, HashMap<Long, ArrayList<Word>>> lemmas = new HashMap<String, HashMap<Long, ArrayList<Word>>>();
             for (POS pos : POS.getAllPOS()) {
+                if (log.isInfoEnabled()) {
+                    log.info(JWNL.resolveMessage("PRINCETON_INFO_015", pos.getLabel()));
+                }
                 Iterator<Synset> si = getSynsetIterator(pos);
                 while (si.hasNext()) {
                     Synset s = si.next();
-                    for (Word w : s.getWords()) {
-                        final String lemma = w.getLemma().toLowerCase();//like in index file
-                        HashMap<Long, ArrayList<Word>> lexWords = lemmas.get(lemma);
-                        if (null == lexWords) {
-                            lexWords = new HashMap<Long, ArrayList<Word>>();
-                            lemmas.put(lemma, lexWords);
+                    //WN TRICK
+                    //skip adjective satellites, because in lexicographer files they come with head synset
+                    //and it seems the head synset makes them unique in lex files
+                    if (!s.isAdjectiveCluster()) {
+                        for (Word w : s.getWords()) {
+                            final String lemma = w.getLemma().toLowerCase();//like in index file
+                            HashMap<Long, ArrayList<Word>> lexWords = lemmas.get(lemma);
+                            if (null == lexWords) {
+                                lexWords = new HashMap<Long, ArrayList<Word>>();
+                                lemmas.put(lemma, lexWords);
+                            }
+                            boolean found = false;
+                            ArrayList<Word> words = lexWords.get(w.getSynset().getLexFileNum());
+                            if (null == words) {
+                                words = new ArrayList<Word>();
+                                lexWords.put(w.getSynset().getLexFileNum(), words);
+                            } else {
+                                for (Word ww : words) {
+                                    if (ww.getLemma().equalsIgnoreCase(lemma)) {
+                                        found = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (!found) {
+                                words.add(w);
+                            }
                         }
-                        ArrayList<Word> words = lexWords.get(w.getSynset().getLexFileNum());
-                        if (null == words) {
-                            words = new ArrayList<Word>();
-                            lexWords.put(w.getSynset().getLexFileNum(), words);
-                        }
-                        words.add(w);
                     }
                 }
                 long counter = 0;
@@ -475,7 +497,9 @@ public abstract class Dictionary {
                 for (HashMap<Long, ArrayList<Word>> lexWords : lemmas.values()) {
                     counter++;
                     if (0 == (counter % reportInt)) {
-                        log.log(MessageLogLevel.INFO, "PRINCETON_INFO_014", 100 * counter / total);
+                        if (log.isInfoEnabled()) {
+                            log.info(JWNL.resolveMessage("PRINCETON_INFO_014", 100 * counter / total));
+                        }
                     }
                     for (ArrayList<Word> words : lexWords.values()) {
                         long id = -1;//find max id
@@ -494,7 +518,9 @@ public abstract class Dictionary {
                         for (Word w : words) {
                             if (-1 == w.getLexId()) {
                                 if (lexIdWarn && (99 < id)) {//lex_id is a two digit decimal integer
-                                    log.log(MessageLogLevel.WARN, "PRINCETON_INFO_014", new Object[]{id, w});
+                                    if (log.isWarnEnabled()) {
+                                        log.warn(JWNL.resolveMessage("PRINCETON_INFO_014", new Object[]{id, w}));
+                                    }
                                 }
                                 w.setLexId(id);
                                 id++;
@@ -502,9 +528,10 @@ public abstract class Dictionary {
                         }
                     }
                 }
+                if (log.isInfoEnabled()) {
+                    log.info(JWNL.resolveMessage("PRINCETON_INFO_016", pos.getLabel()));
+                }
             }
-
-            log.log(MessageLogLevel.INFO, "PRINCETON_INFO_016");
         }
     }
 

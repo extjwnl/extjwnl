@@ -11,7 +11,7 @@ import java.io.IOException;
  * <code>FileManager</code> defines the interface between the <code>FileBackedDictionary</code> and the file system.
  * Methods in this interface operate on and return offsets, which are indices into a dictionary file.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public interface FileManager extends Owned {
@@ -85,6 +85,7 @@ public interface FileManager extends Owned {
 
     /**
      * Returns the number of times the sense marked by <var>senseKey</var> occurs in a semantic concordance.
+     *
      * @param senseKey sense key
      * @return the number of times the sense marked by <var>senseKey</var> occurs in a semantic concordance
      * @throws IOException IOException

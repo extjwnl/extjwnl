@@ -10,7 +10,7 @@ import java.util.*;
 /**
  * A list of <code>PointerTargetTreeNode</code>s.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  */
 public class PointerTargetTreeNodeList extends LinkedList<PointerTargetTreeNode> implements DeepCloneable {
 
@@ -95,6 +95,7 @@ public class PointerTargetTreeNodeList extends LinkedList<PointerTargetTreeNode>
      * Walks the list and performs the operation <code>opr</code> on each node.
      * Searches the list exhaustively and return a List containing all nodes
      * that are returned by <code>opr</code>.
+     *
      * @param opr operation
      * @return list of operation results
      */
@@ -106,7 +107,8 @@ public class PointerTargetTreeNodeList extends LinkedList<PointerTargetTreeNode>
 
     /**
      * Returns all matches and adds them to <var>matches</var>
-     * @param opr operation
+     *
+     * @param opr     operation
      * @param matches list of matches
      */
     public void getAllMatches(Operation opr, List<PointerTargetTreeNode> matches) {
@@ -127,6 +129,7 @@ public class PointerTargetTreeNodeList extends LinkedList<PointerTargetTreeNode>
      * Finds the first node in the list that is equal to <code>node</code>.
      * <code>node</code> is considered to match a node in the list
      * if they contain equal pointer targets and are of the same type.
+     *
      * @param node node to search for
      * @return the first node in the list that is equal to <code>node</code>
      */
@@ -137,6 +140,7 @@ public class PointerTargetTreeNodeList extends LinkedList<PointerTargetTreeNode>
 
     /**
      * Finds all occurrences of <code>node</code> within the list.
+     *
      * @param node node to search for
      * @return all occurrences of <code>node</code> within the list
      */

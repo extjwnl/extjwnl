@@ -14,7 +14,7 @@ import java.util.Random;
 /**
  * Database manager.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class DatabaseManagerImpl implements DatabaseManager {

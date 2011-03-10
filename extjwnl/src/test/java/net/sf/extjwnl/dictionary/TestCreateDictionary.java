@@ -2,7 +2,10 @@ package net.sf.extjwnl.dictionary;
 
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.data.*;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

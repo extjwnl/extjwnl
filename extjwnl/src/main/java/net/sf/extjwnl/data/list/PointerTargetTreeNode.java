@@ -15,7 +15,7 @@ import java.util.ListIterator;
  * may have a ancestry tree, and each node, besides having links to its children, has links to the
  * synonyms of its target.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class PointerTargetTreeNode extends PointerTargetNode {
@@ -144,18 +144,18 @@ public class PointerTargetTreeNode extends PointerTargetNode {
      * @return list of pointer targets
      */
     public List<PointerTargetNodeList> toList(PointerTargetNodeList list) {
-            list.add(getPointerTarget(), getType());
-            List<PointerTargetNodeList> l = new ArrayList<PointerTargetNodeList>();
-            if (hasValidChildTreeList()) {
-                PointerTargetTreeNodeList childTreeList = getChildTreeList();
-                ListIterator itr = childTreeList.listIterator();
-                while (itr.hasNext()) {
-                    l.addAll(((PointerTargetTreeNode) itr.next()).toList(list.clone()));
-                }
-            } else {
-                l.add(list);
+        list.add(getPointerTarget(), getType());
+        List<PointerTargetNodeList> l = new ArrayList<PointerTargetNodeList>();
+        if (hasValidChildTreeList()) {
+            PointerTargetTreeNodeList childTreeList = getChildTreeList();
+            ListIterator itr = childTreeList.listIterator();
+            while (itr.hasNext()) {
+                l.addAll(((PointerTargetTreeNode) itr.next()).toList(list.clone()));
             }
-            return l;
+        } else {
+            l.add(list);
+        }
+        return l;
     }
 
     public PointerTargetTreeNode clone() throws CloneNotSupportedException {

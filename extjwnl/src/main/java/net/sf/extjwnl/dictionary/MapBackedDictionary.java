@@ -1,11 +1,15 @@
 package net.sf.extjwnl.dictionary;
 
+import net.sf.extjwnl.JWNL;
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.data.*;
-import net.sf.extjwnl.dictionary.file.*;
-import net.sf.extjwnl.util.MessageLog;
-import net.sf.extjwnl.util.MessageLogLevel;
+import net.sf.extjwnl.dictionary.file.DictionaryCatalog;
+import net.sf.extjwnl.dictionary.file.DictionaryCatalogSet;
+import net.sf.extjwnl.dictionary.file.DictionaryFileType;
+import net.sf.extjwnl.dictionary.file.ObjectDictionaryFile;
 import net.sf.extjwnl.util.factory.Param;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 
 import java.io.IOException;
@@ -15,12 +19,12 @@ import java.util.*;
  * A <code>Dictionary</code> backed by <code>Map</code>s. Warning: this has huge memory requirements.
  * Make sure to start the interpreter with a large enough free memory pool to accommodate this.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class MapBackedDictionary extends Dictionary {
 
-    private static final MessageLog log = new MessageLog(MapBackedDictionary.class);
+    private static final Log log = LogFactory.getLog(MapBackedDictionary.class);
     /**
      * <code>MorphologicalProcessor</code> class install parameter. The value should be the
      * class of <code>MorphologicalProcessor</code> to use.
@@ -122,6 +126,7 @@ public class MapBackedDictionary extends Dictionary {
     @Override
     public void edit() throws JWNLException {
         try {
+            super.edit();
             files.edit();
 
             //update max offsets for new synset creation
@@ -137,8 +142,6 @@ public class MapBackedDictionary extends Dictionary {
                 }
                 maxOffset.put(pos, maxOff);
             }
-
-            super.edit();
         } catch (IOException e) {
             throw new JWNLException("EXCEPTION_001", e.getMessage(), e);
         }
@@ -270,18 +273,22 @@ public class MapBackedDictionary extends Dictionary {
             }
         }
         // Load all the hash tables into memory
-        log.log(MessageLogLevel.INFO, "DICTIONARY_INFO_009");
-        if (log.isLevelEnabled(MessageLogLevel.TRACE)) {
-            log.log(MessageLogLevel.TRACE, "DICTIONARY_INFO_010", Runtime.getRuntime().freeMemory());
+        if (log.isInfoEnabled()) {
+            log.info(JWNL.resolveMessage("DICTIONARY_INFO_009"));
+        }
+        if (log.isTraceEnabled()) {
+            log.trace(JWNL.resolveMessage("DICTIONARY_INFO_010", Runtime.getRuntime().freeMemory()));
         }
 
         for (DictionaryFileType fileType : DictionaryFileType.getAllDictionaryFileTypes()) {
             DictionaryCatalog<ObjectDictionaryFile> catalog = files.get(fileType);
             for (POS pos : POS.getAllPOS()) {
-                log.log(MessageLogLevel.INFO, "DICTIONARY_INFO_011", new Object[]{pos.getLabel(), fileType.getName()});
+                if (log.isInfoEnabled()) {
+                    log.info(JWNL.resolveMessage("DICTIONARY_INFO_011", new Object[]{pos.getLabel(), fileType.getName()}));
+                }
                 putTable(pos, fileType, loadDictFile(catalog.get(pos)));
-                if (log.isLevelEnabled(MessageLogLevel.TRACE)) {
-                    log.log(MessageLogLevel.TRACE, "DICTIONARY_INFO_012", Runtime.getRuntime().freeMemory());
+                if (log.isTraceEnabled()) {
+                    log.trace(JWNL.resolveMessage("DICTIONARY_INFO_012", Runtime.getRuntime().freeMemory()));
                 }
             }
         }

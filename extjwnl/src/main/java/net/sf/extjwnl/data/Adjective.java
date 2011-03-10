@@ -2,7 +2,6 @@ package net.sf.extjwnl.data;
 
 import net.sf.extjwnl.JWNL;
 import net.sf.extjwnl.dictionary.Dictionary;
-import net.sf.extjwnl.util.Resolvable;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -14,10 +13,14 @@ import java.util.Map;
  * <p/>
  * Note: Adjective positions are only supported through WordNet v1.5.
  *
- * @author John Didion <jdidion@users.sourceforge.net>
+ * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class Adjective extends Word {
+
+    static {
+        JWNL.initialize();
+    }
 
     private static final long serialVersionUID = 1L;
 
@@ -26,25 +29,14 @@ public class Adjective extends Word {
     private static final String AP_ATTRIBUTIVE_KEY = "a";
     private static final String AP_IMMEDIATE_POSTNOMINAL_KEY = "ip";
 
+    private static final Map<String, AdjectivePosition> KEY_TO_OBJECT_MAP = new HashMap<String, AdjectivePosition>();
+
     public static final AdjectivePosition NONE = new AdjectivePosition("NONE", NONE_KEY);
     public static final AdjectivePosition PREDICATIVE = new AdjectivePosition("AP_PREDICATIVE", AP_PREDICATIVE_KEY);
     public static final AdjectivePosition ATTRIBUTIVE = new AdjectivePosition("AP_ATTRIBUTIVE", AP_ATTRIBUTIVE_KEY);
     public static final AdjectivePosition IMMEDIATE_POSTNOMINAL = new AdjectivePosition("AP_IMMEDIATE_POSTNOMINAL", AP_IMMEDIATE_POSTNOMINAL_KEY);
 
     public static final AdjectivePosition[] ADJECTIVE_POSITIONS = {NONE, PREDICATIVE, ATTRIBUTIVE, IMMEDIATE_POSTNOMINAL};
-
-    private static final Map<String, AdjectivePosition> KEY_TO_OBJECT_MAP = new HashMap<String, AdjectivePosition>();
-
-    private static boolean initialized = false;
-
-    public static void initialize() {
-        if (!initialized) {
-            for (AdjectivePosition adjectivePosition : ADJECTIVE_POSITIONS) {
-                KEY_TO_OBJECT_MAP.put(adjectivePosition.getKey(), adjectivePosition);
-            }
-            initialized = true;
-        }
-    }
 
     public static AdjectivePosition getAdjectivePositionForKey(String key) {
         return KEY_TO_OBJECT_MAP.get(key);
@@ -73,11 +65,12 @@ public class Adjective extends Word {
      */
     public static final class AdjectivePosition implements Serializable {
         private String key;
-        private Resolvable label;
+        private transient String label;
 
         private AdjectivePosition(String label, String key) {
-            this.label = new Resolvable(label);
+            this.label = JWNL.resolveMessage(label);
             this.key = key;
+            KEY_TO_OBJECT_MAP.put(key, this);
         }
 
         public String getKey() {
@@ -85,7 +78,7 @@ public class Adjective extends Word {
         }
 
         public String getLabel() {
-            return label.toString();
+            return label;
         }
 
         public String toString() {
