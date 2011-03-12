@@ -579,11 +579,11 @@ public class PointerUtils {
     }
 
     /**
-     * Returns the synonyms for <code>synset</code>. This is meant for adjectives. Synonyms to
+     * Returns the synonyms for <var>synset</var>. This is meant for adjectives. Synonyms to
      * nouns and verbs are just their hypernyms.
      *
      * @param synset synset
-     * @return the synonyms for <code>synset</code>
+     * @return the synonyms for <var>synset</var>
      */
     public static PointerTargetNodeList getSynonyms(Synset synset) {
         return getPointerTargets(synset, PointerType.SIMILAR_TO);
@@ -598,6 +598,15 @@ public class PointerUtils {
      */
     public static PointerTargetTree getSynonymTree(Synset synset, int depth) {
         return new PointerTargetTree(synset, makePointerTargetTreeList(synset, PointerType.SIMILAR_TO, null, depth, false));
+    }
+
+    /**
+     * Returns the pertainyms for <var>synset</var>.
+     * @param synset synset
+     * @return the pertainyms for <var>synset</var>
+     */
+    public static PointerTargetNodeList getPertainyms(Synset synset) {
+        return getPointerTargets(synset, PointerType.PERTAINYM);
     }
 
     /**
