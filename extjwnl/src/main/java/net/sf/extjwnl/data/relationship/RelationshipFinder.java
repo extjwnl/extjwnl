@@ -156,9 +156,11 @@ public class RelationshipFinder {
             PointerTargetNodeList sourceNodes, PointerTargetNodeList targetNodes,
             PointerType type, Synset sourceSynset, Synset targetSynset) throws CloneNotSupportedException {
 
+        PointerTargetNode sourceRoot = sourceNodes.get(0);
+        PointerTargetNode targetRoot = targetNodes.get(0);
         // If the deepest ancestors of the words are not the same,
         // then there is no relationship between the words.
-        if (!sourceNodes.get(0).equals(targetNodes.get(0))) {
+        if (!sourceRoot.getSynset().equals(targetRoot.getSynset())) {
             return null;
         }
 
