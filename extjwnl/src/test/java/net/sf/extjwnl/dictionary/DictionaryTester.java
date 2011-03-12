@@ -176,4 +176,10 @@ public abstract class DictionaryTester {
 
         RelationshipList list = RelationshipFinder.findRelationships(sU, sB, PointerType.NOMINALIZATION);
     }
+
+    @Test
+    public void testRunningAway() throws JWNLException {
+        IndexWord iw = dictionary.lookupIndexWord(POS.VERB, "running-away");
+        Assert.assertNotNull(iw);
+    }
 }

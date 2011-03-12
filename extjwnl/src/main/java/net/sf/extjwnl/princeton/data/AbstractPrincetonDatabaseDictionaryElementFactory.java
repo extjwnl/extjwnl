@@ -99,6 +99,10 @@ public abstract class AbstractPrincetonDatabaseDictionaryElementFactory extends 
         while (rs.next()) {
             exceptions.add(rs.getString(1));
         }
-        return new Exc(dictionary, pos, derivation, exceptions);
+        if (0 < exceptions.size()) {
+            return new Exc(dictionary, pos, derivation, exceptions);
+        } else {
+            return null;
+        }
     }
 }
