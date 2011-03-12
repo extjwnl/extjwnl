@@ -783,9 +783,6 @@ public class Synset extends PointerTarget implements DictionaryElement {
      * @param lexFileNum - the lexicographer file name number
      */
     public void setLexFileNum(long lexFileNum) {
-        if (!LexFileIdFileNameMap.getMap().containsKey(lexFileNum)) {
-            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_051"));
-        }
         this.lexFileNum = lexFileNum;
     }
 
