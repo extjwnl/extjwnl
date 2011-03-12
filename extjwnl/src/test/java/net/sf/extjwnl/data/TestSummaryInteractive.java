@@ -18,7 +18,7 @@ public class TestSummaryInteractive {
     public static void main(String[] args) throws IOException, JWNLException {
         BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
 
-        Dictionary dic = Dictionary.getInstance(new FileInputStream("./src/main/config/file_properties.xml"));
+        Dictionary dic = Dictionary.getInstance(new FileInputStream("./src/main/resources/file_properties.xml"));
         System.err.flush();
         System.out.flush();
 

@@ -13,11 +13,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
@@ -74,6 +74,10 @@ public abstract class Dictionary {
 
     private boolean editable;
 
+    private static final String DEFAULT_FILE_DICTIONARY_PATH = "c:/program files/wordnet/3.0/dict";
+    private static final String DEFAULT_MAP_DICTIONARY_PATH = "./data/map";
+    private static final String DEFAULT_DB_DICTIONARY_PATH = "jdbc:mysql://localhost/jwnl?user=root";
+
     // stores max offset for each POS
     protected HashMap<POS, Long> maxOffset = new HashMap<POS, Long>(POS.getAllPOS().size());
 
@@ -128,43 +132,52 @@ public abstract class Dictionary {
         return dictionary;
     }
 
-    public static Dictionary createStaticInstance(InputStream propertiesStream) throws JWNLException {
-        return setInstance(getInstance(propertiesStream));
-    }
-
     /**
      * Parses a properties file and creates a dictionary.
      *
-     * @param propertiesStream the properties file stream
+     * @param properties the properties file stream
      * @return dictionary
      * @throws JWNLException various JWNL exceptions, depending on where this fails
      */
-    public static Dictionary getInstance(InputStream propertiesStream) throws JWNLException {
+    public static Dictionary getInstance(InputStream properties) throws JWNLException {
         try {
             // find the properties file
-            if (propertiesStream == null || propertiesStream.available() <= 0) {
+            if (properties == null || properties.available() <= 0) {
                 throw new JWNLException("JWNL_EXCEPTION_001");
             }
         } catch (IOException e) {
             throw new JWNLException("JWNL_EXCEPTION_001", e);
         }
 
+        Dictionary result = getInstance(new InputSource(properties));
+
+        // do this in a separate try/catch since parse can also throw an IOException
+        try {
+            properties.close();
+        } catch (IOException e) {
+            //hush it
+        }
+
+        return result;
+    }
+
+    /**
+     * Parses properties and creates a dictionary.
+     *
+     * @param properties input source with properties
+     * @return dictionary
+     * @throws JWNLException various JWNL exceptions, depending on where this fails
+     */
+    public static Dictionary getInstance(InputSource properties) throws JWNLException {
         // parse the properties file
         Document doc;
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             factory.setValidating(false);
             DocumentBuilder docBuilder = factory.newDocumentBuilder();
-            doc = docBuilder.parse(propertiesStream);
+            doc = docBuilder.parse(properties);
         } catch (Exception e) {
             throw new JWNLException("JWNL_EXCEPTION_002", e);
-        }
-
-        // do this in a separate try/catch since parse can also throw an IOException
-        try {
-            propertiesStream.close();
-        } catch (IOException e) {
-            //hush it
         }
 
         org.w3c.dom.Element root = doc.getDocumentElement();
@@ -196,7 +209,58 @@ public abstract class Dictionary {
         return dictionary;
     }
 
-    private static Dictionary setInstance(Dictionary dictionary) {
+    /**
+     * Returns FileBackedDictionary instance with default configuration.
+     *
+     * @param dictionaryPath dictionary path
+     * @return FileBackedDictionary instance with default configuration
+     * @throws JWNLException JWNLException
+     */
+    public static Dictionary getFileBackedInstance(String dictionaryPath) throws JWNLException {
+        try {
+            String properties = getTextFromStream(JWNL.class.getResourceAsStream("file_properties.xml"));
+            properties = properties.replace(DEFAULT_FILE_DICTIONARY_PATH, dictionaryPath);
+            return getInstance(new InputSource(new StringReader(properties)));
+        } catch (IOException e) {
+            throw new JWNLException("IO error opening properties file", e);
+        }
+    }
+
+    /**
+     * Returns MapBackedDictionary instance with default configuration.
+     *
+     * @param dictionaryPath dictionary path
+     * @return MapBackedDictionary instance with default configuration
+     * @throws JWNLException JWNLException
+     */
+    public static Dictionary getMapBackedInstance(String dictionaryPath) throws JWNLException {
+        try {
+            String properties = getTextFromStream(JWNL.class.getResourceAsStream("map_properties.xml"));
+            properties = properties.replace(DEFAULT_MAP_DICTIONARY_PATH, dictionaryPath);
+            return getInstance(new InputSource(new StringReader(properties)));
+        } catch (IOException e) {
+            throw new JWNLException("IO error opening properties file", e);
+        }
+    }
+
+    /**
+     * Returns DatabaseBackedDictionary instance with default configuration.
+     *
+     * @param dbURL database url
+     * @return DatabaseBackedDictionary instance with default configuration
+     * @throws JWNLException JWNLException
+     */
+    public static Dictionary getDatabaseBackedInstance(String dbURL) throws JWNLException {
+        try {
+            String properties = getTextFromStream(JWNL.class.getResourceAsStream("database_properties.xml"));
+            properties = properties.replace(DEFAULT_DB_DICTIONARY_PATH, dbURL);
+            return getInstance(new InputSource(new StringReader(properties)));
+        } catch (IOException e) {
+            throw new JWNLException("IO error opening properties file", e);
+        }
+    }
+
+    public static Dictionary setInstance(Dictionary dictionary) {
         if (log.isInfoEnabled()) {
             log.info(JWNL.resolveMessage("DICTIONARY_INFO_002", dictionary));
         }
@@ -798,5 +862,21 @@ public abstract class Dictionary {
         long result = maxOffset.get(pos) + 1;
         maxOffset.put(pos, result);
         return result;
+    }
+
+    private static String getTextFromStream(InputStream inputStream) throws IOException {
+        BufferedReader fileCheck;
+        fileCheck = new BufferedReader(new InputStreamReader(inputStream));
+        StringBuilder fileText = new StringBuilder();
+        String line;
+        while (null != (line = fileCheck.readLine())) {
+            fileText.append(line).append("\n");
+        }
+        try {
+            fileCheck.close();
+        } catch (IOException e) {
+            // doesn't matter.
+        }
+        return fileText.toString();
     }
 }
