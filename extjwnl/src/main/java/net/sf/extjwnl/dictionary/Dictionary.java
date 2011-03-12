@@ -53,10 +53,10 @@ public abstract class Dictionary {
     private static final String NUMBER_ATTRIBUTE = "number";
 
     /**
-     * Whether to check and fix lexicographer ids, default false.
+     * Whether to check and fix lexicographer ids, default true.
      */
     public static final String CHECK_LEX_IDS_KEY = "check_lex_ids";
-    private boolean checkLexIds = false;
+    private boolean checkLexIds = true;
 
     /**
      * The singleton instance of the dictionary to be used throughout the system.
