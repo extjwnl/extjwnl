@@ -121,7 +121,7 @@ public abstract class DictionaryTester {
         IndexWord iwU = dictionary.getIndexWord(POS.ADJECTIVE, "ugly");
         Assert.assertNotNull(iwU);
         Assert.assertTrue(1 < iwU.getSenses().size());
-        for (Synset synset: iwU.getSenses()) {
+        for (Synset synset : iwU.getSenses()) {
             Assert.assertEquals(0, synset.getLexFileNum());
             Assert.assertEquals("adj.all", synset.getLexFileName());
         }
@@ -181,5 +181,11 @@ public abstract class DictionaryTester {
     public void testRunningAway() throws JWNLException {
         IndexWord iw = dictionary.lookupIndexWord(POS.VERB, "running-away");
         Assert.assertNotNull(iw);
+    }
+
+    @Test
+    public void testFairSenseKey() throws JWNLException {
+        Synset synset = getSynsetBySenseKey(POS.ADJECTIVE, "fair", "fair%5:00:00:feminine:01");
+        Assert.assertNotNull(synset);
     }
 }
