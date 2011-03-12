@@ -128,22 +128,27 @@ public abstract class DictionaryTester {
     }
 
     private Synset getSynsetBySenseKey(POS pos, String lemma, String senseKey) throws JWNLException {
+        return getWordBySenseKey(pos, lemma, senseKey).getSynset();
+    }
+
+    private Word getWordBySenseKey(POS pos, String lemma, String senseKey) throws JWNLException {
         IndexWord iwB = dictionary.getIndexWord(pos, lemma);
         Assert.assertNotNull(iwB);
         Assert.assertTrue(0 < iwB.getSenses().size());
-        Synset sB = null;
+        Word result = null;
         searchB:
         for (Synset synset : iwB.getSenses()) {
             for (Word word : synset.getWords()) {
                 if (senseKey.equals(word.getSenseKey())) {
-                    sB = synset;
+                    result = word;
                     break searchB;
                 }
             }
         }
-        Assert.assertNotNull(sB);
-        return sB;
+        Assert.assertNotNull(result);
+        return result;
     }
+
 
     @Test
     public void testAntonym() throws JWNLException, CloneNotSupportedException {
@@ -201,5 +206,19 @@ public abstract class DictionaryTester {
         Assert.assertTrue(0 < iws.size());
         word = dictionary.lookupIndexWord(POS.ADJECTIVE, "online");
         Assert.assertNotNull(word);
+    }
+
+    @Test
+    public void testVerbFrames() throws JWNLException {
+        Synset synset = getSynsetBySenseKey(POS.VERB, "complete", "complete%2:30:02::");
+        Assert.assertNotNull(synset);
+        Assert.assertEquals(2, synset.getVerbFrameFlags().cardinality());
+        Assert.assertTrue(synset.getVerbFrameFlags().get(2));
+        Assert.assertTrue(synset.getVerbFrameFlags().get(33));
+        Word w = getWordBySenseKey(POS.VERB, "complete", "complete%2:30:02::");
+        Assert.assertTrue(w instanceof Verb);
+        Verb v = (Verb) w;
+        Assert.assertTrue(v.getVerbFrameFlags().get(8));
+        Assert.assertTrue(v.getVerbFrameFlags().get(11));
     }
 }
