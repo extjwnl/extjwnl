@@ -25,6 +25,17 @@ import java.util.*;
  * A <code>RandomAccessDictionaryFile</code> that accesses files
  * named with Princeton's dictionary file naming convention.
  *
+ * Accepts parameters:
+ *
+ * <code>write_princeton_header</code>: whether to add standard princeton header to files on save, default: false.
+ * <code>check_lex_file_number</code>: whether to warn about lex file numbers correctness, default: true
+ * <code>check_relation_limit</code>: whether to warn about relation count being off limits, default: true
+ * <code>check_offset_limit</code>: whether to warn about offsets being off limits, default: true
+ * <code>check_word_count_limit</code>: whether to warn about word count being off limits, default: true
+ * <code>check_lex_id_limit</code>: whether to warn about lex id being off limits, default: true
+ * <code>check_pointer_index_limit</code>: whether to warn about pointer target indices being off limits, default: true
+ * <code>check_verb_frame_limit</code>: whether to warn about verb frame indices being off limits, default: true
+ *
  * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
@@ -65,6 +76,27 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
     private static final String WRITE_PRINCETON_HEADER_KEY = "write_princeton_header";
     private boolean writePrincetonHeader = false;
 
+    private static final String CHECK_LEX_FILE_NUMBER_KEY = "check_lex_file_number";
+    private boolean checkLexFileNumber = true;
+
+    private static final String CHECK_RELATION_LIMIT_KEY = "check_relation_limit";
+    private boolean checkRelationLimit = true;
+
+    private static final String CHECK_OFFSET_LIMIT_KEY = "check_offset_limit";
+    private boolean checkOffsetLimit = true;
+
+    private static final String CHECK_WORD_COUNT_LIMIT_KEY = "check_word_count_limit";
+    private boolean checkWordCountLimit = true;
+
+    private static final String CHECK_LEX_ID_LIMIT_KEY = "check_lex_id_limit";
+    private boolean checkLexIdLimit = true;
+
+    private static final String CHECK_POINTER_INDEX_LIMIT_KEY = "check_pointer_index_limit";
+    private boolean checkPointerIndexLimit = true;
+
+    private static final String CHECK_VERB_FRAME_LIMIT_KEY = "check_verb_frame_limit";
+    private boolean checkVerbFrameLimit = true;
+
     /**
      * Read-only file permission.
      */
@@ -99,6 +131,27 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
         }
         if (params.containsKey(WRITE_PRINCETON_HEADER_KEY)) {
             writePrincetonHeader = Boolean.parseBoolean(params.get(WRITE_PRINCETON_HEADER_KEY).getValue());
+        }
+        if (params.containsKey(CHECK_LEX_FILE_NUMBER_KEY)) {
+            checkLexFileNumber = Boolean.parseBoolean(params.get(CHECK_LEX_FILE_NUMBER_KEY).getValue());
+        }
+        if (params.containsKey(CHECK_RELATION_LIMIT_KEY)) {
+            checkRelationLimit = Boolean.parseBoolean(params.get(CHECK_RELATION_LIMIT_KEY).getValue());
+        }
+        if (params.containsKey(CHECK_OFFSET_LIMIT_KEY)) {
+            checkOffsetLimit = Boolean.parseBoolean(params.get(CHECK_OFFSET_LIMIT_KEY).getValue());
+        }
+        if (params.containsKey(CHECK_WORD_COUNT_LIMIT_KEY)) {
+            checkWordCountLimit = Boolean.parseBoolean(params.get(CHECK_WORD_COUNT_LIMIT_KEY).getValue());
+        }
+        if (params.containsKey(CHECK_LEX_ID_LIMIT_KEY)) {
+            checkLexIdLimit = Boolean.parseBoolean(params.get(CHECK_LEX_ID_LIMIT_KEY).getValue());
+        }
+        if (params.containsKey(CHECK_POINTER_INDEX_LIMIT_KEY)) {
+            checkPointerIndexLimit = Boolean.parseBoolean(params.get(CHECK_POINTER_INDEX_LIMIT_KEY).getValue());
+        }
+        if (params.containsKey(CHECK_VERB_FRAME_LIMIT_KEY)) {
+            checkVerbFrameLimit = Boolean.parseBoolean(params.get(CHECK_VERB_FRAME_LIMIT_KEY).getValue());
         }
     }
 
@@ -296,6 +349,9 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
             long offset = 0;
             if (writePrincetonHeader) {
                 offset = offset + PRINCETON_HEADER.length();
+                if (checkOffsetLimit && log.isWarnEnabled() && (99999999 < offset)) {
+                    log.warn(JWNL.resolveMessage("PRINCETON_WARN_003", offset));
+                }
             }
             for (Synset s : synsets) {
                 s.setOffset(offset);
@@ -480,6 +536,12 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
         if (synset.isAdjectiveCluster()) {
             posKey = POS.ADJECTIVE_SATELLITE.getKey();
         }
+        if (checkLexFileNumber && log.isWarnEnabled() && !LexFileIdFileNameMap.getMap().containsKey(synset.getLexFileNum())) {
+            log.warn(JWNL.resolveMessage("PRINCETON_WARN_001", synset.getLexFileNum()));
+        }
+        if (checkWordCountLimit && log.isWarnEnabled() && (0xFF < synset.getWords().size())) {
+            log.warn(JWNL.resolveMessage("PRINCETON_WARN_004", new Object[]{synset.getOffset(), synset.getWords().size()}));
+        }
         StringBuilder result = new StringBuilder(String.format("%s %02d %s %02x ", dfOff.format(synset.getOffset()), synset.getLexFileNum(), posKey, synset.getWords().size()));
         for (Word w : synset.getWords()) {
             //ASCII form of a word as entered in the synset by the lexicographer, with spaces replaced by underscore characters (_ ). The text of the word is case sensitive.
@@ -491,9 +553,15 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                     lemma = lemma + "(" + a.getAdjectivePosition().getKey() + ")";
                 }
             }
+            if (checkLexIdLimit && log.isWarnEnabled() && (0xF < w.getLexId())) {
+                log.warn(JWNL.resolveMessage("PRINCETON_WARN_005", new Object[]{synset.getOffset(), w.getLemma(), w.getLexId()}));
+            }
             result.append(String.format("%s %x ", lemma, w.getLexId()));
         }
         //Three digit decimal integer indicating the number of pointers from this synset to other synsets. If p_cnt is 000 the synset has no pointers.
+        if (checkRelationLimit && log.isWarnEnabled() && (999 < synset.getPointers().size())) {
+            log.warn(JWNL.resolveMessage("PRINCETON_WARN_002", new Object[]{synset.getOffset(), synset.getPointers().size()}));
+        }
         result.append(String.format("%03d ", synset.getPointers().size()));
         for (Pointer p : synset.getPointers()) {
             //pointer_symbol  synset_offset  pos  source/target
@@ -512,6 +580,12 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
             //A lexical relation between two words in different synsets is represented by non-zero values in the source and target word numbers.
             // The first and last two bytes of this field indicate the word numbers in the source and target synsets, respectively, between which the relation holds.
             // Word numbers are assigned to the word fields in a synset, from left to right, beginning with 1 .
+            if (checkPointerIndexLimit && log.isWarnEnabled() && (0xFF < p.getSourceIndex())) {
+                log.warn(JWNL.resolveMessage("PRINCETON_WARN_006", new Object[]{synset.getOffset(), p.getSource().getSynset().getOffset(), p.getSourceIndex()}));
+            }
+            if (checkPointerIndexLimit && log.isWarnEnabled() && (0xFF < p.getTargetIndex())) {
+                log.warn(JWNL.resolveMessage("PRINCETON_WARN_006", new Object[]{synset.getOffset(), p.getTarget().getSynset().getOffset(), p.getTargetIndex()}));
+            }
             result.append(String.format("%02x%02x ", p.getSourceIndex(), p.getTargetIndex()));
         }
 
@@ -534,8 +608,14 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                     }
                 }
             }
+            if (checkVerbFrameLimit && log.isWarnEnabled() && (99 < verbFramesCount)) {
+                log.warn(JWNL.resolveMessage("PRINCETON_WARN_007", new Object[]{synset.getOffset(), verbFramesCount}));
+            }
             result.append(String.format("%02d ", verbFramesCount));
             for (int i = verbFrames.nextSetBit(0); i >= 0; i = verbFrames.nextSetBit(i + 1)) {
+                if (checkVerbFrameLimit && log.isWarnEnabled() && (99 < i)) {
+                    log.warn(JWNL.resolveMessage("PRINCETON_WARN_008", new Object[]{synset.getOffset(), i}));
+                }
                 result.append(String.format("+ %02d 00 ", i));
             }
             for (Word word : synset.getWords()) {
@@ -543,6 +623,9 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                     BitSet bits = ((Verb) word).getVerbFrameFlags();
                     for (int i = bits.nextSetBit(0); i >= 0; i = bits.nextSetBit(i + 1)) {
                         if (!verbFrames.get(i)) {
+                            if (checkVerbFrameLimit && log.isWarnEnabled() && (0xFF < word.getIndex())) {
+                                log.warn(JWNL.resolveMessage("PRINCETON_WARN_008", new Object[]{synset.getOffset(), word.getIndex()}));
+                            }
                             result.append(String.format("+ %02d %02x ", i, word.getIndex()));
                         }
                     }
