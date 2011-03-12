@@ -2,8 +2,6 @@ package net.sf.extjwnl.data;
 
 import net.sf.extjwnl.data.list.*;
 
-import java.util.ArrayList;
-
 /**
  * This class contains static methods for performing various pointer operations. A pointer from one synset/word to
  * another connotes a relationship between those words. The type of the relationship is specified by the type
@@ -602,6 +600,7 @@ public class PointerUtils {
 
     /**
      * Returns the pertainyms for <var>synset</var>.
+     *
      * @param synset synset
      * @return the pertainyms for <var>synset</var>
      */
@@ -745,8 +744,7 @@ public class PointerUtils {
                                                                       PointerType labelType, int depth,
                                                                       boolean allowRedundancies) {
         PointerTargetTreeNodeList treeList = new PointerTargetTreeNodeList();
-        for (Object aList : list) {
-            PointerTargetNode node = (PointerTargetNode) aList;
+        for (PointerTargetNode node : list) {
             treeList.add(node.getPointerTarget(),
                     makePointerTargetTreeList(node.getSynset(), searchTypes, labelType, depth, allowRedundancies),
                     labelType);
@@ -754,37 +752,29 @@ public class PointerUtils {
         return treeList;
     }
 
-    //AA: to control cycles in sense-clustered wordnets by Rion Snow
-    private static ArrayList<Synset> makePointerTargetTreeListStack = new ArrayList<Synset>();
-
     private static PointerTargetTreeNodeList makePointerTargetTreeList(Synset synset, PointerType[] searchTypes,
                                                                        PointerType labelType, int depth,
                                                                        boolean allowRedundancies,
                                                                        PointerTargetTreeNode parent) {
         depth--;
         PointerTargetTreeNodeList list = new PointerTargetTreeNodeList();
-        if (!makePointerTargetTreeListStack.contains(synset)) {
-            makePointerTargetTreeListStack.add(0, synset);
-            for (PointerType type : searchTypes) {
-                PointerTargetNodeList targets = new PointerTargetNodeList(synset.getTargets(type), type);
-                if (targets.size() > 0) {
-                    for (Object target : targets) {
-                        PointerTargetNode ptr = (PointerTargetNode) target;
-                        ptr.getSynset();
-                        PointerTargetTreeNode node =
-                                new PointerTargetTreeNode(ptr.getPointerTarget(),
-                                        labelType == null ? type : labelType, parent);
-                        if (allowRedundancies || !list.contains(node)) {
-                            if (depth != 0) {
-                                node.setChildTreeList(makePointerTargetTreeList(node.getSynset(), searchTypes, labelType,
-                                        depth, allowRedundancies, node));
-                            }
-                            list.add(node);
+        for (PointerType type : searchTypes) {
+            PointerTargetNodeList targets = new PointerTargetNodeList(synset.getTargets(type), type);
+            if (targets.size() > 0) {
+                for (PointerTargetNode ptr : targets) {
+                    ptr.getSynset();
+                    PointerTargetTreeNode node =
+                            new PointerTargetTreeNode(ptr.getPointerTarget(),
+                                    labelType == null ? type : labelType, parent);
+                    if (allowRedundancies || !list.contains(node)) {
+                        if (depth != 0) {
+                            node.setChildTreeList(makePointerTargetTreeList(node.getSynset(), searchTypes, labelType,
+                                    depth, allowRedundancies, node));
                         }
+                        list.add(node);
                     }
                 }
             }
-            makePointerTargetTreeListStack.remove(0);
         }
         return list;
     }
@@ -922,8 +912,7 @@ public class PointerUtils {
         ancestorDepth--;
         PointerTargetTreeNodeList inherited = new PointerTargetTreeNodeList();
         if (null != list) {//AA: cycle with "period"...
-            for (Object aList : list) {
-                PointerTargetTreeNode node = (PointerTargetTreeNode) aList;
+            for (PointerTargetTreeNode node : list) {
                 if (allowRedundancies || !inherited.contains(node)) {
                     if (ancestorDepth == 0) {
                         inherited.add(node.getPointerTarget(),
