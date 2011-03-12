@@ -2,6 +2,8 @@ package net.sf.extjwnl.dictionary;
 
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.data.*;
+import net.sf.extjwnl.data.relationship.RelationshipFinder;
+import net.sf.extjwnl.data.relationship.RelationshipList;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -110,5 +112,25 @@ public abstract class DictionaryTester {
         List<Synset> senses = index.getSenses();
         Assert.assertTrue(2 < senses.size());
         PointerUtils.getHypernymTree(senses.get(2));
+    }
+
+    @Test
+    public void testAntonym() throws JWNLException, CloneNotSupportedException {
+        IndexWord iwB = dictionary.getIndexWord(POS.ADJECTIVE, "beautiful");
+        Assert.assertNotNull(iwB);
+        Assert.assertTrue(1 < iwB.getSenses().size());
+        Synset sB = iwB.getSenses().get(0);
+
+        IndexWord iwU = dictionary.getIndexWord(POS.ADJECTIVE, "ugly");
+        Assert.assertNotNull(iwU);
+        Assert.assertTrue(1 < iwU.getSenses().size());
+        Synset sU = iwU.getSenses().get(0);
+
+        RelationshipList list = RelationshipFinder.findRelationships(sB, sU, PointerType.ANTONYM);
+        Assert.assertNotNull(list);
+        Assert.assertTrue(0 < list.size());
+        Assert.assertEquals(PointerType.ANTONYM, list.get(0).getType());
+        Assert.assertEquals(sB, list.get(0).getSourceSynset());
+        Assert.assertEquals(sU, list.get(0).getTargetSynset());
     }
 }
