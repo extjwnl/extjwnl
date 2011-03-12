@@ -75,18 +75,18 @@ public class Exc extends BaseDictionaryElement {
     }
 
     /**
-     * Returns the lemma of the exception word.
+     * Returns the lemma (derivation) of the exception word.
      *
-     * @return the lemma of the exception word
+     * @return the lemma (derivation) of the exception word
      */
     public String getLemma() {
         return lemma;
     }
 
     /**
-     * Returns list of exceptions.
+     * Returns list of exceptions (base forms).
      *
-     * @return list of exceptions
+     * @return list of exceptions (base forms)
      */
     public List<String> getExceptions() {
         return exceptions;

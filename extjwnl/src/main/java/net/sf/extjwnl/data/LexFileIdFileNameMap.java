@@ -16,56 +16,57 @@ public class LexFileIdFileNameMap implements Map<Long, String> {
     private static Map<Long, String> lexFileIdLexFileName;
 
     static {
-        List<String> names = new ArrayList<String>();
-        names.add("adj.all");
-        names.add("adj.pert");
-        names.add("adv.all");
-        names.add("noun.Tops");
-        names.add("noun.act");
-        names.add("noun.animal");
-        names.add("noun.artifact");
-        names.add("noun.attribute");
-        names.add("noun.body");
-        names.add("noun.cognition");
-        names.add("noun.communication");
-        names.add("noun.event");
-        names.add("noun.feeling");
-        names.add("noun.food");
-        names.add("noun.group");
-        names.add("noun.location");
-        names.add("noun.motive");
-        names.add("noun.object");
-        names.add("noun.person");
-        names.add("noun.phenomenon");
-        names.add("noun.plant");
-        names.add("noun.possession");
-        names.add("noun.process");
-        names.add("noun.quantity");
-        names.add("noun.relation");
-        names.add("noun.shape");
-        names.add("noun.state");
-        names.add("noun.substance");
-        names.add("noun.time");
-        names.add("verb.body");
-        names.add("verb.change");
-        names.add("verb.cognition");
-        names.add("verb.communication");
-        names.add("verb.competition");
-        names.add("verb.consumption");
-        names.add("verb.contact");
-        names.add("verb.creation");
-        names.add("verb.emotion");
-        names.add("verb.motion");
-        names.add("verb.perception");
-        names.add("verb.possession");
-        names.add("verb.social");
-        names.add("verb.stative");
-        names.add("verb.weather");
-        names.add("adj.ppl");
+        String[] names = {
+                "adj.all",
+                "adj.pert",
+                "adv.all",
+                "noun.Tops",
+                "noun.act",
+                "noun.animal",
+                "noun.artifact",
+                "noun.attribute",
+                "noun.body",
+                "noun.cognition",
+                "noun.communication",
+                "noun.event",
+                "noun.feeling",
+                "noun.food",
+                "noun.group",
+                "noun.location",
+                "noun.motive",
+                "noun.object",
+                "noun.person",
+                "noun.phenomenon",
+                "noun.plant",
+                "noun.possession",
+                "noun.process",
+                "noun.quantity",
+                "noun.relation",
+                "noun.shape",
+                "noun.state",
+                "noun.substance",
+                "noun.time",
+                "verb.body",
+                "verb.change",
+                "verb.cognition",
+                "verb.communication",
+                "verb.competition",
+                "verb.consumption",
+                "verb.contact",
+                "verb.creation",
+                "verb.emotion",
+                "verb.motion",
+                "verb.perception",
+                "verb.possession",
+                "verb.social",
+                "verb.stative",
+                "verb.weather",
+                "adj.ppl"
+        };
 
         lexFileIdLexFileName = new HashMap<Long, String>();
-        for (int i = 0; i < names.size(); i++) {
-            lexFileIdLexFileName.put((long) i, names.get(i));
+        for (int i = 0; i < names.length; i++) {
+            lexFileIdLexFileName.put((long) i, names[i]);
         }
         lexFileIdLexFileName = Collections.unmodifiableMap(lexFileIdLexFileName);
     }

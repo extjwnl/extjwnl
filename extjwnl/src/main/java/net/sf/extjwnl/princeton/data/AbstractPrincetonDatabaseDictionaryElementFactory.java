@@ -51,11 +51,15 @@ public abstract class AbstractPrincetonDatabaseDictionaryElementFactory extends 
             String gloss = synsets.getString(2);
             synset.setGloss(gloss);
 
+            long lexFileNum = synsets.getLong(3);
+            synset.setLexFileNum(lexFileNum);
+
             while (words.next()) {
                 String lemma = words.getString(1);
                 int index = words.getInt(2);
                 Word word = createWord(synset, index, lemma);
                 word.setUseCount(words.getInt(3));
+                word.setLexId(words.getLong(4));
                 synset.getWords().add(word);
             }
 

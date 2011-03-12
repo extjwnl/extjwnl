@@ -47,10 +47,10 @@ public class DatabaseManagerImpl implements DatabaseManager {
             "SELECT lemma FROM IndexWord WHERE pos = ? AND lemma LIKE ?";
 
     protected static final String SYNSET_SQL =
-            "SELECT is_adj_cluster, gloss FROM Synset WHERE pos = ? AND file_offset = ?";
+            "SELECT is_adj_cluster, gloss, lex_file_num FROM Synset WHERE pos = ? AND file_offset = ?";
 
     protected static final String SYNSET_WORD_SQL =
-            "SELECT sw.word, sw.word_index, sw.usage_cnt " +
+            "SELECT sw.word, sw.word_index, sw.usage_cnt, sw.lex_id " +
                     "FROM Synset s, SynsetWord sw " +
                     "WHERE s.synset_id = sw.synset_id AND s.pos = ? AND s.file_offset = ?";
 
@@ -68,10 +68,10 @@ public class DatabaseManagerImpl implements DatabaseManager {
             "SELECT offset FROM Synset WHERE pos = ?";
 
     protected static final String EXCEPTION_SQL =
-            "SELECT exception FROM Exception WHERE pos = ? AND lemma = ?";
+            "SELECT base FROM Exceptions WHERE pos = ? AND derivation = ?";
 
     protected static final String ALL_EXCEPTIONS_SQL =
-            "SELECT lemma FROM Exception WHERE pos = ?";
+            "SELECT derivation FROM Exceptions WHERE pos = ?";
 
     protected static final Random rand = new Random(new Date().getTime());
 

@@ -9,6 +9,7 @@ CREATE INDEX I_IndexWord ON IndexWord (pos, lemma(10));
 CREATE TABLE Synset (
   synset_id       integer(10),
   file_offset     integer(10),
+  lex_file_num    integer(10),
   pos             char,
   is_adj_cluster  bit,
   gloss           text
@@ -21,7 +22,8 @@ CREATE TABLE SynsetWord (
   synset_id       integer(10),
   word            varchar(255),
   word_index      integer(10),
-  usage_cnt	  integer(10)  
+  usage_cnt	      integer(10),
+  lex_id	      integer(10)
 );
 
 CREATE INDEX I_SynsetWord On SynsetWord (synset_id);
@@ -55,11 +57,11 @@ CREATE TABLE IndexWordSynset (
 
 CREATE INDEX I_IndexWordSynset On IndexWordSynset (index_word_id, synset_id);
 
-CREATE TABLE SynsetException (
+CREATE TABLE Exceptions (
   exception_id    integer(10),
   pos             char,
-  s_exception	  varchar(255),
-  lemma           varchar(255)
+  base            varchar(255),
+  derivation      varchar(255)
 );
 
-CREATE INDEX I_Exception On SynsetException (pos, s_exception(10));
+CREATE INDEX I_Exception On Exceptions (pos, base(10));

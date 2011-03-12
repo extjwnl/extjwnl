@@ -60,6 +60,8 @@ public abstract class DictionaryTester {
 
     protected List<String> lemmas = Arrays.asList("tank", "army tank", "armored combat vehicle", "armoured combat vehicle");
 
+    protected String[] exceptions = {"bicennaries", "bicentenary", "bicentennial"};
+
     protected Dictionary dictionary;
 
     @Before
@@ -115,16 +117,47 @@ public abstract class DictionaryTester {
     }
 
     @Test
+    public void testLexFileNumber() throws JWNLException {
+        IndexWord iwU = dictionary.getIndexWord(POS.ADJECTIVE, "ugly");
+        Assert.assertNotNull(iwU);
+        Assert.assertTrue(1 < iwU.getSenses().size());
+        for (Synset synset: iwU.getSenses()) {
+            Assert.assertEquals(0, synset.getLexFileNum());
+            Assert.assertEquals("adj.all", synset.getLexFileName());
+        }
+    }
+
+    @Test
     public void testAntonym() throws JWNLException, CloneNotSupportedException {
         IndexWord iwB = dictionary.getIndexWord(POS.ADJECTIVE, "beautiful");
         Assert.assertNotNull(iwB);
         Assert.assertTrue(1 < iwB.getSenses().size());
-        Synset sB = iwB.getSenses().get(0);
+        Synset sB = null;
+        searchB:
+        for (Synset synset : iwB.getSenses()) {
+            for (Word word : synset.getWords()) {
+                if ("beautiful%3:00:00::".equals(word.getSenseKey())) {
+                    sB = synset;
+                    break searchB;
+                }
+            }
+        }
+        Assert.assertNotNull(sB);
 
         IndexWord iwU = dictionary.getIndexWord(POS.ADJECTIVE, "ugly");
         Assert.assertNotNull(iwU);
         Assert.assertTrue(1 < iwU.getSenses().size());
-        Synset sU = iwU.getSenses().get(0);
+        Synset sU = null;
+        searchU:
+        for (Synset synset : iwU.getSenses()) {
+            for (Word word : synset.getWords()) {
+                if ("ugly%3:00:00::".equals(word.getSenseKey())) {
+                    sU = synset;
+                    break searchU;
+                }
+            }
+        }
+        Assert.assertNotNull(sU);
 
         RelationshipList list = RelationshipFinder.findRelationships(sB, sU, PointerType.ANTONYM);
         Assert.assertNotNull(list);
@@ -132,5 +165,16 @@ public abstract class DictionaryTester {
         Assert.assertEquals(PointerType.ANTONYM, list.get(0).getType());
         Assert.assertEquals(sB, list.get(0).getSourceSynset());
         Assert.assertEquals(sU, list.get(0).getTargetSynset());
+    }
+
+    @Test
+    public void testExceptions() throws JWNLException {
+        Exc e = dictionary.getException(POS.NOUN, exceptions[0]);
+        Assert.assertNotNull(e);
+        Assert.assertEquals(POS.NOUN, e.getPOS());
+        Assert.assertEquals(exceptions[0], e.getLemma());
+        Assert.assertEquals(2, e.getExceptions().size());
+        Assert.assertEquals(exceptions[1], e.getExceptions().get(0));
+        Assert.assertEquals(exceptions[2], e.getExceptions().get(1));
     }
 }
