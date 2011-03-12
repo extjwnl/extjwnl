@@ -18,7 +18,9 @@ contains several improvements, such as:
  * Maven
  * documentation improvements
  * improved unit test coverage
- * other improvements and fixes
+ * enhanced database support
+ * simplified configuration
+ * multiple other improvements and fixes
 
 3. Getting started
 
@@ -43,11 +45,11 @@ http://extjwnl.sourceforge.net
 Download:
 http://sourceforge.net/projects/extjwnl/files
 
-Documentation:
+Documentation Wiki:
 http://sourceforge.net/apps/trac/extjwnl/
 
 Mailing Lists:
-https://lists.sourceforge.net/lists/listinfo/extjwnl-announce
+http://lists.sourceforge.net/lists/listinfo/extjwnl-announce
 
 Forums:
 http://sourceforge.net/projects/extjwnl/forums/

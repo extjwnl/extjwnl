@@ -1,3 +1,12 @@
+1.5.1
+
+- multiple bug fixes from JWNL forum threads + unit test coverage
+- initialization of default configurations (file,map,database) by using path or url only
+- support for lex file num and lex file id in database
+- database import speeded up
+- warnings for dict format violations in save routine
+- config file parameters documented in Javadoc
+
 1.5
 
 - creating, updating and writing dictionaries
