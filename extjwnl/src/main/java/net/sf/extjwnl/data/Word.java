@@ -4,6 +4,7 @@ import net.sf.extjwnl.JWNL;
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.dictionary.Dictionary;
 
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -518,4 +519,8 @@ public class Word extends PointerTarget {
         return senseKey.toString();
     }
 
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        dictionary = Dictionary.getRestoreDictionary();
+    }
 }
