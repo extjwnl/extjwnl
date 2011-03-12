@@ -127,37 +127,28 @@ public abstract class DictionaryTester {
         }
     }
 
-    @Test
-    public void testAntonym() throws JWNLException, CloneNotSupportedException {
-        IndexWord iwB = dictionary.getIndexWord(POS.ADJECTIVE, "beautiful");
+    private Synset getSynsetBySenseKey(POS pos, String lemma, String senseKey) throws JWNLException {
+        IndexWord iwB = dictionary.getIndexWord(pos, lemma);
         Assert.assertNotNull(iwB);
-        Assert.assertTrue(1 < iwB.getSenses().size());
+        Assert.assertTrue(0 < iwB.getSenses().size());
         Synset sB = null;
         searchB:
         for (Synset synset : iwB.getSenses()) {
             for (Word word : synset.getWords()) {
-                if ("beautiful%3:00:00::".equals(word.getSenseKey())) {
+                if (senseKey.equals(word.getSenseKey())) {
                     sB = synset;
                     break searchB;
                 }
             }
         }
         Assert.assertNotNull(sB);
+        return sB;
+    }
 
-        IndexWord iwU = dictionary.getIndexWord(POS.ADJECTIVE, "ugly");
-        Assert.assertNotNull(iwU);
-        Assert.assertTrue(1 < iwU.getSenses().size());
-        Synset sU = null;
-        searchU:
-        for (Synset synset : iwU.getSenses()) {
-            for (Word word : synset.getWords()) {
-                if ("ugly%3:00:00::".equals(word.getSenseKey())) {
-                    sU = synset;
-                    break searchU;
-                }
-            }
-        }
-        Assert.assertNotNull(sU);
+    @Test
+    public void testAntonym() throws JWNLException, CloneNotSupportedException {
+        Synset sB = getSynsetBySenseKey(POS.ADJECTIVE, "beautiful", "beautiful%3:00:00::");
+        Synset sU = getSynsetBySenseKey(POS.ADJECTIVE, "ugly", "ugly%3:00:00::");
 
         RelationshipList list = RelationshipFinder.findRelationships(sB, sU, PointerType.ANTONYM);
         Assert.assertNotNull(list);
@@ -176,5 +167,13 @@ public abstract class DictionaryTester {
         Assert.assertEquals(2, e.getExceptions().size());
         Assert.assertEquals(exceptions[1], e.getExceptions().get(0));
         Assert.assertEquals(exceptions[2], e.getExceptions().get(1));
+    }
+
+    @Test
+    public void testDerivedForms() throws JWNLException, CloneNotSupportedException {
+        Synset sB = getSynsetBySenseKey(POS.NOUN, "inventor", "inventor%1:18:00::");
+        Synset sU = getSynsetBySenseKey(POS.VERB, "invent", "invent%2:36:00::");
+
+        RelationshipList list = RelationshipFinder.findRelationships(sU, sB, PointerType.NOMINALIZATION);
     }
 }
