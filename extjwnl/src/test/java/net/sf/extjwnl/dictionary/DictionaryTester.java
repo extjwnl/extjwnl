@@ -188,4 +188,18 @@ public abstract class DictionaryTester {
         Synset synset = getSynsetBySenseKey(POS.ADJECTIVE, "fair", "fair%5:00:00:feminine:01");
         Assert.assertNotNull(synset);
     }
+
+    @Test
+    public void testOnline() throws JWNLException {
+        IndexWordSet iws = dictionary.lookupAllIndexWords("on-line");
+        Assert.assertNotNull(iws);
+        Assert.assertTrue(0 < iws.size());
+        IndexWord word = dictionary.lookupIndexWord(POS.ADJECTIVE, "on-line");
+        Assert.assertNotNull(word);
+        iws = dictionary.lookupAllIndexWords("online");
+        Assert.assertNotNull(iws);
+        Assert.assertTrue(0 < iws.size());
+        word = dictionary.lookupIndexWord(POS.ADJECTIVE, "online");
+        Assert.assertNotNull(word);
+    }
 }
