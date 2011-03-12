@@ -1,10 +1,7 @@
 package net.sf.extjwnl.dictionary;
 
 import net.sf.extjwnl.JWNLException;
-import net.sf.extjwnl.data.IndexWord;
-import net.sf.extjwnl.data.POS;
-import net.sf.extjwnl.data.Synset;
-import net.sf.extjwnl.data.Word;
+import net.sf.extjwnl.data.*;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -105,5 +102,13 @@ public abstract class DictionaryTester {
         Assert.assertEquals("Verb synset frame size test", 2, indices.length);
         Assert.assertEquals("Verb synset frame test", 2, indices[0]);
         Assert.assertEquals("Verb synset frame test", 33, indices[1]);
+    }
+
+    @Test
+    public void testCycles() throws JWNLException {
+        IndexWord index = dictionary.lookupIndexWord(POS.VERB, "contain");
+        List<Synset> senses = index.getSenses();
+        Assert.assertTrue(2 < senses.size());
+        PointerUtils.getHypernymTree(senses.get(2));
     }
 }

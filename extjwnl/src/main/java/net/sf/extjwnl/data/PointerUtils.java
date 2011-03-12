@@ -1,6 +1,12 @@
 package net.sf.extjwnl.data;
 
+import net.sf.extjwnl.JWNL;
 import net.sf.extjwnl.data.list.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * This class contains static methods for performing various pointer operations. A pointer from one synset/word to
@@ -11,6 +17,8 @@ import net.sf.extjwnl.data.list.*;
  * @author John Didion <jdidion@didion.net>
  */
 public class PointerUtils {
+
+    private static final Log log = LogFactory.getLog(PointerUtils.class);
 
     /**
      * Representation of infinite depth. Used to tell the pointer operations to
@@ -768,8 +776,25 @@ public class PointerUtils {
                                     labelType == null ? type : labelType, parent);
                     if (allowRedundancies || !list.contains(node)) {
                         if (depth != 0) {
-                            node.setChildTreeList(makePointerTargetTreeList(node.getSynset(), searchTypes, labelType,
-                                    depth, allowRedundancies, node));
+                            //check cycles through parent
+                            Set<PointerTargetTreeNode> parents = new HashSet<PointerTargetTreeNode>();
+                            PointerTargetTreeNode currentParent = parent;
+                            while (null != currentParent) {
+                                if (!parents.contains(currentParent)) {
+                                    parents.add(currentParent);
+                                    currentParent = currentParent.getParent();
+                                } else {
+                                    //cycle
+                                    if (log.isWarnEnabled()) {
+                                        log.warn(JWNL.resolveMessage("DICTIONARY_WARN_001", currentParent));
+                                    }
+                                    break;
+                                }
+                            }
+                            if (null == currentParent) {
+                                node.setChildTreeList(makePointerTargetTreeList(node.getSynset(), searchTypes, labelType,
+                                        depth, allowRedundancies, node));
+                            }
                         }
                         list.add(node);
                     }
