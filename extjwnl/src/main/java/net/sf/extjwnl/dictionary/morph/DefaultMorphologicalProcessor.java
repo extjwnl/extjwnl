@@ -30,11 +30,12 @@ public class DefaultMorphologicalProcessor implements MorphologicalProcessor {
     private Dictionary dictionary;
 
     /**
-     * Parameter that determines the size of the base form cache
+     * Parameter that determines the size of the base form cache.
      */
     public static final String CACHE_CAPACITY = "cache_capacity";
+
     /**
-     * Parameter that determines the operations this morphological processor will perform
+     * Parameter that determines the operations this morphological processor will perform.
      */
     public static final String OPERATIONS = "operations";
 

@@ -37,7 +37,11 @@ public class FileManagerImpl implements FileManager {
     private RandomAccessDictionaryFile cntList;
     private RandomAccessDictionaryFile senseIndex;
 
-    private static final String CACHE_USE_COUNT_KEY = "cache_use_count";
+    /**
+     * Whether to cache use counts, default false. Setting this parameter to <code>true</true> speeds up elements
+     * loading from files considerably, at the expense of some amount of memory.
+     */
+    public static final String CACHE_USE_COUNT_KEY = "cache_use_count";
     private boolean cacheUseCount = false;
 
     private Map<String, Integer> useCountCache = new HashMap<String, Integer>();

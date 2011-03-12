@@ -20,9 +20,9 @@ public abstract class AbstractPrincetonRandomAccessDictionaryFile extends Abstra
         implements RandomAccessDictionaryFile {
 
     /**
-     * Encoding parameter name.
+     * Dictionary file encoding. Use Java compatible encoding names. See {@link java.nio.charset.Charset}.
      */
-    private static final String ENCODING = "encoding";
+    public static final String ENCODING = "encoding";
 
     /**
      * Used for caching the previously accessed file offset.

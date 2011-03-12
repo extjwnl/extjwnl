@@ -52,12 +52,11 @@ public abstract class Dictionary {
     private static final String PUBLISHER_ATTRIBUTE = "publisher";
     private static final String NUMBER_ATTRIBUTE = "number";
 
-    //warn about incompatible lex ids: lex_id is a two digit decimal integer
-    private static final String LEX_ID_WARN_KEY = "warn_lex_ids";
-    private static final String SKIP_LEX_ID_CHECK_KEY = "skip_lex_ids_check";
-
-    private boolean lexIdWarn = true;
-    private boolean skipLexIdCheck = false;
+    /**
+     * Whether to check and fix lexicographer ids, default false.
+     */
+    public static final String CHECK_LEX_IDS_KEY = "check_lex_ids";
+    private boolean checkLexIds = false;
 
     /**
      * The singleton instance of the dictionary to be used throughout the system.
@@ -272,12 +271,8 @@ public abstract class Dictionary {
             params.put(p.getName(), p);
         }
 
-        if (params.containsKey(LEX_ID_WARN_KEY)) {
-            lexIdWarn = Boolean.parseBoolean(params.get(LEX_ID_WARN_KEY).getValue());
-        }
-
-        if (params.containsKey(SKIP_LEX_ID_CHECK_KEY)) {
-            skipLexIdCheck = Boolean.parseBoolean(params.get(SKIP_LEX_ID_CHECK_KEY).getValue());
+        if (params.containsKey(CHECK_LEX_IDS_KEY)) {
+            checkLexIds = Boolean.parseBoolean(params.get(CHECK_LEX_IDS_KEY).getValue());
         }
     }
 
@@ -449,7 +444,7 @@ public abstract class Dictionary {
             throw new JWNLException("DICTIONARY_EXCEPTION_029");
         }
 
-        if (!skipLexIdCheck) {
+        if (checkLexIds) {
             //fixing word lex ids
             //lex ids should be unique within lex file name
             //lemma -> lex file num -> words
@@ -517,11 +512,6 @@ public abstract class Dictionary {
                         id++;
                         for (Word w : words) {
                             if (-1 == w.getLexId()) {
-                                if (lexIdWarn && (99 < id)) {//lex_id is a two digit decimal integer
-                                    if (log.isWarnEnabled()) {
-                                        log.warn(JWNL.resolveMessage("PRINCETON_INFO_014", new Object[]{id, w}));
-                                    }
-                                }
                                 w.setLexId(id);
                                 id++;
                             }

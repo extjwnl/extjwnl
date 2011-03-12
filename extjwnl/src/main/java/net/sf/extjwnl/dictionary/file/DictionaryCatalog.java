@@ -29,7 +29,7 @@ public class DictionaryCatalog<E extends DictionaryFile> implements Owned {
 
     /**
      * File type install parameter. The value should be the
-     * name of the appropriate subclass of DictionaryFileType.
+     * name of the subclass of DictionaryFileType compatible with the catalog owner implementation.
      */
     public static final String DICTIONARY_FILE_TYPE_KEY = "file_type";
 

@@ -24,7 +24,13 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
      * class of <code>MorphologicalProcessor</code> to use.
      */
     public static final String MORPH = "morphological_processor";
+    /**
+     * The class of DatabaseDictionaryElementFactory to use.
+     */
     public static final String DICTIONARY_ELEMENT_FACTORY = "dictionary_element_factory";
+    /**
+     * Database manager install parameter. The value should be the class of DatabaseManager to use.
+     */
     public static final String DATABASE_MANAGER = "database_manager";
 
     private DatabaseDictionaryElementFactory elementFactory;

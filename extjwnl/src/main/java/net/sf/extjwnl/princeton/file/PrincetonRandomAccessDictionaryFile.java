@@ -25,17 +25,6 @@ import java.util.*;
  * A <code>RandomAccessDictionaryFile</code> that accesses files
  * named with Princeton's dictionary file naming convention.
  *
- * Accepts parameters:
- *
- * <code>write_princeton_header</code>: whether to add standard princeton header to files on save, default: false.
- * <code>check_lex_file_number</code>: whether to warn about lex file numbers correctness, default: true
- * <code>check_relation_limit</code>: whether to warn about relation count being off limits, default: true
- * <code>check_offset_limit</code>: whether to warn about offsets being off limits, default: true
- * <code>check_word_count_limit</code>: whether to warn about word count being off limits, default: true
- * <code>check_lex_id_limit</code>: whether to warn about lex id being off limits, default: true
- * <code>check_pointer_index_limit</code>: whether to warn about pointer target indices being off limits, default: true
- * <code>check_verb_frame_limit</code>: whether to warn about verb frame indices being off limits, default: true
- *
  * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
@@ -73,28 +62,52 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
             "  28 any associated documentation shall at all times remain with  \n" +
             "  29 Princeton University and LICENSEE agrees to preserve same.  \n";
 
-    private static final String WRITE_PRINCETON_HEADER_KEY = "write_princeton_header";
+    /**
+     * Whether to add standard princeton header to files on save, default: false.
+     */
+    public static final String WRITE_PRINCETON_HEADER_KEY = "write_princeton_header";
     private boolean writePrincetonHeader = false;
 
-    private static final String CHECK_LEX_FILE_NUMBER_KEY = "check_lex_file_number";
+    /**
+     * Whether to warn about lex file numbers correctness, default: true.
+     */
+    public static final String CHECK_LEX_FILE_NUMBER_KEY = "check_lex_file_number";
     private boolean checkLexFileNumber = true;
 
-    private static final String CHECK_RELATION_LIMIT_KEY = "check_relation_limit";
+    /**
+     * Whether to warn about relation count being off limits, default: true.
+     */
+    public static final String CHECK_RELATION_LIMIT_KEY = "check_relation_limit";
     private boolean checkRelationLimit = true;
 
-    private static final String CHECK_OFFSET_LIMIT_KEY = "check_offset_limit";
+    /**
+     * Whether to warn about offsets being off limits, default: true.
+     */
+    public static final String CHECK_OFFSET_LIMIT_KEY = "check_offset_limit";
     private boolean checkOffsetLimit = true;
 
-    private static final String CHECK_WORD_COUNT_LIMIT_KEY = "check_word_count_limit";
+    /**
+     * Whether to warn about word count being off limits, default: true.
+     */
+    public static final String CHECK_WORD_COUNT_LIMIT_KEY = "check_word_count_limit";
     private boolean checkWordCountLimit = true;
 
-    private static final String CHECK_LEX_ID_LIMIT_KEY = "check_lex_id_limit";
+    /**
+     * Whether to warn about lex id being off limits, default: true.
+     */
+    public static final String CHECK_LEX_ID_LIMIT_KEY = "check_lex_id_limit";
     private boolean checkLexIdLimit = true;
 
-    private static final String CHECK_POINTER_INDEX_LIMIT_KEY = "check_pointer_index_limit";
+    /**
+     * Whether to warn about pointer target indices being off limits, default: true
+     */
+    public static final String CHECK_POINTER_INDEX_LIMIT_KEY = "check_pointer_index_limit";
     private boolean checkPointerIndexLimit = true;
 
-    private static final String CHECK_VERB_FRAME_LIMIT_KEY = "check_verb_frame_limit";
+    /**
+     * Whether to warn about verb frame indices being off limits, default: true
+     */
+    public static final String CHECK_VERB_FRAME_LIMIT_KEY = "check_verb_frame_limit";
     private boolean checkVerbFrameLimit = true;
 
     /**
