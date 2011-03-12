@@ -40,8 +40,7 @@
     </developers>
     <scm>
         <connection>scm:git:git://extjwnl.git.sourceforge.net/gitroot/extjwnl/extjwnl</connection>
-        <developerConnection>scm:git:ssh://autayeu@extjwnl.git.sourceforge.net/gitroot/extjwnl/autayeu
-        </developerConnection>
+        <developerConnection>scm:git:ssh://autayeu@extjwnl.git.sourceforge.net/gitroot/extjwnl/extjwnl</developerConnection>
         <url>http://extjwnl.git.sourceforge.net</url>
     </scm>
 
