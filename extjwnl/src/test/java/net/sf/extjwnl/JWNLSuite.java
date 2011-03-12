@@ -1,10 +1,7 @@
 package net.sf.extjwnl;
 
 import net.sf.extjwnl.data.*;
-import net.sf.extjwnl.dictionary.TestCreateFileBackedDictionary;
-import net.sf.extjwnl.dictionary.TestCreateMapBackedDictionary;
-import net.sf.extjwnl.dictionary.TestFileBackedDictionary;
-import net.sf.extjwnl.dictionary.TestFileBackedDictionaryEdit;
+import net.sf.extjwnl.dictionary.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
@@ -25,7 +22,8 @@ import org.junit.runners.Suite;
 //        TestDatabaseBackedDictionary.class,
         TestCreateFileBackedDictionary.class,
         TestCreateMapBackedDictionary.class,
-        TestFileBackedDictionaryEdit.class
+        TestFileBackedDictionaryEdit.class,
+        TestThreads.class
 })
 public class JWNLSuite {
 
@@ -41,7 +39,8 @@ public class JWNLSuite {
 //                TestDatabaseBackedDictionary.class,
                 TestCreateFileBackedDictionary.class,
                 TestCreateMapBackedDictionary.class,
-                TestFileBackedDictionaryEdit.class
+                TestFileBackedDictionaryEdit.class,
+                TestThreads.class
         };
         String[] names = new String[classes.length];
         for (int i = 0; i < classes.length; i++) {
