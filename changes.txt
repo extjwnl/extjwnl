@@ -1,3 +1,8 @@
+1.5.2
+
+- introduced utility method Dictionary.getWordBySenseKey
+- changed constants to enums
+
 1.5.1
 
 - multiple bug fixes from JWNL forum threads + unit test coverage
