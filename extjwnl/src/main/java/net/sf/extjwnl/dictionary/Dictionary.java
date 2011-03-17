@@ -341,17 +341,16 @@ public abstract class Dictionary {
     }
 
     /**
-     * Return an Iterator over all the IndexWords of part-of-speech
-     * <var>pos</var> in the database.
+     * Returns an Iterator over all the IndexWords of part-of-speech <var>pos</var> in the database.
      *
      * @param pos The part-of-speech
-     * @return An iterator over <code>IndexWord</code>s
+     * @return iterator over <code>IndexWord</code>s
      * @throws JWNLException JWNLException
      */
     public abstract Iterator<IndexWord> getIndexWordIterator(POS pos) throws JWNLException;
 
     /**
-     * Return an Iterator over all the IndexWords of part-of-speech <var>pos</var>
+     * Returns an Iterator over all the IndexWords of part-of-speech <var>pos</var>
      * whose lemmas contain <var>substring</var> as a substring.
      *
      * @param pos       The part-of-speech.
@@ -362,7 +361,7 @@ public abstract class Dictionary {
     public abstract Iterator<IndexWord> getIndexWordIterator(POS pos, String substring) throws JWNLException;
 
     /**
-     * Look up a word in the database. The search is case-independent,
+     * Looks up a word in the database. The search is case-independent,
      * and phrases are separated by spaces ("look up", not "look_up").
      * Note: this method does not subject <var>lemma</var> to any
      * morphological processing. If you want this, use {@link #lookupIndexWord(POS, String)}.
@@ -378,7 +377,59 @@ public abstract class Dictionary {
     public abstract IndexWord getRandomIndexWord(POS pos) throws JWNLException;
 
     /**
-     * Return an Iterator over all the Synsets of part-of-speech <var>pos</var>
+     * Returns a word by specified <var>senseKey</var> or null if not found.
+     *
+     * @param senseKey sense key
+     * @return a word by specified <var>senseKey</var> or null if not found
+     * @throws JWNLException JWNLException
+     */
+    public Word getWordBySenseKey(String senseKey) throws JWNLException {
+        int percentIndex = senseKey.indexOf('%');
+        String lemma = senseKey.substring(0, percentIndex).replace('_', ' ');
+        String ssType = senseKey.substring(percentIndex + 1, senseKey.indexOf(':', percentIndex));
+        POS pos = null;
+        switch (Integer.parseInt(ssType)) {
+            case 1: {
+                pos = POS.NOUN;
+                break;
+            }
+            case 2: {
+                pos = POS.VERB;
+                break;
+            }
+            case 3: {
+                pos = POS.ADJECTIVE;
+                break;
+            }
+            case 4: {
+                pos = POS.ADVERB;
+                break;
+            }
+            case 5: {
+                pos = POS.ADJECTIVE;
+                break;
+            }
+        }
+        Word result = null;
+        if (null != pos) {
+            IndexWord iw = getIndexWord(pos, lemma);
+            if (null != iw) {
+                searchB:
+                for (Synset synset : iw.getSenses()) {
+                    for (Word word : synset.getWords()) {
+                        if (senseKey.equals(word.getSenseKey())) {
+                            result = word;
+                            break searchB;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Returns an Iterator over all the Synsets of part-of-speech <var>pos</var>
      * in the database.
      *
      * @param pos The part-of-speech.
@@ -388,7 +439,7 @@ public abstract class Dictionary {
     public abstract Iterator<Synset> getSynsetIterator(POS pos) throws JWNLException;
 
     /**
-     * Return the <code>Synset</code> at offset <var>offset</var> from the database.
+     * Returns the <code>Synset</code> at offset <var>offset</var> from the database.
      *
      * @param pos    The part-of-speech file to look in
      * @param offset The offset of the synset in the file
@@ -398,7 +449,7 @@ public abstract class Dictionary {
     public abstract Synset getSynsetAt(POS pos, long offset) throws JWNLException;
 
     /**
-     * Return an Iterator over all the Exceptions in the database.
+     * Returns an Iterator over all the Exceptions in the database.
      *
      * @param pos the part-of-speech
      * @return Iterator An iterator over <code>Exc</code>s
@@ -407,7 +458,7 @@ public abstract class Dictionary {
     public abstract Iterator<Exc> getExceptionIterator(POS pos) throws JWNLException;
 
     /**
-     * Lookup <var>derivation</var> in the exceptions file of part-of-speech <var>
+     * Looks up <var>derivation</var> in the exceptions file of part-of-speech <var>
      * pos</var> and return an Exc object containing the results.
      *
      * @param pos        the exception file to look in
@@ -418,7 +469,7 @@ public abstract class Dictionary {
     public abstract Exc getException(POS pos, String derivation) throws JWNLException;
 
     /**
-     * Shut down the dictionary
+     * Shuts down the dictionary
      */
     public abstract void close();
 
@@ -431,8 +482,8 @@ public abstract class Dictionary {
     }
 
     /**
-     * Main word lookup procedure. First try a normal lookup. If that doesn't work,
-     * try looking up the stemmed form of the lemma.
+     * Looks up a word <var>lemma</var>. First tries a normal lookup. If that doesn't work,
+     * tries looking up the stemmed form of the lemma.
      *
      * @param pos   the part-of-speech of the word to look up
      * @param lemma the lemma to look up
@@ -450,7 +501,7 @@ public abstract class Dictionary {
     }
 
     /**
-     * Return a set of <code>IndexWord</code>s, with each element in the set
+     * Returns a set of <code>IndexWord</code>s, with each element in the set
      * corresponding to a part-of-speech of <var>word</var>.
      *
      * @param lemma the word for which to lookup senses

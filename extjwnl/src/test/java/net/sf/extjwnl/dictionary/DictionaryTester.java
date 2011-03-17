@@ -127,33 +127,14 @@ public abstract class DictionaryTester {
         }
     }
 
-    private Synset getSynsetBySenseKey(POS pos, String lemma, String senseKey) throws JWNLException {
-        return getWordBySenseKey(pos, lemma, senseKey).getSynset();
+    private Synset getSynsetBySenseKey(String senseKey) throws JWNLException {
+        return dictionary.getWordBySenseKey(senseKey).getSynset();
     }
-
-    private Word getWordBySenseKey(POS pos, String lemma, String senseKey) throws JWNLException {
-        IndexWord iwB = dictionary.getIndexWord(pos, lemma);
-        Assert.assertNotNull(iwB);
-        Assert.assertTrue(0 < iwB.getSenses().size());
-        Word result = null;
-        searchB:
-        for (Synset synset : iwB.getSenses()) {
-            for (Word word : synset.getWords()) {
-                if (senseKey.equals(word.getSenseKey())) {
-                    result = word;
-                    break searchB;
-                }
-            }
-        }
-        Assert.assertNotNull(result);
-        return result;
-    }
-
 
     @Test
     public void testAntonym() throws JWNLException, CloneNotSupportedException {
-        Synset sB = getSynsetBySenseKey(POS.ADJECTIVE, "beautiful", "beautiful%3:00:00::");
-        Synset sU = getSynsetBySenseKey(POS.ADJECTIVE, "ugly", "ugly%3:00:00::");
+        Synset sB = getSynsetBySenseKey("beautiful%3:00:00::");
+        Synset sU = getSynsetBySenseKey("ugly%3:00:00::");
 
         RelationshipList list = RelationshipFinder.findRelationships(sB, sU, PointerType.ANTONYM);
         Assert.assertNotNull(list);
@@ -176,8 +157,8 @@ public abstract class DictionaryTester {
 
     @Test
     public void testDerivedForms() throws JWNLException, CloneNotSupportedException {
-        Synset sB = getSynsetBySenseKey(POS.NOUN, "inventor", "inventor%1:18:00::");
-        Synset sU = getSynsetBySenseKey(POS.VERB, "invent", "invent%2:36:00::");
+        Synset sB = getSynsetBySenseKey("inventor%1:18:00::");
+        Synset sU = getSynsetBySenseKey("invent%2:36:00::");
 
         RelationshipList list = RelationshipFinder.findRelationships(sU, sB, PointerType.NOMINALIZATION);
     }
@@ -190,7 +171,7 @@ public abstract class DictionaryTester {
 
     @Test
     public void testFairSenseKey() throws JWNLException {
-        Synset synset = getSynsetBySenseKey(POS.ADJECTIVE, "fair", "fair%5:00:00:feminine:01");
+        Synset synset = getSynsetBySenseKey("fair%5:00:00:feminine:01");
         Assert.assertNotNull(synset);
     }
 
@@ -210,12 +191,12 @@ public abstract class DictionaryTester {
 
     @Test
     public void testVerbFrames() throws JWNLException {
-        Synset synset = getSynsetBySenseKey(POS.VERB, "complete", "complete%2:30:02::");
+        Synset synset = getSynsetBySenseKey("complete%2:30:02::");
         Assert.assertNotNull(synset);
         Assert.assertEquals(2, synset.getVerbFrameFlags().cardinality());
         Assert.assertTrue(synset.getVerbFrameFlags().get(2));
         Assert.assertTrue(synset.getVerbFrameFlags().get(33));
-        Word w = getWordBySenseKey(POS.VERB, "complete", "complete%2:30:02::");
+        Word w = dictionary.getWordBySenseKey("complete%2:30:02::");
         Assert.assertTrue(w instanceof Verb);
         Verb v = (Verb) w;
         Assert.assertTrue(v.getVerbFrameFlags().get(8));
