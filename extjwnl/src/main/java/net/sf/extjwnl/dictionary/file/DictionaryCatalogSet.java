@@ -7,7 +7,7 @@ import net.sf.extjwnl.util.factory.Owned;
 import net.sf.extjwnl.util.factory.Param;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -21,7 +21,7 @@ import java.util.Map;
  */
 public class DictionaryCatalogSet<E extends DictionaryFile> implements Owned {
 
-    private Map<DictionaryFileType, DictionaryCatalog<E>> catalogs = new HashMap<DictionaryFileType, DictionaryCatalog<E>>();
+    private Map<DictionaryFileType, DictionaryCatalog<E>> catalogs = new EnumMap<DictionaryFileType, DictionaryCatalog<E>>(DictionaryFileType.class);
     private Dictionary dictionary;
 
     /**

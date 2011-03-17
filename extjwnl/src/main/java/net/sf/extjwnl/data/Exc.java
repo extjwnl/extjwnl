@@ -23,7 +23,7 @@ import java.util.List;
  */
 public class Exc extends BaseDictionaryElement {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     private POS pos;
 
@@ -135,11 +135,5 @@ public class Exc extends BaseDictionaryElement {
         }
 
         return JWNL.resolveMessage("DATA_TOSTRING_001", new Object[]{getLemma(), str.toString()});
-    }
-
-    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
-        in.defaultReadObject();
-        // set POS to reference the static instance defined in the current runtime environment
-        pos = POS.getPOSForKey(pos.getKey());
     }
 }

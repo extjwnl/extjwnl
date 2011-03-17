@@ -2,7 +2,6 @@ package net.sf.extjwnl.data;
 
 import net.sf.extjwnl.JWNL;
 
-import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -16,20 +15,7 @@ import java.util.*;
  * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
-public class PointerType implements Serializable, Comparable<PointerType> {
-
-    static {
-        JWNL.initialize();
-    }
-
-    private static final long serialVersionUID = 1L;
-
-    // Flags for tagging a pointer type with the POS types it apples to.
-    private static final int N = 1;
-    private static final int V = 2;
-    private static final int ADJ = 4;
-    private static final int ADV = 8;
-    private static final int LEXICAL = 16;
+public enum PointerType {
 
 //    from globals.c
 //    "!",			/* 1 ANTPTR (all) */
@@ -72,95 +58,55 @@ public class PointerType implements Serializable, Comparable<PointerType> {
 //    "@i", 			/* 38 INSTANCE (noun) */
 //    "~i",			/* 39 INSTANCES (noun) */
 
+    ANTONYM("!", "ANTONYM", PointerTypeFlags.N | PointerTypeFlags.V | PointerTypeFlags.ADJ | PointerTypeFlags.ADV | PointerTypeFlags.LEXICAL),
+    HYPERNYM("@", "HYPERNYM", PointerTypeFlags.N | PointerTypeFlags.V),
+    HYPONYM("~", "HYPONYM", PointerTypeFlags.N | PointerTypeFlags.V),
+    ENTAILMENT("*", "ENTAILMENT", PointerTypeFlags.V),
+    SIMILAR_TO("&", "SIMILAR", PointerTypeFlags.ADJ),
+    MEMBER_HOLONYM("#m", "MEMBER_HOLONYM", PointerTypeFlags.N),
+    SUBSTANCE_HOLONYM("#s", "SUBSTANCE_HOLONYM", PointerTypeFlags.N),
+    PART_HOLONYM("#p", "PART_HOLONYM", PointerTypeFlags.N),
+    MEMBER_MERONYM("%m", "MEMBER_MERONYM", PointerTypeFlags.N),
+    SUBSTANCE_MERONYM("%s", "SUBSTANCE_MERONYM", PointerTypeFlags.N),
+    PART_MERONYM("%p", "PART_MERONYM", PointerTypeFlags.N),
+    //    "#",			/* 12 MERONYM (noun) */
+//    "%",			/* 13 HOLONYM (noun) */
+    CAUSE(">", "CAUSE", PointerTypeFlags.V),
+    PARTICIPLE_OF("<", "PARTICIPLE_OF", PointerTypeFlags.ADJ | PointerTypeFlags.LEXICAL),
+    SEE_ALSO("^", "ALSO_SEE", PointerTypeFlags.N | PointerTypeFlags.V | PointerTypeFlags.ADJ | PointerTypeFlags.LEXICAL),
+    PERTAINYM("\\", "PERTAINYM", PointerTypeFlags.ADJ | PointerTypeFlags.ADV | PointerTypeFlags.LEXICAL),
+    ATTRIBUTE("=", "ATTRIBUTE", PointerTypeFlags.N | PointerTypeFlags.ADJ),
+    VERB_GROUP("$", "VERB_GROUP", PointerTypeFlags.V),
+    NOMINALIZATION("+", "NOMINALIZATION", PointerTypeFlags.N | PointerTypeFlags.V),
+    DOMAIN_ALL(";", "DOMAIN_ALL", PointerTypeFlags.N | PointerTypeFlags.V | PointerTypeFlags.ADJ | PointerTypeFlags.ADV | PointerTypeFlags.LEXICAL),
+    MEMBER_ALL("-", "MEMBER_ALL", PointerTypeFlags.N),
+    CATEGORY(";c", "CATEGORY_DOMAIN", PointerTypeFlags.N | PointerTypeFlags.V | PointerTypeFlags.ADJ | PointerTypeFlags.ADV | PointerTypeFlags.LEXICAL),
+    USAGE(";u", "USAGE_DOMAIN", PointerTypeFlags.N | PointerTypeFlags.V | PointerTypeFlags.ADJ | PointerTypeFlags.ADV | PointerTypeFlags.LEXICAL),
+    REGION(";r", "REGION_DOMAIN", PointerTypeFlags.N | PointerTypeFlags.V | PointerTypeFlags.ADJ | PointerTypeFlags.ADV | PointerTypeFlags.LEXICAL),
+    CATEGORY_MEMBER("-c", "CATEGORY_MEMBER", PointerTypeFlags.N),
+    USAGE_MEMBER("-u", "USAGE_MEMBER", PointerTypeFlags.N),
+    REGION_MEMBER("-r", "REGION_MEMBER", PointerTypeFlags.N),
+    INSTANCE_HYPERNYM("@i", "INSTANCE_HYPERNYM", PointerTypeFlags.N | PointerTypeFlags.V),
+    INSTANCES_HYPONYM("~i", "INSTANCES_HYPONYM", PointerTypeFlags.N | PointerTypeFlags.V);
 
-    private static final String ANTONYM_KEY = "!";
-    private static final String HYPERNYM_KEY = "@";
-    private static final String HYPONYM_KEY = "~";
-    private static final String ATTRIBUTE_KEY = "=";
-    private static final String ALSO_SEE_KEY = "^";
-    private static final String ENTAILMENT_KEY = "*";
-    private static final String CAUSE_KEY = ">";
-    private static final String VERB_GROUP_KEY = "$";
-    private static final String MEMBER_HOLONYM_KEY = "#m";
-    private static final String SUBSTANCE_HOLONYM_KEY = "#s";
-    private static final String PART_HOLONYM_KEY = "#p";
-    private static final String MEMBER_MERONYM_KEY = "%m";
-    private static final String SUBSTANCE_MERONYM_KEY = "%s";
-    private static final String PART_MERONYM_KEY = "%p";
-    private static final String SIMILAR_KEY = "&";
-    private static final String PARTICIPLE_OF_KEY = "<";
-    private static final String PERTAINYM_KEY = "\\";
-    private static final String NOMINALIZATION_KEY = "+";
-    private static final String CATEGORY_DOMAIN_KEY = ";c";
-    private static final String CATEGORY_MEMBER_KEY = "-c";
-    private static final String REGION_DOMAIN_KEY = ";r";
-    private static final String REGION_MEMBER_KEY = "-r";
-    private static final String USAGE_DOMAIN_KEY = ";u";
-    private static final String USAGE_MEMBER_KEY = "-u";
-    private static final String INSTANCE_HYPERNYM_KEY = "@i";
-    private static final String INSTANCES_HYPONYM_KEY = "~i";
-    private static final String DOMAIN_ALL_KEY = ";";
-    private static final String MEMBER_ALL_KEY = "-";
-
-    private static final Map<POS, Integer> POS_TO_MASK_MAP = new HashMap<POS, Integer>();
-    private static final Map<String, PointerType> KEY_TO_POINTER_TYPE_MAP = new HashMap<String, PointerType>();
+    private static final Map<POS, Integer> POS_TO_MASK_MAP = new EnumMap<POS, Integer>(POS.class);
 
     static {
-        POS_TO_MASK_MAP.put(POS.NOUN, N);
-        POS_TO_MASK_MAP.put(POS.VERB, V);
-        POS_TO_MASK_MAP.put(POS.ADJECTIVE, ADJ);
-        POS_TO_MASK_MAP.put(POS.ADVERB, ADV);
+        POS_TO_MASK_MAP.put(POS.NOUN, PointerTypeFlags.N);
+        POS_TO_MASK_MAP.put(POS.VERB, PointerTypeFlags.V);
+        POS_TO_MASK_MAP.put(POS.ADJECTIVE, PointerTypeFlags.ADJ);
+        POS_TO_MASK_MAP.put(POS.ADVERB, PointerTypeFlags.ADV);
     }
-
-    // All categories
-    public static final PointerType ANTONYM = new PointerType(1, "ANTONYM", ANTONYM_KEY, N | V | ADJ | ADV | LEXICAL);
-    public static final PointerType CATEGORY = new PointerType(35, "CATEGORY_DOMAIN", CATEGORY_DOMAIN_KEY, N | V | ADJ | ADV | LEXICAL);
-    public static final PointerType REGION = new PointerType(37, "REGION_DOMAIN", REGION_DOMAIN_KEY, N | V | ADJ | ADV | LEXICAL);
-    public static final PointerType USAGE = new PointerType(36, "USAGE_DOMAIN", USAGE_DOMAIN_KEY, N | V | ADJ | ADV | LEXICAL);
-    public static final PointerType DOMAIN_ALL = new PointerType(21, "DOMAIN_ALL", DOMAIN_ALL_KEY, N | V | ADJ | ADV | LEXICAL);
-
-    // Nouns and Verbs
-    public static final PointerType HYPERNYM = new PointerType(2, "HYPERNYM", HYPERNYM_KEY, N | V);
-    public static final PointerType HYPONYM = new PointerType(3, "HYPONYM", HYPONYM_KEY, N | V);
-    public static final PointerType NOMINALIZATION = new PointerType(20, "NOMINALIZATION", NOMINALIZATION_KEY, N | V);
-
-    public static final PointerType INSTANCE_HYPERNYM = new PointerType(38, "INSTANCE_HYPERNYM", INSTANCE_HYPERNYM_KEY, N | V);
-    public static final PointerType INSTANCES_HYPONYM = new PointerType(39, "INSTANCES_HYPONYM", INSTANCES_HYPONYM_KEY, N | V);
-
-    // Nouns and Adjectives
-    public static final PointerType ATTRIBUTE = new PointerType(18, "ATTRIBUTE", ATTRIBUTE_KEY, N | ADJ);
-    public static final PointerType SEE_ALSO = new PointerType(16, "ALSO_SEE", ALSO_SEE_KEY, N | V | ADJ | LEXICAL);
-
-    // Nouns
-    public static final PointerType MEMBER_HOLONYM = new PointerType(6, "MEMBER_HOLONYM", MEMBER_HOLONYM_KEY, N);
-    public static final PointerType SUBSTANCE_HOLONYM = new PointerType(7, "SUBSTANCE_HOLONYM", SUBSTANCE_HOLONYM_KEY, N);
-    public static final PointerType PART_HOLONYM = new PointerType(8, "PART_HOLONYM", PART_HOLONYM_KEY, N);
-    public static final PointerType MEMBER_MERONYM = new PointerType(9, "MEMBER_MERONYM", MEMBER_MERONYM_KEY, N);
-    public static final PointerType SUBSTANCE_MERONYM = new PointerType(10, "SUBSTANCE_MERONYM", SUBSTANCE_MERONYM_KEY, N);
-    public static final PointerType PART_MERONYM = new PointerType(11, "PART_MERONYM", PART_MERONYM_KEY, N);
-    public static final PointerType CATEGORY_MEMBER = new PointerType(35, "CATEGORY_MEMBER", CATEGORY_MEMBER_KEY, N);
-    public static final PointerType REGION_MEMBER = new PointerType(37, "REGION_MEMBER", REGION_MEMBER_KEY, N);
-    public static final PointerType USAGE_MEMBER = new PointerType(36, "USAGE_MEMBER", USAGE_MEMBER_KEY, N);
-    public static final PointerType MEMBER_ALL = new PointerType(22, "MEMBER_ALL", MEMBER_ALL_KEY, N);
-
-    // Verbs
-    public static final PointerType ENTAILMENT = new PointerType(4, "ENTAILMENT", ENTAILMENT_KEY, V);
-    public static final PointerType CAUSE = new PointerType(14, "CAUSE", CAUSE_KEY, V);
-    public static final PointerType VERB_GROUP = new PointerType(19, "VERB_GROUP", VERB_GROUP_KEY, V);
-
-    // Adjectives
-    public static final PointerType SIMILAR_TO = new PointerType(5, "SIMILAR", SIMILAR_KEY, ADJ);
-    public static final PointerType PARTICIPLE_OF = new PointerType(15, "PARTICIPLE_OF", PARTICIPLE_OF_KEY, ADJ | LEXICAL);
-    public static final PointerType PERTAINYM = new PointerType(17, "PERTAINYM", PERTAINYM_KEY, ADJ | ADV | LEXICAL);
 
     /**
      * A list of all <code>PointerType</code>s.
      */
     private static final List<PointerType> ALL_TYPES = Collections.unmodifiableList(Arrays.asList(
-            ANTONYM, HYPERNYM, HYPONYM, ATTRIBUTE, SEE_ALSO, ENTAILMENT, CAUSE, VERB_GROUP,
-            MEMBER_MERONYM, SUBSTANCE_MERONYM, PART_MERONYM, MEMBER_HOLONYM, SUBSTANCE_HOLONYM, PART_HOLONYM,
-            SIMILAR_TO, PARTICIPLE_OF, NOMINALIZATION, CATEGORY, REGION, USAGE, CATEGORY_MEMBER,
-            REGION_MEMBER, USAGE_MEMBER, INSTANCE_HYPERNYM, INSTANCES_HYPONYM, DOMAIN_ALL, MEMBER_ALL
+            ANTONYM, HYPERNYM, HYPONYM, ENTAILMENT, SIMILAR_TO, MEMBER_HOLONYM, SUBSTANCE_HOLONYM,
+            PART_HOLONYM, MEMBER_MERONYM, SUBSTANCE_MERONYM, PART_MERONYM,
+            CAUSE, PARTICIPLE_OF, SEE_ALSO, PERTAINYM, ATTRIBUTE, VERB_GROUP, NOMINALIZATION,
+            CATEGORY, USAGE, REGION, CATEGORY_MEMBER, USAGE_MEMBER, REGION_MEMBER,
+            INSTANCE_HYPERNYM, INSTANCES_HYPONYM
     ));
 
     static {
@@ -196,7 +142,91 @@ public class PointerType implements Serializable, Comparable<PointerType> {
      * @return the <code>PointerType</code> whose key matches <var>key</var>
      */
     public static PointerType getPointerTypeForKey(String key) {
-        return KEY_TO_POINTER_TYPE_MAP.get(key);
+        if (ANTONYM.getKey().equals(key)) {
+            return ANTONYM;
+        }
+        if (HYPERNYM.getKey().equals(key)) {
+            return HYPERNYM;
+        }
+        if (HYPONYM.getKey().equals(key)) {
+            return HYPONYM;
+        }
+        if (ENTAILMENT.getKey().equals(key)) {
+            return ENTAILMENT;
+        }
+        if (SIMILAR_TO.getKey().equals(key)) {
+            return SIMILAR_TO;
+        }
+        if (MEMBER_HOLONYM.getKey().equals(key)) {
+            return MEMBER_HOLONYM;
+        }
+        if (SUBSTANCE_HOLONYM.getKey().equals(key)) {
+            return SUBSTANCE_HOLONYM;
+        }
+        if (PART_HOLONYM.getKey().equals(key)) {
+            return PART_HOLONYM;
+        }
+        if (MEMBER_MERONYM.getKey().equals(key)) {
+            return MEMBER_MERONYM;
+        }
+        if (SUBSTANCE_MERONYM.getKey().equals(key)) {
+            return SUBSTANCE_MERONYM;
+        }
+        if (PART_MERONYM.getKey().equals(key)) {
+            return PART_MERONYM;
+        }
+        if (CAUSE.getKey().equals(key)) {
+            return CAUSE;
+        }
+        if (PARTICIPLE_OF.getKey().equals(key)) {
+            return PARTICIPLE_OF;
+        }
+        if (SEE_ALSO.getKey().equals(key)) {
+            return SEE_ALSO;
+        }
+        if (PERTAINYM.getKey().equals(key)) {
+            return PERTAINYM;
+        }
+        if (ATTRIBUTE.getKey().equals(key)) {
+            return ATTRIBUTE;
+        }
+        if (VERB_GROUP.getKey().equals(key)) {
+            return VERB_GROUP;
+        }
+        if (NOMINALIZATION.getKey().equals(key)) {
+            return NOMINALIZATION;
+        }
+        if (DOMAIN_ALL.getKey().equals(key)) {
+            return DOMAIN_ALL;
+        }
+        if (MEMBER_ALL.getKey().equals(key)) {
+            return MEMBER_ALL;
+        }
+        if (CATEGORY.getKey().equals(key)) {
+            return CATEGORY;
+        }
+        if (USAGE.getKey().equals(key)) {
+            return USAGE;
+        }
+        if (REGION.getKey().equals(key)) {
+            return REGION;
+        }
+        if (CATEGORY_MEMBER.getKey().equals(key)) {
+            return CATEGORY_MEMBER;
+        }
+        if (USAGE_MEMBER.getKey().equals(key)) {
+            return USAGE_MEMBER;
+        }
+        if (REGION_MEMBER.getKey().equals(key)) {
+            return REGION_MEMBER;
+        }
+        if (INSTANCE_HYPERNYM.getKey().equals(key)) {
+            return INSTANCE_HYPERNYM;
+        }
+        if (INSTANCES_HYPONYM.getKey().equals(key)) {
+            return INSTANCES_HYPONYM;
+        }
+        return null;
     }
 
     public static List<PointerType> getAllPointerTypes() {
@@ -213,39 +243,19 @@ public class PointerType implements Serializable, Comparable<PointerType> {
         return Collections.unmodifiableList(types);
     }
 
-    /**
-     * Sets <var>a</var> as <var>b</var>'s symmetric type, and vice versa.
-     *
-     * @param a pointer type
-     * @param b pointer type
-     */
-    private static void setSymmetric(PointerType a, PointerType b) {
-        a.symmetricType = b;
-        b.symmetricType = a;
-    }
-
-    private static int getPOSMask(POS pos) {
-        return POS_TO_MASK_MAP.get(pos);
-    }
-
-    //serializables using pointer type should restore it to a static variable
-    //establishes order to sort pointer keys for index files
-    private transient int id;
     private transient String label;
     private transient int flags;
-    private String key;
-
+    private transient String key;
     /**
      * The PointerType that is the revers of this PointerType
      */
     private transient PointerType symmetricType;
 
-    private PointerType(int id, String label, String key, int flags) {
-        this.id = id;
-        this.label = JWNL.resolveMessage(label);
+    private PointerType(String key, String label, int flags) {
+        JWNL.initialize();
         this.key = key;
+        this.label = JWNL.resolveMessage(label);
         this.flags = flags;
-        KEY_TO_POINTER_TYPE_MAP.put(key, this);
     }
 
     public String toString() {
@@ -297,37 +307,38 @@ public class PointerType implements Serializable, Comparable<PointerType> {
         return flags;
     }
 
-    public int getId() {
-        return id;
+    /**
+     * Sets <var>a</var> as <var>b</var>'s symmetric type, and vice versa.
+     *
+     * @param a pointer type
+     * @param b pointer type
+     */
+    private static void setSymmetric(PointerType a, PointerType b) {
+        a.symmetricType = b;
+        b.symmetricType = a;
     }
 
-    public int hashCode() {
-        return getLabel().hashCode();
+    private static int getPOSMask(POS pos) {
+        return POS_TO_MASK_MAP.get(pos);
     }
 
-    @Override
-    public int compareTo(PointerType o) {
-        return this.id - o.getId();
-    }
-
-    private String flagStringCache = null;
-
+    private transient String flagStringCache = null;
     private String getFlagsAsString() {
         if (flagStringCache == null) {
             String str = "";
-            if ((flags & N) != 0) {
+            if ((flags & PointerTypeFlags.N) != 0) {
                 str += JWNL.resolveMessage("NOUN") + ", ";
             }
-            if ((flags & V) != 0) {
+            if ((flags & PointerTypeFlags.V) != 0) {
                 str += JWNL.resolveMessage("VERB") + ", ";
             }
-            if ((flags & ADJ) != 0) {
+            if ((flags & PointerTypeFlags.ADJ) != 0) {
                 str += JWNL.resolveMessage("ADJECTIVE") + ", ";
             }
-            if ((flags & ADV) != 0) {
+            if ((flags & PointerTypeFlags.ADV) != 0) {
                 str += JWNL.resolveMessage("ADVERB") + ", ";
             }
-            if ((flags & LEXICAL) != 0) {
+            if ((flags & PointerTypeFlags.LEXICAL) != 0) {
                 str += JWNL.resolveMessage("LEXICAL") + ", ";
             }
             flagStringCache = str.substring(0, str.length() - 2);

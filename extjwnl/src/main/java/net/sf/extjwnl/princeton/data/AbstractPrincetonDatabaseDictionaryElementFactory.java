@@ -72,16 +72,16 @@ public abstract class AbstractPrincetonDatabaseDictionaryElementFactory extends 
                 synset.getPointers().add(new Pointer(synset, type, targetPOS, targetOffset, targetIndex));
             }
 
-            if (POS.VERB.equals(pos)) {
+            if (POS.VERB == pos) {
                 BitSet vFrames = new BitSet();
                 while (verbFrames.next()) {
                     int frameNumber = verbFrames.getInt(1);
                     int wordIndex = verbFrames.getInt(2);
                     if (wordIndex > 0) {
-                        ((MutableVerb) synset.getWords().get(wordIndex - 1)).setVerbFrameFlag(frameNumber);
+                        ((Verb) synset.getWords().get(wordIndex - 1)).getVerbFrameFlags().set(frameNumber);
                     } else {
                         for (Word w : synset.getWords()) {
-                            ((MutableVerb) w).setVerbFrameFlag(frameNumber);
+                            ((Verb) w).getVerbFrameFlags().set(frameNumber);
                         }
                         vFrames.set(frameNumber);
                     }

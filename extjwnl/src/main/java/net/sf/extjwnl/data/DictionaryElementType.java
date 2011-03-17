@@ -7,38 +7,22 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * WordNet contains different file types, index, synset data, and exception files.
- * This class defines what the current dictionary is.
+ * Enumerates different dictionary file types present in WordNet: index, synset data, and exception files.
  *
  * @author Brett Walenz <bwalenz@users.sourceforge.net>
  * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
-public class DictionaryElementType {
+public enum DictionaryElementType {
 
-    static {
-        JWNL.initialize();
-    }
-
-    /**
-     * Property to define an index file.
-     */
-    public static final DictionaryElementType INDEX_WORD = new DictionaryElementType("INDEX_WORD");
-
-    /**
-     * Property to define a synset file.
-     */
-    public static final DictionaryElementType SYNSET = new DictionaryElementType("SYNSET");
-
-    /**
-     * Property that defines an exception file.
-     */
-    public static final DictionaryElementType EXCEPTION = new DictionaryElementType("EXCEPTION");
+    INDEX_WORD("INDEX_WORD"),
+    SYNSET("SYNSET"),
+    EXCEPTION("EXCEPTION");
 
     /**
      * The name of the dictionary element type.
      */
-    private final String name;
+    private transient String name;
 
     /**
      * A list of the different dictionary types.
@@ -63,6 +47,7 @@ public class DictionaryElementType {
      * @param name name
      */
     private DictionaryElementType(String name) {
+        JWNL.initialize();
         this.name = JWNL.resolveMessage(name);
     }
 
@@ -77,9 +62,5 @@ public class DictionaryElementType {
      */
     public String getName() {
         return name;
-    }
-
-    public int hashCode() {
-        return name.hashCode();
     }
 }

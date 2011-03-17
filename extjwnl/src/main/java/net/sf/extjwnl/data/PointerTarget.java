@@ -18,7 +18,7 @@ import java.util.List;
  */
 public abstract class PointerTarget implements Serializable, Owned {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     protected transient Dictionary dictionary;
 
@@ -55,8 +55,8 @@ public abstract class PointerTarget implements Serializable, Owned {
         List<Pointer> result = new ArrayList<Pointer>();
         for (Pointer pointer : getPointers()) {
             if (pointer.getType().equals(type)
-                    || type.equals(PointerType.HYPERNYM) && pointer.getType().equals(PointerType.INSTANCE_HYPERNYM)
-                    || type.equals(PointerType.HYPONYM) && pointer.getType().equals(PointerType.INSTANCES_HYPONYM)) {
+                    || PointerType.HYPERNYM == type && PointerType.INSTANCE_HYPERNYM == pointer.getType()
+                    || PointerType.HYPONYM == type && PointerType.INSTANCES_HYPONYM == pointer.getType()) {
                 result.add(pointer);
             }
         }

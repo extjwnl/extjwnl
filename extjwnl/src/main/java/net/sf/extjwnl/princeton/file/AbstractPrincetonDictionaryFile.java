@@ -7,7 +7,7 @@ import net.sf.extjwnl.dictionary.file.AbstractDictionaryFile;
 import net.sf.extjwnl.dictionary.file.DictionaryFileType;
 import net.sf.extjwnl.util.factory.Param;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 
 /**
@@ -29,13 +29,13 @@ public abstract class AbstractPrincetonDictionaryFile extends AbstractDictionary
     private static final Map<DictionaryFileType, FileNames> fileTypeToFileNameMap;
 
     static {
-        posToExtMap = new HashMap<POS, String>(4, 1);
+        posToExtMap = new EnumMap<POS, String>(POS.class);
         posToExtMap.put(POS.NOUN, NOUN_EXT);
         posToExtMap.put(POS.VERB, VERB_EXT);
         posToExtMap.put(POS.ADJECTIVE, ADJECTIVE_EXT);
         posToExtMap.put(POS.ADVERB, ADVERB_EXT);
 
-        fileTypeToFileNameMap = new HashMap<DictionaryFileType, FileNames>(3, 1);
+        fileTypeToFileNameMap = new EnumMap<DictionaryFileType, FileNames>(DictionaryFileType.class);
         fileTypeToFileNameMap.put(DictionaryFileType.INDEX, new FileNames("idx", "index"));
         fileTypeToFileNameMap.put(DictionaryFileType.DATA, new FileNames("dat", "data"));
         fileTypeToFileNameMap.put(DictionaryFileType.EXCEPTION, new FileNames("exc", "exc"));

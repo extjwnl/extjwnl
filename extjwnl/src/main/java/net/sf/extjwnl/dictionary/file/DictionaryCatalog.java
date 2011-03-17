@@ -8,7 +8,7 @@ import net.sf.extjwnl.util.factory.Owned;
 import net.sf.extjwnl.util.factory.Param;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -33,7 +33,7 @@ public class DictionaryCatalog<E extends DictionaryFile> implements Owned {
      */
     public static final String DICTIONARY_FILE_TYPE_KEY = "file_type";
 
-    private Map<POS, E> files = new HashMap<POS, E>();
+    private Map<POS, E> files = new EnumMap<POS, E>(POS.class);
     private DictionaryFileType fileType;
     private Dictionary dictionary;
 

@@ -6,10 +6,7 @@ import net.sf.extjwnl.dictionary.Dictionary;
 import net.sf.extjwnl.util.factory.Param;
 
 import java.sql.SQLException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Database manager.
@@ -76,7 +73,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
     protected static final Random rand = new Random(new Date().getTime());
 
     protected ConnectionManager connectionManager;
-    protected Map<POS, MinMax> minMaxIds = new HashMap<POS, MinMax>();
+    protected Map<POS, MinMax> minMaxIds = new EnumMap<POS, MinMax>(POS.class);
     protected Dictionary dictionary;
 
     public DatabaseManagerImpl(Dictionary dictionary, Map<String, Param> params) throws JWNLException {

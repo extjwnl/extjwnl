@@ -98,7 +98,7 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory extends Abst
             synset.getPointers().add(p);
         }
 
-        if (pos == POS.VERB) {
+        if (POS.VERB == pos) {
             BitSet verbFrames = new BitSet();
             int verbFrameCount = tokenizer.nextInt();
             for (int i = 0; i < verbFrameCount; i++) {
@@ -106,10 +106,10 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory extends Abst
                 int frameNumber = tokenizer.nextInt();
                 int wordIndex = tokenizer.nextHexInt();
                 if (wordIndex > 0) {
-                    ((MutableVerb) synset.getWords().get(wordIndex - 1)).setVerbFrameFlag(frameNumber);
+                    ((Verb) synset.getWords().get(wordIndex - 1)).getVerbFrameFlags().set(frameNumber);
                 } else {
                     for (Word w : synset.getWords()) {
-                        ((MutableVerb) w).setVerbFrameFlag(frameNumber);
+                        ((Verb) w).getVerbFrameFlags().set(frameNumber);
                     }
                     verbFrames.set(frameNumber);
                 }

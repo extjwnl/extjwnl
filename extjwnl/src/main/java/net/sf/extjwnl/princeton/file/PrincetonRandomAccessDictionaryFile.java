@@ -32,36 +32,6 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
 
     private static final Log log = LogFactory.getLog(PrincetonRandomAccessDictionaryFile.class);
 
-    private static final String PRINCETON_HEADER = "  1 This software and database is being provided to you, the LICENSEE, by  \n" +
-            "  2 Princeton University under the following license.  By obtaining, using  \n" +
-            "  3 and/or copying this software and database, you agree that you have  \n" +
-            "  4 read, understood, and will comply with these terms and conditions.:  \n" +
-            "  5   \n" +
-            "  6 Permission to use, copy, modify and distribute this software and  \n" +
-            "  7 database and its documentation for any purpose and without fee or  \n" +
-            "  8 royalty is hereby granted, provided that you agree to comply with  \n" +
-            "  9 the following copyright notice and statements, including the disclaimer,  \n" +
-            "  10 and that the same appear on ALL copies of the software, database and  \n" +
-            "  11 documentation, including modifications that you make for internal  \n" +
-            "  12 use or for distribution.  \n" +
-            "  13   \n" +
-            "  14 WordNet 3.0 Copyright 2006 by Princeton University.  All rights reserved.  \n" +
-            "  15   \n" +
-            "  16 THIS SOFTWARE AND DATABASE IS PROVIDED \"AS IS\" AND PRINCETON  \n" +
-            "  17 UNIVERSITY MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR  \n" +
-            "  18 IMPLIED.  BY WAY OF EXAMPLE, BUT NOT LIMITATION, PRINCETON  \n" +
-            "  19 UNIVERSITY MAKES NO REPRESENTATIONS OR WARRANTIES OF MERCHANT-  \n" +
-            "  20 ABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE USE  \n" +
-            "  21 OF THE LICENSED SOFTWARE, DATABASE OR DOCUMENTATION WILL NOT  \n" +
-            "  22 INFRINGE ANY THIRD PARTY PATENTS, COPYRIGHTS, TRADEMARKS OR  \n" +
-            "  23 OTHER RIGHTS.  \n" +
-            "  24   \n" +
-            "  25 The name of Princeton University or Princeton may not be used in  \n" +
-            "  26 advertising or publicity pertaining to distribution of the software  \n" +
-            "  27 and/or database.  Title to copyright in this software, database and  \n" +
-            "  28 any associated documentation shall at all times remain with  \n" +
-            "  29 Princeton University and LICENSEE agrees to preserve same.  \n";
-
     /**
      * Whether to add standard princeton header to files on save, default: false.
      */
@@ -110,19 +80,48 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
     public static final String CHECK_VERB_FRAME_LIMIT_KEY = "check_verb_frame_limit";
     private boolean checkVerbFrameLimit = true;
 
+    protected RandomAccessFile raFile = null;
+
+    private static final String PRINCETON_HEADER = "  1 This software and database is being provided to you, the LICENSEE, by  \n" +
+            "  2 Princeton University under the following license.  By obtaining, using  \n" +
+            "  3 and/or copying this software and database, you agree that you have  \n" +
+            "  4 read, understood, and will comply with these terms and conditions.:  \n" +
+            "  5   \n" +
+            "  6 Permission to use, copy, modify and distribute this software and  \n" +
+            "  7 database and its documentation for any purpose and without fee or  \n" +
+            "  8 royalty is hereby granted, provided that you agree to comply with  \n" +
+            "  9 the following copyright notice and statements, including the disclaimer,  \n" +
+            "  10 and that the same appear on ALL copies of the software, database and  \n" +
+            "  11 documentation, including modifications that you make for internal  \n" +
+            "  12 use or for distribution.  \n" +
+            "  13   \n" +
+            "  14 WordNet 3.0 Copyright 2006 by Princeton University.  All rights reserved.  \n" +
+            "  15   \n" +
+            "  16 THIS SOFTWARE AND DATABASE IS PROVIDED \"AS IS\" AND PRINCETON  \n" +
+            "  17 UNIVERSITY MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR  \n" +
+            "  18 IMPLIED.  BY WAY OF EXAMPLE, BUT NOT LIMITATION, PRINCETON  \n" +
+            "  19 UNIVERSITY MAKES NO REPRESENTATIONS OR WARRANTIES OF MERCHANT-  \n" +
+            "  20 ABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE USE  \n" +
+            "  21 OF THE LICENSED SOFTWARE, DATABASE OR DOCUMENTATION WILL NOT  \n" +
+            "  22 INFRINGE ANY THIRD PARTY PATENTS, COPYRIGHTS, TRADEMARKS OR  \n" +
+            "  23 OTHER RIGHTS.  \n" +
+            "  24   \n" +
+            "  25 The name of Princeton University or Princeton may not be used in  \n" +
+            "  26 advertising or publicity pertaining to distribution of the software  \n" +
+            "  27 and/or database.  Title to copyright in this software, database and  \n" +
+            "  28 any associated documentation shall at all times remain with  \n" +
+            "  29 Princeton University and LICENSEE agrees to preserve same.  \n";
+
     /**
      * Read-only file permission.
      */
-    public static final String READ_ONLY = "r";
+    private static final String READ_ONLY = "r";
+
     /**
      * Read-write file permission.
      */
-    public static final String READ_WRITE = "rw";
+    private static final String READ_WRITE = "rw";
 
-    /**
-     * The random-access file.
-     */
-    protected RandomAccessFile raFile = null;
 
     private CharsetDecoder decoder;
 
@@ -233,7 +232,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
     public String readLineWord() throws IOException {
         if (isOpen()) {
             //in data files offset needs no decoding, it is numeric
-            if (null == encoding || getFileType().equals(DictionaryFileType.DATA)) {
+            if (null == encoding || DictionaryFileType.DATA == getFileType()) {
                 StringBuffer input = new StringBuffer();
                 int c;
                 while (((c = raFile.read()) != -1) && c != '\n' && c != '\r' && c != ' ') {
@@ -326,7 +325,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
         if (log.isInfoEnabled()) {
             log.info(JWNL.resolveMessage("PRINCETON_INFO_004", getFilename()));
         }
-        if (DictionaryFileType.EXCEPTION.equals(getFileType())) {
+        if (DictionaryFileType.EXCEPTION == getFileType()) {
             ArrayList<String> exceptions = new ArrayList<String>();
             Iterator<Exc> ei = dictionary.getExceptionIterator(getPOS());
             while (ei.hasNext()) {
@@ -339,7 +338,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
 
             seek(0);
             writeStrings(exceptions);
-        } else if (DictionaryFileType.DATA.equals(getFileType())) {
+        } else if (DictionaryFileType.DATA == getFileType()) {
             ArrayList<Synset> synsets = new ArrayList<Synset>();
             Iterator<Synset> si = dictionary.getSynsetIterator(getPOS());
             while (si.hasNext()) {
@@ -412,7 +411,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                 log.info(JWNL.resolveMessage("PRINCETON_INFO_009", getFilename()));
             }
 
-        } else if (DictionaryFileType.INDEX.equals(getFileType())) {
+        } else if (DictionaryFileType.INDEX == getFileType()) {
             ArrayList<String> indexes = new ArrayList<String>();
 
             Iterator<IndexWord> ii = dictionary.getIndexWordIterator(getPOS());
@@ -547,7 +546,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
         //w_cnt Two digit hexadecimal integer indicating the number of words in the synset.
         String posKey = synset.getPOS().getKey();
         if (synset.isAdjectiveCluster()) {
-            posKey = POS.ADJECTIVE_SATELLITE.getKey();
+            posKey = POS.ADJECTIVE_SATELLITE_KEY;
         }
         if (checkLexFileNumber && log.isWarnEnabled() && !LexFileIdFileNameMap.getMap().containsKey(synset.getLexFileNum())) {
             log.warn(JWNL.resolveMessage("PRINCETON_WARN_001", synset.getLexFileNum()));
@@ -562,7 +561,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
             String lemma = w.getLemma().replace(' ', '_');
             if (w instanceof Adjective) {
                 Adjective a = (Adjective) w;
-                if (!Adjective.NONE.equals(a.getAdjectivePosition())) {
+                if (AdjectivePosition.NONE != a.getAdjectivePosition()) {
                     lemma = lemma + "(" + a.getAdjectivePosition().getKey() + ")";
                 }
             }
@@ -603,7 +602,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
         }
 
         //frames In data.verb only
-        if (POS.VERB.equals(synset.getPOS())) {
+        if (POS.VERB == synset.getPOS()) {
             BitSet verbFrames = synset.getVerbFrameFlags();
             int verbFramesCount = verbFrames.cardinality();
             for (Word word : synset.getWords()) {

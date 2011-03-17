@@ -79,7 +79,7 @@ public abstract class Dictionary {
     private static final String DEFAULT_DB_DICTIONARY_PATH = "jdbc:mysql://localhost/jwnl?user=root";
 
     // stores max offset for each POS
-    protected HashMap<POS, Long> maxOffset = new HashMap<POS, Long>(POS.getAllPOS().size());
+    protected Map<POS, Long> maxOffset = new EnumMap<POS, Long>(POS.class);
 
     /**
      * Represents a version of WordNet.
@@ -387,29 +387,7 @@ public abstract class Dictionary {
         int percentIndex = senseKey.indexOf('%');
         String lemma = senseKey.substring(0, percentIndex).replace('_', ' ');
         String ssType = senseKey.substring(percentIndex + 1, senseKey.indexOf(':', percentIndex));
-        POS pos = null;
-        switch (Integer.parseInt(ssType)) {
-            case 1: {
-                pos = POS.NOUN;
-                break;
-            }
-            case 2: {
-                pos = POS.VERB;
-                break;
-            }
-            case 3: {
-                pos = POS.ADJECTIVE;
-                break;
-            }
-            case 4: {
-                pos = POS.ADVERB;
-                break;
-            }
-            case 5: {
-                pos = POS.ADJECTIVE;
-                break;
-            }
-        }
+        POS pos = POS.getPOSForId(Integer.parseInt(ssType));
         Word result = null;
         if (null != pos) {
             IndexWord iw = getIndexWord(pos, lemma);

@@ -28,7 +28,7 @@ import java.util.*;
  */
 public class Synset extends PointerTarget implements DictionaryElement {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     private static final Log log = LogFactory.getLog(Synset.class);
 
@@ -575,7 +575,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
         words = new WordList();
         isAdjectiveCluster = false;
 
-        if (POS.VERB.equals(pos)) {
+        if (POS.VERB == pos) {
             verbFrameFlags = new BitSet();
         }
 
@@ -595,7 +595,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
         words = new WordList();
         isAdjectiveCluster = false;
 
-        if (POS.VERB.equals(pos)) {
+        if (POS.VERB == pos) {
             verbFrameFlags = new BitSet();
         }
         this.offset = offset;
@@ -699,7 +699,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
      * @return all Verb Frames that are valid for all the words in this synset
      */
     public String[] getVerbFrames() {
-        if (POS.VERB.equals(pos)) {
+        if (POS.VERB == pos) {
             return VerbFrame.getFrames(verbFrameFlags);
         } else {
             return EMPTY_STRING_ARRAY;
@@ -707,7 +707,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
     }
 
     public BitSet getVerbFrameFlags() {
-        if (POS.VERB.equals(pos)) {
+        if (POS.VERB == pos) {
             return verbFrameFlags;
         } else {
             return EMPTY_BIT_SET;
@@ -715,7 +715,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
     }
 
     public void setVerbFrameFlags(BitSet verbFrameFlags) {
-        if (!POS.VERB.equals(pos)) {
+        if (POS.VERB != pos) {
             throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_049"));
         }
         if (null == verbFrameFlags) {
@@ -725,7 +725,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
     }
 
     public int[] getVerbFrameIndices() {
-        if (POS.VERB.equals(pos)) {
+        if (POS.VERB == pos) {
             return VerbFrame.getVerbFrameIndices(verbFrameFlags);
         } else {
             return EMPTY_INT_ARRAY;
@@ -811,8 +811,6 @@ public class Synset extends PointerTarget implements DictionaryElement {
 
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
-        // set POS to reference the static instance defined in the current runtime environment
-        pos = POS.getPOSForKey(pos.getKey());
         dictionary = Dictionary.getRestoreDictionary();
     }
 }

@@ -124,7 +124,7 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
                 pointerQuery = dbManager.getPointerQuery(pos, offset);
                 verbFrameQuery = dbManager.getVerbFrameQuery(pos, offset);
                 synset = elementFactory.createSynset(pos, offset, query.execute(), wordQuery.execute(),
-                        pointerQuery.execute(), POS.VERB.equals(pos) ? verbFrameQuery.execute() : null);
+                        pointerQuery.execute(), POS.VERB == pos ? verbFrameQuery.execute() : null);
                 if (synset != null && isCachingEnabled()) {
                     cacheSynset(new POSKey(pos, offset), synset);
                 }

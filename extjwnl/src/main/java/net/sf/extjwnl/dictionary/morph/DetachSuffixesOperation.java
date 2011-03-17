@@ -29,7 +29,7 @@ public class DetachSuffixesOperation extends AbstractDelegatingOperation {
 
     public DetachSuffixesOperation(Dictionary dictionary, Map<String, Param> params) throws JWNLException {
         super(dictionary, params);
-        suffixMap = new HashMap<POS, String[][]>();
+        suffixMap = new EnumMap<POS, String[][]>(POS.class);
         for (Param p : params.values()) {
             POS pos = POS.getPOSForLabel(p.getName());
             if (pos != null) {

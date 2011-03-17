@@ -59,9 +59,4 @@ public class POSKey {
     public String toString() {
         return JWNL.resolveMessage("DICTIONARY_TOSTRING_001", new Object[]{pos, key});
     }
-
-    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
-        in.defaultReadObject();
-        pos = POS.getPOSForKey(pos.getKey());
-    }
 }

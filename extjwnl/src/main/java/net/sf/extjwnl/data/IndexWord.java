@@ -18,7 +18,7 @@ import java.util.*;
  */
 public class IndexWord extends BaseDictionaryElement {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     private static final Log log = LogFactory.getLog(IndexWord.class);
 
@@ -594,12 +594,6 @@ public class IndexWord extends BaseDictionaryElement {
             }
         }
         return 0;
-    }
-
-    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
-        in.defaultReadObject();
-        // set POS to reference the static instance defined in the current runtime environment
-        pos = POS.getPOSForKey(pos.getKey());
     }
 
     private void writeObject(java.io.ObjectOutputStream oos) throws IOException {

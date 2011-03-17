@@ -18,7 +18,7 @@ import java.util.*;
  */
 public class Word extends PointerTarget {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     /**
      * The Synset to which this word belongs.
@@ -250,7 +250,7 @@ public class Word extends PointerTarget {
         for (Synset ss : sortedSenses) {
             String summary = "";
             String lastSummary;
-            if (POS.NOUN.equals(getSynset().getPOS())) {
+            if (POS.NOUN == getSynset().getPOS()) {
                 //try INSTANCE_OF first of all, because for people and places it is better
                 //to show class, rather than another name.
                 List<Pointer> pointers = ss.getPointers(PointerType.INSTANCE_HYPERNYM);
@@ -263,7 +263,7 @@ public class Word extends PointerTarget {
                     summary = getShortestLemma(getLemmasFromSynset(ss), summaries);
                 }
                 if (summaries.contains(summary)) {
-                    if (POS.NOUN.equals(getSynset().getPOS()) || POS.VERB.equals(getSynset().getPOS())) {
+                    if (POS.NOUN == getSynset().getPOS() || POS.VERB == getSynset().getPOS()) {
                         //try HYPERNYMS
                         List<Pointer> pointers = ss.getPointers(PointerType.HYPERNYM);
                         summary = getShortestLemma(getLemmasFromPointers(pointers), summaries);
@@ -284,7 +284,7 @@ public class Word extends PointerTarget {
                                 //try gloss for verbs
                                 //for nouns glosses are written in a manner that requires parsing to extract good summary
                                 if (0 == summary.length()) {
-                                    if (POS.VERB.equals(getSynset().getPOS())) {
+                                    if (POS.VERB == getSynset().getPOS()) {
                                         String gloss = ss.getGloss();
                                         summary = gloss.substring(0, gloss.indexOf(" "));
                                     } else {
@@ -301,7 +301,7 @@ public class Word extends PointerTarget {
                         }
                     } else {//NV
                         //AR
-                        if (POS.ADJECTIVE.equals(getSynset().getPOS())) {
+                        if (POS.ADJECTIVE == getSynset().getPOS()) {
                             //try SIMILAR_TO
                             List<Pointer> pointers = ss.getPointers(PointerType.SIMILAR_TO);
                             summary = getShortestLemma(getLemmasFromPointers(pointers), summaries);
@@ -346,7 +346,7 @@ public class Word extends PointerTarget {
                             } else {
                                 summary = lastSummary;
                             }
-                        } else if (POS.ADVERB.equals(getSynset().getPOS())) {
+                        } else if (POS.ADVERB == getSynset().getPOS()) {
                             //try PERTAINYM (former DERIVED)
                             List<Pointer> pointers = ss.getPointers(PointerType.PERTAINYM);
                             summary = getShortestLemma(getLemmasFromPointers(pointers), summaries);
@@ -438,19 +438,9 @@ public class Word extends PointerTarget {
      * @return sense key
      */
     public String getSenseKey() {
-        int ss_type = 5;
-        if (getPOS().equals(POS.NOUN)) {
-            ss_type = 1;
-        } else if (getPOS().equals(POS.VERB)) {
-            ss_type = 2;
-        } else if (getPOS().equals(POS.ADJECTIVE)) {
-            ss_type = 3;
-        } else if (getPOS().equals(POS.ADVERB)) {
-            ss_type = 4;
-        }
-
+        int ss_type = getPOS().getId();
         if (getSynset().isAdjectiveCluster()) {
-            ss_type = 5;
+            ss_type = POS.ADJECTIVE_SATELLITE_ID;
         }
 
         StringBuilder senseKey = new StringBuilder(String.format("%s%%%d:%02d:%02d:", lemma.toLowerCase().replace(' ', '_'), ss_type, synset.getLexFileNum(), lexId));
@@ -478,24 +468,14 @@ public class Word extends PointerTarget {
      * @return sense key
      */
     public String getSenseKeyWithAdjClass() {
-        int ss_type = 5;
-        if (getPOS().equals(POS.NOUN)) {
-            ss_type = 1;
-        } else if (getPOS().equals(POS.VERB)) {
-            ss_type = 2;
-        } else if (getPOS().equals(POS.ADJECTIVE)) {
-            ss_type = 3;
-        } else if (getPOS().equals(POS.ADVERB)) {
-            ss_type = 4;
-        }
-
+        int ss_type = getPOS().getId();
         if (getSynset().isAdjectiveCluster()) {
-            ss_type = 5;
+            ss_type = POS.ADJECTIVE_SATELLITE_ID;
         }
 
         StringBuilder senseKey = new StringBuilder(String.format("%s%%%d:%02d:%02d:", lemma.toLowerCase().replace(' ', '_'), ss_type, synset.getLexFileNum(), lexId));
 
-        if (5 == ss_type) {
+        if (POS.ADJECTIVE_SATELLITE_ID == ss_type) {
             List<Pointer> p = synset.getPointers(PointerType.SIMILAR_TO);
             if (0 < p.size()) {
                 Pointer headWord = p.get(0);
@@ -505,7 +485,7 @@ public class Word extends PointerTarget {
                     String lemma = word.getLemma().toLowerCase().replace(' ', '_');
                     if (word instanceof Adjective) {
                         Adjective a = (Adjective) word;
-                        if (!Adjective.NONE.equals(a.getAdjectivePosition())) {
+                        if (AdjectivePosition.NONE != a.getAdjectivePosition()) {
                             lemma = lemma + "(" + a.getAdjectivePosition().getKey() + ")";
                         }
                     }

@@ -2,10 +2,7 @@ package net.sf.extjwnl.data;
 
 import net.sf.extjwnl.JWNL;
 
-import java.util.Collection;
-import java.util.Hashtable;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * A class to simplify the access to a set of <code>IndexWord</code>s, each containing
@@ -19,7 +16,7 @@ public class IndexWordSet {
     /**
      * Map of IndexWords in this set.
      */
-    private Map<POS, IndexWord> indexWords = new Hashtable<POS, IndexWord>(4, (float) 1.0);
+    private Map<POS, IndexWord> indexWords = new EnumMap<POS, IndexWord>(POS.class);
     private String lemma;
 
     public IndexWordSet(String lemma) {
@@ -88,7 +85,7 @@ public class IndexWordSet {
      *
      * @return a set of all the parts-of-speech for which there is an IndexWord in this set
      */
-    public Set getValidPOSSet() {
+    public Set<POS> getValidPOSSet() {
         return indexWords.keySet();
     }
 
@@ -119,8 +116,8 @@ public class IndexWordSet {
             str = JWNL.resolveMessage("DATA_TOSTRING_003");
         } else {
             StringBuffer buf = new StringBuffer();
-            for (Object o : getValidPOSSet()) {
-                buf.append(getIndexWord((POS) o).toString());
+            for (POS o : getValidPOSSet()) {
+                buf.append(getIndexWord(o).toString());
             }
             str = buf.toString();
         }

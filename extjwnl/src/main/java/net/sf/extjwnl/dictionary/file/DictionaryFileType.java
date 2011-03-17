@@ -8,25 +8,18 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Instances of this class specify the different types of dictionary files (the different classes of dictionary files.
+ * Enumerates different types of dictionary files.
  *
  * @author John Didion <jdidion@didion.net>
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
-public class DictionaryFileType {
+public enum DictionaryFileType {
 
-    private static final String INDEX_KEY = "index";
-    private static final String DATA_KEY = "data";
-    private static final String EXCEPTION_KEY = "exception";
-    private static final String REVCNTLIST_KEY = "cntlist.rev";
-    private static final String CNTLIST_KEY = "cntlist";
-
-    // File type constants
-    public static final DictionaryFileType INDEX = new DictionaryFileType(INDEX_KEY, DictionaryElementType.INDEX_WORD);
-    public static final DictionaryFileType DATA = new DictionaryFileType(DATA_KEY, DictionaryElementType.SYNSET);
-    public static final DictionaryFileType EXCEPTION = new DictionaryFileType(EXCEPTION_KEY, DictionaryElementType.EXCEPTION);
-    public static final DictionaryFileType REVCNTLIST = new DictionaryFileType(REVCNTLIST_KEY, null);
-    public static final DictionaryFileType CNTLIST = new DictionaryFileType(CNTLIST_KEY, null);
+    INDEX("index", DictionaryElementType.INDEX_WORD),
+    DATA("data", DictionaryElementType.SYNSET),
+    EXCEPTION("exception", DictionaryElementType.EXCEPTION),
+    REVCNTLIST("cntlist.rev", null),
+    CNTLIST("cntlist", null);
 
     private static final List<DictionaryFileType> ALL_TYPES = Collections.unmodifiableList(Arrays.asList(INDEX, DATA, EXCEPTION));
 
@@ -34,8 +27,8 @@ public class DictionaryFileType {
         return ALL_TYPES;
     }
 
-    private String name;
-    private DictionaryElementType elementType;
+    private transient String name;
+    private transient DictionaryElementType elementType;
 
     private DictionaryFileType(String type, DictionaryElementType elementType) {
         name = type;
@@ -52,9 +45,5 @@ public class DictionaryFileType {
 
     public String toString() {
         return JWNL.resolveMessage("DICTIONARY_TOSTRING_002", getName());
-    }
-
-    public int hashCode() {
-        return getName().hashCode();
     }
 }

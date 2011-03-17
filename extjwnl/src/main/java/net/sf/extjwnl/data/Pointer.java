@@ -20,7 +20,7 @@ import java.io.Serializable;
  */
 public class Pointer implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     private static final Log log = LogFactory.getLog(Pointer.class);
 
@@ -224,12 +224,6 @@ public class Pointer implements Serializable {
             return JWNL.resolveMessage("DATA_TOSTRING_013", new Object[]{pos, offset, index});
         }
 
-        private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
-            in.defaultReadObject();
-            // set POS to reference the static instance defined in the current runtime environment
-            pos = POS.getPOSForKey(pos.getKey());
-        }
-
         @Override
         public boolean equals(Object o) {
             if (this == o) {
@@ -262,12 +256,6 @@ public class Pointer implements Serializable {
             result = 31 * result + index;
             return result;
         }
-    }
-
-    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
-        in.defaultReadObject();
-        // set pointer type to reference the static instance defined in the current runtime environment
-        pointerType = PointerType.getPointerTypeForKey(pointerType.getKey());
     }
 
     private void writeObject(java.io.ObjectOutputStream oos) throws IOException {
