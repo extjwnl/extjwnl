@@ -33,7 +33,7 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
      */
     public static final String DATABASE_MANAGER = "database_manager";
 
-    private DatabaseDictionaryElementFactory elementFactory;
+    private DatabaseDictionaryElementFactory factory;
     private DatabaseManager dbManager;
 
     public DatabaseBackedDictionary(Document doc) throws JWNLException {
@@ -49,7 +49,7 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
         param = params.get(DATABASE_MANAGER);
         DatabaseManager manager = (param == null) ? null : (DatabaseManager) param.create();
 
-        elementFactory = factory;
+        this.factory = factory;
         dbManager = manager;
         setMorphologicalProcessor(morph);
     }
@@ -65,7 +65,7 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
                 Query query = null;
                 try {
                     query = dbManager.getIndexWordSynsetsQuery(pos, lemma);
-                    word = elementFactory.createIndexWord(pos, lemma, query.execute());
+                    word = factory.createIndexWord(pos, lemma, query.execute());
                     if (word != null && isCachingEnabled()) {
                         cacheIndexWord(new POSKey(pos, lemma), word);
                     }
@@ -123,7 +123,7 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
                 wordQuery = dbManager.getSynsetWordQuery(pos, offset);
                 pointerQuery = dbManager.getPointerQuery(pos, offset);
                 verbFrameQuery = dbManager.getVerbFrameQuery(pos, offset);
-                synset = elementFactory.createSynset(pos, offset, query.execute(), wordQuery.execute(),
+                synset = factory.createSynset(pos, offset, query.execute(), wordQuery.execute(),
                         pointerQuery.execute(), POS.VERB == pos ? verbFrameQuery.execute() : null);
                 if (synset != null && isCachingEnabled()) {
                     cacheSynset(new POSKey(pos, offset), synset);
@@ -163,7 +163,7 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
             Query query = null;
             try {
                 query = dbManager.getExceptionQuery(pos, derivation);
-                exc = elementFactory.createExc(pos, derivation, query.execute());
+                exc = factory.createExc(pos, derivation, query.execute());
                 if (exc != null && isCachingEnabled()) {
                     cacheException(new POSKey(pos, derivation), exc);
                 }
