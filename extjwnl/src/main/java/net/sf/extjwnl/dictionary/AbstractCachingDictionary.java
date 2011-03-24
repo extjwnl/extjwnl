@@ -286,7 +286,7 @@ public abstract class AbstractCachingDictionary extends Dictionary {
             int count = 0;
             Iterator<Exc> ei = getExceptionIterator(pos);
             while (ei.hasNext()) {
-                if (count % 1000 == 0) {
+                if (count % 10000 == 0) {
                     if (log.isInfoEnabled()) {
                         log.info(JWNL.resolveMessage("DICTIONARY_INFO_005", count));
                     }
@@ -307,7 +307,7 @@ public abstract class AbstractCachingDictionary extends Dictionary {
             maxOffset.put(pos, 0L);
             Iterator<Synset> si = getSynsetIterator(pos);
             while (si.hasNext()) {
-                if (count % 1000 == 0) {
+                if (count % 10000 == 0) {
                     if (log.isInfoEnabled()) {
                         log.info(JWNL.resolveMessage("DICTIONARY_INFO_005", count));
                     }
@@ -334,7 +334,7 @@ public abstract class AbstractCachingDictionary extends Dictionary {
             int count = 0;
             Iterator<IndexWord> ii = getIndexWordIterator(pos);
             while (ii.hasNext()) {
-                if (count % 1000 == 0) {
+                if (count % 10000 == 0) {
                     if (log.isInfoEnabled()) {
                         log.info(JWNL.resolveMessage("DICTIONARY_INFO_005", count));
                     }
