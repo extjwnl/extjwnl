@@ -439,7 +439,7 @@ public class Word extends PointerTarget {
      */
     public String getSenseKey() {
         int ss_type = getPOS().getId();
-        if (getSynset().isAdjectiveCluster()) {
+        if (POS.ADJECTIVE == getSynset().getPOS() && getSynset().isAdjectiveCluster()) {
             ss_type = POS.ADJECTIVE_SATELLITE_ID;
         }
 

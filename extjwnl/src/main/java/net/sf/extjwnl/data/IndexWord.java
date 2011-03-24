@@ -119,16 +119,12 @@ public class IndexWord extends BaseDictionaryElement {
             }
             loadAllSynsets();
             if (null != dictionary && dictionary.isEditable()) {
-                if (!super.contains(synset)) {
-                    Synset result = super.set(index, synset);
-                    if (null != result) {
-                        removeWordsFromSynset(result, lemma);
-                    }
-                    addWord(synset, lemma);
-                    return result;
-                } else {
-                    return get(index);
+                Synset result = super.set(index, synset);
+                if (null != result) {
+                    removeWordsFromSynset(result, lemma);
                 }
+                addWord(synset, lemma);
+                return result;
             } else {
                 return super.set(index, synset);
             }
@@ -144,13 +140,9 @@ public class IndexWord extends BaseDictionaryElement {
             }
             loadAllSynsets();
             if (null != dictionary && dictionary.isEditable()) {
-                if (!super.contains(synset)) {
-                    boolean result = super.add(synset);
-                    addWord(synset, lemma);
-                    return result;
-                } else {
-                    return false;
-                }
+                boolean result = super.add(synset);
+                addWord(synset, lemma);
+                return result;
             } else {
                 return super.add(synset);
             }
@@ -166,10 +158,8 @@ public class IndexWord extends BaseDictionaryElement {
             }
             loadAllSynsets();
             if (null != dictionary && dictionary.isEditable()) {
-                if (!super.contains(synset)) {
-                    super.add(index, synset);
-                    addWord(synset, lemma);
-                }
+                super.add(index, synset);
+                addWord(synset, lemma);
             } else {
                 super.add(index, synset);
             }
@@ -257,12 +247,11 @@ public class IndexWord extends BaseDictionaryElement {
         public boolean addAll(int index, Collection<? extends Synset> c) {
             loadAllSynsets();
             if (null != dictionary && dictionary.isEditable()) {
-                boolean result = !super.containsAll(c);
                 for (Synset synset : c) {
                     add(index, synset);
                     index++;
                 }
-                return result;
+                return true;
             } else {
                 return super.addAll(index, c);
             }
