@@ -18,7 +18,7 @@ import java.util.List;
  */
 public abstract class PointerTarget implements Serializable, Owned {
 
-    private static final long serialVersionUID = 3L;
+    private static final long serialVersionUID = 4L;
 
     protected transient Dictionary dictionary;
 

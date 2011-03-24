@@ -18,7 +18,7 @@ import java.util.*;
  */
 public class Word extends PointerTarget {
 
-    private static final long serialVersionUID = 3L;
+    private static final long serialVersionUID = 4L;
 
     /**
      * The Synset to which this word belongs.
@@ -42,7 +42,7 @@ public class Word extends PointerTarget {
      * to the same file, although there is no requirement that the numbers be consecutive or begin with 00.
      * Note that a value of 00 is the default.
      */
-    private long lexId = -1;//flag as not set
+    private int lexId = -1;//flag as not set
 
     /**
      * The summary of this word.
@@ -121,7 +121,7 @@ public class Word extends PointerTarget {
      *
      * @return the lexicographer id that identifies this lemma
      */
-    public long getLexId() {
+    public int getLexId() {
         return lexId;
     }
 
@@ -130,7 +130,7 @@ public class Word extends PointerTarget {
      *
      * @param lexId the lexicographer id that identifies this lemma
      */
-    public void setLexId(long lexId) {
+    public void setLexId(int lexId) {
         this.lexId = lexId;
     }
 

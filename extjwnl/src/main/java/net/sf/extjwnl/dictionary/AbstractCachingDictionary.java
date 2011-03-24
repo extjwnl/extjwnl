@@ -268,7 +268,7 @@ public abstract class AbstractCachingDictionary extends Dictionary {
         super.removeIndexWord(indexWord);
     }
 
-    protected void cacheAll() throws JWNLException {
+    public void cacheAll() throws JWNLException {
         for (POS pos : POS.getAllPOS()) {
             cachePOS(pos);
         }

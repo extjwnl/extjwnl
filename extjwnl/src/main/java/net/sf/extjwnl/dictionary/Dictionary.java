@@ -590,8 +590,8 @@ public abstract class Dictionary {
                         }
                     }
                     for (ArrayList<Word> words : lexWords.values()) {
-                        long id = -1;//find max id
-                        Set<Long> lexIds = new HashSet<Long>(words.size());
+                        int id = -1;//find max id
+                        Set<Integer> lexIds = new HashSet<Integer>(words.size());
                         for (Word w : words) {
                             if (id < w.getLexId()) {
                                 id = w.getLexId();

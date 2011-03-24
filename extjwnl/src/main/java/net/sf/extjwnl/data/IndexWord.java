@@ -18,7 +18,7 @@ import java.util.*;
  */
 public class IndexWord extends BaseDictionaryElement {
 
-    private static final long serialVersionUID = 3L;
+    private static final long serialVersionUID = 4L;
 
     private static final Log log = LogFactory.getLog(IndexWord.class);
 

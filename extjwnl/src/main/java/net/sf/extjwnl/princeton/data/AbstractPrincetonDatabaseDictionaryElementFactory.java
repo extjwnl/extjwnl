@@ -66,7 +66,7 @@ public abstract class AbstractPrincetonDatabaseDictionaryElementFactory extends 
                 int index = words.getInt(2);
                 Word word = createWord(synset, index, lemma);
                 word.setUseCount(words.getInt(3));
-                word.setLexId(words.getLong(4));
+                word.setLexId(words.getInt(4));
                 synset.getWords().add(word);
             }
             if (synset.getWords() instanceof ArrayList) {

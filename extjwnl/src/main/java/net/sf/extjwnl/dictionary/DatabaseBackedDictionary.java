@@ -282,7 +282,7 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
     }
 
     @Override
-    protected void cacheAll() throws JWNLException {
+    public void cacheAll() throws JWNLException {
         if (factory instanceof AbstractPrincetonDictionaryElementFactory) {
             ((AbstractPrincetonDictionaryElementFactory) factory).startCaching();
         }

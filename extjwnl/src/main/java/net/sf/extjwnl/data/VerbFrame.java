@@ -17,7 +17,7 @@ public class VerbFrame implements Serializable {
         JWNL.initialize();
     }
 
-    private static final long serialVersionUID = 3L;
+    private static final long serialVersionUID = 4L;
 
     private static VerbFrame[] verbFrames;
 
