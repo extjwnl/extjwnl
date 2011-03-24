@@ -654,9 +654,6 @@ public abstract class Dictionary {
         if (!isEditable()) {
             throw new JWNLException("DICTIONARY_EXCEPTION_029");
         }
-        if (this != element.getDictionary()) {
-            throw new JWNLException("DICTIONARY_EXCEPTION_040");
-        }
         if (element instanceof Exc) {
             removeException((Exc) element);
         } else if (element instanceof IndexWord) {
@@ -707,9 +704,6 @@ public abstract class Dictionary {
     public void removeException(Exc exc) throws JWNLException {
         if (!isEditable()) {
             throw new JWNLException("DICTIONARY_EXCEPTION_029");
-        }
-        if (this != exc.getDictionary()) {
-            throw new JWNLException("DICTIONARY_EXCEPTION_040");
         }
         exc.setDictionary(null);
     }

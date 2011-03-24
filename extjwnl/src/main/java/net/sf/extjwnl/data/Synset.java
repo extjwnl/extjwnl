@@ -61,7 +61,6 @@ public class Synset extends PointerTarget implements DictionaryElement {
      */
     private long lexFileNum;
 
-    private transient Dictionary settingDictionary;
 
     private static final String[] EMPTY_STRING_ARRAY = new String[0];
     private static final BitSet EMPTY_BIT_SET = new BitSet();
@@ -566,7 +565,6 @@ public class Synset extends PointerTarget implements DictionaryElement {
 
     public Synset(Dictionary dictionary, POS pos) throws JWNLException {
         super(dictionary);
-        this.settingDictionary = dictionary;
         if (null == pos) {
             throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_041"));
         }
@@ -586,7 +584,6 @@ public class Synset extends PointerTarget implements DictionaryElement {
 
     public Synset(Dictionary dictionary, POS pos, long offset) throws JWNLException {
         super(dictionary);
-        this.settingDictionary = dictionary;
         if (null == pos) {
             throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_041"));
         }
@@ -797,16 +794,17 @@ public class Synset extends PointerTarget implements DictionaryElement {
 
     @Override
     public void setDictionary(Dictionary dictionary) throws JWNLException {
-        if (settingDictionary != dictionary) {
-            settingDictionary = dictionary;
+        if (dictionary != this.dictionary) {
             if (null != this.dictionary) {
-                this.dictionary.removeElement(this);
+                Dictionary old = this.dictionary;
+                this.dictionary = dictionary;
+                old.removeElement(this);
             }
+            super.setDictionary(dictionary);
             if (null != dictionary) {
                 dictionary.addElement(this);
             }
         }
-        super.setDictionary(dictionary);
     }
 
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
