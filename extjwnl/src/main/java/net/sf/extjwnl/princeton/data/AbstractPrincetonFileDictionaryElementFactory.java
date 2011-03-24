@@ -60,7 +60,15 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory extends Abst
         long lexFileNum = tokenizer.nextLong();
         String synsetPOS = tokenizer.nextToken();
 
-        Synset synset = new Synset(dictionary, POS.getPOSForKey(synsetPOS), offset);
+        Synset synset;
+        if (POS.VERB == pos) {
+            synset = new VerbSynset(dictionary, POS.getPOSForKey(synsetPOS), offset);
+        } else if (POS.ADJECTIVE == pos) {
+            synset = new AdjectiveSynset(dictionary, pos, offset);
+        } else {
+            synset = new Synset(dictionary, POS.getPOSForKey(synsetPOS), offset);
+        }
+
         synset.setLexFileNum(lexFileNum);
 
         if ("s".equals(synsetPOS)) {

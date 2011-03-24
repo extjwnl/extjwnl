@@ -251,7 +251,7 @@ public class DictionaryToDatabase {
             synsetStmt.setLong(2, synset.getOffset());
             synsetStmt.setLong(3, synset.getLexFileNum());
             synsetStmt.setString(4, synset.getPOS().getKey());
-            synsetStmt.setBoolean(5, synset.isAdjectiveCluster());
+            synsetStmt.setBoolean(5, POS.ADJECTIVE == synset.getPOS() && synset.isAdjectiveCluster());
             synsetStmt.setString(6, synset.getGloss());
             synsetStmt.execute();
             List<Word> words = synset.getWords();

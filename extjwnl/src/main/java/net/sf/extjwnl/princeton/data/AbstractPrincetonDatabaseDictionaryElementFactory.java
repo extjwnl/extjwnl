@@ -42,7 +42,15 @@ public abstract class AbstractPrincetonDatabaseDictionaryElementFactory extends 
     public Synset createSynset(POS pos, long offset, ResultSet synsets, ResultSet words, ResultSet pointers, ResultSet verbFrames)
             throws SQLException, JWNLException {
         if (synsets.next()) {
-            Synset synset = new Synset(dictionary, pos, offset);
+            Synset synset;
+            if (POS.VERB == pos) {
+                synset = new VerbSynset(dictionary, pos, offset);
+            } else if (POS.ADJECTIVE == pos) {
+                synset = new AdjectiveSynset(dictionary, pos, offset);
+            } else {
+                synset = new Synset(dictionary, pos, offset);
+            }
+
             if (POS.ADJECTIVE == pos) {
                 synset.setIsAdjectiveCluster(synsets.getBoolean(1));
             }

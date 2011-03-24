@@ -48,22 +48,11 @@ public class Synset extends PointerTarget implements DictionaryElement {
      * The text (definition, usage examples) associated with the synset.
      */
     private String gloss;
-    private BitSet verbFrameFlags;
-
-    /**
-     * for use only with WordNet 1.6 and earlier
-     */
-    private boolean isAdjectiveCluster;
 
     /**
      * The lexicographer file name id.
      */
     private long lexFileNum;
-
-
-    private static final String[] EMPTY_STRING_ARRAY = new String[0];
-    private static final BitSet EMPTY_BIT_SET = new BitSet();
-    private static final int[] EMPTY_INT_ARRAY = new int[0];
 
     //for access control and updates
     private class PointerList extends ArrayList<Pointer> {
@@ -560,11 +549,6 @@ public class Synset extends PointerTarget implements DictionaryElement {
         this.pos = pos;
         pointers = new PointerList();
         words = new WordList();
-        isAdjectiveCluster = false;
-
-        if (POS.VERB == pos) {
-            verbFrameFlags = new BitSet();
-        }
 
         if (null != dictionary && dictionary.isEditable()) {
             dictionary.addSynset(this);
@@ -579,11 +563,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
         this.pos = pos;
         pointers = new PointerList();
         words = new WordList();
-        isAdjectiveCluster = false;
 
-        if (POS.VERB == pos) {
-            verbFrameFlags = new BitSet();
-        }
         this.offset = offset;
         if (null != dictionary && dictionary.isEditable()) {
             dictionary.addSynset(this);
@@ -674,11 +654,11 @@ public class Synset extends PointerTarget implements DictionaryElement {
     }
 
     public boolean isAdjectiveCluster() {
-        return isAdjectiveCluster;
+        throw new UnsupportedOperationException();
     }
 
     public void setIsAdjectiveCluster(boolean isAdjectiveCluster) {
-        this.isAdjectiveCluster = isAdjectiveCluster;
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -687,37 +667,19 @@ public class Synset extends PointerTarget implements DictionaryElement {
      * @return all Verb Frames that are valid for all the words in this synset
      */
     public String[] getVerbFrames() {
-        if (POS.VERB == pos) {
-            return VerbFrame.getFrames(verbFrameFlags);
-        } else {
-            return EMPTY_STRING_ARRAY;
-        }
+        throw new UnsupportedOperationException();
     }
 
     public BitSet getVerbFrameFlags() {
-        if (POS.VERB == pos) {
-            return verbFrameFlags;
-        } else {
-            return EMPTY_BIT_SET;
-        }
+        throw new UnsupportedOperationException();
     }
 
     public void setVerbFrameFlags(BitSet verbFrameFlags) {
-        if (POS.VERB != pos) {
-            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_049"));
-        }
-        if (null == verbFrameFlags) {
-            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_050"));
-        }
-        this.verbFrameFlags = verbFrameFlags;
+        throw new UnsupportedOperationException();
     }
 
     public int[] getVerbFrameIndices() {
-        if (POS.VERB == pos) {
-            return VerbFrame.getVerbFrameIndices(verbFrameFlags);
-        } else {
-            return EMPTY_INT_ARRAY;
-        }
+        throw new UnsupportedOperationException();
     }
 
     /**
