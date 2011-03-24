@@ -211,10 +211,12 @@ public class Synset extends PointerTarget implements DictionaryElement {
                 Pointer pointer = (Pointer) o;
                 //delete symmetric pointer from the target
                 if (null != pointer.getType().getSymmetricType()) {
-                    for (Pointer p : pointer.getTargetSynset().getPointers()) {
-                        if (offset == p.getTargetOffset() && pointer.getType().getSymmetricType().equals(p.getType())) {
-                            pointer.getTargetSynset().getPointers().remove(p);
-                            break;
+                    if (null != pointer.getTargetSynset()) {
+                        for (Pointer p : pointer.getTargetSynset().getPointers()) {
+                            if (offset == p.getTargetOffset() && pointer.getType().getSymmetricType().equals(p.getType())) {
+                                pointer.getTargetSynset().getPointers().remove(p);
+                                break;
+                            }
                         }
                     }
                 }
@@ -355,7 +357,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
                     List<Pointer> toDelete = null;
                     for (int i = 0; i < super.size(); i++) {
                         Pointer pointer = super.get(i);
-                        if (dictionary != pointer.getSource().getDictionary() || dictionary != pointer.getTarget().getDictionary()) {
+                        if (dictionary != pointer.getSource().getDictionary() || null == pointer.getTarget() || dictionary != pointer.getTarget().getDictionary()) {
                             if (null == toDelete) {
                                 toDelete = new ArrayList<Pointer>(0);
                             }

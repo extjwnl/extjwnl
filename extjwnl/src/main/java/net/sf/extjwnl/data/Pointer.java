@@ -95,7 +95,7 @@ public class Pointer implements Serializable {
         try {
             if (null == target && null != source.getDictionary()) {
                 Synset syn = source.getDictionary().getSynsetAt(targetIndex.pos, targetIndex.offset);
-                target = (targetIndex.index == 0) ? syn : syn.getWords().get(targetIndex.index - 1);
+                target = (targetIndex.index == 0) ? syn : (null == syn ? null : syn.getWords().get(targetIndex.index - 1));
             }
         } catch (JWNLException e) {
             if (log.isErrorEnabled()) {
@@ -121,6 +121,9 @@ public class Pointer implements Serializable {
      * @return the synset that is a) the target of this pointer, or b) the synset that contains the target of this pointer.
      */
     public Synset getTargetSynset() {
+        if (null == getTarget()) {
+            return null;
+        }
         return getTarget().getSynset();
     }
 

@@ -7,7 +7,6 @@ import net.sf.extjwnl.data.*;
 import net.sf.extjwnl.dictionary.file.DictionaryFileType;
 import net.sf.extjwnl.dictionary.file_manager.FileManager;
 import net.sf.extjwnl.princeton.data.AbstractPrincetonDictionaryElementFactory;
-import net.sf.extjwnl.util.factory.Param;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
@@ -197,12 +196,14 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
                 if (line == null) {
                     line = getFileManager().readLineAt(pos, DictionaryFileType.DATA, offset);
                 }
-                synset = factory.createSynset(pos, line);
-                for (Word w : synset.getWords()) {
-                    w.setUseCount(fileManager.getUseCount(w.getSenseKeyWithAdjClass()));
-                }
+                if (null != line) {
+                    synset = factory.createSynset(pos, line);
+                    for (Word w : synset.getWords()) {
+                        w.setUseCount(fileManager.getUseCount(w.getSenseKeyWithAdjClass()));
+                    }
 
-                cacheSynset(synset);
+                    cacheSynset(synset);
+                }
             } catch (IOException e) {
                 throw new JWNLException("DICTIONARY_EXCEPTION_005", offset, e);
             }

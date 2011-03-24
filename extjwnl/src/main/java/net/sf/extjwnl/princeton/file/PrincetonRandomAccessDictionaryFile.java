@@ -365,27 +365,33 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
             });
 
             dfOff = new DecimalFormat("00000000");//8 by default
-            if (log.isInfoEnabled()) {
-                log.info(JWNL.resolveMessage("PRINCETON_INFO_006", synsets.size()));
-            }
-            long offset = 0;
-            if (writePrincetonHeader) {
-                offset = offset + PRINCETON_HEADER.length();
-                if (checkOffsetLimit && log.isWarnEnabled() && (99999999 < offset)) {
-                    log.warn(JWNL.resolveMessage("PRINCETON_WARN_003", offset));
+            {
+                if (log.isInfoEnabled()) {
+                    log.info(JWNL.resolveMessage("PRINCETON_INFO_006", synsets.size()));
                 }
-            }
-            for (Synset s : synsets) {
-                s.setOffset(offset);
-                if (null == encoding) {
-                    offset = offset + renderSynset(s).getBytes().length + 1;//\n should be 1 byte
-                } else {
-                    offset = offset + renderSynset(s).getBytes(encoding).length + 1;//\n should be 1 byte
+                long offset = 0;
+                if (writePrincetonHeader) {
+                    offset = offset + PRINCETON_HEADER.length();
+                    if (checkOffsetLimit && log.isWarnEnabled() && (99999999 < offset)) {
+                        log.warn(JWNL.resolveMessage("PRINCETON_WARN_003", offset));
+                    }
                 }
+                for (Synset s : synsets) {
+                    s.setOffset(offset);
+                    String renderedSynset = renderSynset(s);
+                    if (checkDataFileLineLengthLimit && log.isWarnEnabled() && 15360 < renderedSynset.length()) {
+                        log.warn(JWNL.resolveMessage("PRINCETON_WARN_009", s.getOffset()));
+                    }
+                    if (null == encoding) {
+                        offset = offset + renderedSynset.getBytes().length + 1;//\n should be 1 byte
+                    } else {
+                        offset = offset + renderedSynset.getBytes(encoding).length + 1;//\n should be 1 byte
+                    }
+                }
+                //calculate offset length
+                decimalFormatString = createOffsetFormatString(offset);
+                dfOff = new DecimalFormat(decimalFormatString);//there is a small chance another update might be necessary
             }
-            //calculate offset length
-            decimalFormatString = createOffsetFormatString(offset);
-            dfOff = new DecimalFormat(decimalFormatString);//there is a small chance another update might be necessary
 
             if (log.isInfoEnabled()) {
                 log.info(JWNL.resolveMessage("PRINCETON_INFO_007", synsets.size()));
@@ -411,9 +417,6 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                     }
                 }
                 String renderedSynset = renderSynset(synset);
-                if (checkDataFileLineLengthLimit && log.isWarnEnabled() && 15360 < renderedSynset.length()) {
-                    log.warn(JWNL.resolveMessage("PRINCETON_WARN_009", offset));
-                }
                 if (null == encoding) {
                     raFile.write(renderedSynset.getBytes());
                 } else {

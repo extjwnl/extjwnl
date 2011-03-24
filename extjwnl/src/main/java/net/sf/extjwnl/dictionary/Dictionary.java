@@ -90,6 +90,13 @@ public abstract class Dictionary {
     private static final String DEFAULT_MAP_DICTIONARY_PATH = "./data/map";
     private static final String DEFAULT_DB_DICTIONARY_PATH = "jdbc:mysql://localhost/jwnl?user=root";
 
+    private static final Comparator<Word> wordLexIdComparator = new Comparator<Word>() {
+        @Override
+        public int compare(Word o1, Word o2) {
+            return o1.getLexId() - o2.getLexId();
+        }
+    };
+
     // stores max offset for each POS
     protected Map<POS, Long> maxOffset = new EnumMap<POS, Long>(POS.class);
 
@@ -559,74 +566,42 @@ public abstract class Dictionary {
 
         if (checkLexIds) {
             //fixing word lex ids
-            //lex ids should be unique within lex file name
-            //lemma -> lex file num -> words
-            HashMap<String, HashMap<Long, ArrayList<Word>>> lemmas = new HashMap<String, HashMap<Long, ArrayList<Word>>>();
             for (POS pos : POS.getAllPOS()) {
                 if (log.isInfoEnabled()) {
                     log.info(JWNL.resolveMessage("PRINCETON_INFO_015", pos.getLabel()));
                 }
-                Iterator<Synset> si = getSynsetIterator(pos);
-                while (si.hasNext()) {
-                    Synset s = si.next();
-                    //WN TRICK
-                    //skip adjective satellites, because in lexicographer files they come with head synset
-                    //and it seems the head synset makes them unique in lex files
-                    if (!(POS.ADJECTIVE == s.getPOS() && s.isAdjectiveCluster())) {
-                        for (Word w : s.getWords()) {
-                            final String lemma = w.getLemma().toLowerCase();//like in index file
-                            HashMap<Long, ArrayList<Word>> lexWords = lemmas.get(lemma);
-                            if (null == lexWords) {
-                                lexWords = new HashMap<Long, ArrayList<Word>>();
-                                lemmas.put(lemma, lexWords);
-                            }
-                            boolean found = false;
-                            ArrayList<Word> words = lexWords.get(w.getSynset().getLexFileNum());
-                            if (null == words) {
-                                words = new ArrayList<Word>();
-                                lexWords.put(w.getSynset().getLexFileNum(), words);
-                            } else {
-                                for (Word ww : words) {
-                                    if (ww.getLemma().equalsIgnoreCase(lemma)) {
-                                        found = true;
-                                        break;
-                                    }
+                Iterator<IndexWord> ii = getIndexWordIterator(pos);
+                while (ii.hasNext()) {
+                    IndexWord iw = ii.next();
+                    //lex ids should be unique within lex file name
+                    //lex file name -> list of words
+                    Map<Long, List<Word>> words = new HashMap<Long, List<Word>>();
+                    for (Synset sense : iw.getSenses()) {
+                        for (Word word : sense.getWords()) {
+                            if (word.getLemma().equalsIgnoreCase(iw.getLemma())) {
+                                List<Word> list = words.get(sense.getLexFileNum());
+                                if (null == list) {
+                                    list = new ArrayList<Word>();
+                                    words.put(sense.getLexFileNum(), list);
                                 }
-                            }
-                            if (!found) {
-                                words.add(w);
+                                list.add(word);
                             }
                         }
                     }
-                }
-                long counter = 0;
-                long total = lemmas.values().size();
-                long reportInt = (total / 20) + 1;//i.e. report every 5%
-                for (HashMap<Long, ArrayList<Word>> lexWords : lemmas.values()) {
-                    counter++;
-                    if (0 == (counter % reportInt)) {
-                        if (log.isInfoEnabled()) {
-                            log.info(JWNL.resolveMessage("PRINCETON_INFO_014", 100 * counter / total));
-                        }
-                    }
-                    for (ArrayList<Word> words : lexWords.values()) {
-                        int id = -1;//find max id
-                        Set<Integer> lexIds = new HashSet<Integer>(words.size());
-                        for (Word w : words) {
-                            if (id < w.getLexId()) {
-                                id = w.getLexId();
-                            }
-                            if (lexIds.contains(w.getLexId())) {
-                                w.setLexId(-1);
-                            } else {
-                                lexIds.add(w.getLexId());
+
+                    for (Map.Entry<Long, List<Word>> entry : words.entrySet()) {
+                        List<Word> list = entry.getValue();
+                        Collections.sort(list, wordLexIdComparator);
+                        int maxId = -1;
+                        for (Word word : list) {
+                            if (maxId < word.getLexId()) {
+                                maxId = word.getLexId();
                             }
                         }
-                        id++;
-                        for (Word w : words) {
-                            if (-1 == w.getLexId()) {
-                                w.setLexId(id);
-                                id++;
+                        for (Word word : list) {
+                            if (-1 == word.getLexId()) {
+                                maxId++;
+                                word.setLexId(maxId);
                             }
                         }
                     }
