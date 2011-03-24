@@ -133,7 +133,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
             }
             boolean result = super.add(pointer);
 
-            if (null != dictionary && dictionary.isEditable()) {
+            if (null != dictionary && dictionary.isEditable() && dictionary.getManageSymmetricPointers()) {
                 if (null != pointer.getType().getSymmetricType()) {
                     Pointer symmetric = new Pointer(pointer.getType().getSymmetricType(), pointer.getTarget(), pointer.getSource());
                     if (!pointer.getTarget().getSynset().getPointers().contains(symmetric)) {
@@ -152,7 +152,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
             }
             super.add(index, pointer);
 
-            if (null != dictionary && dictionary.isEditable()) {
+            if (null != dictionary && dictionary.isEditable() && dictionary.getManageSymmetricPointers()) {
                 if (null != pointer.getType().getSymmetricType()) {
                     Pointer symmetric = new Pointer(pointer.getType().getSymmetricType(), pointer.getTarget(), pointer.getSource());
                     if (!pointer.getTarget().getSynset().getPointers().contains(symmetric)) {
@@ -189,7 +189,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
         @Override
         public Pointer remove(int index) {
             Pointer result = super.remove(index);
-            if (null != dictionary && dictionary.isEditable()) {
+            if (null != dictionary && dictionary.isEditable() && dictionary.getManageSymmetricPointers()) {
                 //delete symmetric pointer from the target
                 Pointer pointer = get(index);
                 if (null != pointer.getType().getSymmetricType()) {
@@ -207,7 +207,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
         @Override
         public boolean remove(Object o) {
             boolean result = super.remove(o);
-            if (null != dictionary && dictionary.isEditable() && o instanceof Pointer) {
+            if (null != dictionary && dictionary.isEditable() && dictionary.getManageSymmetricPointers() && o instanceof Pointer) {
                 Pointer pointer = (Pointer) o;
                 //delete symmetric pointer from the target
                 if (null != pointer.getType().getSymmetricType()) {
@@ -229,7 +229,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
                 super.clear();
                 for (Pointer pointer : copy) {
                     //delete symmetric pointer from the target
-                    if (null != pointer.getType().getSymmetricType()) {
+                    if (null != pointer.getType().getSymmetricType() && dictionary.getManageSymmetricPointers()) {
                         for (Pointer p : pointer.getTargetSynset().getPointers()) {
                             if (offset == p.getTargetOffset() && pointer.getType().getSymmetricType().equals(p.getType())) {
                                 pointer.getTargetSynset().getPointers().remove(p);
@@ -250,7 +250,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
                 super.removeRange(fromIndex, toIndex);
                 for (Pointer pointer : copy) {
                     //delete symmetric pointer from the target
-                    if (null != pointer.getType().getSymmetricType()) {
+                    if (null != pointer.getType().getSymmetricType() && dictionary.getManageSymmetricPointers()) {
                         for (Pointer p : pointer.getTargetSynset().getPointers()) {
                             if (offset == p.getTargetOffset() && pointer.getType().getSymmetricType().equals(p.getType())) {
                                 pointer.getTargetSynset().getPointers().remove(p);
@@ -304,7 +304,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
                         Pointer pointer = (Pointer) object;
                         if (copy.contains(pointer)) {
                             //delete symmetric pointer from the target
-                            if (null != pointer.getType().getSymmetricType()) {
+                            if (null != pointer.getType().getSymmetricType() && dictionary.getManageSymmetricPointers()) {
                                 for (Pointer p : pointer.getTargetSynset().getPointers()) {
                                     if (offset == p.getTargetOffset() && pointer.getType().getSymmetricType().equals(p.getType())) {
                                         pointer.getTargetSynset().getPointers().remove(p);
@@ -331,7 +331,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
                         Pointer pointer = (Pointer) object;
                         if (!copy.contains(pointer)) {
                             //delete symmetric pointer from the target
-                            if (null != pointer.getType().getSymmetricType()) {
+                            if (null != pointer.getType().getSymmetricType() && dictionary.getManageSymmetricPointers()) {
                                 for (Pointer p : pointer.getTargetSynset().getPointers()) {
                                     if (offset == p.getTargetOffset() && pointer.getType().getSymmetricType().equals(p.getType())) {
                                         pointer.getTargetSynset().getPointers().remove(p);

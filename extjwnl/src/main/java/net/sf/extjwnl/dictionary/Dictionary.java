@@ -43,6 +43,11 @@ public abstract class Dictionary {
      */
     public static final String MORPH = "morphological_processor";
 
+    /**
+     * Whether to add symmetric pointers automatically, default true.
+     */
+    public static final String EDIT_MANAGE_SYMMETRIC_POINTERS = "edit_manage_symmetric_pointers";
+    private boolean editManageSymmetricPointers = true;
 
     // tag names
     private static final String VERSION_TAG = "version";
@@ -350,6 +355,9 @@ public abstract class Dictionary {
         MorphologicalProcessor morph = (param == null) ? null : (MorphologicalProcessor) param.create();
         this.setMorphologicalProcessor(morph);
 
+        if (params.containsKey(EDIT_MANAGE_SYMMETRIC_POINTERS)) {
+            editManageSymmetricPointers = Boolean.parseBoolean(params.get(EDIT_MANAGE_SYMMETRIC_POINTERS).getValue());
+        }
     }
 
     /**
@@ -839,6 +847,10 @@ public abstract class Dictionary {
                 }
             }
         }
+    }
+
+    public boolean getManageSymmetricPointers() {
+        return editManageSymmetricPointers;
     }
 
     /**
