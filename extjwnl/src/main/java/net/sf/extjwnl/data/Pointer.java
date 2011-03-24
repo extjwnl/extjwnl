@@ -93,7 +93,7 @@ public class Pointer implements Serializable {
      */
     public PointerTarget getTarget() {
         try {
-            if (null == target) {
+            if (null == target && null != source.getDictionary()) {
                 Synset syn = source.getDictionary().getSynsetAt(targetIndex.pos, targetIndex.offset);
                 target = (targetIndex.index == 0) ? syn : syn.getWords().get(targetIndex.index - 1);
             }
@@ -131,7 +131,7 @@ public class Pointer implements Serializable {
      */
     public long getTargetOffset() {
         if (null == target) {
-            if (source.getDictionary().isEditable()) {
+            if (null != source.getDictionary() && source.getDictionary().isEditable()) {
                 return getTarget().getSynset().getOffset();
             } else {
                 return targetIndex.offset;
@@ -143,7 +143,7 @@ public class Pointer implements Serializable {
 
     public int getTargetIndex() {
         if (null == target) {
-            if (source.getDictionary().isEditable()) {
+            if (null != source.getDictionary() && source.getDictionary().isEditable()) {
                 return getTarget().getIndex();
             } else {
                 return targetIndex.index;
@@ -155,7 +155,7 @@ public class Pointer implements Serializable {
 
     public POS getTargetPOS() {
         if (null == target) {
-            if (source.getDictionary().isEditable()) {
+            if (null != source.getDictionary() && source.getDictionary().isEditable()) {
                 return getTarget().getSynset().getPOS();
             } else {
                 return targetIndex.pos;
