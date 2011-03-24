@@ -62,7 +62,7 @@ public class TestThreads {
                     Assert.assertNotNull(iws);
                     Assert.assertTrue(0 < iws.size());
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    throw new RuntimeException(e);
                 }
             }
 //            }

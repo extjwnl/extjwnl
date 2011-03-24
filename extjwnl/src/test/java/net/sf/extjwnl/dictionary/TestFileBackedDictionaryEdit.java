@@ -20,11 +20,8 @@ public class TestFileBackedDictionaryEdit {
     public void TestLoadEmptyDictionary() throws IOException, JWNLException, InterruptedException {
         Dictionary dictionary = Dictionary.getInstance(new FileInputStream(properties));
         dictionary.edit();
-        System.out.println("Sleeping...");
-        Toolkit.getDefaultToolkit().beep();
-        Thread.sleep(30000);
-//        dictionary.save();
-//        dictionary.close();
-//        dictionary.delete();
+        dictionary.save();
+        dictionary.close();
+        dictionary.delete();
     }
 }
