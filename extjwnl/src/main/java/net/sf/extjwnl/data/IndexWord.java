@@ -546,7 +546,7 @@ public class IndexWord extends BaseDictionaryElement {
         Collections.sort(nonUCSenses, Collections.<Synset>reverseOrder(synsetOffsetComparator));
 
         //if ADJ, output cluster heads, then fans
-        if (POS.ADJECTIVE.equals(getPOS())) {
+        if (POS.ADJECTIVE == getPOS()) {
             int i = 0;
             while (i < nonUCSenses.size()) {
                 if (!nonUCSenses.get(i).isAdjectiveCluster()) {
@@ -570,7 +570,7 @@ public class IndexWord extends BaseDictionaryElement {
                 //2 huge offsets might lead to integer overflow
                 return (int) (result / Math.abs(result));
             } else {
-                if (POS.ADJECTIVE.equals(o1.getPOS()) && POS.ADJECTIVE.equals(o2.getPOS())) {
+                if (POS.ADJECTIVE == o1.getPOS() && POS.ADJECTIVE == o2.getPOS()) {
                     if (o1.isAdjectiveCluster() && !o2.isAdjectiveCluster()) {
                         return 1;
                     } else if (o2.isAdjectiveCluster() && !o1.isAdjectiveCluster()) {

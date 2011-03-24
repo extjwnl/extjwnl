@@ -45,8 +45,9 @@ public abstract class AbstractPrincetonDatabaseDictionaryElementFactory extends 
             throws SQLException, JWNLException {
         if (synsets.next()) {
             Synset synset = new Synset(dictionary, pos, offset);
-            boolean isAdjectiveCluster = synsets.getBoolean(1);
-            synset.setIsAdjectiveCluster(isAdjectiveCluster);
+            if (POS.ADJECTIVE == pos) {
+                synset.setIsAdjectiveCluster(synsets.getBoolean(1));
+            }
 
             String gloss = synsets.getString(2);
             synset.setGloss(gloss);

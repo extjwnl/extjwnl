@@ -65,11 +65,9 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory extends Abst
         Synset synset = new Synset(dictionary, POS.getPOSForKey(synsetPOS), offset);
         synset.setLexFileNum(lexFileNum);
 
-        boolean isAdjectiveCluster = false;
         if ("s".equals(synsetPOS)) {
-            isAdjectiveCluster = true;
+            synset.setIsAdjectiveCluster(true);
         }
-        synset.setIsAdjectiveCluster(isAdjectiveCluster);
 
         int wordCount = tokenizer.nextHexInt();
         for (int i = 0; i < wordCount; i++) {

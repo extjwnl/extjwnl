@@ -552,7 +552,7 @@ public abstract class Dictionary {
                     //WN TRICK
                     //skip adjective satellites, because in lexicographer files they come with head synset
                     //and it seems the head synset makes them unique in lex files
-                    if (!s.isAdjectiveCluster()) {
+                    if (!(POS.ADJECTIVE == s.getPOS() && s.isAdjectiveCluster())) {
                         for (Word w : s.getWords()) {
                             final String lemma = w.getLemma().toLowerCase();//like in index file
                             HashMap<Long, ArrayList<Word>> lexWords = lemmas.get(lemma);
