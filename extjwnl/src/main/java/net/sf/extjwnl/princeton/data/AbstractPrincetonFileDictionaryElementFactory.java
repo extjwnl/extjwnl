@@ -86,6 +86,9 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory extends Abst
             w.setLexId(lexId);
             synset.getWords().add(w);
         }
+        if (synset.getWords() instanceof ArrayList) {
+            ((ArrayList) synset.getWords()).trimToSize();
+        }
 
         int pointerCount = tokenizer.nextInt();
         for (int i = 0; i < pointerCount; i++) {
@@ -100,6 +103,9 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory extends Abst
 
             Pointer p = new Pointer(source, pointerType, targetPOS, targetOffset, targetIndex);
             synset.getPointers().add(p);
+        }
+        if (synset.getPointers() instanceof ArrayList) {
+            ((ArrayList) synset.getPointers()).trimToSize();
         }
 
         if (POS.VERB == pos) {
@@ -143,6 +149,7 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory extends Abst
         while (st.hasMoreTokens()) {
             exceptions.add(stringCache.replace(st.nextToken().replace('_', ' ')));
         }
+        exceptions.trimToSize();
         if (log.isTraceEnabled()) {
             log.trace(JWNL.resolveMessage("PRINCETON_INFO_001", new Object[]{pos, lemma}));
         }

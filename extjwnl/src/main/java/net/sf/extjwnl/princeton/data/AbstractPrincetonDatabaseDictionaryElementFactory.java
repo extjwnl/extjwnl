@@ -69,6 +69,9 @@ public abstract class AbstractPrincetonDatabaseDictionaryElementFactory extends 
                 word.setLexId(words.getLong(4));
                 synset.getWords().add(word);
             }
+            if (synset.getWords() instanceof ArrayList) {
+                ((ArrayList) synset.getWords()).trimToSize();
+            }
 
             while (pointers.next()) {
                 PointerType type = PointerType.getPointerTypeForKey(pointers.getString(1));
@@ -77,6 +80,9 @@ public abstract class AbstractPrincetonDatabaseDictionaryElementFactory extends 
                 //int sourceIndex = pointers.getInt(4);
                 int targetIndex = pointers.getInt(5);
                 synset.getPointers().add(new Pointer(synset, type, targetPOS, targetOffset, targetIndex));
+            }
+            if (synset.getPointers() instanceof ArrayList) {
+                ((ArrayList) synset.getPointers()).trimToSize();
             }
 
             if (POS.VERB == pos) {
@@ -107,6 +113,7 @@ public abstract class AbstractPrincetonDatabaseDictionaryElementFactory extends 
             exceptions.add(stringCache.replace(rs.getString(1)));
         }
         if (0 < exceptions.size()) {
+            exceptions.trimToSize();
             return new Exc(dictionary, pos, stringCache.replace(derivation), exceptions);
         } else {
             return null;
