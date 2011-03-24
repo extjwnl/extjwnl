@@ -21,11 +21,6 @@ import java.util.NoSuchElementException;
  */
 public class DatabaseBackedDictionary extends AbstractCachingDictionary {
     /**
-     * <code>MorphologicalProcessor</code> class install parameter. The value should be the
-     * class of <code>MorphologicalProcessor</code> to use.
-     */
-    public static final String MORPH = "morphological_processor";
-    /**
      * The class of DatabaseDictionaryElementFactory to use.
      */
     public static final String DICTIONARY_ELEMENT_FACTORY = "dictionary_element_factory";
@@ -39,11 +34,8 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
 
     public DatabaseBackedDictionary(Document doc) throws JWNLException {
         super(doc);
-        Param param = params.get(MORPH);
-        MorphologicalProcessor morph =
-                (param == null) ? null : (MorphologicalProcessor) param.create();
 
-        param = params.get(DICTIONARY_ELEMENT_FACTORY);
+        Param param = params.get(DICTIONARY_ELEMENT_FACTORY);
         DatabaseDictionaryElementFactory factory =
                 (param == null) ? null : (DatabaseDictionaryElementFactory) param.create();
 
@@ -52,7 +44,6 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
 
         this.factory = factory;
         dbManager = manager;
-        setMorphologicalProcessor(morph);
     }
 
     public IndexWord getIndexWord(POS pos, String lemma) throws JWNLException {

@@ -27,11 +27,6 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
 
     private static final Log log = LogFactory.getLog(FileBackedDictionary.class);
     /**
-     * Morphological processor class install parameter. The value should be the
-     * class of MorphologicalProcessor to use.
-     */
-    public static final String MORPH = "morphological_processor";
-    /**
      * File manager install parameter. The value should be the class of FileManager to use.
      */
     public static final String FILE_MANAGER = "file_manager";
@@ -66,8 +61,6 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
     public FileBackedDictionary(Document doc) throws JWNLException {
         super(doc);
 
-        Param param = params.get(MORPH);
-        MorphologicalProcessor morph = (param == null) ? null : (MorphologicalProcessor) param.create();
         FileManager manager = (FileManager) (params.get(FILE_MANAGER)).create();
         // caching is enabled by default
         FileDictionaryElementFactory factory =
@@ -75,7 +68,6 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
         boolean enableCaching =
                 !params.containsKey(ENABLE_CACHING) || !params.get(ENABLE_CACHING).getValue().equalsIgnoreCase("false");
 
-        this.setMorphologicalProcessor(morph);
         this.setCachingEnabled(enableCaching);
         this.fileManager = manager;
         this.factory = factory;

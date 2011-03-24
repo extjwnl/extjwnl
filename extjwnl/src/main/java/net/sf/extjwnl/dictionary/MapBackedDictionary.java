@@ -7,7 +7,6 @@ import net.sf.extjwnl.dictionary.file.DictionaryCatalog;
 import net.sf.extjwnl.dictionary.file.DictionaryCatalogSet;
 import net.sf.extjwnl.dictionary.file.DictionaryFileType;
 import net.sf.extjwnl.dictionary.file.ObjectDictionaryFile;
-import net.sf.extjwnl.util.factory.Param;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
@@ -25,11 +24,6 @@ import java.util.*;
 public class MapBackedDictionary extends Dictionary {
 
     private static final Log log = LogFactory.getLog(MapBackedDictionary.class);
-    /**
-     * <code>MorphologicalProcessor</code> class install parameter. The value should be the
-     * class of <code>MorphologicalProcessor</code> to use.
-     */
-    public static final String MORPH = "morphological_processor";
 
     /**
      * Random number generator used by getRandomIndexWord()
@@ -41,10 +35,6 @@ public class MapBackedDictionary extends Dictionary {
 
     public MapBackedDictionary(Document doc) throws JWNLException {
         super(doc);
-        Param param = params.get(MORPH);
-        MorphologicalProcessor morph = (param == null) ? null : (MorphologicalProcessor) param.create();
-
-        this.setMorphologicalProcessor(morph);
         this.load();
     }
 

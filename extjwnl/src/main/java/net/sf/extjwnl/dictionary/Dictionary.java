@@ -37,6 +37,13 @@ public abstract class Dictionary {
 
     private static final Log log = LogFactory.getLog(Dictionary.class);
 
+    /**
+     * Morphological processor class install parameter. The value should be the
+     * class of MorphologicalProcessor to use.
+     */
+    public static final String MORPH = "morphological_processor";
+
+
     // tag names
     private static final String VERSION_TAG = "version";
     private static final String DICTIONARY_TAG = "dictionary";
@@ -338,6 +345,11 @@ public abstract class Dictionary {
         if (params.containsKey(CHECK_LEX_IDS_KEY)) {
             checkLexIds = Boolean.parseBoolean(params.get(CHECK_LEX_IDS_KEY).getValue());
         }
+
+        Param param = params.get(MORPH);
+        MorphologicalProcessor morph = (param == null) ? null : (MorphologicalProcessor) param.create();
+        this.setMorphologicalProcessor(morph);
+
     }
 
     /**
