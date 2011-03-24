@@ -13,7 +13,7 @@ import java.util.BitSet;
  * @author Aliaksandr Autayeu <avtaev@gmail.com>
  */
 public class Verb extends Word {
-    private static final long serialVersionUID = 2L;
+    private static final long serialVersionUID = 3L;
     /**
      * A bit array of all the verb frames that are valid for this word.
      * see {@link VerbFrame} for more explanation.

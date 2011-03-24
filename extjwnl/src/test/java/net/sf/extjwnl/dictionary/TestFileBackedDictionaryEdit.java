@@ -3,6 +3,7 @@ package net.sf.extjwnl.dictionary;
 import net.sf.extjwnl.JWNLException;
 import org.junit.Test;
 
+import java.awt.*;
 import java.io.FileInputStream;
 import java.io.IOException;
 
@@ -16,11 +17,14 @@ public class TestFileBackedDictionaryEdit {
     protected String properties = "./src/main/config/clean_file.xml";
 
     @Test
-    public void TestLoadEmptyDictionary() throws IOException, JWNLException {
+    public void TestLoadEmptyDictionary() throws IOException, JWNLException, InterruptedException {
         Dictionary dictionary = Dictionary.getInstance(new FileInputStream(properties));
         dictionary.edit();
-        dictionary.save();
-        dictionary.close();
-        dictionary.delete();
+        System.out.println("Sleeping...");
+        Toolkit.getDefaultToolkit().beep();
+        Thread.sleep(30000);
+//        dictionary.save();
+//        dictionary.close();
+//        dictionary.delete();
     }
 }

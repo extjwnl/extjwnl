@@ -20,7 +20,7 @@ import java.io.Serializable;
  */
 public class Pointer implements Serializable {
 
-    private static final long serialVersionUID = 2L;
+    private static final long serialVersionUID = 3L;
 
     private static final Log log = LogFactory.getLog(Pointer.class);
 

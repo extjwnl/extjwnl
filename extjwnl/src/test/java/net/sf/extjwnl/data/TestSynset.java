@@ -41,7 +41,7 @@ public class TestSynset extends BaseDataTest {
         Assert.assertEquals(gloss, testObj.getGloss());
     }
 
-    @Test
+    @Test(expected =  UnsupportedOperationException.class)
     public void testGetVerbFrameFlags() {
         Assert.assertTrue(testObj.getVerbFrameFlags().isEmpty());
     }
