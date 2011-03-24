@@ -4,6 +4,7 @@ import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.data.*;
 import net.sf.extjwnl.dictionary.database.DatabaseManager;
 import net.sf.extjwnl.dictionary.database.Query;
+import net.sf.extjwnl.princeton.data.AbstractPrincetonDictionaryElementFactory;
 import net.sf.extjwnl.util.factory.Param;
 import org.w3c.dom.Document;
 
@@ -277,6 +278,17 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
         protected Exc createElement() throws Exception {
             String derivation = getResults().getString(1);
             return getException(getPOS(), derivation);
+        }
+    }
+
+    @Override
+    protected void cacheAll() throws JWNLException {
+        if (factory instanceof AbstractPrincetonDictionaryElementFactory) {
+            ((AbstractPrincetonDictionaryElementFactory) factory).startCaching();
+        }
+        super.cacheAll();
+        if (factory instanceof AbstractPrincetonDictionaryElementFactory) {
+            ((AbstractPrincetonDictionaryElementFactory) factory).stopCaching();
         }
     }
 }

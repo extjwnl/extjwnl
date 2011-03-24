@@ -3,13 +3,11 @@ package net.sf.extjwnl.princeton.data;
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.data.*;
 import net.sf.extjwnl.dictionary.Dictionary;
+import net.sf.extjwnl.util.factory.Param;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Base class for database element factories.
@@ -19,8 +17,8 @@ import java.util.List;
  */
 public abstract class AbstractPrincetonDatabaseDictionaryElementFactory extends AbstractPrincetonDictionaryElementFactory implements DatabaseDictionaryElementFactory {
 
-    public AbstractPrincetonDatabaseDictionaryElementFactory(Dictionary dictionary) {
-        super(dictionary);
+    public AbstractPrincetonDatabaseDictionaryElementFactory(Dictionary dictionary, Map<String, Param> params) {
+        super(dictionary, params);
     }
 
     public IndexWord createIndexWord(POS pos, String lemma, ResultSet rs) throws SQLException, JWNLException {
@@ -38,7 +36,7 @@ public abstract class AbstractPrincetonDatabaseDictionaryElementFactory extends 
             offsetArray[i] = itr.next();
         }
 
-        return new IndexWord(dictionary, lemma, pos, offsetArray);
+        return new IndexWord(dictionary, stringCache.replace(lemma), pos, offsetArray);
     }
 
     public Synset createSynset(POS pos, long offset, ResultSet synsets, ResultSet words, ResultSet pointers, ResultSet verbFrames)
@@ -56,7 +54,7 @@ public abstract class AbstractPrincetonDatabaseDictionaryElementFactory extends 
             synset.setLexFileNum(lexFileNum);
 
             while (words.next()) {
-                String lemma = words.getString(1);
+                String lemma = stringCache.replace(words.getString(1));
                 int index = words.getInt(2);
                 Word word = createWord(synset, index, lemma);
                 word.setUseCount(words.getInt(3));
@@ -96,12 +94,12 @@ public abstract class AbstractPrincetonDatabaseDictionaryElementFactory extends 
     }
 
     public Exc createExc(POS pos, String derivation, ResultSet rs) throws SQLException, JWNLException {
-        List<String> exceptions = new ArrayList<String>();
+        ArrayList<String> exceptions = new ArrayList<String>();
         while (rs.next()) {
-            exceptions.add(rs.getString(1));
+            exceptions.add(stringCache.replace(rs.getString(1)));
         }
         if (0 < exceptions.size()) {
-            return new Exc(dictionary, pos, derivation, exceptions);
+            return new Exc(dictionary, pos, stringCache.replace(derivation), exceptions);
         } else {
             return null;
         }

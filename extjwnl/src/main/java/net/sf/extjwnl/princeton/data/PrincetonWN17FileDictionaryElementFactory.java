@@ -14,6 +14,6 @@ import java.util.Map;
 public class PrincetonWN17FileDictionaryElementFactory extends AbstractPrincetonFileDictionaryElementFactory {
 
     public PrincetonWN17FileDictionaryElementFactory(Dictionary dictionary, Map<String, Param> params) {
-        super(dictionary);
+        super(dictionary, params);
     }
 }

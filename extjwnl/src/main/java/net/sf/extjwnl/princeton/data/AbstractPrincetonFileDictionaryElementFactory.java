@@ -5,13 +5,11 @@ import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.data.*;
 import net.sf.extjwnl.dictionary.Dictionary;
 import net.sf.extjwnl.util.TokenizerParser;
+import net.sf.extjwnl.util.factory.Param;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.List;
-import java.util.StringTokenizer;
+import java.util.*;
 
 /**
  * <code>FileDictionaryElementFactory</code> that parses lines from the dictionary files distributed by the
@@ -24,13 +22,13 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory extends Abst
 
     private static final Log log = LogFactory.getLog(AbstractPrincetonFileDictionaryElementFactory.class);
 
-    protected AbstractPrincetonFileDictionaryElementFactory(Dictionary dictionary) {
-        super(dictionary);
+    protected AbstractPrincetonFileDictionaryElementFactory(Dictionary dictionary, Map<String, Param> params) {
+        super(dictionary, params);
     }
 
     public IndexWord createIndexWord(POS pos, String line) throws JWNLException {
         TokenizerParser tokenizer = new TokenizerParser(line, " ");
-        String lemma = tokenizer.nextToken().replace('_', ' ');
+        String lemma = stringCache.replace(tokenizer.nextToken().replace('_', ' '));
         tokenizer.nextToken(); // pos
         tokenizer.nextToken();    // sense_cnt
 
@@ -71,7 +69,7 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory extends Abst
 
         int wordCount = tokenizer.nextHexInt();
         for (int i = 0; i < wordCount; i++) {
-            String lemma = tokenizer.nextToken().replace('_', ' ');
+            String lemma = stringCache.replace(tokenizer.nextToken().replace('_', ' '));
 
             int lexId = tokenizer.nextHexInt(); // lex id
 
@@ -132,10 +130,10 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory extends Abst
 
     public Exc createExc(POS pos, String line) throws JWNLException {
         StringTokenizer st = new StringTokenizer(line);
-        String lemma = st.nextToken().replace('_', ' ');
-        List<String> exceptions = new ArrayList<String>();
+        String lemma = stringCache.replace(st.nextToken().replace('_', ' '));
+        ArrayList<String> exceptions = new ArrayList<String>();
         while (st.hasMoreTokens()) {
-            exceptions.add(st.nextToken().replace('_', ' '));
+            exceptions.add(stringCache.replace(st.nextToken().replace('_', ' ')));
         }
         if (log.isTraceEnabled()) {
             log.trace(JWNL.resolveMessage("PRINCETON_INFO_001", new Object[]{pos, lemma}));

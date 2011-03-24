@@ -6,6 +6,7 @@ import net.sf.extjwnl.JWNLRuntimeException;
 import net.sf.extjwnl.data.*;
 import net.sf.extjwnl.dictionary.file.DictionaryFileType;
 import net.sf.extjwnl.dictionary.file_manager.FileManager;
+import net.sf.extjwnl.princeton.data.AbstractPrincetonDictionaryElementFactory;
 import net.sf.extjwnl.util.factory.Param;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -414,6 +415,17 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
             fileManager.save();
         } catch (IOException e) {
             throw new JWNLException("EXCEPTION_001", e.getMessage(), e);
+        }
+    }
+
+    @Override
+    protected void cacheAll() throws JWNLException {
+        if (factory instanceof AbstractPrincetonDictionaryElementFactory) {
+            ((AbstractPrincetonDictionaryElementFactory) factory).startCaching();
+        }
+        super.cacheAll();
+        if (factory instanceof AbstractPrincetonDictionaryElementFactory) {
+            ((AbstractPrincetonDictionaryElementFactory) factory).stopCaching();
         }
     }
 }
