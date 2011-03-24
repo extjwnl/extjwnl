@@ -6,9 +6,8 @@ import net.sf.extjwnl.data.IndexWord;
 import net.sf.extjwnl.data.POS;
 import net.sf.extjwnl.dictionary.Dictionary;
 import net.sf.extjwnl.dictionary.MorphologicalProcessor;
-import net.sf.extjwnl.dictionary.POSKey;
-import net.sf.extjwnl.util.cache.Cache;
-import net.sf.extjwnl.util.cache.LRUCache;
+import net.sf.extjwnl.util.cache.LRUPOSCache;
+import net.sf.extjwnl.util.cache.POSCache;
 import net.sf.extjwnl.util.factory.Param;
 import net.sf.extjwnl.util.factory.ParamList;
 
@@ -41,7 +40,7 @@ public class DefaultMorphologicalProcessor implements MorphologicalProcessor {
 
     private static final int DEFAULT_CACHE_CAPACITY = 1000;
 
-    private Cache<POSKey, LookupInfo> lookupCache;
+    private POSCache<String, LookupInfo> lookupCache;
 
     private Operation[] operations;
 
@@ -57,7 +56,7 @@ public class DefaultMorphologicalProcessor implements MorphologicalProcessor {
 
         Param param = params.get(CACHE_CAPACITY);
         int capacity = (param == null) ? DEFAULT_CACHE_CAPACITY : Integer.parseInt(param.getValue());
-        lookupCache = new LRUCache<POSKey, LookupInfo>(capacity);
+        lookupCache = new LRUPOSCache<String, LookupInfo>(capacity);
     }
 
     /**
@@ -73,7 +72,7 @@ public class DefaultMorphologicalProcessor implements MorphologicalProcessor {
      */
     public IndexWord lookupBaseForm(POS pos, String derivation) throws JWNLException {
         // See if we've already looked this word up
-        LookupInfo info = getCachedLookupInfo(new POSKey(pos, derivation));
+        LookupInfo info = getCachedLookupInfo(pos, derivation);
         if (info != null && info.getBaseForms().isCurrentFormAvailable()) {
             // get the last base form we retrieved. if you want
             // the next possible base form, use lookupNextBaseForm
@@ -83,12 +82,12 @@ public class DefaultMorphologicalProcessor implements MorphologicalProcessor {
         }
     }
 
-    private void cacheLookupInfo(POSKey key, LookupInfo info) {
-        lookupCache.put(key, info);
+    private void cacheLookupInfo(POS pos, String key, LookupInfo info) {
+        lookupCache.getCache(pos).put(key, info);
     }
 
-    private LookupInfo getCachedLookupInfo(POSKey key) {
-        return lookupCache.get(key);
+    private LookupInfo getCachedLookupInfo(POS pos, String key) {
+        return lookupCache.getCache(pos).get(key);
     }
 
     /**
@@ -109,11 +108,10 @@ public class DefaultMorphologicalProcessor implements MorphologicalProcessor {
 
         String str = null;
         if (info == null) {
-            POSKey key = new POSKey(pos, derivation);
-            info = getCachedLookupInfo(key);
+            info = getCachedLookupInfo(pos, derivation);
             if (info == null) {
                 info = new LookupInfo(pos, derivation, operations);
-                cacheLookupInfo(key, info);
+                cacheLookupInfo(pos, derivation, info);
             }
         }
 
@@ -132,10 +130,10 @@ public class DefaultMorphologicalProcessor implements MorphologicalProcessor {
     }
 
     public List<String> lookupAllBaseForms(POS pos, String derivation) throws JWNLException {
-        LookupInfo info = getCachedLookupInfo(new POSKey(pos, derivation));
+        LookupInfo info = getCachedLookupInfo(pos, derivation);
         if (info == null) {
             info = new LookupInfo(pos, derivation, operations);
-            cacheLookupInfo(new POSKey(pos, derivation), info);
+            cacheLookupInfo(pos, derivation, info);
         }
         int index = info.getBaseForms().getIndex();
         while (info.isNextOperationAvailable()) {

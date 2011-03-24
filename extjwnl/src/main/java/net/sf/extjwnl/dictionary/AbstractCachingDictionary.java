@@ -23,7 +23,7 @@ public abstract class AbstractCachingDictionary extends Dictionary {
 
     private static final Log log = LogFactory.getLog(AbstractCachingDictionary.class);
 
-    private CacheSet<DictionaryElementType, POSKey, DictionaryElement> caches;
+    private CacheSet<DictionaryElementType, Object, DictionaryElement> caches;
     protected boolean isCachingEnabled;
 
     protected AbstractCachingDictionary(Document doc) throws JWNLException {
@@ -69,71 +69,71 @@ public abstract class AbstractCachingDictionary extends Dictionary {
         }
     }
 
-    protected void cacheIndexWord(POSKey key, IndexWord word) {
-        cache(DictionaryElementType.INDEX_WORD, key, word);
+    protected void cacheIndexWord(IndexWord word) {
+        cache(DictionaryElementType.INDEX_WORD, word);
     }
 
-    protected void clearIndexWord(POSKey key) {
-        clear(DictionaryElementType.INDEX_WORD, key);
+    protected void clearIndexWord(POS pos, Object key) {
+        clear(DictionaryElementType.INDEX_WORD, pos, key);
     }
 
-    protected IndexWord getCachedIndexWord(POSKey key) {
-        return (IndexWord) getCached(DictionaryElementType.INDEX_WORD, key);
-    }
-
-    //public access to allow synset to update cache on offset change without extra hassle
-    public void cacheSynset(POSKey key, Synset synset) {
-        cache(DictionaryElementType.SYNSET, key, synset);
+    protected IndexWord getCachedIndexWord(POS pos, Object key) {
+        return (IndexWord) getCached(DictionaryElementType.INDEX_WORD, pos, key);
     }
 
     //public access to allow synset to update cache on offset change without extra hassle
-    public void clearSynset(POSKey key) {
-        clear(DictionaryElementType.SYNSET, key);
+    public void cacheSynset(Synset synset) {
+        cache(DictionaryElementType.SYNSET, synset);
     }
 
-    protected Synset getCachedSynset(POSKey key) {
-        return (Synset) getCached(DictionaryElementType.SYNSET, key);
+    //public access to allow synset to update cache on offset change without extra hassle
+    public void clearSynset(POS pos, Object key) {
+        clear(DictionaryElementType.SYNSET, pos, key);
     }
 
-    protected void cacheException(POSKey key, Exc exception) {
-        cache(DictionaryElementType.EXCEPTION, key, exception);
+    protected Synset getCachedSynset(POS pos, Object key) {
+        return (Synset) getCached(DictionaryElementType.SYNSET, pos, key);
     }
 
-    protected void clearException(POSKey key) {
-        clear(DictionaryElementType.EXCEPTION, key);
+    protected void cacheException(Exc exception) {
+        cache(DictionaryElementType.EXCEPTION, exception);
     }
 
-    protected Exc getCachedException(POSKey key) {
-        return (Exc) getCached(DictionaryElementType.EXCEPTION, key);
+    protected void clearException(POS pos, Object key) {
+        clear(DictionaryElementType.EXCEPTION, pos, key);
     }
 
-    private CacheSet<DictionaryElementType, POSKey, DictionaryElement> getCaches() {
+    protected Exc getCachedException(POS pos, Object key) {
+        return (Exc) getCached(DictionaryElementType.EXCEPTION, pos, key);
+    }
+
+    private CacheSet<DictionaryElementType, Object, DictionaryElement> getCaches() {
         if (!isCachingEnabled()) {
             throw new JWNLRuntimeException("DICTIONARY_EXCEPTION_022");
         }
         if (caches == null) {
-            caches = new LRUCacheSet<DictionaryElementType, POSKey, DictionaryElement>
+            caches = new LRUCacheSet<DictionaryElementType, Object, DictionaryElement>
                     (DictionaryElementType.getAllDictionaryElementTypes().toArray(
                             new DictionaryElementType[DictionaryElementType.getAllDictionaryElementTypes().size()]));
         }
         return caches;
     }
 
-    private void cache(DictionaryElementType fileType, POSKey key, DictionaryElement obj) {
+    private void cache(DictionaryElementType fileType, DictionaryElement obj) {
         if (isCachingEnabled()) {
-            getCaches().cacheObject(fileType, key, obj);
+            getCaches().cacheObject(fileType, obj.getPOS(), obj.getKey(), obj);
         }
     }
 
-    private void clear(DictionaryElementType fileType, POSKey key) {
+    private void clear(DictionaryElementType fileType, POS pos, Object key) {
         if (isCachingEnabled()) {
-            getCaches().clearObject(fileType, key);
+            getCaches().clearObject(fileType, pos, key);
         }
     }
 
-    private DictionaryElement getCached(DictionaryElementType fileType, POSKey key) {
+    private DictionaryElement getCached(DictionaryElementType fileType, POS pos, Object key) {
         if (isCachingEnabled()) {
-            return getCaches().getCachedObject(fileType, key);
+            return getCaches().getCachedObject(fileType, pos, key);
         }
         return null;
     }
@@ -191,21 +191,21 @@ public abstract class AbstractCachingDictionary extends Dictionary {
     @Override
     public Iterator<Exc> getExceptionIterator(POS pos) throws JWNLException {
         @SuppressWarnings({"unchecked", "UnnecessaryLocalVariable"})
-        Iterator<Exc> result = (Iterator<Exc>) (Object) getPOSIterator(pos, caches.getCache(DictionaryElementType.EXCEPTION).values().iterator());
+        Iterator<Exc> result = (Iterator<Exc>) (Object) getPOSIterator(pos, caches.getCache(DictionaryElementType.EXCEPTION).getCache(pos).values().iterator());
         return result;
     }
 
     @Override
     public Iterator<Synset> getSynsetIterator(POS pos) throws JWNLException {
         @SuppressWarnings({"unchecked", "UnnecessaryLocalVariable"})
-        Iterator<Synset> result = (Iterator<Synset>) (Object) getPOSIterator(pos, caches.getCache(DictionaryElementType.SYNSET).values().iterator());
+        Iterator<Synset> result = (Iterator<Synset>) (Object) getPOSIterator(pos, caches.getCache(DictionaryElementType.SYNSET).getCache(pos).values().iterator());
         return result;
     }
 
     @Override
     public Iterator<IndexWord> getIndexWordIterator(POS pos) throws JWNLException {
         @SuppressWarnings({"unchecked", "UnnecessaryLocalVariable"})
-        Iterator<IndexWord> result = (Iterator<IndexWord>) (Object) getPOSIterator(pos, caches.getCache(DictionaryElementType.INDEX_WORD).values().iterator());
+        Iterator<IndexWord> result = (Iterator<IndexWord>) (Object) getPOSIterator(pos, caches.getCache(DictionaryElementType.INDEX_WORD).getCache(pos).values().iterator());
         return result;
     }
 
@@ -235,36 +235,36 @@ public abstract class AbstractCachingDictionary extends Dictionary {
     @Override
     public void addSynset(Synset synset) throws JWNLException {
         super.addSynset(synset);
-        cacheSynset(new POSKey(synset.getPOS(), synset.getOffset()), synset);
+        cacheSynset(synset);
     }
 
     @Override
     public void removeSynset(Synset synset) throws JWNLException {
-        clearSynset(new POSKey(synset.getPOS(), synset.getOffset()));
+        clearSynset(synset.getPOS(), synset.getKey());
         super.removeSynset(synset);
     }
 
     @Override
     public void addException(Exc exc) throws JWNLException {
         super.addException(exc);
-        cacheException(new POSKey(exc.getPOS(), exc.getLemma()), exc);
+        cacheException(exc);
     }
 
     @Override
     public void removeException(Exc exc) throws JWNLException {
-        clearException(new POSKey(exc.getPOS(), exc.getLemma()));
+        clearException(exc.getPOS(), exc.getKey());
         super.removeException(exc);
     }
 
     @Override
     public void addIndexWord(IndexWord indexWord) throws JWNLException {
         super.addIndexWord(indexWord);
-        cacheIndexWord(new POSKey(indexWord.getPOS(), indexWord.getLemma()), indexWord);
+        cacheIndexWord(indexWord);
     }
 
     @Override
     public void removeIndexWord(IndexWord indexWord) throws JWNLException {
-        clearIndexWord(new POSKey(indexWord.getPOS(), indexWord.getLemma()));
+        clearIndexWord(indexWord.getPOS(), indexWord.getKey());
         super.removeIndexWord(indexWord);
     }
 

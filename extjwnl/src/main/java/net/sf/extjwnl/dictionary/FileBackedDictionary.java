@@ -143,7 +143,7 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
         IndexWord word = null;
         if (lemma.length() > 0) {
             if (isCachingEnabled()) {
-                word = getCachedIndexWord(new POSKey(pos, lemma));
+                word = getCachedIndexWord(pos, lemma);
             }
             if (!isEditable() && word == null) {
                 try {
@@ -173,7 +173,7 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
     private IndexWord parseAndCacheIndexWordLine(POS pos, String line) throws JWNLException {
         IndexWord word = factory.createIndexWord(pos, line);
         if (isCachingEnabled() && word != null) {
-            cacheIndexWord(new POSKey(pos, word.getLemma()), word);
+            cacheIndexWord(word);
         }
         return word;
     }
@@ -199,8 +199,7 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
     }
 
     private Synset getSynset(POS pos, long offset, String line) throws JWNLException {
-        POSKey key = new POSKey(pos, offset);
-        Synset synset = getCachedSynset(key);
+        Synset synset = getCachedSynset(pos, offset);
         if (!isEditable() && synset == null) {
             try {
                 if (line == null) {
@@ -211,7 +210,7 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
                     w.setUseCount(fileManager.getUseCount(w.getSenseKeyWithAdjClass()));
                 }
 
-                cacheSynset(key, synset);
+                cacheSynset(synset);
             } catch (IOException e) {
                 throw new JWNLException("DICTIONARY_EXCEPTION_005", offset, e);
             }
@@ -226,7 +225,7 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
                     Exc exc = null;
                     if (isCachingEnabled()) {
                         String lemma = line.substring(0, line.indexOf(' '));
-                        exc = getCachedException(new POSKey(pos, lemma));
+                        exc = getCachedException(pos, lemma);
                     }
                     if (exc == null) {
                         exc = parseAndCacheExceptionLine(pos, line);
@@ -243,11 +242,9 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
         derivation = prepareQueryString(derivation);
 
         Exc exc = null;
-        POSKey key;
         if (derivation != null) {
             if (isCachingEnabled()) {
-                key = new POSKey(pos, derivation);
-                exc = getCachedException(key);
+                exc = getCachedException(pos, derivation);
             }
             if (!isEditable() && exc == null) {
                 long offset;
@@ -268,7 +265,7 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
     private Exc parseAndCacheExceptionLine(POS pos, String line) throws JWNLException {
         Exc exc = factory.createExc(pos, line);
         if (isCachingEnabled() && exc != null) {
-            cacheException(new POSKey(pos, exc.getLemma()), exc);
+            cacheException(exc);
         }
         return exc;
     }
@@ -368,7 +365,8 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
         protected IndexWord parseLine(POS pos, long offset, String line) throws JWNLException {
             IndexWord word = null;
             if (isCachingEnabled()) {
-                word = getCachedIndexWord(new POSKey(this.pos, offset));
+                String lemma = line.substring(0, line.indexOf(' '));
+                word = getCachedIndexWord(this.pos, lemma);
             }
             if (word == null) {
                 word = parseAndCacheIndexWordLine(this.pos, line);

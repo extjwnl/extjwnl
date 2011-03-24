@@ -4,7 +4,6 @@ import net.sf.extjwnl.JWNL;
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.dictionary.AbstractCachingDictionary;
 import net.sf.extjwnl.dictionary.Dictionary;
-import net.sf.extjwnl.dictionary.POSKey;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -666,10 +665,12 @@ public class Synset extends PointerTarget implements DictionaryElement {
     public void setOffset(long offset) {
         if (dictionary instanceof AbstractCachingDictionary) {
             AbstractCachingDictionary acd = (AbstractCachingDictionary) dictionary;
-            acd.clearSynset(new POSKey(pos, this.offset));
-            acd.cacheSynset(new POSKey(pos, offset), this);
+            acd.clearSynset(pos, this.offset);
+            this.offset = offset;
+            acd.cacheSynset(this);
+        } else {
+            this.offset = offset;
         }
-        this.offset = offset;
     }
 
     public boolean isAdjectiveCluster() {

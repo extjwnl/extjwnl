@@ -1,5 +1,7 @@
 package net.sf.extjwnl.util.cache;
 
+import net.sf.extjwnl.data.POS;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,7 +15,7 @@ public abstract class CacheSet<K, A, B> {
     public static final int DEFAULT_CACHE_CAPACITY = 1000;
 
     //K, V = Cache<A, B>
-    private Map<K, Cache<A, B>> caches = new HashMap<K, Cache<A, B>>();
+    private Map<K, POSCache<A, B>> caches = new HashMap<K, POSCache<A, B>>();
 
     public CacheSet(K[] keys) {
         this(keys, DEFAULT_CACHE_CAPACITY);
@@ -31,7 +33,7 @@ public abstract class CacheSet<K, A, B> {
         }
     }
 
-    protected abstract Cache<A, B> createCache(int size);
+    protected abstract POSCache<A, B> createCache(int size);
 
     public void addCache(K key) {
         addCache(key, DEFAULT_CACHE_CAPACITY);
@@ -41,39 +43,53 @@ public abstract class CacheSet<K, A, B> {
         caches.put(key, createCache(size));
     }
 
-    public void cacheObject(K cacheKey, A key, B value) {
-        getCache(cacheKey).put(key, value);
+    public void cacheObject(K cacheKey, POS pos, A key, B value) {
+        getCache(cacheKey).getCache(pos).put(key, value);
     }
 
-    public void clearObject(K cacheKey, A key) {
-        getCache(cacheKey).remove(key);
+    public void clearObject(K cacheKey, POS pos, A key) {
+        getCache(cacheKey).getCache(pos).remove(key);
     }
 
-    public B getCachedObject(K cacheKey, A key) {
-        return getCache(cacheKey).get(key);
+    public B getCachedObject(K cacheKey, POS pos, A key) {
+        return getCache(cacheKey).getCache(pos).get(key);
     }
 
     public void clearCache(K key) {
-        getCache(key).clear();
+        for (POS pos : POS.getAllPOS()) {
+            getCache(key).getCache(pos).clear();
+        }
     }
 
     public int getCacheSize(K cacheKey) {
-        return getCache(cacheKey).getSize();
+        int result = 0;
+        for (POS pos : POS.getAllPOS()) {
+            result = result + getCache(cacheKey).getCache(pos).getSize();
+        }
+        return result;
     }
 
     public int getCacheCapacity(K cacheKey) {
-        return getCache(cacheKey).getCapacity();
+        int result = 0;
+        for (POS pos : POS.getAllPOS()) {
+            result = result + getCache(cacheKey).getCache(pos).getCapacity();
+        }
+        return result;
     }
 
     public int setCacheCapacity(K cacheKey, int capacity) {
-        return getCache(cacheKey).setCapacity(capacity);
+        int result = 0;
+        for (POS pos : POS.getAllPOS()) {
+            result = result + getCache(cacheKey).getCache(pos).setCapacity(capacity);
+        }
+        return result;
     }
 
     public int getSize() {
         return caches.size();
     }
 
-    public Cache<A, B> getCache(K cacheKey) {
+    public POSCache<A, B> getCache(K cacheKey) {
         return caches.get(cacheKey);
     }
 }

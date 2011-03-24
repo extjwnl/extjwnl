@@ -60,7 +60,7 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
         IndexWord word = null;
         if (lemma.length() > 0) {
             if (isCachingEnabled()) {
-                word = getCachedIndexWord(new POSKey(pos, lemma));
+                word = getCachedIndexWord(pos, lemma);
             }
             if (word == null) {
                 Query query = null;
@@ -68,7 +68,7 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
                     query = dbManager.getIndexWordSynsetsQuery(pos, lemma);
                     word = factory.createIndexWord(pos, lemma, query.execute());
                     if (word != null && isCachingEnabled()) {
-                        cacheIndexWord(new POSKey(pos, lemma), word);
+                        cacheIndexWord(word);
                     }
                 } catch (SQLException e) {
                     throw new JWNLException("DICTIONARY_EXCEPTION_023", e);
@@ -112,7 +112,7 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
     public Synset getSynsetAt(POS pos, long offset) throws JWNLException {
         Synset synset = null;
         if (isCachingEnabled()) {
-            synset = getCachedSynset(new POSKey(pos, offset));
+            synset = getCachedSynset(pos, offset);
         }
         if (synset == null) {
             Query query = null;
@@ -127,7 +127,7 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
                 synset = factory.createSynset(pos, offset, query.execute(), wordQuery.execute(),
                         pointerQuery.execute(), POS.VERB == pos ? verbFrameQuery.execute() : null);
                 if (synset != null && isCachingEnabled()) {
-                    cacheSynset(new POSKey(pos, offset), synset);
+                    cacheSynset(synset);
                 }
             } catch (SQLException e) {
                 throw new JWNLException("DICTIONARY_EXCEPTION_023", e);
@@ -158,7 +158,7 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
         derivation = prepareQueryString(derivation);
         Exc exc = null;
         if (isCachingEnabled()) {
-            exc = getCachedException(new POSKey(pos, derivation));
+            exc = getCachedException(pos, derivation);
         }
         if (exc == null) {
             Query query = null;
@@ -166,7 +166,7 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
                 query = dbManager.getExceptionQuery(pos, derivation);
                 exc = factory.createExc(pos, derivation, query.execute());
                 if (exc != null && isCachingEnabled()) {
-                    cacheException(new POSKey(pos, derivation), exc);
+                    cacheException(exc);
                 }
             } catch (SQLException e) {
                 throw new JWNLException("DICTIONARY_EXCEPTION_023", e);

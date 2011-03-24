@@ -20,7 +20,7 @@ public class LRUCacheSet<K, A, B> extends CacheSet<K, A, B> {
         super(keys, sizes);
     }
 
-    protected Cache<A, B> createCache(int size) {
-        return new LRUCache<A, B>(size);
+    protected POSCache<A, B> createCache(int size) {
+        return new LRUPOSCache<A, B>(size);
     }
 }
