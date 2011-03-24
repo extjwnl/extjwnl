@@ -4,8 +4,6 @@ import net.sf.extjwnl.JWNL;
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.dictionary.Dictionary;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -32,7 +30,7 @@ public class Exc extends BaseDictionaryElement {
      */
     private String lemma;
 
-    private ArrayList<String> exceptions;
+    private List<String> exceptions;
 
     /**
      * Creates a new exception entry.
@@ -56,7 +54,7 @@ public class Exc extends BaseDictionaryElement {
         }
         this.pos = pos;
         this.lemma = lemma;
-        this.exceptions = new ArrayList<String>(exceptions);
+        this.exceptions = exceptions;
         if (null != dictionary && dictionary.isEditable()) {
             dictionary.addException(this);
         }
