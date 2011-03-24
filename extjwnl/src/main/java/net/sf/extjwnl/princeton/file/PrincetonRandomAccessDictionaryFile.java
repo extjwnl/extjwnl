@@ -80,6 +80,13 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
     public static final String CHECK_VERB_FRAME_LIMIT_KEY = "check_verb_frame_limit";
     private boolean checkVerbFrameLimit = true;
 
+    /**
+     * Whether to warn about data file line length being off limits, default: true. The line length was
+     * found empirically by testing wnb.exe for crashes. It equals 15360.
+     */
+    public static final String CHECK_DATA_FILE_LINE_LENGTH_LIMIT_KEY = "check_data_file_line_length_limit";
+    private boolean checkDataFileLineLengthLimit = true;
+
     protected RandomAccessFile raFile = null;
 
     private static final String PRINCETON_HEADER = "  1 This software and database is being provided to you, the LICENSEE, by  \n" +
@@ -164,6 +171,9 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
         }
         if (params.containsKey(CHECK_VERB_FRAME_LIMIT_KEY)) {
             checkVerbFrameLimit = Boolean.parseBoolean(params.get(CHECK_VERB_FRAME_LIMIT_KEY).getValue());
+        }
+        if (params.containsKey(CHECK_DATA_FILE_LINE_LENGTH_LIMIT_KEY)) {
+            checkDataFileLineLengthLimit = Boolean.parseBoolean(params.get(CHECK_DATA_FILE_LINE_LENGTH_LIMIT_KEY).getValue());
         }
     }
 
@@ -400,10 +410,14 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                         log.info(JWNL.resolveMessage("PRINCETON_INFO_014", 100 * counter / total));
                     }
                 }
+                String renderedSynset = renderSynset(synset);
+                if (checkDataFileLineLengthLimit && log.isWarnEnabled() && 15360 < renderedSynset.length()) {
+                    log.warn(JWNL.resolveMessage("PRINCETON_WARN_009", offset));
+                }
                 if (null == encoding) {
-                    raFile.write(renderSynset(synset).getBytes());
+                    raFile.write(renderedSynset.getBytes());
                 } else {
-                    raFile.write(renderSynset(synset).getBytes(encoding));
+                    raFile.write(renderedSynset.getBytes(encoding));
                 }
                 raFile.writeBytes("\n");
             }
@@ -545,7 +559,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
         //synset_offset  lex_filenum  ss_type  w_cnt  word  lex_id  [word  lex_id...]  p_cnt  [ptr...]  [frames...]  |   gloss
         //w_cnt Two digit hexadecimal integer indicating the number of words in the synset.
         String posKey = synset.getPOS().getKey();
-        if (synset.isAdjectiveCluster()) {
+        if (POS.ADJECTIVE == synset.getPOS() && synset.isAdjectiveCluster()) {
             posKey = POS.ADJECTIVE_SATELLITE_KEY;
         }
         if (checkLexFileNumber && log.isWarnEnabled() && !LexFileIdFileNameMap.getMap().containsKey(synset.getLexFileNum())) {
@@ -554,7 +568,18 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
         if (checkWordCountLimit && log.isWarnEnabled() && (0xFF < synset.getWords().size())) {
             log.warn(JWNL.resolveMessage("PRINCETON_WARN_004", new Object[]{synset.getOffset(), synset.getWords().size()}));
         }
-        StringBuilder result = new StringBuilder(String.format("%s %02d %s %02x ", dfOff.format(synset.getOffset()), synset.getLexFileNum(), posKey, synset.getWords().size()));
+        StringBuilder result = new StringBuilder(dfOff.format(synset.getOffset()));
+        if (synset.getLexFileNum() < 10) {
+            result.append(" 0").append(synset.getLexFileNum());
+        } else {
+            result.append(" ").append(synset.getLexFileNum());
+        }
+        result.append(" ").append(posKey);
+        if (synset.getWords().size() < 0x10) {
+            result.append(" 0").append(Integer.toHexString(synset.getWords().size())).append(" ");
+        } else {
+            result.append(" ").append(Integer.toHexString(synset.getWords().size())).append(" ");
+        }
         for (Word w : synset.getWords()) {
             //ASCII form of a word as entered in the synset by the lexicographer, with spaces replaced by underscore characters (_ ). The text of the word is case sensitive.
             //lex_id One digit hexadecimal integer that, when appended onto lemma , uniquely identifies a sense within a lexicographer file.
@@ -568,13 +593,20 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
             if (checkLexIdLimit && log.isWarnEnabled() && (0xF < w.getLexId())) {
                 log.warn(JWNL.resolveMessage("PRINCETON_WARN_005", new Object[]{synset.getOffset(), w.getLemma(), w.getLexId()}));
             }
-            result.append(String.format("%s %x ", lemma, w.getLexId()));
+            result.append(lemma).append(" ");
+            result.append(Long.toHexString(w.getLexId())).append(" ");
         }
         //Three digit decimal integer indicating the number of pointers from this synset to other synsets. If p_cnt is 000 the synset has no pointers.
         if (checkRelationLimit && log.isWarnEnabled() && (999 < synset.getPointers().size())) {
             log.warn(JWNL.resolveMessage("PRINCETON_WARN_002", new Object[]{synset.getOffset(), synset.getPointers().size()}));
         }
-        result.append(String.format("%03d ", synset.getPointers().size()));
+        if (synset.getPointers().size() < 100) {
+            result.append("0");
+            if (synset.getPointers().size() < 10) {
+                result.append("0");
+            }
+        }
+        result.append(synset.getPointers().size()).append(" ");
         for (Pointer p : synset.getPointers()) {
             //pointer_symbol  synset_offset  pos  source/target
             result.append(p.getType().getKey()).append(" ");
@@ -598,7 +630,14 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
             if (checkPointerIndexLimit && log.isWarnEnabled() && (0xFF < p.getTargetIndex())) {
                 log.warn(JWNL.resolveMessage("PRINCETON_WARN_006", new Object[]{synset.getOffset(), p.getTarget().getSynset().getOffset(), p.getTargetIndex()}));
             }
-            result.append(String.format("%02x%02x ", p.getSourceIndex(), p.getTargetIndex()));
+            if (p.getSourceIndex() < 0x10) {
+                result.append("0");
+            }
+            result.append(Integer.toHexString(p.getSourceIndex()));
+            if (p.getTargetIndex() < 0x10) {
+                result.append("0");
+            }
+            result.append(Integer.toHexString(p.getTargetIndex())).append(" ");
         }
 
         //frames In data.verb only
@@ -623,12 +662,20 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
             if (checkVerbFrameLimit && log.isWarnEnabled() && (99 < verbFramesCount)) {
                 log.warn(JWNL.resolveMessage("PRINCETON_WARN_007", new Object[]{synset.getOffset(), verbFramesCount}));
             }
-            result.append(String.format("%02d ", verbFramesCount));
+            if (verbFramesCount < 10) {
+                result.append("0");
+            }
+            result.append(Integer.toString(verbFramesCount)).append(" ");
             for (int i = verbFrames.nextSetBit(0); i >= 0; i = verbFrames.nextSetBit(i + 1)) {
                 if (checkVerbFrameLimit && log.isWarnEnabled() && (99 < i)) {
                     log.warn(JWNL.resolveMessage("PRINCETON_WARN_008", new Object[]{synset.getOffset(), i}));
                 }
-                result.append(String.format("+ %02d 00 ", i));
+                result.append("+ ");
+                if (i < 10) {
+                    result.append("0");
+                }
+                result.append(Integer.toString(i));
+                result.append(" 00 ");
             }
             for (Word word : synset.getWords()) {
                 if (word instanceof Verb) {
@@ -638,7 +685,15 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                             if (checkVerbFrameLimit && log.isWarnEnabled() && (0xFF < word.getIndex())) {
                                 log.warn(JWNL.resolveMessage("PRINCETON_WARN_008", new Object[]{synset.getOffset(), word.getIndex()}));
                             }
-                            result.append(String.format("+ %02d %02x ", i, word.getIndex()));
+                            result.append("+ ");
+                            if (i < 10) {
+                                result.append("0");
+                            }
+                            result.append(Integer.toString(i)).append(" ");
+                            if (word.getIndex() < 0x10) {
+                                result.append("0");
+                            }
+                            result.append(Integer.toHexString(word.getIndex())).append(" ");
                         }
                     }
                 }
