@@ -96,7 +96,7 @@ public class Word extends PointerTarget {
         if (null == lemma || "".equals(lemma)) {
             throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_046"));
         }
-        this.lemma = lemma;
+        this.lemma = lemma.trim();
     }
 
     /**
