@@ -380,7 +380,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                     s.setOffset(offset);
                     String renderedSynset = renderSynset(s);
                     if (checkDataFileLineLengthLimit && log.isWarnEnabled() && 15360 < renderedSynset.length()) {
-                        log.warn(JWNL.resolveMessage("PRINCETON_WARN_009", s.getOffset()));
+                        log.warn(JWNL.resolveMessage("PRINCETON_WARN_009", new Object[]{s.getOffset(), renderedSynset.length()}));
                     }
                     if (null == encoding) {
                         offset = offset + renderedSynset.getBytes().length + 1;//\n should be 1 byte
