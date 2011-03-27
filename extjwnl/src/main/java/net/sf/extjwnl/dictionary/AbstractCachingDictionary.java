@@ -23,6 +23,43 @@ public abstract class AbstractCachingDictionary extends Dictionary {
 
     private static final Log log = LogFactory.getLog(AbstractCachingDictionary.class);
 
+    public static final class IndexWordIterator implements Iterator<IndexWord> {
+        private Iterator<IndexWord> itr;
+        private String searchString;
+        private IndexWord startWord;
+
+        public IndexWordIterator(Iterator<IndexWord> itr, String searchString, IndexWord startWord) {
+            this.itr = itr;
+            this.searchString = searchString;
+            this.startWord = startWord;
+        }
+
+        public boolean hasNext() {
+            return (startWord != null);
+        }
+
+        public IndexWord next() {
+            if (hasNext()) {
+                IndexWord thisWord = startWord;
+                startWord = null;
+                while (itr.hasNext()) {
+                    IndexWord word = itr.next();
+                    if (word.getLemma().indexOf(searchString) != -1) {
+                        startWord = word;
+                        break;
+                    }
+                }
+                return thisWord;
+            } else {
+                throw new NoSuchElementException();
+            }
+        }
+
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+    }
+
     private CacheSet<DictionaryElementType, Object, DictionaryElement> caches;
     protected boolean isCachingEnabled;
 
@@ -138,74 +175,24 @@ public abstract class AbstractCachingDictionary extends Dictionary {
         return null;
     }
 
-    private static final class DictionaryElementIterator implements Iterator<DictionaryElement> {
-        private Iterator<DictionaryElement> itr;
-        private POS pos;
-        private DictionaryElement start;
-
-        public DictionaryElementIterator(Iterator<DictionaryElement> itr, POS pos, DictionaryElement start) {
-            this.itr = itr;
-            this.pos = pos;
-            this.start = start;
-        }
-
-        public boolean hasNext() {
-            return (start != null);
-        }
-
-        public DictionaryElement next() {
-            if (hasNext()) {
-                DictionaryElement d = start;
-                start = null;
-                while (itr.hasNext()) {
-                    DictionaryElement n = itr.next();
-                    if (n.getPOS().equals(pos)) {
-                        start = n;
-                        break;
-                    }
-                }
-                return d;
-            } else {
-                throw new NoSuchElementException();
-            }
-        }
-
-        public void remove() {
-            throw new UnsupportedOperationException();
-        }
-    }
-
-    private static Iterator<DictionaryElement> getPOSIterator(POS pos, Iterator<DictionaryElement> iterator) {
-        DictionaryElement start = null;
-        while (iterator.hasNext()) {
-            DictionaryElement n = iterator.next();
-            if (n.getPOS().equals(pos)) {
-                start = n;
-                break;
-            }
-        }
-        return new DictionaryElementIterator(iterator, pos, start);
-
-    }
-
     @Override
     public Iterator<Exc> getExceptionIterator(POS pos) throws JWNLException {
         @SuppressWarnings({"unchecked", "UnnecessaryLocalVariable"})
-        Iterator<Exc> result = (Iterator<Exc>) (Object) getPOSIterator(pos, caches.getCache(DictionaryElementType.EXCEPTION).getCache(pos).values().iterator());
+        Iterator<Exc> result = (Iterator<Exc>) (Object) caches.getCache(DictionaryElementType.EXCEPTION).getCache(pos).values().iterator();
         return result;
     }
 
     @Override
     public Iterator<Synset> getSynsetIterator(POS pos) throws JWNLException {
         @SuppressWarnings({"unchecked", "UnnecessaryLocalVariable"})
-        Iterator<Synset> result = (Iterator<Synset>) (Object) getPOSIterator(pos, caches.getCache(DictionaryElementType.SYNSET).getCache(pos).values().iterator());
+        Iterator<Synset> result = (Iterator<Synset>) (Object) caches.getCache(DictionaryElementType.SYNSET).getCache(pos).values().iterator();
         return result;
     }
 
     @Override
     public Iterator<IndexWord> getIndexWordIterator(POS pos) throws JWNLException {
         @SuppressWarnings({"unchecked", "UnnecessaryLocalVariable"})
-        Iterator<IndexWord> result = (Iterator<IndexWord>) (Object) getPOSIterator(pos, caches.getCache(DictionaryElementType.INDEX_WORD).getCache(pos).values().iterator());
+        Iterator<IndexWord> result = (Iterator<IndexWord>) (Object) caches.getCache(DictionaryElementType.INDEX_WORD).getCache(pos).values().iterator();
         return result;
     }
 
@@ -222,7 +209,7 @@ public abstract class AbstractCachingDictionary extends Dictionary {
                 break;
             }
         }
-        return new MapBackedDictionary.IndexWordIterator(itr, substring, start);
+        return new IndexWordIterator(itr, substring, start);
     }
 
     @Override
@@ -230,6 +217,34 @@ public abstract class AbstractCachingDictionary extends Dictionary {
         setCacheCapacity(Integer.MAX_VALUE);
         cacheAll();
         super.edit();
+        //resolving pointers here to use faster iterators on hashes
+        for (POS pos : POS.getAllPOS()) {
+            resolvePointers(pos);
+        }
+    }
+
+    private void resolvePointers(POS pos) throws JWNLException {
+        if (log.isInfoEnabled()) {
+            log.info(JWNL.resolveMessage("DICTIONARY_INFO_013", pos.getLabel()));
+        }
+
+        {
+            Iterator<Synset> si = getSynsetIterator(pos);
+            while (si.hasNext()) {
+                Synset s = si.next();
+                for (Pointer p : s.getPointers()) {
+                    p.getTarget();//resolve pointers
+                }
+            }
+        }
+
+        {
+            Iterator<IndexWord> ii = getIndexWordIterator(pos);
+            while (ii.hasNext()) {
+                IndexWord iw = ii.next();
+                iw.getSenses().iterator();//resolve pointers
+            }
+        }
     }
 
     @Override
@@ -317,14 +332,10 @@ public abstract class AbstractCachingDictionary extends Dictionary {
                 if (maxOffset.get(pos) < s.getOffset()) {
                     maxOffset.put(pos, s.getOffset());
                 }
-                for (Pointer p : s.getPointers()) {
-                    p.getTarget();//resolve pointers
-                }
             }
             if (log.isInfoEnabled()) {
                 log.info(JWNL.resolveMessage("DICTIONARY_INFO_006", count));
             }
-
         }
 
         {
@@ -340,8 +351,7 @@ public abstract class AbstractCachingDictionary extends Dictionary {
                     }
                 }
                 count++;
-                IndexWord iw = ii.next();
-                iw.getSenses().iterator();//resolve pointers
+                ii.next();
             }
             if (log.isInfoEnabled()) {
                 log.info(JWNL.resolveMessage("DICTIONARY_INFO_006", count));

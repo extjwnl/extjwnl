@@ -63,7 +63,7 @@ public class MapBackedDictionary extends Dictionary {
                 break;
             }
         }
-        return new IndexWordIterator(itr, substring, start);
+        return new AbstractCachingDictionary.IndexWordIterator(itr, substring, start);
     }
 
     public Iterator<IndexWord> getIndexWordIterator(POS pos) {
@@ -213,43 +213,6 @@ public class MapBackedDictionary extends Dictionary {
         @Override
         public String toString() {
             return pos.getLabel() + "." + fileType.getName();
-        }
-    }
-
-    public static final class IndexWordIterator implements Iterator<IndexWord> {
-        private Iterator<IndexWord> itr;
-        private String searchString;
-        private IndexWord startWord;
-
-        public IndexWordIterator(Iterator<IndexWord> itr, String searchString, IndexWord startWord) {
-            this.itr = itr;
-            this.searchString = searchString;
-            this.startWord = startWord;
-        }
-
-        public boolean hasNext() {
-            return (startWord != null);
-        }
-
-        public IndexWord next() {
-            if (hasNext()) {
-                IndexWord thisWord = startWord;
-                startWord = null;
-                while (itr.hasNext()) {
-                    IndexWord word = itr.next();
-                    if (word.getLemma().indexOf(searchString) != -1) {
-                        startWord = word;
-                        break;
-                    }
-                }
-                return thisWord;
-            } else {
-                throw new NoSuchElementException();
-            }
-        }
-
-        public void remove() {
-            throw new UnsupportedOperationException();
         }
     }
 

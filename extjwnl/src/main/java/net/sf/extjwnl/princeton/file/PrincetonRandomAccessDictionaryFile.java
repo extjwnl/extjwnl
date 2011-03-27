@@ -189,7 +189,6 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                 int c = -1;
                 boolean eol = false;
                 int idx = 1;
-                StringBuilder input = new StringBuilder();
 
                 while (!eol) {
                     switch (c = read()) {
@@ -206,7 +205,6 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                             break;
                         default: {
                             lineArr[idx - 1] = (byte) c;
-                            input.append((char) c);
                             idx++;
                             if (LINE_MAX == idx) {
                                 byte[] t = new byte[LINE_MAX * 2];
@@ -219,7 +217,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                     }
                 }
 
-                if ((c == -1) && (input.length() == 0)) {
+                if ((c == -1) && (1 == idx)) {
                     return null;
                 }
                 if (1 < idx) {
@@ -228,10 +226,11 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                         CharBuffer cb = decoder.decode(bb);
                         return cb.toString();
                     } catch (MalformedInputException e) {
-                        return " ";
+                        log.error(JWNL.resolveMessage("PRINCETON_EXCEPTION_008", getFilePointer()));
+                        throw e;
                     }
                 } else {
-                    return input.toString();
+                    return null;
                 }
             }
         } else {
