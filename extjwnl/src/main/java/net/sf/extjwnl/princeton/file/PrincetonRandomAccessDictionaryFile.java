@@ -306,8 +306,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                         CharBuffer cb = decoder.decode(bb);
                         return cb.toString();
                     } catch (MalformedInputException e) {
-                        log.error(JWNL.resolveMessage("PRINCETON_EXCEPTION_008", getFilePointer()));
-                        throw e;
+                        return " ";
                     }
                 } else {
                     return null;
