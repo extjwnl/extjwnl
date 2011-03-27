@@ -133,4 +133,12 @@ public class PrincetonChannelDictionaryFile extends AbstractPrincetonRandomAcces
     public int read() throws IOException {
         return (int) buffer.get();
     }
+
+    public int getOffsetLength() {
+        throw new UnsupportedOperationException();
+    }
+
+    public void setOffsetLength(int length) {
+        throw new UnsupportedOperationException();
+    }
 }

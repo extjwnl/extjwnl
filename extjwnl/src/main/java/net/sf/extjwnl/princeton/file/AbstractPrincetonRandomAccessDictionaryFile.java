@@ -72,11 +72,6 @@ public abstract class AbstractPrincetonRandomAccessDictionaryFile extends Abstra
     }
 
     @Override
-    public String getOffsetFormatString() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public void writeLine(String line) throws IOException {
         throw new UnsupportedOperationException();
     }

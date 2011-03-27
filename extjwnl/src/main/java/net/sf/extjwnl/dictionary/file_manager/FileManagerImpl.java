@@ -9,13 +9,13 @@ import net.sf.extjwnl.data.Synset;
 import net.sf.extjwnl.data.Word;
 import net.sf.extjwnl.dictionary.Dictionary;
 import net.sf.extjwnl.dictionary.file.*;
+import net.sf.extjwnl.princeton.file.PrincetonRandomAccessDictionaryFile;
 import net.sf.extjwnl.util.TokenizerParser;
 import net.sf.extjwnl.util.factory.Param;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
-import java.text.DecimalFormat;
 import java.util.*;
 
 /**
@@ -317,6 +317,30 @@ public class FileManagerImpl implements FileManager {
         files.open();
         files.save();
 
+        //find max offset length
+        int maxOffsetLength = 0;
+        for (DictionaryFileType dft : DictionaryFileType.getAllDictionaryFileTypes()) {
+            Iterator<RandomAccessDictionaryFile> itr = files.get(dft).getFileIterator();
+            while (itr.hasNext()) {
+                RandomAccessDictionaryFile radf = itr.next();
+                if (maxOffsetLength < radf.getOffsetLength()) {
+                    maxOffsetLength = radf.getOffsetLength();
+                }
+            }
+        }
+
+        //render again those with small offsets
+        for (DictionaryFileType dft : DictionaryFileType.getAllDictionaryFileTypes()) {
+            Iterator<RandomAccessDictionaryFile> itr = files.get(dft).getFileIterator();
+            while (itr.hasNext()) {
+                RandomAccessDictionaryFile radf = itr.next();
+                if (maxOffsetLength < radf.getOffsetLength()) {
+                    radf.setOffsetLength(maxOffsetLength);
+                    radf.save();
+                }
+            }
+        }
+
         {
             if (log.isInfoEnabled()) {
                 log.info(JWNL.resolveMessage("PRINCETON_INFO_004", revCntList.getFile().getName()));
@@ -407,18 +431,6 @@ public class FileManagerImpl implements FileManager {
 
         {
             //sense index
-
-            //find the largest offset over all POS
-            String decimalFormatString = "00000000";
-            for (POS pos : POS.getAllPOS()) {
-                for (DictionaryFileType dft : DictionaryFileType.getAllDictionaryFileTypes()) {
-                    RandomAccessDictionaryFile dictionaryFile = files.getDictionaryFile(pos, dft);
-                    if (decimalFormatString.length() < dictionaryFile.getOffsetFormatString().length()) {
-                        decimalFormatString = dictionaryFile.getOffsetFormatString();
-                    }
-                }
-            }
-            DecimalFormat dfOff = new DecimalFormat(decimalFormatString);
             if (log.isInfoEnabled()) {
                 log.info(JWNL.resolveMessage("PRINCETON_INFO_004", senseIndex.getFile().getName()));
             }
@@ -431,8 +443,15 @@ public class FileManagerImpl implements FileManager {
                         Synset synset = iw.getSenses().get(i);
                         for (Word w : synset.getWords()) {
                             if (w.getLemma().equalsIgnoreCase(iw.getLemma())) {
+                                StringBuilder result = new StringBuilder(100);
                                 //sense_key  synset_offset  sense_number  tag_cnt
-                                senseIndexContent.add(w.getSenseKey() + " " + dfOff.format(synset.getOffset()) + " " + Integer.toString(i + 1) + " " + w.getUseCount());
+                                result.append(w.getSenseKey()).append(" ");
+                                PrincetonRandomAccessDictionaryFile.formatOffset(synset.getOffset(), maxOffsetLength, result);
+                                result.append(" ");
+                                result.append(Integer.toString(i + 1));
+                                result.append(" ");
+                                result.append(w.getUseCount());
+                                senseIndexContent.add(result.toString());
                             }
                         }
                     }

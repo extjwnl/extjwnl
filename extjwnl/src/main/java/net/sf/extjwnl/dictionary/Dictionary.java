@@ -574,7 +574,9 @@ public abstract class Dictionary {
         if (!isEditable()) {
             throw new JWNLException("DICTIONARY_EXCEPTION_029");
         }
-
+        if (log.isInfoEnabled()) {
+            log.info(JWNL.resolveMessage("PRINCETON_INFO_022"));
+        }
         if (checkLexIds) {
             //fixing word lex ids
             for (POS pos : POS.getAllPOS()) {

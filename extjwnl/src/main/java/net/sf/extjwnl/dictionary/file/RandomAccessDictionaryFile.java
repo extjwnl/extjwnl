@@ -99,9 +99,16 @@ public interface RandomAccessDictionaryFile extends DictionaryFile {
     void writeStrings(Collection<String> strings) throws IOException;
 
     /**
-     * Returns offset format string that accommodates largest offset.
+     * Returns offset length that accommodates largest offset.
      *
-     * @return offset format string that accommodates largest offset
+     * @return offset length that accommodates largest offset
      */
-    String getOffsetFormatString();
+    int getOffsetLength();
+
+    /**
+     * Sets offset length to be used while rendering the file.
+     *
+     * @param length offset length to be used while rendering the file
+     */
+    void setOffsetLength(int length);
 }

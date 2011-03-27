@@ -18,7 +18,6 @@ import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.MalformedInputException;
-import java.text.DecimalFormat;
 import java.util.*;
 
 /**
@@ -129,14 +128,95 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
      */
     private static final String READ_WRITE = "rw";
 
+    private final static char[] digits = {
+            '0', '1', '2', '3', '4', '5',
+            '6', '7', '8', '9', 'a', 'b',
+            'c', 'd', 'e', 'f', 'g', 'h',
+            'i', 'j', 'k', 'l', 'm', 'n',
+            'o', 'p', 'q', 'r', 's', 't',
+            'u', 'v', 'w', 'x', 'y', 'z'
+    };
+
+    private final static char[] DigitTens = {
+            '0', '0', '0', '0', '0', '0', '0', '0', '0', '0',
+            '1', '1', '1', '1', '1', '1', '1', '1', '1', '1',
+            '2', '2', '2', '2', '2', '2', '2', '2', '2', '2',
+            '3', '3', '3', '3', '3', '3', '3', '3', '3', '3',
+            '4', '4', '4', '4', '4', '4', '4', '4', '4', '4',
+            '5', '5', '5', '5', '5', '5', '5', '5', '5', '5',
+            '6', '6', '6', '6', '6', '6', '6', '6', '6', '6',
+            '7', '7', '7', '7', '7', '7', '7', '7', '7', '7',
+            '8', '8', '8', '8', '8', '8', '8', '8', '8', '8',
+            '9', '9', '9', '9', '9', '9', '9', '9', '9', '9',
+    };
+
+    private final static char[] DigitOnes = {
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+    };
 
     private CharsetDecoder decoder;
 
     private int LINE_MAX = 1024;//1K buffer
     private byte[] lineArr = new byte[LINE_MAX];
 
-    private DecimalFormat dfOff;
-    private String decimalFormatString = "00000000";
+    private int offsetLength = -1;
+
+    public static void formatOffset(long i, int formatLength, StringBuilder target) {
+        int lastIdx = target.length();
+        target.setLength(target.length() + formatLength);
+
+        //lifted from Long.java
+        long q;
+        int r;
+        int charPos = lastIdx + formatLength;
+
+        // Get 2 digits/iteration using longs until quotient fits into an int
+        while (i > Integer.MAX_VALUE && 0 < charPos) {
+            q = i / 100;
+            // really: r = i - (q * 100);
+            r = (int) (i - ((q << 6) + (q << 5) + (q << 2)));
+            i = q;
+            target.setCharAt(--charPos, DigitOnes[r]);
+            target.setCharAt(--charPos, DigitTens[r]);
+        }
+
+        // Get 2 digits/iteration using ints
+        int q2;
+        int i2 = (int) i;
+        while (i2 >= 65536 && 0 < charPos) {
+            q2 = i2 / 100;
+            // really: r = i2 - (q * 100);
+            r = i2 - ((q2 << 6) + (q2 << 5) + (q2 << 2));
+            i2 = q2;
+            target.setCharAt(--charPos, DigitOnes[r]);
+            target.setCharAt(--charPos, DigitTens[r]);
+        }
+
+        // Fall thru to fast mode for smaller numbers
+        // assert(i2 <= 65536, i2);
+        while (0 < charPos) {
+            q2 = (i2 * 52429) >>> (16 + 3);
+            r = i2 - ((q2 << 3) + (q2 << 1));  // r = i2-(q2*10) ...
+            target.setCharAt(--charPos, digits[r]);
+            i2 = q2;
+            if (i2 == 0) {
+                break;
+            }
+        }
+
+        while (lastIdx < charPos && 0 < charPos) {
+            target.setCharAt(--charPos, '0');
+        }
+    }
 
     public PrincetonRandomAccessDictionaryFile(Dictionary dictionary, Map<String, Param> params) {
         super(dictionary, params);
@@ -321,7 +401,6 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
         raFile = new RandomAccessFile(file, READ_WRITE);
     }
 
-
     public long length() throws IOException {
         return raFile.length();
     }
@@ -363,8 +442,11 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                 }
             });
 
-            dfOff = new DecimalFormat("00000000");//8 by default
-            {
+            int offsetDigitCount = 8;//8 by default for WN compatibility
+            do {
+                if (offsetLength < offsetDigitCount) {
+                    offsetLength = offsetDigitCount;
+                }
                 if (log.isInfoEnabled()) {
                     log.info(JWNL.resolveMessage("PRINCETON_INFO_006", synsets.size()));
                 }
@@ -375,7 +457,16 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                         log.warn(JWNL.resolveMessage("PRINCETON_WARN_003", offset));
                     }
                 }
+                long counter = 0;
+                long total = synsets.size();
+                long reportInt = (total / 20) + 1;//i.e. report every 5%
                 for (Synset s : synsets) {
+                    counter++;
+                    if (0 == (counter % reportInt)) {
+                        if (log.isInfoEnabled()) {
+                            log.info(JWNL.resolveMessage("PRINCETON_INFO_014", 100 * counter / total));
+                        }
+                    }
                     s.setOffset(offset);
                     String renderedSynset = renderSynset(s);
                     if (checkDataFileLineLengthLimit && log.isWarnEnabled() && 15360 < renderedSynset.length()) {
@@ -387,10 +478,10 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                         offset = offset + renderedSynset.getBytes(encoding).length + 1;//\n should be 1 byte
                     }
                 }
-                //calculate offset length
-                decimalFormatString = createOffsetFormatString(offset);
-                dfOff = new DecimalFormat(decimalFormatString);//there is a small chance another update might be necessary
-            }
+
+                //calculate used offset length
+                offsetDigitCount = Math.max(offsetLength, getDigitCount(offset));
+            } while (offsetLength < offsetDigitCount);
 
             if (log.isInfoEnabled()) {
                 log.info(JWNL.resolveMessage("PRINCETON_INFO_007", synsets.size()));
@@ -407,6 +498,9 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                     log.info(JWNL.resolveMessage("PRINCETON_INFO_020", getFilename()));
                 }
                 raFile.writeBytes(PRINCETON_HEADER);
+            }
+            if (log.isInfoEnabled()) {
+                log.info(JWNL.resolveMessage("PRINCETON_INFO_021", getFilename()));
             }
             for (Synset synset : synsets) {
                 counter++;
@@ -430,23 +524,24 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
         } else if (DictionaryFileType.INDEX == getFileType()) {
             ArrayList<String> indexes = new ArrayList<String>();
 
-            Iterator<IndexWord> ii = dictionary.getIndexWordIterator(getPOS());
-            long maxOffset = 0;
-            while (ii.hasNext()) {
-                IndexWord indexWord = ii.next();
-                for (Synset synset : indexWord.getSenses()) {
-                    if (maxOffset < synset.getOffset()) {
-                        maxOffset = synset.getOffset();
+            if (-1 == offsetLength) {
+                Iterator<IndexWord> ii = dictionary.getIndexWordIterator(getPOS());
+                long maxOffset = 0;
+                while (ii.hasNext()) {
+                    IndexWord indexWord = ii.next();
+                    for (Synset synset : indexWord.getSenses()) {
+                        if (maxOffset < synset.getOffset()) {
+                            maxOffset = synset.getOffset();
+                        }
                     }
                 }
+                offsetLength = Math.max(8, getDigitCount(maxOffset));
             }
-            decimalFormatString = createOffsetFormatString(maxOffset);
-            dfOff = new DecimalFormat(decimalFormatString);
 
             if (log.isInfoEnabled()) {
                 log.info(JWNL.resolveMessage("PRINCETON_INFO_011", getFilename()));
             }
-            ii = dictionary.getIndexWordIterator(getPOS());
+            Iterator<IndexWord> ii = dictionary.getIndexWordIterator(getPOS());
             while (ii.hasNext()) {
                 indexes.add(renderIndexWord(ii.next()));
             }
@@ -536,28 +631,23 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
         }
     }
 
-
-    @Override
-    public String getOffsetFormatString() {
-        return decimalFormatString;
-    }
-
-    private String createOffsetFormatString(long offset) {
-        int offsetLength = 0;
-        while (0 < offset) {
-            offset = offset / 10;
-            offsetLength++;
-        }
-        offsetLength = Math.max(8, offsetLength);
-        StringBuilder formatString = new StringBuilder();
-        while (0 < offsetLength) {
-            formatString.append("0");
-            offsetLength--;
-        }
-        return formatString.toString();
+    private int getDigitCount(long number) {
+        return (number == 0) ? 1 : (int) Math.log10(number) + 1;
     }
 
     private String renderSynset(Synset synset) {
+        int estLength = offsetLength + 1//offset
+                + 2 + 1 //lexfilenum
+                + 1//ss_type
+                + offsetLength + 1//w_cnt
+                + (10 + 3 + 1) * synset.getWords().size()//avg word 10 chars + lex_id max 3 chars
+                + offsetLength + 1//p_cnt
+                + (1 + 1 + offsetLength + 1 + 1 + 1 + 4 + 1) * synset.getPointers().size()
+                + synset.getGloss().length() + 2 + 2;
+        if (POS.VERB == synset.getPOS()) {
+            estLength = estLength + 8 * synset.getWords().size();//8 for verb flag, about one per word
+        }
+
         //synset_offset  lex_filenum  ss_type  w_cnt  word  lex_id  [word  lex_id...]  p_cnt  [ptr...]  [frames...]  |   gloss
         //w_cnt Two digit hexadecimal integer indicating the number of words in the synset.
         String posKey = synset.getPOS().getKey();
@@ -570,7 +660,8 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
         if (checkWordCountLimit && log.isWarnEnabled() && (0xFF < synset.getWords().size())) {
             log.warn(JWNL.resolveMessage("PRINCETON_WARN_004", new Object[]{synset.getOffset(), synset.getWords().size()}));
         }
-        StringBuilder result = new StringBuilder(dfOff.format(synset.getOffset()));
+        StringBuilder result = new StringBuilder(estLength);
+        formatOffset(synset.getOffset(), offsetLength, result);
         if (synset.getLexFileNum() < 10) {
             result.append(" 0").append(synset.getLexFileNum());
         } else {
@@ -613,7 +704,8 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
             //pointer_symbol  synset_offset  pos  source/target
             result.append(p.getType().getKey()).append(" ");
             //synset_offset is the byte offset of the target synset in the data file corresponding to pos
-            result.append(dfOff.format(p.getTargetOffset())).append(" ");
+            formatOffset(p.getTargetOffset(), offsetLength, result);
+            result.append(" ");
             //pos
             result.append(p.getTargetPOS().getKey()).append(" ");
             //source/target
@@ -708,11 +800,6 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
     }
 
     private String renderIndexWord(IndexWord indexWord) {
-        //lemma  pos  synset_cnt  p_cnt  [ptr_symbol...]  sense_cnt  tagsense_cnt   synset_offset  [synset_offset...]
-        StringBuilder result = new StringBuilder(indexWord.getLemma().replace(' ', '_'));
-        result.append(" ");
-        result.append(indexWord.getPOS().getKey()).append(" ");//pos
-        result.append(Integer.toString(indexWord.getSenses().size())).append(" ");//synset_cnt
         ArrayList<PointerType> pointerTypes = new ArrayList<PointerType>();
         //find all the pointers that come from this word
         for (Synset synset : indexWord.getSenses()) {
@@ -732,8 +819,25 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                 }
             }
         }
-
         Collections.sort(pointerTypes);
+
+        //sort senses and find out tagged sense count
+        int tagSenseCnt = indexWord.sortSenses();
+
+        int estLength = indexWord.getLemma().length() + 1 //lemma
+                + 2 //pos
+                + 2 * (offsetLength + 1) //synset_cnt + sense_cnt
+                + 1 + offsetLength//p_cnt
+                + 3 * pointerTypes.size()//ptrs, each max 2 chars + 1 space
+                + offsetLength + 1//tagsense_cnt
+                + (offsetLength + 1) * indexWord.getSenses().size() + 2;
+
+        //lemma  pos  synset_cnt  p_cnt  [ptr_symbol...]  sense_cnt  tagsense_cnt   synset_offset  [synset_offset...]
+        StringBuilder result = new StringBuilder(estLength);
+        result.append(indexWord.getLemma().replace(' ', '_'));
+        result.append(" ");
+        result.append(indexWord.getPOS().getKey()).append(" ");//pos
+        result.append(Integer.toString(indexWord.getSenses().size())).append(" ");//synset_cnt
         result.append(Integer.toString(pointerTypes.size())).append(" ");//p_cnt
         for (PointerType pointerType : pointerTypes) {
             result.append(pointerType.getKey()).append(" ");
@@ -741,12 +845,11 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
 
         result.append(Integer.toString(indexWord.getSenses().size())).append(" ");//sense_cnt
 
-        //sort senses and find out tagged sense count
-        int tagSenseCnt = indexWord.sortSenses();
         result.append(Integer.toString(tagSenseCnt)).append(" ");//tagsense_cnt
 
         for (Synset synset : indexWord.getSenses()) {
-            result.append(dfOff.format(synset.getOffset())).append(" ");//synset_offset
+            formatOffset(synset.getOffset(), offsetLength, result);
+            result.append(" ");//synset_offset
         }
 
         result.append(" ");
@@ -760,5 +863,13 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
             result.append(" ").append(e.replace(' ', '_'));
         }
         return result.toString();
+    }
+
+    public int getOffsetLength() {
+        return offsetLength;
+    }
+
+    public void setOffsetLength(int length) {
+        offsetLength = length;
     }
 }

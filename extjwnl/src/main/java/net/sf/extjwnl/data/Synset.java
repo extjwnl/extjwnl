@@ -351,7 +351,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
         }
 
         private void checkPointers() {
-            if (dictionary.getCheckAlienPointers() && !checkingPointers) {
+            if (null != dictionary && dictionary.getCheckAlienPointers() && !checkingPointers) {
                 checkingPointers = true;
                 if (null != dictionary && dictionary.isEditable()) {
                     List<Pointer> toDelete = null;
