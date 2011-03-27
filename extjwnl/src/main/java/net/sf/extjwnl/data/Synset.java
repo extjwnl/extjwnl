@@ -351,7 +351,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
         }
 
         private void checkPointers() {
-            if (!checkingPointers) {
+            if (dictionary.getCheckAlienPointers() && !checkingPointers) {
                 checkingPointers = true;
                 if (null != dictionary && dictionary.isEditable()) {
                     List<Pointer> toDelete = null;
@@ -359,12 +359,15 @@ public class Synset extends PointerTarget implements DictionaryElement {
                         Pointer pointer = super.get(i);
                         if (dictionary != pointer.getSource().getDictionary() || null == pointer.getTarget() || dictionary != pointer.getTarget().getDictionary()) {
                             if (null == toDelete) {
-                                toDelete = new ArrayList<Pointer>(0);
+                                toDelete = new ArrayList<Pointer>();
                             }
                             toDelete.add(pointer);
                         }
                     }
                     if (null != toDelete) {
+                        if (log.isWarnEnabled() && 0 < toDelete.size()) {
+                            log.warn(JWNL.resolveMessage("DICTIONARY_WARN_002", Synset.this.getOffset()));
+                        }
                         for (Pointer pointer : toDelete) {
                             remove(pointer);
                         }

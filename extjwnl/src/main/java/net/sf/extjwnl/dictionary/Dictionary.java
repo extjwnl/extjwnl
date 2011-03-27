@@ -49,6 +49,13 @@ public abstract class Dictionary {
     public static final String EDIT_MANAGE_SYMMETRIC_POINTERS = "edit_manage_symmetric_pointers";
     private boolean editManageSymmetricPointers = true;
 
+    /**
+     * Whether to check for alien pointers (pointing nowhere, or to another dictionary), default true.
+     */
+    public static final String EDIT_CHECK_ALIEN_POINTERS = "edit_check_alien_pointers";
+    private boolean editCheckAlienPointers = true;
+
+
     // tag names
     private static final String VERSION_TAG = "version";
     private static final String DICTIONARY_TAG = "dictionary";
@@ -364,6 +371,10 @@ public abstract class Dictionary {
 
         if (params.containsKey(EDIT_MANAGE_SYMMETRIC_POINTERS)) {
             editManageSymmetricPointers = Boolean.parseBoolean(params.get(EDIT_MANAGE_SYMMETRIC_POINTERS).getValue());
+        }
+
+        if (params.containsKey(EDIT_CHECK_ALIEN_POINTERS)) {
+            editCheckAlienPointers = Boolean.parseBoolean(params.get(EDIT_CHECK_ALIEN_POINTERS).getValue());
         }
     }
 
@@ -826,6 +837,10 @@ public abstract class Dictionary {
 
     public boolean getManageSymmetricPointers() {
         return editManageSymmetricPointers;
+    }
+
+    public boolean getCheckAlienPointers() {
+        return editCheckAlienPointers;
     }
 
     /**
