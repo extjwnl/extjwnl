@@ -28,7 +28,7 @@ public class TestThreads {
 
     @Test
     public void TestThreadedLookupAllIndexWords() throws FileNotFoundException, JWNLException {
-        //JWNL.initialize(new FileInputStream(properties));
+        JWNL.initialize(new FileInputStream(properties));
 
         List<String> words0 = new ArrayList<String>(Arrays.asList(list));
         List<String> words1 = new ArrayList<String>(Arrays.asList(list));
