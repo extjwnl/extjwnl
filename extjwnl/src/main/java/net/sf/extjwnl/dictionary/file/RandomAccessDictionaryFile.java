@@ -112,5 +112,5 @@ public interface RandomAccessDictionaryFile extends DictionaryFile {
      *
      * @param length offset length to be used while rendering the file
      */
-    void setOffsetLength(int length);
+    void setOffsetLength(int length) throws JWNLException, IOException;
 }

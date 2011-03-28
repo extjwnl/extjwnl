@@ -4,6 +4,7 @@ import net.sf.extjwnl.JWNL;
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.JWNLRuntimeException;
 import net.sf.extjwnl.data.*;
+import net.sf.extjwnl.dictionary.AbstractCachingDictionary;
 import net.sf.extjwnl.dictionary.Dictionary;
 import net.sf.extjwnl.dictionary.file.DictionaryFileFactory;
 import net.sf.extjwnl.dictionary.file.DictionaryFileType;
@@ -434,37 +435,6 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
             }
             Collections.sort(synsets, synsetOffsetComparator);
 
-            {
-                if (log.isInfoEnabled()) {
-                    log.info(JWNL.resolveMessage("PRINCETON_INFO_006", synsets.size()));
-                }
-                long offset = 0;
-                if (writePrincetonHeader) {
-                    offset = offset + PRINCETON_HEADER.length();
-                }
-                long counter = 0;
-                long total = synsets.size();
-                long reportInt = (total / 20) + 1;//i.e. report every 5%
-                for (Synset s : synsets) {
-                    counter++;
-                    if (0 == (counter % reportInt)) {
-                        if (log.isInfoEnabled()) {
-                            log.info(JWNL.resolveMessage("PRINCETON_INFO_014", 100 * counter / total));
-                        }
-                    }
-                    s.setOffset(offset);
-                    String renderedSynset = renderSynset(s);
-                    if (checkDataFileLineLengthLimit && log.isWarnEnabled() && 15360 < renderedSynset.length()) {
-                        log.warn(JWNL.resolveMessage("PRINCETON_WARN_009", new Object[]{s.getOffset(), renderedSynset.length()}));
-                    }
-                    if (null == encoding) {
-                        offset = offset + renderedSynset.getBytes().length + 1;//\n should be 1 byte
-                    } else {
-                        offset = offset + renderedSynset.getBytes(encoding).length + 1;//\n should be 1 byte
-                    }
-                }
-            }
-
             if (log.isInfoEnabled()) {
                 log.info(JWNL.resolveMessage("PRINCETON_INFO_007", synsets.size()));
             }
@@ -834,6 +804,17 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
 
     public int getOffsetLength() throws IOException, JWNLException {
         if (DictionaryFileType.DATA == getFileType()) {
+            ArrayList<Synset> synsets = new ArrayList<Synset>();
+            Iterator<Synset> si = dictionary.getSynsetIterator(getPOS());
+            while (si.hasNext()) {
+                synsets.add(si.next());
+            }
+
+            if (log.isInfoEnabled()) {
+                log.info(JWNL.resolveMessage("PRINCETON_INFO_005", synsets.size()));
+            }
+            Collections.sort(synsets, synsetOffsetComparator);
+
             offsetLength = 8;
             int offsetDigitCount = 8;//8 by default for WN compatibility
             do {
@@ -843,14 +824,22 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                         log.warn(JWNL.resolveMessage("PRINCETON_WARN_010", offsetLength));
                     }
                 }
+                if (log.isInfoEnabled()) {
+                    log.info(JWNL.resolveMessage("PRINCETON_INFO_006", new Object[]{synsets.size(), getFilename()}));
+                }
                 long offset = 0;
                 if (writePrincetonHeader) {
                     offset = offset + PRINCETON_HEADER.length();
                 }
-                Iterator<Synset> si = dictionary.getSynsetIterator(getPOS());
-                while (si.hasNext()) {
-                    Synset s = si.next();
+                long safeOffset = Integer.MAX_VALUE - 1;
+                for (Synset s : synsets) {
                     String renderedSynset = renderSynset(s);
+                    Synset oldSynset = dictionary.getSynsetAt(s.getPOS(), offset);
+                    if (null != oldSynset) {
+                        oldSynset.setOffset(safeOffset);
+                        safeOffset--;
+                    }
+                    s.setOffset(offset);
                     if (null == encoding) {
                         offset = offset + renderedSynset.getBytes().length + 1;//\n should be 1 byte
                     } else {
@@ -877,7 +866,46 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
         return offsetLength;
     }
 
-    public void setOffsetLength(int length) {
-        offsetLength = length;
+    public void setOffsetLength(int length) throws JWNLException, IOException {
+        if (offsetLength != length) {
+            offsetLength = length;
+
+            //recalculate offsets which might change due to changed offset length
+            if (DictionaryFileType.DATA == getFileType()) {
+                ArrayList<Synset> synsets = new ArrayList<Synset>();
+                Iterator<Synset> si = dictionary.getSynsetIterator(getPOS());
+                while (si.hasNext()) {
+                    synsets.add(si.next());
+                }
+
+                if (log.isInfoEnabled()) {
+                    log.info(JWNL.resolveMessage("PRINCETON_INFO_005", synsets.size()));
+                }
+                Collections.sort(synsets, synsetOffsetComparator);
+
+                if (log.isInfoEnabled()) {
+                    log.info(JWNL.resolveMessage("PRINCETON_INFO_006", new Object[]{synsets.size(), getFilename()}));
+                }
+                long offset = 0;
+                if (writePrincetonHeader) {
+                    offset = offset + PRINCETON_HEADER.length();
+                }
+                long safeOffset = Integer.MAX_VALUE - 1;
+                for (Synset s : synsets) {
+                    String renderedSynset = renderSynset(s);
+                    Synset oldSynset = dictionary.getSynsetAt(s.getPOS(), offset);
+                    if (null != oldSynset) {
+                        oldSynset.setOffset(safeOffset);
+                        safeOffset--;
+                    }
+                    s.setOffset(offset);
+                    if (null == encoding) {
+                        offset = offset + renderedSynset.getBytes().length + 1;//\n should be 1 byte
+                    } else {
+                        offset = offset + renderedSynset.getBytes(encoding).length + 1;//\n should be 1 byte
+                    }
+                }
+            }
+        }
     }
 }

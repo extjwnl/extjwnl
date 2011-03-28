@@ -96,11 +96,20 @@ public class Pointer implements Serializable {
             if (null == target && null != source.getDictionary()) {
                 Synset syn = source.getDictionary().getSynsetAt(targetIndex.pos, targetIndex.offset);
                 target = (targetIndex.index == 0) ? syn : (null == syn ? null : syn.getWords().get(targetIndex.index - 1));
+                if (null != target && source.getDictionary().isEditable()) {
+                    targetIndex = null;
+                }
             }
         } catch (JWNLException e) {
             if (log.isErrorEnabled()) {
                 log.error(JWNL.resolveMessage("EXCEPTION_001", e.getMessage()), e);
             }
+        } catch (IndexOutOfBoundsException e) {
+            if (log.isErrorEnabled()) {
+                log.error(JWNL.resolveMessage("EXCEPTION_001", e.getMessage()), e);
+                log.error(JWNL.resolveMessage("EXCEPTION_002", new Object[]{source.getSynset().getOffset(), targetIndex.offset, targetIndex.index}));
+            }
+            throw e;
         }
         return target;
     }
@@ -262,7 +271,11 @@ public class Pointer implements Serializable {
     }
 
     private void writeObject(java.io.ObjectOutputStream oos) throws IOException {
+        boolean wasNull = null == targetIndex;
         this.targetIndex = new TargetIndex(getTargetPOS(), getTargetOffset(), getTargetIndex());
         oos.defaultWriteObject();
+        if (wasNull) {
+            this.targetIndex = null;
+        }
     }
 }
