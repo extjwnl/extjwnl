@@ -315,31 +315,30 @@ public class FileManagerImpl implements FileManager {
     public void save() throws IOException, JWNLException {
         files.delete();
         files.open();
-        files.save();
 
         //find max offset length
         int maxOffsetLength = 0;
-        for (DictionaryFileType dft : DictionaryFileType.getAllDictionaryFileTypes()) {
-            Iterator<RandomAccessDictionaryFile> itr = files.get(dft).getFileIterator();
+        {
+            Iterator<RandomAccessDictionaryFile> itr = files.get(DictionaryFileType.DATA).getFileIterator();
             while (itr.hasNext()) {
                 RandomAccessDictionaryFile radf = itr.next();
-                if (maxOffsetLength < radf.getOffsetLength()) {
-                    maxOffsetLength = radf.getOffsetLength();
+                int offsetLength = radf.getOffsetLength();
+                if (maxOffsetLength < offsetLength) {
+                    maxOffsetLength = offsetLength;
                 }
             }
         }
 
-        //render again those with small offsets
+        //set the same max offset length for all files
         for (DictionaryFileType dft : DictionaryFileType.getAllDictionaryFileTypes()) {
             Iterator<RandomAccessDictionaryFile> itr = files.get(dft).getFileIterator();
             while (itr.hasNext()) {
                 RandomAccessDictionaryFile radf = itr.next();
-                if (maxOffsetLength < radf.getOffsetLength()) {
-                    radf.setOffsetLength(maxOffsetLength);
-                    radf.save();
-                }
+                radf.setOffsetLength(maxOffsetLength);
             }
         }
+
+        files.save();
 
         {
             if (log.isInfoEnabled()) {

@@ -1,5 +1,7 @@
 package net.sf.extjwnl.dictionary.file;
 
+import net.sf.extjwnl.JWNLException;
+
 import java.io.IOException;
 import java.util.Collection;
 
@@ -103,7 +105,7 @@ public interface RandomAccessDictionaryFile extends DictionaryFile {
      *
      * @return offset length that accommodates largest offset
      */
-    int getOffsetLength();
+    int getOffsetLength() throws JWNLException, IOException;
 
     /**
      * Sets offset length to be used while rendering the file.

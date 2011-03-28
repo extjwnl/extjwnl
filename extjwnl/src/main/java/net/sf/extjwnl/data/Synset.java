@@ -647,14 +647,22 @@ public class Synset extends PointerTarget implements DictionaryElement {
         return offset;
     }
 
-    public void setOffset(long offset) {
-        if (dictionary instanceof AbstractCachingDictionary) {
-            AbstractCachingDictionary acd = (AbstractCachingDictionary) dictionary;
-            acd.clearSynset(pos, this.offset);
-            this.offset = offset;
-            acd.cacheSynset(this);
-        } else {
-            this.offset = offset;
+    public void setOffset(long offset) throws JWNLException {
+        if (this.offset != offset) {
+            if (dictionary instanceof AbstractCachingDictionary) {
+                AbstractCachingDictionary acd = (AbstractCachingDictionary) dictionary;
+                Synset oldSynset = acd.getSynsetAt(pos, offset);
+                if (null != oldSynset) {
+                    if (log.isWarnEnabled()) {
+                        log.warn(JWNL.resolveMessage("DICTIONARY_WARN_003", oldSynset));
+                    }
+                }
+                acd.clearSynset(pos, this.offset);
+                this.offset = offset;
+                acd.cacheSynset(this);
+            } else {
+                this.offset = offset;
+            }
         }
     }
 

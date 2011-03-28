@@ -50,12 +50,6 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
     private boolean checkRelationLimit = true;
 
     /**
-     * Whether to warn about offsets being off limits, default: true.
-     */
-    public static final String CHECK_OFFSET_LIMIT_KEY = "check_offset_limit";
-    private boolean checkOffsetLimit = true;
-
-    /**
      * Whether to warn about word count being off limits, default: true.
      */
     public static final String CHECK_WORD_COUNT_LIMIT_KEY = "check_word_count_limit";
@@ -163,6 +157,12 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
             '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
     };
 
+    private final static Comparator<Synset> synsetOffsetComparator = new Comparator<Synset>() {
+                    public int compare(Synset o1, Synset o2) {
+                        return (int) Math.signum(o1.getOffset() - o2.getOffset());
+                    }
+                };
+
     private CharsetDecoder decoder;
 
     private int LINE_MAX = 1024;//1K buffer
@@ -236,9 +236,6 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
         }
         if (params.containsKey(CHECK_RELATION_LIMIT_KEY)) {
             checkRelationLimit = Boolean.parseBoolean(params.get(CHECK_RELATION_LIMIT_KEY).getValue());
-        }
-        if (params.containsKey(CHECK_OFFSET_LIMIT_KEY)) {
-            checkOffsetLimit = Boolean.parseBoolean(params.get(CHECK_OFFSET_LIMIT_KEY).getValue());
         }
         if (params.containsKey(CHECK_WORD_COUNT_LIMIT_KEY)) {
             checkWordCountLimit = Boolean.parseBoolean(params.get(CHECK_WORD_COUNT_LIMIT_KEY).getValue());
@@ -435,26 +432,15 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
             if (log.isInfoEnabled()) {
                 log.info(JWNL.resolveMessage("PRINCETON_INFO_005", synsets.size()));
             }
-            Collections.sort(synsets, new Comparator<Synset>() {
-                public int compare(Synset o1, Synset o2) {
-                    return (int) Math.signum(o1.getOffset() - o2.getOffset());
-                }
-            });
+            Collections.sort(synsets, synsetOffsetComparator);
 
-            int offsetDigitCount = 8;//8 by default for WN compatibility
-            do {
-                if (offsetLength < offsetDigitCount) {
-                    offsetLength = offsetDigitCount;
-                }
+            {
                 if (log.isInfoEnabled()) {
                     log.info(JWNL.resolveMessage("PRINCETON_INFO_006", synsets.size()));
                 }
                 long offset = 0;
                 if (writePrincetonHeader) {
                     offset = offset + PRINCETON_HEADER.length();
-                    if (checkOffsetLimit && log.isWarnEnabled() && (99999999 < offset)) {
-                        log.warn(JWNL.resolveMessage("PRINCETON_WARN_003", offset));
-                    }
                 }
                 long counter = 0;
                 long total = synsets.size();
@@ -477,10 +463,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                         offset = offset + renderedSynset.getBytes(encoding).length + 1;//\n should be 1 byte
                     }
                 }
-
-                //calculate used offset length
-                offsetDigitCount = Math.max(offsetLength, getDigitCount(offset));
-            } while (offsetLength < offsetDigitCount);
+            }
 
             if (log.isInfoEnabled()) {
                 log.info(JWNL.resolveMessage("PRINCETON_INFO_007", synsets.size()));
@@ -519,23 +502,8 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
             if (log.isInfoEnabled()) {
                 log.info(JWNL.resolveMessage("PRINCETON_INFO_009", getFilename()));
             }
-
         } else if (DictionaryFileType.INDEX == getFileType()) {
             ArrayList<String> indexes = new ArrayList<String>();
-
-            if (-1 == offsetLength) {
-                Iterator<IndexWord> ii = dictionary.getIndexWordIterator(getPOS());
-                long maxOffset = 0;
-                while (ii.hasNext()) {
-                    IndexWord indexWord = ii.next();
-                    for (Synset synset : indexWord.getSenses()) {
-                        if (maxOffset < synset.getOffset()) {
-                            maxOffset = synset.getOffset();
-                        }
-                    }
-                }
-                offsetLength = Math.max(8, getDigitCount(maxOffset));
-            }
 
             if (log.isInfoEnabled()) {
                 log.info(JWNL.resolveMessage("PRINCETON_INFO_011", getFilename()));
@@ -864,7 +832,48 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
         return result.toString();
     }
 
-    public int getOffsetLength() {
+    public int getOffsetLength() throws IOException, JWNLException {
+        if (DictionaryFileType.DATA == getFileType()) {
+            offsetLength = 8;
+            int offsetDigitCount = 8;//8 by default for WN compatibility
+            do {
+                if (offsetLength < offsetDigitCount) {
+                    offsetLength = offsetDigitCount;
+                    if (log.isWarnEnabled()) {
+                        log.warn(JWNL.resolveMessage("PRINCETON_WARN_010", offsetLength));
+                    }
+                }
+                long offset = 0;
+                if (writePrincetonHeader) {
+                    offset = offset + PRINCETON_HEADER.length();
+                }
+                Iterator<Synset> si = dictionary.getSynsetIterator(getPOS());
+                while (si.hasNext()) {
+                    Synset s = si.next();
+                    String renderedSynset = renderSynset(s);
+                    if (null == encoding) {
+                        offset = offset + renderedSynset.getBytes().length + 1;//\n should be 1 byte
+                    } else {
+                        offset = offset + renderedSynset.getBytes(encoding).length + 1;//\n should be 1 byte
+                    }
+                }
+
+                //calculate used offset length
+                offsetDigitCount = Math.max(offsetLength, getDigitCount(offset));
+            } while (offsetLength < offsetDigitCount);
+        } else if (DictionaryFileType.INDEX == getFileType()) {
+            Iterator<IndexWord> ii = dictionary.getIndexWordIterator(getPOS());
+            long maxOffset = 0;
+            while (ii.hasNext()) {
+                IndexWord indexWord = ii.next();
+                for (Synset synset : indexWord.getSenses()) {
+                    if (maxOffset < synset.getOffset()) {
+                        maxOffset = synset.getOffset();
+                    }
+                }
+            }
+            offsetLength = Math.max(8, getDigitCount(maxOffset));
+        }
         return offsetLength;
     }
 
