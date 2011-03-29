@@ -1,3 +1,15 @@
+1.5.3
+
+- rendering speed improved
+- iterators and loading speed improved
+- options to speed up things
+- memory footprint reduced
+- options to manage memory footprint size
+- offset length is now homogenous across files
+- more detailed log messages
+- lemmas are now trimmed on word creation
+- word and pointer lists now allow duplicates, checks should be on the client side
+
 1.5.2
 
 - introduced utility method Dictionary.getWordBySenseKey
