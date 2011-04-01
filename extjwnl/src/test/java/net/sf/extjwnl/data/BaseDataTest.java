@@ -16,7 +16,7 @@ import java.io.InputStream;
  */
 public class BaseDataTest {
 
-    private final String properties = "./src/test/config/clean_file.xml";
+    private final String properties = "./src/test/resources/clean_file.xml";
 
     protected Dictionary dictionary;
 

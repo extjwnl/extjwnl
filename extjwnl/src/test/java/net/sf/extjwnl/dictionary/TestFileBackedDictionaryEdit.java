@@ -14,7 +14,7 @@ import java.io.IOException;
  */
 public class TestFileBackedDictionaryEdit {
 
-    protected String properties = "./src/test/config/clean_file.xml";
+    protected String properties = "./src/test/resources/clean_file.xml";
 
     @Test
     public void TestLoadEmptyDictionary() throws IOException, JWNLException, InterruptedException {
