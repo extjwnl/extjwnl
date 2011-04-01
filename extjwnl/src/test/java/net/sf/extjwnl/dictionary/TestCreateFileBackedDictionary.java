@@ -11,7 +11,7 @@ import java.io.InputStream;
  */
 public class TestCreateFileBackedDictionary extends TestCreateDictionary {
 
-    protected static final String properties = "./src/main/config/clean_file.xml";
+    protected static final String properties = "./src/test/config/clean_file.xml";
 
     @Override
     protected InputStream getProperties() throws FileNotFoundException {
