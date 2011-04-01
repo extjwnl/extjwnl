@@ -1,0 +1,1 @@
+Put WordNet 3.0 files here for tests to work and to avoid changing the config files.

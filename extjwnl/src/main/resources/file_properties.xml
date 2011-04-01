@@ -43,7 +43,7 @@
                 <!--<param name="encoding" value="UTF-8"/>-->
             </param>
             <!--<param name="cache_use_count" value="true"/>-->
-            <param name="dictionary_path" value="c:/program files/wordnet/3.0/dict"/>
+            <param name="dictionary_path" value="./data/wn30"/>
         </param>
     </dictionary>
     <resource class="PrincetonResource"/>
