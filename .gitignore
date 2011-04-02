@@ -1,7 +1,9 @@
 *.iml
 .idea
-/target/
+**/target/
+/target
 /data/
-/extjwnl/target/
 /extjwnl/data/
-/utilities/target/
+**/.classpath
+.project
+.settings/
