@@ -13,19 +13,21 @@ import java.util.BitSet;
  */
 public class VerbSynset extends Synset {
 
-    private static final String[] EMPTY_STRING_ARRAY = new String[0];
-    private static final BitSet EMPTY_BIT_SET = new BitSet();
-    private static final int[] EMPTY_INT_ARRAY = new int[0];
-
     private BitSet verbFrameFlags;
 
     public VerbSynset(Dictionary dictionary, POS pos) throws JWNLException {
         super(dictionary, pos);
+        if (POS.VERB != pos) {
+            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_056"));
+        }
         verbFrameFlags = new BitSet();
     }
 
     public VerbSynset(Dictionary dictionary, POS pos, long offset) throws JWNLException {
         super(dictionary, pos, offset);
+        if (POS.VERB != pos) {
+            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_056"));
+        }
         verbFrameFlags = new BitSet();
     }
 
@@ -35,25 +37,14 @@ public class VerbSynset extends Synset {
      * @return all Verb Frames that are valid for all the words in this synset
      */
     public String[] getVerbFrames() {
-        if (POS.VERB == pos) {
-            return VerbFrame.getFrames(verbFrameFlags);
-        } else {
-            return EMPTY_STRING_ARRAY;
-        }
+        return VerbFrame.getFrames(verbFrameFlags);
     }
 
     public BitSet getVerbFrameFlags() {
-        if (POS.VERB == pos) {
-            return verbFrameFlags;
-        } else {
-            return EMPTY_BIT_SET;
-        }
+        return verbFrameFlags;
     }
 
     public void setVerbFrameFlags(BitSet verbFrameFlags) {
-        if (POS.VERB != pos) {
-            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_049"));
-        }
         if (null == verbFrameFlags) {
             throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_050"));
         }
@@ -61,11 +52,6 @@ public class VerbSynset extends Synset {
     }
 
     public int[] getVerbFrameIndices() {
-        if (POS.VERB == pos) {
-            return VerbFrame.getVerbFrameIndices(verbFrameFlags);
-        } else {
-            return EMPTY_INT_ARRAY;
-        }
+        return VerbFrame.getVerbFrameIndices(verbFrameFlags);
     }
-
 }
