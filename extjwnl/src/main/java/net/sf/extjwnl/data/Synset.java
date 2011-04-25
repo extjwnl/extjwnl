@@ -629,7 +629,11 @@ public class Synset extends PointerTarget implements DictionaryElement {
     }
 
     public String getGloss() {
-        return gloss;
+        if (null == gloss) {
+            return "";
+        } else {
+            return gloss;
+        }
     }
 
     public void setGloss(String gloss) {
