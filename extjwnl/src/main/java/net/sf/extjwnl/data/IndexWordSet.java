@@ -75,7 +75,7 @@ public class IndexWordSet {
      *
      * @return a collection of the IndexWords in this set
      */
-    public Collection getIndexWordCollection() {
+    public Collection<IndexWord> getIndexWordCollection() {
         return indexWords.values();
     }
 
