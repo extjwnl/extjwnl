@@ -10,7 +10,7 @@ import java.util.*;
  * call to {@link net.sf.extjwnl.dictionary.Dictionary#lookupAllIndexWords Dictionary.lookupAllIndexWords}.
  *
  * @author John Didion <jdidion@didion.net>
- * @author Aliaksandr Autayeu <avtaev@gmail.com>
+ * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
  */
 public class IndexWordSet {
     /**

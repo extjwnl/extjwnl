@@ -12,7 +12,7 @@ import java.util.*;
  * Database manager.
  *
  * @author John Didion <jdidion@didion.net>
- * @author Aliaksandr Autayeu <avtaev@gmail.com>
+ * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
  */
 public class DatabaseManagerImpl implements DatabaseManager {
     public static final String DRIVER = "driver";

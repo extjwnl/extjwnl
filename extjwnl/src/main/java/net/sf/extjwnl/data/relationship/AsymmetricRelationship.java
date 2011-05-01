@@ -13,7 +13,7 @@ import net.sf.extjwnl.data.list.PointerTargetNodeList;
  * the common parent index is thus 2.
  *
  * @author John Didion <jdidion@didion.net>
- * @author Aliaksandr Autayeu <avtaev@gmail.com>
+ * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
  */
 public class AsymmetricRelationship extends Relationship {
     /**

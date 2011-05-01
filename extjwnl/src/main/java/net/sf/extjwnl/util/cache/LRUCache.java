@@ -8,7 +8,7 @@ import java.util.Map;
  * capacity, the least recently used elements will be removed.
  *
  * @author John Didion <jdidion@didion.net>
- * @author Aliaksandr Autayeu <avtaev@gmail.com>
+ * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
  */
 public class LRUCache<K, V> extends LinkedHashMap<K, V> implements Cache<K, V> {
 

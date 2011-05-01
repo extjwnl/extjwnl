@@ -5,7 +5,7 @@ import java.util.*;
 /**
  * Maps the lexicographer files names to identifiers. See LEXNAMES(5WN).
  *
- * @author Aliaksandr Autayeu <avtaev@gmail.com>
+ * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
  */
 public class LexFileNameLexFileIdMap implements Map<String, Long> {
 

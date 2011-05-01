@@ -6,7 +6,7 @@ import java.io.IOException;
  * <code>DictionaryFile</code> that reads and writes serialized objects.
  *
  * @author John Didion <jdidion@didion.net>
- * @author Aliaksandr Autayeu <avtaev@gmail.com>
+ * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
  */
 public interface ObjectDictionaryFile extends DictionaryFile {
 

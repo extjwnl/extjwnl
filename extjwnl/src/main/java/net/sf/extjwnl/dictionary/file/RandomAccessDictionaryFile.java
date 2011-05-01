@@ -9,7 +9,7 @@ import java.util.Collection;
  * <code>DictionaryFile</code> that reads lines from a random-access text file.
  *
  * @author John Didion <jdidion@didion.net>
- * @author Aliaksandr Autayeu <avtaev@gmail.com>
+ * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
  */
 public interface RandomAccessDictionaryFile extends DictionaryFile {
 

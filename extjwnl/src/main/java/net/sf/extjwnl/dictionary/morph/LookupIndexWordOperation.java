@@ -10,7 +10,7 @@ import java.util.Map;
  * Looks up index words.
  *
  * @author John Didion <jdidion@didion.net>
- * @author Aliaksandr Autayeu <avtaev@gmail.com>
+ * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
  */
 public class LookupIndexWordOperation extends AbstractOperation {
 

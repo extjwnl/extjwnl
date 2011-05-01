@@ -17,7 +17,7 @@ import java.util.NoSuchElementException;
  * Extends <code>Dictionary</code> to provide caching of elements.
  *
  * @author John Didion <jdidion@didion.net>
- * @author Aliaksandr Autayeu <avtaev@gmail.com>
+ * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
  */
 public abstract class AbstractCachingDictionary extends Dictionary {
 

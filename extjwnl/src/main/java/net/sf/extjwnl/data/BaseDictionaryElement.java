@@ -8,7 +8,7 @@ import java.io.IOException;
 /**
  * Base class for dictionary elements.
  *
- * @author Aliaksandr Autayeu <avtaev@gmail.com>
+ * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
  */
 public abstract class BaseDictionaryElement implements DictionaryElement {
 

@@ -12,7 +12,7 @@ import java.util.Arrays;
  * Tests Exc class.
  *
  * @author Brett Walenz <bwalenz@users.sourceforge.net>
- * @author Aliaksandr Autayeu <avtaev@gmail.com>
+ * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
  */
 public class TestExc extends BaseDataTest {
 

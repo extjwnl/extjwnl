@@ -14,7 +14,7 @@ import java.util.*;
  * An <code>IndexWord</code> is created or retrieved via {@link Dictionary#lookupIndexWord lookupIndexWord}.
  *
  * @author John Didion <jdidion@didion.net>
- * @author Aliaksandr Autayeu <avtaev@gmail.com>
+ * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
  */
 public class IndexWord extends BaseDictionaryElement {
 

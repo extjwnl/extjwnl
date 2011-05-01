@@ -20,7 +20,7 @@ import java.util.NoSuchElementException;
  * in the WordNet distribution directory.
  *
  * @author John Didion <jdidion@didion.net>
- * @author Aliaksandr Autayeu <avtaev@gmail.com>
+ * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
  */
 public class FileBackedDictionary extends AbstractCachingDictionary {
 

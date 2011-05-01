@@ -12,7 +12,7 @@ import java.io.IOException;
  * Methods in this interface operate on and return offsets, which are indices into a dictionary file.
  *
  * @author John Didion <jdidion@didion.net>
- * @author Aliaksandr Autayeu <avtaev@gmail.com>
+ * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
  */
 public interface FileManager extends Owned {
     /**

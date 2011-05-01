@@ -5,7 +5,7 @@ import net.sf.extjwnl.data.POS;
 /**
  * A set of Caches split by POS.
  *
- * @author Aliaksandr Autayeu <avtaev@gmail.com>
+ * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
  */
 public interface POSCache<K, V> {
 

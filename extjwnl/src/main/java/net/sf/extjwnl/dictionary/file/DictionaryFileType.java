@@ -11,7 +11,7 @@ import java.util.List;
  * Enumerates different types of dictionary files.
  *
  * @author John Didion <jdidion@didion.net>
- * @author Aliaksandr Autayeu <avtaev@gmail.com>
+ * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
  */
 public enum DictionaryFileType {
 

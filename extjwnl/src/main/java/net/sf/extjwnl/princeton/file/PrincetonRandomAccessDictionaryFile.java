@@ -25,7 +25,7 @@ import java.util.*;
  * named with Princeton's dictionary file naming convention.
  *
  * @author John Didion <jdidion@didion.net>
- * @author Aliaksandr Autayeu <avtaev@gmail.com>
+ * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
  */
 public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandomAccessDictionaryFile implements DictionaryFileFactory<PrincetonRandomAccessDictionaryFile> {
 

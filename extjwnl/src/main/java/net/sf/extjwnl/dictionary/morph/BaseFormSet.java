@@ -9,7 +9,7 @@ import java.util.List;
  * A group of possible base forms for a particular lemma.
  *
  * @author John Didion <jdidion@didion.net>
- * @author Aliaksandr Autayeu <avtaev@gmail.com>
+ * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
  */
 public class BaseFormSet {
     private List<String> forms = new ArrayList<String>();

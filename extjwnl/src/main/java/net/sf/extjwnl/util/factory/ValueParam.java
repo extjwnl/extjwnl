@@ -8,7 +8,7 @@ import java.util.List;
  * Param with only value.
  *
  * @author John Didion <jdidion@didion.net>
- * @author Aliaksandr Autayeu <avtaev@gmail.com>
+ * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
  */
 public class ValueParam extends AbstractValueParam {
     private String value;

@@ -8,7 +8,7 @@ import net.sf.extjwnl.util.factory.Owned;
  * Base class for morphological operations.
  *
  * @author John Didion <jdidion@didion.net>
- * @author Aliaksandr Autayeu <avtaev@gmail.com>
+ * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
  */
 public interface Operation extends Owned {
 

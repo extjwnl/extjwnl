@@ -12,7 +12,7 @@ import java.util.Map;
  * Looks up the word in the exceptions file of the given part-of-speech.
  *
  * @author John Didion <jdidion@didion.net>
- * @author Aliaksandr Autayeu <avtaev@gmail.com>
+ * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
  */
 public class LookupExceptionsOperation extends AbstractOperation {
 

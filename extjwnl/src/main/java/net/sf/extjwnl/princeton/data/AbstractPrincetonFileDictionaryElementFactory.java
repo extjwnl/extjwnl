@@ -16,7 +16,7 @@ import java.util.*;
  * WordNet team at Princeton's Cognitive Science department.
  *
  * @author John Didion <jdidion@didion.net>
- * @author Aliaksandr Autayeu <avtaev@gmail.com>
+ * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
  */
 public abstract class AbstractPrincetonFileDictionaryElementFactory extends AbstractPrincetonDictionaryElementFactory implements FileDictionaryElementFactory {
 

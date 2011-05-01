@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * A set of Caches split by POS.
  *
- * @author Aliaksandr Autayeu <avtaev@gmail.com>
+ * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
  */
 public class LRUPOSCache<K, V> implements POSCache<K, V> {
 

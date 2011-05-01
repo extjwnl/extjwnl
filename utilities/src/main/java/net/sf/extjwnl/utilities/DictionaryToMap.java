@@ -26,7 +26,7 @@ import java.util.Map;
  * (such as word sense disambiguation algorithms or dictionary services).
  *
  * @author Brett Walenz <bwalenz@users.sourceforge.net>
- * @author Aliaksandr Autayeu <avtaev@gmail.com>
+ * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
  */
 public class DictionaryToMap {
 

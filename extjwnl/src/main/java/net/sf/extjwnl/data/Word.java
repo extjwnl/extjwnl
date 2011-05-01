@@ -14,7 +14,7 @@ import java.util.*;
  * {@link Word#getPointers getPointers} retrieves the pointers themselves.
  *
  * @author John Didion <jdidion@didion.net>
- * @author Aliaksandr Autayeu <avtaev@gmail.com>
+ * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
  */
 public class Word extends PointerTarget {
 

@@ -12,7 +12,7 @@ import java.io.IOException;
  * the appropriate methods to read from the file.
  *
  * @author John Didion <jdidion@didion.net>
- * @author Aliaksandr Autayeu <avtaev@gmail.com>
+ * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
  */
 public interface DictionaryFile extends Owned {
 

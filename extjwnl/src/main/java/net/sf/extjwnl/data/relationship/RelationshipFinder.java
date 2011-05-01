@@ -12,7 +12,7 @@ import java.util.List;
  * Helper class to find relations.
  *
  * @author John Didion <jdidion@didion.net>
- * @author Aliaksandr Autayeu <avtaev@gmail.com>
+ * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
  */
 public class RelationshipFinder {
 

@@ -10,7 +10,7 @@ import java.util.List;
  * A container for the root node of a pointer target tree.
  *
  * @author John Didion <jdidion@didion.net>
- * @author Aliaksandr Autayeu <avtaev@gmail.com>
+ * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
  */
 public class PointerTargetTree {
 

@@ -19,7 +19,7 @@ import java.util.Map;
  * Uses java.nio.channels.FileChannel for file access.
  *
  * @author John Didion <jdidion@didion.net>
- * @author Aliaksandr Autayeu <avtaev@gmail.com>
+ * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
  */
 public class PrincetonChannelDictionaryFile extends AbstractPrincetonRandomAccessDictionaryFile implements DictionaryFileFactory<PrincetonChannelDictionaryFile> {
     /**

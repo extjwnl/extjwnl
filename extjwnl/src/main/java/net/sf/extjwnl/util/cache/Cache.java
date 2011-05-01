@@ -7,7 +7,7 @@ import java.util.Collection;
  * unspecified amount of time (which the implementor of <code>Cache</code> may further specify).
  *
  * @author John Didion <jdidion@didion.net>
- * @author Aliaksandr Autayeu <avtaev@gmail.com>
+ * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
  */
 public interface Cache<K, V> {
     /**

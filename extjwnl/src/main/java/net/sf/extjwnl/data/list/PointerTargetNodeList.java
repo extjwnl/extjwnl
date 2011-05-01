@@ -14,7 +14,7 @@ import java.util.*;
  * the source word.
  *
  * @author John Didion <jdidion@didion.net>
- * @author Aliaksandr Autayeu <avtaev@gmail.com>
+ * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
  */
 public class PointerTargetNodeList extends LinkedList<PointerTargetNode> implements DeepCloneable {
 

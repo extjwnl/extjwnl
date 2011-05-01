@@ -7,7 +7,7 @@ import java.io.InputStream;
 /**
  * Tests FileBackedDictionary editing.
  *
- * @author Aliaksandr Autayeu <avtaev@gmail.com>
+ * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
  */
 public class TestCreateFileBackedDictionary extends TestCreateDictionary {
 

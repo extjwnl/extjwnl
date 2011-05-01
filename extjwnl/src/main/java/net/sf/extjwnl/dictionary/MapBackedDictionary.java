@@ -19,7 +19,7 @@ import java.util.*;
  * Make sure to start the interpreter with a large enough free memory pool to accommodate this.
  *
  * @author John Didion <jdidion@didion.net>
- * @author Aliaksandr Autayeu <avtaev@gmail.com>
+ * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
  */
 public class MapBackedDictionary extends Dictionary {
 

@@ -7,7 +7,7 @@ import java.util.ListIterator;
  * A printer for displaying the contents of a node list.
  *
  * @author John Didion <jdidion@didion.net>
- * @author Aliaksandr Autayeu <avtaev@gmail.com>
+ * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
  */
 public abstract class NodePrinter<E extends Node> {
 

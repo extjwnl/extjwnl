@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * Attempt to reproduce http://sourceforge.net/tracker/?func=detail&aid=3202925&group_id=33824&atid=409470
  *
- * @author Aliaksandr Autayeu <avtaev@gmail.com>
+ * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
  * @author wangyeee
  */
 public class TestThreads {

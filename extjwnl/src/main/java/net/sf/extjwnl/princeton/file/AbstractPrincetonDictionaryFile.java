@@ -17,7 +17,7 @@ import java.util.Map;
  * MAC, UNIX: <index, data>.<noun, verb, adj, adv>, <noun, verb, adj, adv>.exc
  *
  * @author John Didion <jdidion@didion.net>
- * @author Aliaksandr Autayeu <avtaev@gmail.com>
+ * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
  */
 public abstract class AbstractPrincetonDictionaryFile extends AbstractDictionaryFile {
     private static final String NOUN_EXT = "noun";

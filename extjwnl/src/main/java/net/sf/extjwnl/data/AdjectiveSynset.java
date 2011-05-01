@@ -7,7 +7,7 @@ import net.sf.extjwnl.dictionary.Dictionary;
 /**
  * A <code>Synset</code> for adjectives.
  *
- * @author Aliaksandr Autayeu <avtaev@gmail.com>
+ * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
  */
 public class AdjectiveSynset extends Synset {
 

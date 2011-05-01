@@ -10,7 +10,7 @@ import java.io.IOException;
 /**
  * Tests editing the FileBackedDictionary.
  *
- * @author Aliaksandr Autayeu <avtaev@gmail.com>
+ * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
  */
 public class TestFileBackedDictionaryEdit {
 
