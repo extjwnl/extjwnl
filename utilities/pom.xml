@@ -125,6 +125,10 @@
                                             <mainClass>net.sf.extjwnl.utilities.Examples</mainClass>
                                             <name>examples</name>
                                         </program>
+                                        <program>
+                                            <mainClass>net.sf.extjwnl.cli.ewn</mainClass>
+                                            <name>ewn</name>
+                                        </program>
                                     </programs>
                                 </configuration>
                             </execution>
