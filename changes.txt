@@ -1,3 +1,10 @@
+1.6
+
+- introduced ewn: a command-line interface with edit commands
+- added isLexical function to PointerType
+- few bug fixes
+- few more input and data checks
+
 1.5.3
 
 - rendering speed improved
