@@ -4,7 +4,6 @@ import net.sf.extjwnl.JWNL;
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.JWNLRuntimeException;
 import net.sf.extjwnl.data.*;
-import net.sf.extjwnl.dictionary.AbstractCachingDictionary;
 import net.sf.extjwnl.dictionary.Dictionary;
 import net.sf.extjwnl.dictionary.file.DictionaryFileFactory;
 import net.sf.extjwnl.dictionary.file.DictionaryFileType;
@@ -159,10 +158,10 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
     };
 
     private final static Comparator<Synset> synsetOffsetComparator = new Comparator<Synset>() {
-                    public int compare(Synset o1, Synset o2) {
-                        return (int) Math.signum(o1.getOffset() - o2.getOffset());
-                    }
-                };
+        public int compare(Synset o1, Synset o2) {
+            return (int) Math.signum(o1.getOffset() - o2.getOffset());
+        }
+    };
 
     private CharsetDecoder decoder;
 
