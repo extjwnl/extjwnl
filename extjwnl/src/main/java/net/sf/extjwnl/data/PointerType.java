@@ -284,6 +284,10 @@ public enum PointerType {
         return symmetricTo(this);
     }
 
+    public boolean isLexical() {
+        return (flags & PointerTypeFlags.LEXICAL) != 0;
+    }
+
     /**
      * Returns true if <var>type</var> is symmetric to this pointer type.
      *
