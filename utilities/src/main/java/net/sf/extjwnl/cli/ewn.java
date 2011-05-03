@@ -180,8 +180,8 @@ public class ewn {
                 String lemma = null;
                 int lexFileNum = -1;
                 int lexId = -1;
-                String headLemma = null;
-                int headLexId = -1;
+//                String headLemma = null;
+//                int headLexId = -1;
                 POS pos = null;
                 String derivation = null;
 
@@ -205,18 +205,18 @@ public class ewn {
                                         String lexIdString = lexFileString.substring(lexFileString.indexOf(':') + 1);
                                         if (-1 < lexIdString.indexOf(':')) {
                                             lexId = Integer.parseInt(lexIdString.substring(0, lexIdString.indexOf(':')));
-                                            if (lexIdString.indexOf(':') + 1 < lexIdString.length()) {
-                                                headLemma = lexIdString.substring(lexIdString.indexOf(':') + 1);
-                                                if (-1 < headLemma.indexOf(':')) {
-                                                    headLemma = headLemma.substring(0, headLemma.indexOf(':'));
-                                                    if (null != headLemma && !"".equals(headLemma) && lexIdString.lastIndexOf(':') + 1 < lexIdString.length()) {
-                                                        headLexId = Integer.parseInt(lexIdString.substring(lexIdString.lastIndexOf(':') + 1));
-                                                    }
-                                                } else {
-                                                    log.error("Malformed sensekey " + key);
-                                                    System.exit(1);
-                                                }
-                                            }
+//                                            if (lexIdString.indexOf(':') + 1 < lexIdString.length()) {
+//                                                headLemma = lexIdString.substring(lexIdString.indexOf(':') + 1);
+//                                                if (-1 < headLemma.indexOf(':')) {
+//                                                    headLemma = headLemma.substring(0, headLemma.indexOf(':'));
+//                                                    if (null != headLemma && !"".equals(headLemma) && lexIdString.lastIndexOf(':') + 1 < lexIdString.length()) {
+//                                                        headLexId = Integer.parseInt(lexIdString.substring(lexIdString.lastIndexOf(':') + 1));
+//                                                    }
+//                                                } else {
+//                                                    log.error("Malformed sensekey " + key);
+//                                                    System.exit(1);
+//                                                }
+//                                            }
                                         } else {
                                             log.error("Malformed sensekey " + key);
                                             System.exit(1);
@@ -545,7 +545,7 @@ public class ewn {
                             } else {
                                 ArrayList<String> list = new ArrayList<String>(1);
                                 list.add(baseform);
-                                e = d.createException(pos, derivation, list);
+                                d.createException(pos, derivation, list);
                             }
                             derivation = null;
                         } else {
