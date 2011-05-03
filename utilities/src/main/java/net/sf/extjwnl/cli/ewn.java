@@ -62,25 +62,29 @@ public class ewn {
                     "        -over                   Overview of Senses\n" +
                     "\n" +
                     "usage edit: ewn sensekey -command [value] [-command value] ... [sensekey -command ...]\n" +
+                    "            ewn pos#derivation -command value\n" +
                     "\n" +
                     "command is one of the following:\n" +
                     "        -add                           Add a new synset identified by this sensekey\n" +
                     "        -remove                        Remove the synset\n" +
-                    "        -addword word [index]          Add the word at index to the synset\n" +
-                    "        -removeword word               Remove the word from the synset\n" +
+                    "        -addword word                  Add the word to the synset\n" +
+                    "        -removeword                    Remove the word from the synset\n" +
                     "        -setgloss gloss                Set the gloss of the synset\n" +
                     "        -setadjclus true|false         Set the adjective cluster flag\n" +
                     "        -setverbframe [-]n             Set the verb frame flag n (minus removes the flag)\n" +
                     "        -setverbframeall [-]n          Set the verb frame flag n for all words (minus removes the flag)\n" +
                     "        -setlexfile num|name           Set the lex file number or name\n" +
                     "        -addptr sensekey key           Add a pointer to sensekey with type defined by key\n" +
-                    "        -removeptr sensekey key        Remove the pointer of type key to sensekey\n" +
+                    "        -removeptr sensekey key        Remove the pointer to sensekey\n" +
                     "        -setlexid lexid                Set the lex id\n" +
                     "        -setusecount count             Set the use count\n" +
+                    "        -addexc baseform               Add baseform to exceptional forms of derivation. pos is one of n,v,a,r\n" +
+                    "        -removeexc [baseform]          Remove all [or only baseform] exceptional forms of derivation. pos is one of n,v,a,r\n" +
                     "\n" +
                     "usage edit: ewn -script filename\n" +
-                    "        filename contains commands as above. For example,\n" +
-                    "        goal%1:09:00:: -add -addword end -setgloss \"the state ... achieve it; \"\"the ends justify the means\"\"\"";
+                    "        filename contains edit commands as above, one sensekey per line. For example,\n" +
+                    "        goal%1:09:00:: -add -addword end -setgloss \"the state ... achieve it; \"\"the ends justify the means\"\"\"\n" +
+                    "        n#oxen -addexc ox";
 
     private static final String defaultConfig = "ewn.xml";
     private static final DecimalFormat df = new DecimalFormat("00000000");
@@ -108,7 +112,7 @@ public class ewn {
 
         if (null != d) {
             //parse and execute command line
-            if ((-1 < args[0].indexOf('%') && -1 < args[0].indexOf(':')) || "-script".equals(args[0])) {
+            if ((-1 < args[0].indexOf('%') && -1 < args[0].indexOf(':')) || "-script".equals(args[0]) || (-1 < args[0].indexOf('#'))) {
                 d.edit();
                 //edit
                 if ("-script".equals(args[0])) {
@@ -179,9 +183,10 @@ public class ewn {
                 String headLemma = null;
                 int headLexId = -1;
                 POS pos = null;
+                String derivation = null;
 
                 for (int i = 0; i < args.length; i++) {
-                    if (null == key && '-' != args[i].charAt(0)) {
+                    if (null == key && '-' != args[i].charAt(0) && ((-1 < args[i].indexOf('%') && -1 < args[i].indexOf(':')))) {
                         key = args[i];
                         log.info("Searching " + key + "...");
                         if (null != key) {
@@ -227,6 +232,20 @@ public class ewn {
                             } else {
                                 log.error("Malformed sensekey " + key);
                                 System.exit(1);
+                            }
+                        }
+                    } else if (-1 < args[i].indexOf('#')) {
+                        if (2 < args[i].length()) {
+                            derivation = args[i].substring(2);
+                            if (null == derivation) {
+                                log.error("Missing derivation");
+                                System.exit(1);
+                            } else {
+                                pos = POS.getPOSForKey(args[i].substring(0, 1));
+                                if (null == pos) {
+                                    log.error("POS " + args[i] + " is not recognized for derivation " + derivation);
+                                    System.exit(1);
+                                }
                             }
                         }
                     }
@@ -510,6 +529,53 @@ public class ewn {
                                 System.exit(1);
                             }
                         }
+                    }
+
+                    if ("-addexc".equals(args[i])) {
+                        i++;
+                        if (i < args.length && '-' != args[i].charAt(0)) {
+                            String baseform = args[i];
+                            Exc e = d.getException(pos, derivation);
+                            if (null != e) {
+                                if (null != e.getExceptions()) {
+                                    if (!e.getExceptions().contains(baseform)) {
+                                        e.getExceptions().add(baseform);
+                                    }
+                                }
+                            } else {
+                                ArrayList<String> list = new ArrayList<String>(1);
+                                list.add(baseform);
+                                e = d.createException(pos, derivation, list);
+                            }
+                            derivation = null;
+                        } else {
+                            log.error("Missing baseform for addexc command for derivation " + derivation);
+                            System.exit(1);
+                        }
+                    }
+
+                    if ("-removeexc".equals(args[i])) {
+                        Exc e = d.getException(pos, derivation);
+                        if (null != e) {
+                            i++;
+                            if (i < args.length && '-' != args[i].charAt(0)) {
+                                String baseform = args[i];
+                                if (null != e.getExceptions()) {
+                                    if (e.getExceptions().contains(baseform)) {
+                                        e.getExceptions().remove(baseform);
+                                    }
+                                    if (0 == e.getExceptions().size()) {
+                                        d.removeException(e);
+                                    }
+                                }
+                            } else {
+                                d.removeException(e);
+                            }
+                        } else {
+                            log.error("Missing derivation " + derivation);
+                            System.exit(1);
+                        }
+                        derivation = null;
                     }
                 }
 
