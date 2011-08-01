@@ -6,7 +6,7 @@ import java.util.StringTokenizer;
  * A <code>StringTokenizer</code> with extensions to retrieve the values of numeric tokens, as well as strings.
  *
  * @author John Didion <jdidion@didion.net>
- * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
+ * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class TokenizerParser extends StringTokenizer {
     public TokenizerParser(String string, String delimiters) {

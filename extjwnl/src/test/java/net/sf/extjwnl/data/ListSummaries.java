@@ -10,7 +10,7 @@ import java.util.Iterator;
 /**
  * Lists summaries.
  *
- * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
+ * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class ListSummaries {
     public static void main(String[] args) throws IOException, JWNLException {

@@ -12,7 +12,7 @@ import java.io.InputStream;
 /**
  * Base class for tests.
  *
- * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
+ * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class BaseDataTest {
 

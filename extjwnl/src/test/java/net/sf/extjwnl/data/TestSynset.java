@@ -11,7 +11,7 @@ import java.io.IOException;
  * Tests Synset functionality by creating a mock synset.
  *
  * @author Brett Walenz <bwalenz@users.sourceforge.net>
- * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
+ * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class TestSynset extends BaseDataTest {
 

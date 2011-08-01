@@ -16,7 +16,7 @@ import java.io.Serializable;
  * be retrieved via {@link Pointer#getType getType}.
  *
  * @author John Didion <jdidion@didion.net>
- * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
+ * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class Pointer implements Serializable {
 

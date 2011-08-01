@@ -9,7 +9,7 @@ import java.io.IOException;
  * Creates a FileBackedDictionary and creates all the test cases.
  *
  * @author Brett Walenz <bwalenz@users.sourceforge.net>
- * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
+ * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class TestFileBackedDictionary extends DictionaryTester {
 

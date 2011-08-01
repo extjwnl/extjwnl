@@ -15,7 +15,7 @@ import java.util.Map;
 /**
  * Base class for element factories. Holds some common code.
  *
- * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
+ * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public abstract class AbstractPrincetonDictionaryElementFactory implements Owned {
 

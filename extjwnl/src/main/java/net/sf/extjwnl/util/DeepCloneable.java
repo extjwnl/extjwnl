@@ -7,7 +7,7 @@ package net.sf.extjwnl.util;
  * and of all it's member objects).
  *
  * @author John Didion <jdidion@didion.net>
- * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
+ * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public interface DeepCloneable extends Cloneable {
 

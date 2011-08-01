@@ -8,7 +8,7 @@ import org.junit.runners.Suite;
 /**
  * All tests.
  *
- * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
+ * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({

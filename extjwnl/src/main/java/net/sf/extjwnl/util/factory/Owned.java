@@ -6,7 +6,7 @@ import net.sf.extjwnl.dictionary.Dictionary;
 /**
  * Supports ownership information.
  *
- * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
+ * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public interface Owned {
 

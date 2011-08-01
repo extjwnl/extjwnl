@@ -10,7 +10,7 @@ import java.util.BitSet;
  * <code>VerbFrame</code>s (use cases of the verb).
  *
  * @author John Didion <jdidion@didion.net>
- * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
+ * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class Verb extends Word {
     private static final long serialVersionUID = 4L;

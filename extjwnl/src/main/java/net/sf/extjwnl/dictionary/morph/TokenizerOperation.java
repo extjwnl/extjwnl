@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * Tokenizer operation.
  *
- * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
+ * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  * @author John Didion <jdidion@didion.net>
  */
 public class TokenizerOperation extends AbstractDelegatingOperation {

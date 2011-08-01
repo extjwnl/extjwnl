@@ -8,7 +8,7 @@ import java.util.List;
  * Param with name and value.
  *
  * @author John Didion <jdidion@didion.net>
- * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
+ * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class NameValueParam extends AbstractValueParam {
     private String name;

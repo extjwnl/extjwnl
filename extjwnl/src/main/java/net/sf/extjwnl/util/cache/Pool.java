@@ -3,7 +3,7 @@ package net.sf.extjwnl.util.cache;
 /**
  * Pool interface for caching.
  *
- * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
+ * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public interface Pool<T> {
 

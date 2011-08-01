@@ -9,7 +9,7 @@ import java.io.Serializable;
  * <code>Synset</code>s, and <code>Exc</code>eptions) must implement this interface.
  *
  * @author John Didion <jdidion@didion.net>
- * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
+ * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public interface DictionaryElement extends Serializable, Owned {
 

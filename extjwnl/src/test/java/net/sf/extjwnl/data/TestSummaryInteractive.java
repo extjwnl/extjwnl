@@ -11,7 +11,7 @@ import java.io.InputStreamReader;
 /**
  * Interactively tests summary generation.
  *
- * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
+ * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class TestSummaryInteractive {
 

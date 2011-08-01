@@ -3,7 +3,7 @@ package net.sf.extjwnl.util.cache;
 /**
  * Pool which does nothing. Hopefully nothing harmful too.
  *
- * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
+ * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class ZeroPool<T> implements Pool<T> {
 

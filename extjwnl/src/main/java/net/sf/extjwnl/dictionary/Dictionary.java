@@ -27,7 +27,7 @@ import java.util.*;
  * See the architecture documentation for information on subclassing Dictionary.
  *
  * @author John Didion <jdidion@didion.net>
- * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
+ * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public abstract class Dictionary {
 

@@ -8,7 +8,7 @@ import net.sf.extjwnl.dictionary.Dictionary;
  * Note: Adjective positions are only supported through WordNet v1.5.
  *
  * @author John Didion <jdidion@didion.net>
- * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
+ * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class Adjective extends Word {
 

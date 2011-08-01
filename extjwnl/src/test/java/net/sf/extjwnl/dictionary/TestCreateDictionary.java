@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * Tests dictionary editing.
  *
- * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
+ * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public abstract class TestCreateDictionary {
 

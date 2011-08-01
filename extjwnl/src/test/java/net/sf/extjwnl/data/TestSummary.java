@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * Tests the word summarization functionality.
  *
- * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
+ * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class TestSummary {
 

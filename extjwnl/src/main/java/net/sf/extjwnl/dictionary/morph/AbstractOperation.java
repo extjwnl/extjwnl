@@ -5,7 +5,7 @@ import net.sf.extjwnl.dictionary.Dictionary;
 /**
  * Base class for operations.
  *
- * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
+ * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public abstract class AbstractOperation implements Operation {
 

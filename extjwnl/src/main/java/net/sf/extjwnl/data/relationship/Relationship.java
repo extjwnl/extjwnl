@@ -19,7 +19,7 @@ import java.io.StringWriter;
  * and {@link net.sf.extjwnl.data.relationship.AsymmetricRelationship Asymmetric}.
  *
  * @author John Didion <jdidion@didion.net>
- * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
+ * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public abstract class Relationship {
     /**

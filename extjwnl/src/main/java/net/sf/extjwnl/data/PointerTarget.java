@@ -14,7 +14,7 @@ import java.util.List;
  * the target of a lexical <code>PointerTarget</code> is a <code>Word</code>.
  *
  * @author John Didion <jdidion@didion.net>
- * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
+ * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public abstract class PointerTarget implements Serializable, Owned {
 

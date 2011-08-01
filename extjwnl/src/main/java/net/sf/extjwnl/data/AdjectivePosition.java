@@ -8,7 +8,7 @@ import net.sf.extjwnl.JWNL;
  * only used through WordNet version 1.6.
  *
  * @author John Didion <jdidion@didion.net>
- * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
+ * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public enum AdjectivePosition {
     NONE("none", "NONE"),

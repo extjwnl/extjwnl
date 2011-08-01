@@ -20,7 +20,7 @@ import java.io.FileInputStream;
  * A class to demonstrate the functionality of the JWNL package.
  *
  * @author John Didion <jdidion@didion.net>
- * @author Aliaksandr Autayeu <aliaksandr@autayeu.com>
+ * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class Examples {
     private static final String USAGE = "Usage: Examples <properties file>";
