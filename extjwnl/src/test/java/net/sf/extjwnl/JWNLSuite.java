@@ -20,6 +20,7 @@ import org.junit.runners.Suite;
 //        TestMapBackedDictionary.class,
 //        TestDatabaseBackedDictionary.class,
         TestCreateFileBackedDictionary.class,
+        TestGetFileBackedInstance.class,
         TestCreateMapBackedDictionary.class,
         TestFileBackedDictionaryEdit.class,
         TestThreads.class
