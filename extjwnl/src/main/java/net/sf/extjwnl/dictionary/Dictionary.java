@@ -93,7 +93,7 @@ public abstract class Dictionary {
 
     private boolean editable;
 
-    private static final String DEFAULT_FILE_DICTIONARY_PATH = "c:/program files/wordnet/3.0/dict";
+    private static final String DEFAULT_FILE_DICTIONARY_PATH = "./data/wn30";
     private static final String DEFAULT_MAP_DICTIONARY_PATH = "./data/map";
     private static final String DEFAULT_DB_DICTIONARY_PATH = "jdbc:mysql://localhost/jwnl?user=root";
 
