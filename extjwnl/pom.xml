@@ -42,19 +42,17 @@
         <finalName>${project.artifactId}-${project.version}</finalName>
         <resources>
             <resource>
-                <targetPath>/</targetPath>
+                <directory>src/main/resources</directory>
                 <filtering>false</filtering>
-                <directory>${basedir}/src/main/resources</directory>
                 <includes>
                     <include>*.properties</include>
                 </includes>
             </resource>
             <resource>
-                <targetPath>net/sf/extjwnl</targetPath>
+                <directory>src/main/resources</directory>
                 <filtering>false</filtering>
-                <directory>${basedir}/src/main/resources</directory>
                 <includes>
-                    <include>*.xml</include>
+                    <include>net/sf/extjwnl/*.xml</include>
                 </includes>
             </resource>
         </resources>
