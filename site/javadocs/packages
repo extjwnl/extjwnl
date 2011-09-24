@@ -4,9 +4,9 @@ net.sf.extjwnl.data.list
 net.sf.extjwnl.data.relationship
 net.sf.extjwnl.dictionary
 net.sf.extjwnl.dictionary.database
-net.sf.extjwnl.dictionary.file
 net.sf.extjwnl.dictionary.file_manager
 net.sf.extjwnl.dictionary.morph
+net.sf.extjwnl.dictionary.file
 net.sf.extjwnl.princeton.data
 net.sf.extjwnl.princeton.file
 net.sf.extjwnl.util
