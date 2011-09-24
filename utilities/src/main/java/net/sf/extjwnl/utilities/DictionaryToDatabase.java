@@ -256,14 +256,17 @@ public class DictionaryToDatabase {
             synsetStmt.execute();
             List<Word> words = synset.getWords();
             synsetWordStmt.setInt(2, id);
-            synsetVerbFrameStmt.setInt(2, id);
 
-            BitSet allWordFrames = synset.getVerbFrameFlags();
-            synsetVerbFrameStmt.setInt(4, 0);//applicable to all words
-            for (int i = allWordFrames.nextSetBit(0); i >= 0; i = allWordFrames.nextSetBit(i + 1)) {
-                synsetVerbFrameStmt.setInt(1, nextId());
-                synsetVerbFrameStmt.setInt(3, i);
-                synsetVerbFrameStmt.execute();
+            BitSet allWordFrames = null;
+            if (synset instanceof VerbSynset) {
+                synsetVerbFrameStmt.setInt(2, id);
+                allWordFrames = synset.getVerbFrameFlags();
+                synsetVerbFrameStmt.setInt(4, 0);//applicable to all words
+                for (int i = allWordFrames.nextSetBit(0); i >= 0; i = allWordFrames.nextSetBit(i + 1)) {
+                    synsetVerbFrameStmt.setInt(1, nextId());
+                    synsetVerbFrameStmt.setInt(3, i);
+                    synsetVerbFrameStmt.execute();
+                }
             }
 
             for (Word word : words) {
@@ -280,7 +283,7 @@ public class DictionaryToDatabase {
                     synsetVerbFrameStmt.setInt(4, word.getIndex());
                     BitSet bits = ((Verb) word).getVerbFrameFlags();
                     for (int i = bits.nextSetBit(0); i >= 0; i = bits.nextSetBit(i + 1)) {
-                        if (!allWordFrames.get(i)) {
+                        if (null != allWordFrames && !allWordFrames.get(i)) {
                             synsetVerbFrameStmt.setInt(1, nextId());
                             synsetVerbFrameStmt.setInt(3, i);
                             synsetVerbFrameStmt.execute();
