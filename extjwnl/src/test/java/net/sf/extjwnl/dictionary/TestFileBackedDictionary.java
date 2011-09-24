@@ -16,7 +16,7 @@ public class TestFileBackedDictionary extends DictionaryTester {
     /**
      * Properties location.
      */
-    protected String properties = "./src/main/resources/file_properties.xml";
+    protected String properties = "./src/main/resources/net/sf/extjwnl/file_properties.xml";
 
     public void initDictionary() throws IOException, JWNLException {
         dictionary = Dictionary.getInstance(new FileInputStream(properties));

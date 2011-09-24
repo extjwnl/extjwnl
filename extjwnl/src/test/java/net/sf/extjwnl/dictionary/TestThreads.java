@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class TestThreads {
 
-    protected final String properties = "./src/main/resources/file_properties.xml";
+    protected final String properties = "./src/main/resources/net/sf/extjwnl/file_properties.xml";
     protected final String[] list = {"tank", "cooler", "pile", "storm", "perfect", "crown", "computer science",
             "failure", "pleasure", "black", "Great Pyramid", "dictionary", "throw", "exception", "initialize",
             "boredom", "file", "index", "list", "apple", "orange", "pear", "find", "treasure", "memory", "good",
