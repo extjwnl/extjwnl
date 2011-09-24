@@ -1,12 +1,12 @@
-CREATE TABLE IndexWord (
+CREATE TABLE indexword (
   index_word_id   integer(10),
   lemma           varchar(255),
   pos             char
 );
 
-CREATE INDEX I_IndexWord ON IndexWord (pos, lemma(10));
+CREATE INDEX i_indexword ON indexword (pos, lemma(10));
 
-CREATE TABLE Synset (
+CREATE TABLE synset (
   synset_id       integer(10),
   file_offset     integer(10),
   lex_file_num    integer(10),
@@ -15,9 +15,9 @@ CREATE TABLE Synset (
   gloss           text
 );
 
-CREATE INDEX I_Synset ON Synset (pos, file_offset);
+CREATE INDEX i_synset ON synset (pos, file_offset);
 
-CREATE TABLE SynsetWord (
+CREATE TABLE synsetword (
   synset_word_id  integer(10),
   synset_id       integer(10),
   word            varchar(255),
@@ -26,9 +26,9 @@ CREATE TABLE SynsetWord (
   lex_id	      integer(10)
 );
 
-CREATE INDEX I_SynsetWord On SynsetWord (synset_id);
+CREATE INDEX i_synsetword On synsetword (synset_id);
 
-CREATE TABLE SynsetPointer (
+CREATE TABLE synsetpointer (
   synset_pointer_id integer(10),
   synset_id         integer(10),
   pointer_type      varchar(2),
@@ -38,30 +38,30 @@ CREATE TABLE SynsetPointer (
   target_index      integer(10)
 );
 
-CREATE INDEX I_SynsetPointer On SynsetPointer (synset_id);
+CREATE INDEX i_synsetpointer On synsetpointer (synset_id);
   
-CREATE TABLE SynsetVerbFrame (
+CREATE TABLE synsetverbframe (
   synset_verb_frame_id  integer(10),
   synset_id             integer(10),
   frame_number          integer(10),
   word_index            integer(10)
 );
 
-CREATE INDEX I_SynsetVerbFrame On SynsetVerbFrame (synset_id);
+CREATE INDEX i_synsetverbframe On synsetverbframe (synset_id);
 
-CREATE TABLE IndexWordSynset (
+CREATE TABLE indexwordsynset (
   index_word_synset_id  integer(10),
   index_word_id         integer(10),
   synset_id             integer(10)
 );
 
-CREATE INDEX I_IndexWordSynset On IndexWordSynset (index_word_id, synset_id);
+CREATE INDEX i_indexwordsynset On indexwordsynset (index_word_id, synset_id);
 
-CREATE TABLE Exceptions (
+CREATE TABLE exceptions (
   exception_id    integer(10),
   pos             char,
   base            varchar(255),
   derivation      varchar(255)
 );
 
-CREATE INDEX I_Exception On Exceptions (pos, base(10));
+CREATE INDEX i_exception On exceptions (pos, base(10));

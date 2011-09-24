@@ -23,7 +23,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
 
     protected static final String LEMMA_FOR_INDEX_WORD_ID_SQL =
             "SELECT iw.lemma " +
-                    "FROM IndexWord iw " +
+                    "FROM indexword iw " +
                     "WHERE iw.pos = ? AND iw.index_word_id = ?";
 
     /**
@@ -31,44 +31,44 @@ public class DatabaseManagerImpl implements DatabaseManager {
      */
     protected static final String SYNSET_IDS_FOR_INDEX_WORD_SQL =
             "SELECT syn.file_offset, iws.synset_id, syn.synset_id "
-                    + "FROM IndexWordSynset iws, IndexWord iw, Synset syn "
+                    + "FROM indexwordsynset iws, indexword iw, synset syn "
                     + "WHERE iws.index_word_id = iw.index_word_id AND syn.synset_id = iws.synset_id AND iw.pos = ?  AND iw.lemma = ?";
 
     protected static final String COUNT_INDEX_WORDS_SQL =
             "SELECT MIN(index_word_id), MAX(index_word_id) FROM indexword WHERE pos = ?";
 
     protected static final String ALL_LEMMAS_SQL =
-            "SELECT lemma FROM IndexWord WHERE pos = ?";
+            "SELECT lemma FROM indexword WHERE pos = ?";
 
     protected static final String ALL_LEMMAS_LIKE_SQL =
-            "SELECT lemma FROM IndexWord WHERE pos = ? AND lemma LIKE ?";
+            "SELECT lemma FROM indexword WHERE pos = ? AND lemma LIKE ?";
 
     protected static final String SYNSET_SQL =
-            "SELECT is_adj_cluster, gloss, lex_file_num FROM Synset WHERE pos = ? AND file_offset = ?";
+            "SELECT is_adj_cluster, gloss, lex_file_num FROM synset WHERE pos = ? AND file_offset = ?";
 
     protected static final String SYNSET_WORD_SQL =
             "SELECT sw.word, sw.word_index, sw.usage_cnt, sw.lex_id " +
-                    "FROM Synset s, SynsetWord sw " +
+                    "FROM synset s, synsetword sw " +
                     "WHERE s.synset_id = sw.synset_id AND s.pos = ? AND s.file_offset = ?";
 
     protected static final String SYNSET_POINTER_SQL =
             "SELECT sp.pointer_type, sp.target_offset, sp.target_pos, sp.source_index, sp.target_index " +
-                    "FROM Synset s, SynsetPointer sp " +
+                    "FROM synset s, synsetpointer sp " +
                     "WHERE s.synset_id = sp.synset_id AND s.pos = ? AND s.file_offset = ?";
 
     protected static final String SYNSET_VERB_FRAME_SQL =
             "SELECT svf.frame_number, svf.word_index " +
-                    "FROM Synset s, SynsetVerbFrame svf " +
+                    "FROM synset s, synsetverbframe svf " +
                     "WHERE s.synset_id = svf.synset_id AND s.pos = ? AND s.file_offset = ?";
 
     protected static final String ALL_SYNSETS_SQL =
-            "SELECT offset FROM Synset WHERE pos = ?";
+            "SELECT offset FROM synset WHERE pos = ?";
 
     protected static final String EXCEPTION_SQL =
-            "SELECT base FROM Exceptions WHERE pos = ? AND derivation = ?";
+            "SELECT base FROM exceptions WHERE pos = ? AND derivation = ?";
 
     protected static final String ALL_EXCEPTIONS_SQL =
-            "SELECT derivation FROM Exceptions WHERE pos = ?";
+            "SELECT derivation FROM exceptions WHERE pos = ?";
 
     protected static final Random rand = new Random(new Date().getTime());
 
