@@ -13,6 +13,8 @@ import java.util.BitSet;
  */
 public class VerbSynset extends Synset {
 
+    private static final long serialVersionUID = 4L;
+
     private BitSet verbFrameFlags;
 
     public VerbSynset(Dictionary dictionary, POS pos) throws JWNLException {

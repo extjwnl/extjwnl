@@ -75,7 +75,7 @@ public class PrincetonChannelDictionaryFile extends AbstractPrincetonRandomAcces
 
     public String readLineWord() throws IOException {
         if (isOpen()) {
-            StringBuffer input = new StringBuffer();
+            StringBuilder input = new StringBuilder();
             int c;
             while (((c = read()) != -1) && c != '\n' && c != '\r' && c != ' ') {
                 input.append((char) c);

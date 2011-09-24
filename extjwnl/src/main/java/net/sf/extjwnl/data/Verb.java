@@ -13,6 +13,7 @@ import java.util.BitSet;
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class Verb extends Word {
+
     private static final long serialVersionUID = 4L;
     /**
      * A bit array of all the verb frames that are valid for this word.

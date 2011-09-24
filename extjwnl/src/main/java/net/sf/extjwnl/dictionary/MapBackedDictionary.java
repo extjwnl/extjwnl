@@ -58,7 +58,7 @@ public class MapBackedDictionary extends Dictionary {
         IndexWord start = null;
         while (itr.hasNext()) {
             IndexWord word = itr.next();
-            if (word.getLemma().indexOf(substring) != -1) {
+            if (word.getLemma().contains(substring)) {
                 start = word;
                 break;
             }

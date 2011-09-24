@@ -220,7 +220,7 @@ public class FileManagerImpl implements FileManager {
                     return -1;
                 }
                 file.setNextLineOffset(offset, nextOffset);
-                if (line.indexOf(substring) >= 0) {
+                if (line.contains(substring)) {
                     return offset;
                 }
                 offset = nextOffset;

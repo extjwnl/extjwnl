@@ -44,7 +44,7 @@ public abstract class AbstractCachingDictionary extends Dictionary {
                 startWord = null;
                 while (itr.hasNext()) {
                     IndexWord word = itr.next();
-                    if (word.getLemma().indexOf(searchString) != -1) {
+                    if (word.getLemma().contains(searchString)) {
                         startWord = word;
                         break;
                     }
@@ -204,7 +204,7 @@ public abstract class AbstractCachingDictionary extends Dictionary {
         IndexWord start = null;
         while (itr.hasNext()) {
             IndexWord word = itr.next();
-            if (word.getLemma().indexOf(substring) != -1) {
+            if (word.getLemma().contains(substring)) {
                 start = word;
                 break;
             }

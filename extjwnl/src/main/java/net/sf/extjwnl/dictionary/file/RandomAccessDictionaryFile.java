@@ -104,6 +104,8 @@ public interface RandomAccessDictionaryFile extends DictionaryFile {
      * Returns offset length that accommodates largest offset.
      *
      * @return offset length that accommodates largest offset
+     * @throws java.io.IOException          IOException
+     * @throws net.sf.extjwnl.JWNLException IOException
      */
     int getOffsetLength() throws JWNLException, IOException;
 
@@ -111,6 +113,8 @@ public interface RandomAccessDictionaryFile extends DictionaryFile {
      * Sets offset length to be used while rendering the file.
      *
      * @param length offset length to be used while rendering the file
+     * @throws java.io.IOException          IOException
+     * @throws net.sf.extjwnl.JWNLException IOException
      */
     void setOffsetLength(int length) throws JWNLException, IOException;
 }

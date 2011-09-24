@@ -155,7 +155,7 @@ public class JWNL {
          * @return true if <var>testOS</var> is a version of this OS
          */
         public boolean matches(String testOS) {
-            return testOS.toLowerCase().indexOf(name.toLowerCase()) >= 0;
+            return testOS.toLowerCase().contains(name.toLowerCase());
         }
     }
 }
