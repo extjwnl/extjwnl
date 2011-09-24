@@ -4,6 +4,7 @@
 - added isLexical function to PointerType
 - few bug fixes
 - few more input and data checks
+- lowercased all table names to improve portability across platforms. take care on upgrade.
 
 1.5.3
 
