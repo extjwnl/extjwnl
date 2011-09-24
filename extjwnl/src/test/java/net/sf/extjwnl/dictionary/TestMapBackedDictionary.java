@@ -15,7 +15,7 @@ public class TestMapBackedDictionary extends DictionaryTester {
     /**
      * Properties location.
      */
-    protected String properties = "./src/main/resources/map_properties.xml";
+    protected String properties = "./src/main/resources/net/sf/extjwnl/map_properties.xml";
 
     public void initDictionary() throws IOException, JWNLException {
         dictionary = Dictionary.getInstance(new FileInputStream(properties));
