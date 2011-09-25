@@ -92,6 +92,7 @@ public class ewn {
     public static void main(String[] args) throws IOException, JWNLException {
         if (args.length < 1) {
             System.out.println(USAGE);
+            System.exit(0);
         }
         //find dictionary
         Dictionary d = null;
