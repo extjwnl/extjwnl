@@ -588,13 +588,23 @@ public class ewn {
                         IndexWord iw = d.getIndexWord(pos, key);
                         if (null == iw) {
                             System.out.println("\nNo information available for " + pos.getLabel() + " " + key);
-                        }
-                        iw = d.lookupIndexWord(pos, key);
-                        if (null != iw) {
+                        } else {
                             System.out.println("\nInformation available for " + iw.getPOS().getLabel() + " " + iw.getLemma());
                             printAvailableInfo(iw);
-                        } else {
-                            System.out.println("\nNo information available for " + iw.getPOS().getLabel() + " " + iw.getLemma());
+                        }
+                        if (null != d.getMorphologicalProcessor()) {
+                            List<String> forms = d.getMorphologicalProcessor().lookupAllBaseForms(pos, key);
+                            if (null != forms) {
+                                for (String form : forms) {
+                                    if (!key.equals(form)) {
+                                        iw = d.getIndexWord(pos, form);
+                                        if (null != iw) {
+                                            System.out.println("\nInformation available for " + iw.getPOS().getLabel() + " " + iw.getLemma());
+                                            printAvailableInfo(iw);
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 } else {
