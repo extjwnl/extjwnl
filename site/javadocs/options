@@ -15,12 +15,10 @@
 -docencoding
 'UTF-8'
 -doctitle
-'extJWNL 1.6 API'
--link
-'http://java.sun.com/javase/6/docs/api'
+'extJWNL 1.6.1 API'
 -linkoffline
-'http://extjwnl.sf.net/extjwnl-utilities/apidocs' '/home/aliaksandr/extjwnl/utilities/target/apidocs'
+'http://download.oracle.com/javase/6/docs/api' '/home/aliaksandr/extjwnl/extjwnl/target/javadoc-bundle-options'
 -use
 -version
 -windowtitle
-'extJWNL 1.6 API'
+'extJWNL 1.6.1 API'
