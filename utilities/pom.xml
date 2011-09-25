@@ -4,13 +4,13 @@
     <parent>
         <groupId>net.sf.extjwnl</groupId>
         <artifactId>extjwnl-parent</artifactId>
-        <version>1.6.1-SNAPSHOT</version>
+        <version>1.6.1</version>
     </parent>
 
     <groupId>net.sf.extjwnl</groupId>
     <artifactId>extjwnl-utilities</artifactId>
     <packaging>jar</packaging>
-    <version>1.6.1-SNAPSHOT</version>
+    <version>1.6.1</version>
     <name>extJWNL Utilities</name>
     <description>Utilities for extJWNL library</description>
 
