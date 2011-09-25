@@ -1,3 +1,7 @@
+1.6.1
+
+- improved morphology handling in ewn
+
 1.6
 
 - introduced ewn: a command-line interface with edit commands
