@@ -1,3 +1,7 @@
+1.6.2 
+
+- NPE in ewn
+
 1.6.1
 
 - improved morphology handling in ewn
