@@ -29,7 +29,7 @@ import java.util.*;
  */
 public class FileManagerImpl implements FileManager {
 
-    private static final Log log = LogFactory.getLog(DictionaryCatalogSet.class);
+    private static final Log log = LogFactory.getLog(FileManagerImpl.class);
 
     private Dictionary dictionary;
 
