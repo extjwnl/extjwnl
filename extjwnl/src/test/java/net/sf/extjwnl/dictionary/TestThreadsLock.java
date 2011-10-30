@@ -52,12 +52,17 @@ public class TestThreadsLock extends MultiThreadedTestCase {
         public void runTestCase() {
             try {
                 for (String word : list) {
-                    log.info(name + " querying for " + word);
-                    d.getMorphologicalProcessor().lookupBaseForm(POS.NOUN, word);
-                    log.info(name + " finished querying for " + word);
+                    if (!isInterrupted()) {
+                        log.info(name + " querying for " + word);
+                        d.getMorphologicalProcessor().lookupBaseForm(POS.NOUN, word);
+                        log.info(name + " finished querying for " + word);
+                    } else {
+                        break;
+                    }
                 }
             } catch (JWNLException e) {
-                e.printStackTrace();
+                handleException(e);
+                interruptThreads();
             }
         }
     }

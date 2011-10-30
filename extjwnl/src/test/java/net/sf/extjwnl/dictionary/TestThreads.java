@@ -59,16 +59,22 @@ public class TestThreads extends MultiThreadedTestCase {
             //uncomment this to solve the problem,
             //but I think there's a better way to solve it.
 //            synchronized (dictionary) {
-            for (String word : words) {
-                try {
-                    //throws an Exception or just stop at here
-                    log.debug("lookup: " + word);
-                    IndexWord iws = dictionary.lookupIndexWord(POS.NOUN, word);
-                    Assert.assertNotNull(iws);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
+            try {
+                for (String word : words) {
+                    if (!isInterrupted()) {
+                        //throws an Exception or just stop at here
+                        log.debug("lookup: " + word);
+                        IndexWord iws = dictionary.lookupIndexWord(POS.NOUN, word);
+                        Assert.assertNotNull(iws);
+                    } else {
+                        break;
+                    }
                 }
+            } catch (JWNLException e) {
+                handleException(e);
+                interruptThreads();
             }
+
 //            }
         }
     }

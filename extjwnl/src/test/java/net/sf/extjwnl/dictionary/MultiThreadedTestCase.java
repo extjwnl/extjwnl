@@ -14,6 +14,8 @@ public class MultiThreadedTestCase extends TestCase {
      */
     private Thread threads[] = null;
 
+    private final Object lock = new Object();
+
     /**
      * The tests TestResult.
      */
@@ -42,9 +44,7 @@ public class MultiThreadedTestCase extends TestCase {
             throw new IllegalArgumentException("runnables is null");
         }
         threads = new Thread[runnables.length];
-        for (int i = 0; i < threads.length; i++) {
-            threads[i] = new Thread(runnables[i]);
-        }
+        System.arraycopy(runnables, 0, threads, 0, threads.length);
         for (Thread thread : threads) {
             thread.start();
         }
@@ -65,7 +65,7 @@ public class MultiThreadedTestCase extends TestCase {
      *
      * @param t Exception to handle.
      */
-    private void handleException(final Throwable t) {
+    protected void handleException(final Throwable t) {
         synchronized (testResult) {
             if (t instanceof AssertionFailedError) {
                 testResult.addFailure(this, (AssertionFailedError) t);
@@ -79,7 +79,7 @@ public class MultiThreadedTestCase extends TestCase {
      * A test case thread. Override runTestCase () and define
      * behaviour of test in there.
      */
-    protected abstract class TestCaseRunnable implements Runnable {
+    protected abstract class TestCaseRunnable extends Thread implements Runnable {
         /**
          * Override this to define the test
          * @throws Throwable Throwable
@@ -99,8 +99,9 @@ public class MultiThreadedTestCase extends TestCase {
                 interruptThreads();
             }
         }
-        private void interruptThreads() {
-            synchronized (this) {
+
+        protected void interruptThreads() {
+            synchronized (lock) {
                 for (Thread t : threads) {
                     if (null != t && t.isAlive()) {
                         t.interrupt();
