@@ -3,8 +3,9 @@ package net.sf.extjwnl.dictionary;
 import net.sf.extjwnl.JWNL;
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.data.IndexWordSet;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
-import org.junit.Test;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -18,7 +19,9 @@ import java.util.List;
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  * @author wangyeee
  */
-public class TestThreads {
+public class TestThreads extends MultiThreadedTestCase {
+
+    private static final Log log = LogFactory.getLog(TestThreads.class);
 
     protected final String properties = "./src/main/resources/net/sf/extjwnl/file_properties.xml";
     protected final String[] list = {"tank", "cooler", "pile", "storm", "perfect", "crown", "computer science",
@@ -26,22 +29,22 @@ public class TestThreads {
             "boredom", "file", "index", "list", "apple", "orange", "pear", "find", "treasure", "memory", "good",
             "reproduce", "claw", "feet", "cold", "green", "glee"};
 
-    @Test
-    public void TestThreadedLookupAllIndexWords() throws FileNotFoundException, JWNLException {
-        JWNL.initialize(new FileInputStream(properties));
-
-        List<String> words0 = new ArrayList<String>(Arrays.asList(list));
-        List<String> words1 = new ArrayList<String>(Arrays.asList(list));
-
-        Thread t0 = new Lookup(words0);
-        Thread t1 = new Lookup(words1);
-        //I start 2 threads looking up words in wordnet
-        t0.start();
-        t1.start();
-
+    public TestThreads(String s) {
+        super(s);
     }
 
-    private class Lookup extends Thread {
+    public void testThreadedLookupAllIndexWords() throws FileNotFoundException, JWNLException {
+        JWNL.initialize(new FileInputStream(properties));
+
+        List<String> words = new ArrayList<String>(Arrays.asList(list));
+
+        TestCaseRunnable t0 = new Lookup(words);
+        TestCaseRunnable t1 = new Lookup(words);
+
+        runTestCaseRunnables(new TestCaseRunnable[]{t0, t1});
+    }
+
+    private class Lookup extends TestCaseRunnable {
 
         private List<String> words;
 
@@ -50,7 +53,7 @@ public class TestThreads {
         }
 
         @Override
-        public void run() {
+        public void runTestCase() {
             Dictionary dictionary = Dictionary.getInstance();
             //uncomment this to solve the problem,
             //but I think there's a better way to solve it.
@@ -58,6 +61,7 @@ public class TestThreads {
             for (String word : words) {
                 try {
                     //throws an Exception or just stop at here
+                    log.debug("lookup: " + word);
                     IndexWordSet iws = dictionary.lookupAllIndexWords(word);
                     Assert.assertNotNull(iws);
                     Assert.assertTrue(0 < iws.size());
