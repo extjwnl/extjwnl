@@ -70,7 +70,7 @@ public class TestThreadsLock extends MultiThreadedTestCase {
         List<String> list = new ArrayList<String>();
         String line = reader.readLine();
         while (line != null) {
-            list.add(line);
+            list.add(line.substring(0, line.indexOf(' ')));
             line = reader.readLine();
         }
 
