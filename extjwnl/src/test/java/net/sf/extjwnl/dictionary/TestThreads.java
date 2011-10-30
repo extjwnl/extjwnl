@@ -2,7 +2,8 @@ package net.sf.extjwnl.dictionary;
 
 import net.sf.extjwnl.JWNL;
 import net.sf.extjwnl.JWNLException;
-import net.sf.extjwnl.data.IndexWordSet;
+import net.sf.extjwnl.data.IndexWord;
+import net.sf.extjwnl.data.POS;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
@@ -25,7 +26,7 @@ public class TestThreads extends MultiThreadedTestCase {
 
     protected final String properties = "./src/main/resources/net/sf/extjwnl/file_properties.xml";
     protected final String[] list = {"tank", "cooler", "pile", "storm", "perfect", "crown", "computer science",
-            "failure", "pleasure", "black", "Great Pyramid", "dictionary", "throw", "exception", "initialize",
+            "failure", "pleasure", "black", "Great Pyramid", "dictionary", "throw", "exception",
             "boredom", "file", "index", "list", "apple", "orange", "pear", "find", "treasure", "memory", "good",
             "reproduce", "claw", "feet", "cold", "green", "glee"};
 
@@ -62,9 +63,8 @@ public class TestThreads extends MultiThreadedTestCase {
                 try {
                     //throws an Exception or just stop at here
                     log.debug("lookup: " + word);
-                    IndexWordSet iws = dictionary.lookupAllIndexWords(word);
+                    IndexWord iws = dictionary.lookupIndexWord(POS.NOUN, word);
                     Assert.assertNotNull(iws);
-                    Assert.assertTrue(0 < iws.size());
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
