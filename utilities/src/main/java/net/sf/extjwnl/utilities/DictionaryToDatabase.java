@@ -44,18 +44,18 @@ public class DictionaryToDatabase {
     /**
      * The database connection.
      */
-    protected Connection connection;
+    protected final Connection connection;
     /**
      * Mapping of database id's to synset offset id's. 1 to 1.
      */
-    protected Map<Integer, long[]> idToSynsetOffset;
+    protected final Map<Integer, long[]> idToSynsetOffset;
 
     /**
      * Mapping of synset offset id's to database id's. 1:1.
      */
-    protected Map<Long, Integer> synsetOffsetToId;
+    protected final Map<Long, Integer> synsetOffsetToId;
 
-    protected Dictionary dictionary;
+    protected final Dictionary dictionary;
 
     /**
      * Run the program, requires 4 arguments. See DictionaryToDatabase.txt for more documentation.
@@ -135,7 +135,7 @@ public class DictionaryToDatabase {
     public void createTables(String scriptFilePath) throws IOException, SQLException {
         log.info("creating tables");
         BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(scriptFilePath)));
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         for (String line = reader.readLine(); line != null; line = reader.readLine()) {
             line = line.trim();
             if (line.length() <= 0) {
@@ -145,7 +145,7 @@ public class DictionaryToDatabase {
             if (line.endsWith(";")) {
                 log.debug(buf.toString());
                 connection.prepareStatement(buf.toString()).execute();
-                buf = new StringBuffer();
+                buf = new StringBuilder();
             } else {
                 buf.append(" ");
             }

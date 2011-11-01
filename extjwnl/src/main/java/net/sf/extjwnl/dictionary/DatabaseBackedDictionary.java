@@ -179,8 +179,8 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
     }
 
     private abstract class DatabaseElementIterator<E extends DictionaryElement> implements Iterator<E> {
-        private POS pos;
-        private Query lemmas;
+        private final POS pos;
+        private final Query lemmas;
         private boolean advanced = false;
         private boolean hasNext = false;
 
@@ -273,7 +273,7 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
     }
 
     @Override
-    public void cacheAll() throws JWNLException {
+    public synchronized void cacheAll() throws JWNLException {
         if (factory instanceof AbstractPrincetonDictionaryElementFactory) {
             ((AbstractPrincetonDictionaryElementFactory) factory).startCaching();
         }

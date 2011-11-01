@@ -19,7 +19,7 @@ import java.util.Map;
  */
 public abstract class AbstractPrincetonDictionaryElementFactory implements Owned {
 
-    protected Dictionary dictionary;
+    protected final Dictionary dictionary;
 
     /**
      * Whether to cache strings in .intern like manner. Reduces memory snapshot for fully-loaded WordNets, default true.
@@ -63,7 +63,7 @@ public abstract class AbstractPrincetonDictionaryElementFactory implements Owned
 
     @Override
     public void setDictionary(Dictionary dictionary) throws JWNLException {
-        this.dictionary = dictionary;
+        throw new UnsupportedOperationException();
     }
 
     @Override

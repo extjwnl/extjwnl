@@ -380,10 +380,14 @@ public class IndexWord extends BaseDictionaryElement {
 
         private void loadAllSynsets() {
             if (null != synsetOffsets) {
-                for (long synsetOffset : synsetOffsets) {
-                    super.add(loadSynset(synsetOffset));
+                synchronized (this) {
+                    if (null != synsetOffsets) {
+                        for (long synsetOffset : synsetOffsets) {
+                            super.add(loadSynset(synsetOffset));
+                        }
+                        synsetOffsets = null;
+                    }
                 }
-                synsetOffsets = null;
             }
         }
 

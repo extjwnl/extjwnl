@@ -19,7 +19,7 @@ public class VerbFrame implements Serializable {
 
     private static final long serialVersionUID = 4L;
 
-    private static VerbFrame[] verbFrames;
+    private static final VerbFrame[] verbFrames;
 
     static {
         int framesSize = Integer.parseInt(JWNL.resolveMessage("NUMBER_OF_VERB_FRAMES"));
@@ -91,8 +91,8 @@ public class VerbFrame implements Serializable {
         return indices;
     }
 
-    private transient String frame;
-    private int index;
+    private final transient String frame;
+    private final int index;
 
     private VerbFrame(String frame, int index) {
         this.frame = JWNL.resolveMessage(frame);

@@ -12,9 +12,10 @@ import java.util.List;
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class BaseFormSet {
-    private List<String> forms = new ArrayList<String>();
+
+    private final List<String> forms = new ArrayList<String>();
+    private final boolean allowDuplicates;
     private int index = -1;
-    private boolean allowDuplicates;
 
     public BaseFormSet() {
         this(false);

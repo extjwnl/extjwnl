@@ -23,7 +23,9 @@ import org.junit.runners.Suite;
         TestGetFileBackedInstance.class,
         TestCreateMapBackedDictionary.class,
         TestFileBackedDictionaryEdit.class,
-        TestThreads.class
+        TestThreads.class,
+        TestThreadsLock.class,
+        TestThreadsDictionary.class
 })
 public class JWNLSuite {
 
@@ -39,7 +41,9 @@ public class JWNLSuite {
                 TestCreateFileBackedDictionary.class,
                 TestCreateMapBackedDictionary.class,
                 TestFileBackedDictionaryEdit.class,
-                TestThreads.class
+                TestThreads.class,
+                TestThreadsLock.class,
+                TestThreadsDictionary.class
         };
         String[] names = new String[classes.length];
         for (int i = 0; i < classes.length; i++) {

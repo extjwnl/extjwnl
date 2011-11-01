@@ -16,7 +16,7 @@ public class PointerTargetNode implements Node {
     /**
      * The PointerTarget
      */
-    private PointerTarget target;
+    private final PointerTarget target;
     /**
      * The relation type that produced this node. e.g. if you make a call to
      * getDirectHypernyms(), each node in the resultant list will have a

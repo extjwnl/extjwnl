@@ -19,19 +19,16 @@ import java.util.Map;
  */
 public abstract class AbstractDictionaryFile implements DictionaryFile {
 
-    protected Dictionary dictionary;
-    protected Map<String, Param> params;
+    protected final Dictionary dictionary;
+    protected final Map<String, Param> params;
     protected File file;
-    private POS pos;
+    protected POS pos;
 
     /**
      * The type of the file. For example, the default implementation defines the types INDEX, DATA, and EXCEPTION.
      */
     private DictionaryFileType fileType;
 
-
-    public AbstractDictionaryFile() {
-    }
 
     public AbstractDictionaryFile(Dictionary dictionary, Map<String, Param> params) {
         this.dictionary = dictionary;
@@ -81,8 +78,10 @@ public abstract class AbstractDictionaryFile implements DictionaryFile {
      * Opens the file.
      */
     public void open() throws IOException {
-        if (!isOpen()) {
-            openFile();
+        synchronized (file) {
+            if (!isOpen()) {
+                openFile();
+            }
         }
     }
 
@@ -99,6 +98,6 @@ public abstract class AbstractDictionaryFile implements DictionaryFile {
     }
 
     public void setDictionary(Dictionary dictionary) {
-        this.dictionary = dictionary;
+        throw new UnsupportedOperationException();
     }
 }

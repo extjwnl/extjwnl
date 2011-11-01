@@ -32,8 +32,8 @@ public enum AdjectivePosition {
         return null;
     }
 
-    private transient String key;
-    private transient String label;
+    private transient final String key;
+    private transient final String label;
 
     private AdjectivePosition(String key, String label) {
         JWNL.initialize();

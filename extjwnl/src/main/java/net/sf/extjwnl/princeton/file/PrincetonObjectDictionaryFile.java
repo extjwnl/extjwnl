@@ -99,7 +99,7 @@ public class PrincetonObjectDictionaryFile extends AbstractPrincetonDictionaryFi
      *
      * @throws IOException IOException
      */
-    public void openStreams() throws IOException {
+    public synchronized void openStreams() throws IOException {
         if (!canWrite()) {
             openOutputStream();
         }

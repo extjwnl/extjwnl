@@ -24,8 +24,8 @@ public abstract class AbstractCachingDictionary extends Dictionary {
     private static final Log log = LogFactory.getLog(AbstractCachingDictionary.class);
 
     public static final class IndexWordIterator implements Iterator<IndexWord> {
-        private Iterator<IndexWord> itr;
-        private String searchString;
+        private final Iterator<IndexWord> itr;
+        private final String searchString;
         private IndexWord startWord;
 
         public IndexWordIterator(Iterator<IndexWord> itr, String searchString, IndexWord startWord) {
@@ -60,7 +60,7 @@ public abstract class AbstractCachingDictionary extends Dictionary {
         }
     }
 
-    private CacheSet<DictionaryElementType, Object, DictionaryElement> caches;
+    private volatile CacheSet<DictionaryElementType, Object, DictionaryElement> caches;
     protected boolean isCachingEnabled;
 
     protected AbstractCachingDictionary(Document doc) throws JWNLException {
@@ -148,12 +148,18 @@ public abstract class AbstractCachingDictionary extends Dictionary {
         if (!isCachingEnabled()) {
             throw new JWNLRuntimeException("DICTIONARY_EXCEPTION_022");
         }
-        if (caches == null) {
-            caches = new LRUCacheSet<DictionaryElementType, Object, DictionaryElement>
-                    (DictionaryElementType.getAllDictionaryElementTypes().toArray(
-                            new DictionaryElementType[DictionaryElementType.getAllDictionaryElementTypes().size()]));
+        //fixed DCL idiom: http://en.wikipedia.org/wiki/Double-checked_locking
+        CacheSet<DictionaryElementType, Object, DictionaryElement> result = caches;
+        if (null == result) {
+            synchronized (this) {
+                result = caches;
+                if (null == result) {
+                    caches = result = new LRUCacheSet<DictionaryElementType, Object, DictionaryElement>
+                            (DictionaryElementType.getAllDictionaryElementTypes());
+                }
+            }
         }
-        return caches;
+        return result;
     }
 
     private void cache(DictionaryElementType fileType, DictionaryElement obj) {
@@ -213,13 +219,14 @@ public abstract class AbstractCachingDictionary extends Dictionary {
     }
 
     @Override
-    public void edit() throws JWNLException {
-        setCacheCapacity(Integer.MAX_VALUE);
-        cacheAll();
-        super.edit();
-        //resolving pointers here to use faster iterators on hashes
-        for (POS pos : POS.getAllPOS()) {
-            resolvePointers(pos);
+    public synchronized void edit() throws JWNLException {
+        if (!isEditable()) {
+            cacheAll();
+            super.edit();
+            //resolving pointers here to use faster iterators on hashes
+            for (POS pos : POS.getAllPOS()) {
+                resolvePointers(pos);
+            }
         }
     }
 
@@ -283,7 +290,8 @@ public abstract class AbstractCachingDictionary extends Dictionary {
         super.removeIndexWord(indexWord);
     }
 
-    public void cacheAll() throws JWNLException {
+    public synchronized void cacheAll() throws JWNLException {
+        setCacheCapacity(Integer.MAX_VALUE);
         for (POS pos : POS.getAllPOS()) {
             cachePOS(pos);
         }

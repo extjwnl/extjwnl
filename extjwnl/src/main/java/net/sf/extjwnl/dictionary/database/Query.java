@@ -16,7 +16,7 @@ public class Query {
     private Connection connection;
     private PreparedStatement statement;
     private ResultSet results;
-    private String sql;
+    private final String sql;
 
     public Query(String sql, Connection conn) {
         connection = conn;

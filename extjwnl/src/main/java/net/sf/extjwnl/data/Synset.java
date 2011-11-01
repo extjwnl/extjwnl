@@ -31,8 +31,8 @@ public class Synset extends PointerTarget implements DictionaryElement {
 
     private static final Log log = LogFactory.getLog(Synset.class);
 
-    protected POS pos;
-    protected PointerList pointers;
+    protected final POS pos;
+    protected final PointerList pointers;
 
     /**
      * The offset of this synset in the data file.
@@ -42,7 +42,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
     /**
      * The words in this synset.
      */
-    private WordList words;
+    private final WordList words;
 
     /**
      * The text (definition, usage examples) associated with the synset.
@@ -352,28 +352,30 @@ public class Synset extends PointerTarget implements DictionaryElement {
 
         private void checkPointers() {
             if (null != dictionary && dictionary.getCheckAlienPointers() && !checkingPointers) {
-                checkingPointers = true;
-                if (null != dictionary && dictionary.isEditable()) {
-                    List<Pointer> toDelete = null;
-                    for (int i = 0; i < super.size(); i++) {
-                        Pointer pointer = super.get(i);
-                        if (dictionary != pointer.getSource().getDictionary() || null == pointer.getTarget() || dictionary != pointer.getTarget().getDictionary()) {
-                            if (null == toDelete) {
-                                toDelete = new ArrayList<Pointer>();
+                synchronized (this) {
+                    checkingPointers = true;
+                    if (null != dictionary && dictionary.isEditable()) {
+                        List<Pointer> toDelete = null;
+                        for (int i = 0; i < super.size(); i++) {
+                            Pointer pointer = super.get(i);
+                            if (dictionary != pointer.getSource().getDictionary() || null == pointer.getTarget() || dictionary != pointer.getTarget().getDictionary()) {
+                                if (null == toDelete) {
+                                    toDelete = new ArrayList<Pointer>();
+                                }
+                                toDelete.add(pointer);
                             }
-                            toDelete.add(pointer);
+                        }
+                        if (null != toDelete) {
+                            if (log.isWarnEnabled() && 0 < toDelete.size()) {
+                                log.warn(JWNL.resolveMessage("DICTIONARY_WARN_002", Synset.this.getOffset()));
+                            }
+                            for (Pointer pointer : toDelete) {
+                                remove(pointer);
+                            }
                         }
                     }
-                    if (null != toDelete) {
-                        if (log.isWarnEnabled() && 0 < toDelete.size()) {
-                            log.warn(JWNL.resolveMessage("DICTIONARY_WARN_002", Synset.this.getOffset()));
-                        }
-                        for (Pointer pointer : toDelete) {
-                            remove(pointer);
-                        }
-                    }
+                    checkingPointers = false;
                 }
-                checkingPointers = false;
             }
         }
     }

@@ -10,7 +10,7 @@ import java.util.*;
 public class ResourceBundleSet extends ResourceBundle {
 
     private Locale locale = Locale.getDefault();
-    private Set<String> resources = new HashSet<String>();
+    private final Set<String> resources = new HashSet<String>();
 
     public ResourceBundleSet(String resource) {
         addResource(resource);
@@ -46,7 +46,7 @@ public class ResourceBundleSet extends ResourceBundle {
 
     public Enumeration<String> getKeys() {
         return new Enumeration<String>() {
-            private Iterator<String> itr = resources.iterator();
+            private final Iterator<String> itr = resources.iterator();
             private Enumeration<String> currentEnum;
 
             public boolean hasMoreElements() {

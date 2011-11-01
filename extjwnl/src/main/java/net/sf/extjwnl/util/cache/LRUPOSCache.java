@@ -2,7 +2,7 @@ package net.sf.extjwnl.util.cache;
 
 import net.sf.extjwnl.data.POS;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 
 /**
@@ -12,20 +12,17 @@ import java.util.Map;
  */
 public class LRUPOSCache<K, V> implements POSCache<K, V> {
 
-    private Map<POS, Cache<K, V>> caches = new HashMap<POS, Cache<K, V>>();
-    private int capacity;
+    private final Map<POS, Cache<K, V>> caches;
 
     public LRUPOSCache(int capacity) {
-        this.capacity = capacity;
+        caches = new EnumMap<POS, Cache<K, V>>(POS.class);
+        for (POS pos : POS.getAllPOS()) {
+            caches.put(pos, new LRUCache<K, V>(capacity));
+        }
     }
 
     @Override
     public Cache<K, V> getCache(POS pos) {
-        Cache<K, V> result = caches.get(pos);
-        if (null == result) {
-            result = new LRUCache<K, V>(capacity);
-            caches.put(pos, result);
-        }
-        return result;
+        return caches.get(pos);
     }
 }

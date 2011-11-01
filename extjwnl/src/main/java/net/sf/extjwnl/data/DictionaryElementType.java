@@ -22,7 +22,7 @@ public enum DictionaryElementType {
     /**
      * The name of the dictionary element type.
      */
-    private transient String name;
+    private final transient String name;
 
     /**
      * A list of the different dictionary types.

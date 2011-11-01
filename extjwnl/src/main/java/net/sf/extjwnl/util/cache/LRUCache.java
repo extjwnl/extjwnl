@@ -1,7 +1,10 @@
 package net.sf.extjwnl.util.cache;
 
-import java.util.LinkedHashMap;
+import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
+
+import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * A fixed-capacity <code>Cache</code> that stores the most recently used elements. Once the cache reaches
@@ -10,36 +13,82 @@ import java.util.Map;
  * @author John Didion <jdidion@didion.net>
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
-public class LRUCache<K, V> extends LinkedHashMap<K, V> implements Cache<K, V> {
+public class LRUCache<K, V> implements Cache<K, V> {
 
-    private int capacity;
+    private final ConcurrentLinkedHashMap<K, V> m;
 
     /**
      * @param capacity the maximum number of elements that can be contained in the cache.
      */
     public LRUCache(int capacity) {
-        super(capacity);
-        setCapacity(capacity);
+        m = new ConcurrentLinkedHashMap.Builder<K, V>().maximumWeightedCapacity(capacity).build();
     }
 
-    public boolean isFull() {
-        return size() >= getCapacity();
-    }
-
-    protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
-        return size() > getCapacity();
-    }
-
-    public int setCapacity(int capacity) {
-        this.capacity = capacity;
-        return this.capacity;
+    public void setCapacity(int capacity) {
+        m.setCapacity(capacity);
     }
 
     public int getCapacity() {
-        return capacity;
+        return m.capacity();
     }
 
-    public int getSize() {
-        return size();
+    @Override
+    public int size() {
+        return m.size();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return m.isEmpty();
+    }
+
+    @Override
+    public boolean containsKey(Object key) {
+        return m.containsKey(key);
+    }
+
+    @Override
+    public boolean containsValue(Object value) {
+        return m.containsValue(value);
+    }
+
+    @Override
+    public V get(Object key) {
+        return m.get(key);
+    }
+
+    @Override
+    public V put(K key, V value) {
+        return m.put(key, value);
+    }
+
+    @Override
+    public V remove(Object key) {
+        return m.remove(key);
+    }
+
+    @Override
+    public void putAll(Map<? extends K, ? extends V> m) {
+        this.m.putAll(m);
+    }
+
+    @Override
+    public void clear() {
+        m.clear();
+    }
+
+    @Override
+    public Set<K> keySet() {
+        return m.keySet();
+    }
+
+    @Override
+    public Collection<V> values() {
+        return m.values();
+    }
+
+    @Override
+    public Set<Entry<K, V>> entrySet() {
+        return m.entrySet();
     }
 }

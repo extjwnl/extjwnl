@@ -395,7 +395,7 @@ public class Word extends PointerTarget {
         this.summary = summary;
     }
 
-    private static ArrayList<String> getLemmasFromSynset(Synset s) throws JWNLException {
+    private static ArrayList<String> getLemmasFromSynset(Synset s) {
         ArrayList<String> result = new ArrayList<String>();
 
         for (Word w : s.getWords()) {
@@ -415,7 +415,7 @@ public class Word extends PointerTarget {
         return result;
     }
 
-    private static String getShortestLemma(ArrayList<String> candidates, Set<String> exceptions) throws JWNLException {
+    private static String getShortestLemma(ArrayList<String> candidates, Set<String> exceptions) {
         //sort by length
         //shortest may not be the best, better choose among first ones - they are better known.
         Collections.sort(candidates, slComp);

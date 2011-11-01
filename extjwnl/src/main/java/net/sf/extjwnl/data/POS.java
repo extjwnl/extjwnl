@@ -98,9 +98,9 @@ public enum POS {
     }
 
 
-    private transient String label;
-    private transient int id;
-    private transient String key;
+    private final transient String label;
+    private final transient int id;
+    private final transient String key;
 
     private POS(int id, String key, String label) {
         JWNL.initialize();

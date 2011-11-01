@@ -6,11 +6,13 @@ import net.sf.extjwnl.data.IndexWord;
 import net.sf.extjwnl.data.POS;
 import net.sf.extjwnl.dictionary.Dictionary;
 import net.sf.extjwnl.dictionary.MorphologicalProcessor;
+import net.sf.extjwnl.util.cache.CacheSet;
 import net.sf.extjwnl.util.cache.LRUPOSCache;
 import net.sf.extjwnl.util.cache.POSCache;
 import net.sf.extjwnl.util.factory.Param;
 import net.sf.extjwnl.util.factory.ParamList;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -26,8 +28,6 @@ import java.util.Map;
  */
 public class DefaultMorphologicalProcessor implements MorphologicalProcessor {
 
-    private Dictionary dictionary;
-
     /**
      * Parameter that determines the size of the base form cache.
      */
@@ -38,11 +38,11 @@ public class DefaultMorphologicalProcessor implements MorphologicalProcessor {
      */
     public static final String OPERATIONS = "operations";
 
-    private static final int DEFAULT_CACHE_CAPACITY = 1000;
+    private final POSCache<String, LookupInfo> lookupCache;
 
-    private POSCache<String, LookupInfo> lookupCache;
+    private final Operation[] operations;
 
-    private Operation[] operations;
+    private final Dictionary dictionary;
 
     public DefaultMorphologicalProcessor(Dictionary dictionary, Map<String, Param> params) throws JWNLException {
         this.dictionary = dictionary;
@@ -55,39 +55,70 @@ public class DefaultMorphologicalProcessor implements MorphologicalProcessor {
         this.operations = operations.toArray(new Operation[operations.size()]);
 
         Param param = params.get(CACHE_CAPACITY);
-        int capacity = (param == null) ? DEFAULT_CACHE_CAPACITY : Integer.parseInt(param.getValue());
+        int capacity = (param == null) ? CacheSet.DEFAULT_CACHE_CAPACITY : Integer.parseInt(param.getValue());
         lookupCache = new LRUPOSCache<String, LookupInfo>(capacity);
     }
 
     /**
-     * Lookup the base form of a word. Given a lemma, finds the WordNet
+     * Lookup the first base form of a word. Given a lemma, finds the WordNet
      * entry most like that lemma. This function returns the first base form
      * found. Subsequent calls to this function with the same part-of-speech
-     * and word will return the same base form. To find another base form for
-     * the pos/word, call lookupNextBaseForm.
+     * and word will return the same base form.
      *
      * @param pos        the part-of-speech of the word to look up
      * @param derivation the word to look up
-     * @return IndexWord the IndexWord found during lookup
+     * @return IndexWord the IndexWord found during lookup or null
      */
     public IndexWord lookupBaseForm(POS pos, String derivation) throws JWNLException {
+        if (null == pos || null == derivation || "".equals(derivation)) {
+            return null;
+        }
         // See if we've already looked this word up
         LookupInfo info = getCachedLookupInfo(pos, derivation);
-        if (info != null && info.getBaseForms().isCurrentFormAvailable()) {
-            // get the last base form we retrieved. if you want
-            // the next possible base form, use lookupNextBaseForm
-            return null == dictionary ? null : dictionary.getIndexWord(pos, info.getBaseForms().getCurrentForm());
-        } else {
-            return lookupNextBaseForm(pos, derivation, info);
+        synchronized (info) {
+            if (info.getBaseForms().isCurrentFormAvailable()) {
+                // get the last base form we retrieved. if you want
+                // the next possible base form, use lookupNextBaseForm
+                return null == dictionary ? null : dictionary.getIndexWord(pos, info.getBaseForms().getCurrentForm());
+            } else {
+                return lookupNextBaseForm(pos, info);
+            }
         }
     }
 
-    private void cacheLookupInfo(POS pos, String key, LookupInfo info) {
-        lookupCache.getCache(pos).put(key, info);
+    /**
+     * Returns all base forms of the derivation.
+     * @param pos        part of speech
+     * @param derivation derivation
+     * @return base forms of the derivation
+     * @throws JWNLException JWNLException
+     */
+    public List<String> lookupAllBaseForms(POS pos, String derivation) throws JWNLException {
+        if (null == derivation || "".equals(derivation)) {
+            return Collections.emptyList();
+        }
+
+        final LookupInfo info = getCachedLookupInfo(pos, derivation);
+        synchronized (info) {
+            while (info.isNextOperationAvailable() && !info.executeNextOperation()) {
+            }
+        }
+        return info.getBaseForms().getForms();
     }
 
     private LookupInfo getCachedLookupInfo(POS pos, String key) {
-        return lookupCache.getCache(pos).get(key);
+        //DCL idiom... careful...
+        LookupInfo info = lookupCache.getCache(pos).get(key);
+        if (info == null) {
+            synchronized (this) {
+                info = lookupCache.getCache(pos).get(key);
+                if (info == null) {
+                    info = new LookupInfo(pos, key);
+                    lookupCache.getCache(pos).put(key, info);
+                }
+            }
+        }
+        return info;
     }
 
     /**
@@ -95,65 +126,40 @@ public class DefaultMorphologicalProcessor implements MorphologicalProcessor {
      * yet been found for the pos/word, it will find the first base form,
      * otherwise it will find the next base form.
      *
+     *
      * @param pos        the part-of-speech of the word to look up
-     * @param derivation the word to look up
      * @param info       lookup info
      * @return IndexWord the IndexWord found during lookup, or null if an IndexWord is not found
      * @throws JWNLException JWNLException
      */
-    private IndexWord lookupNextBaseForm(POS pos, String derivation, LookupInfo info) throws JWNLException {
-        if (derivation == null || derivation.equals("")) {
-            return null;
-        }
-
+    private IndexWord lookupNextBaseForm(POS pos, LookupInfo info) throws JWNLException {
         String str = null;
-        if (info == null) {
-            info = getCachedLookupInfo(pos, derivation);
-            if (info == null) {
-                info = new LookupInfo(pos, derivation, operations);
-                cacheLookupInfo(pos, derivation, info);
-            }
-        }
-
-        // if we've already found another possible base form, return that one
-        if (info.getBaseForms().isMoreFormsAvailable()) {
-            str = info.getBaseForms().getNextForm();
-        } else {
-            while (info.isNextOperationAvailable() && !info.executeNextOperation()) {
-            }
+        synchronized (info) {
+            // if we've already found another possible base form, return that one
             if (info.getBaseForms().isMoreFormsAvailable()) {
                 str = info.getBaseForms().getNextForm();
+            } else {
+                while (info.isNextOperationAvailable() && !info.executeNextOperation()) {
+                }
+                if (info.getBaseForms().isMoreFormsAvailable()) {
+                    str = info.getBaseForms().getNextForm();
+                }
             }
         }
 
         return (str == null) ? null : (null == dictionary ? null : dictionary.getIndexWord(pos, str));
     }
 
-    public List<String> lookupAllBaseForms(POS pos, String derivation) throws JWNLException {
-        LookupInfo info = getCachedLookupInfo(pos, derivation);
-        if (info == null) {
-            info = new LookupInfo(pos, derivation, operations);
-            cacheLookupInfo(pos, derivation, info);
-        }
-        int index = info.getBaseForms().getIndex();
-        while (info.isNextOperationAvailable()) {
-            lookupNextBaseForm(pos, derivation, info);
-        }
-        info.getBaseForms().setIndex(index);
-        return info.getBaseForms().getForms();
-    }
-
     private class LookupInfo {
-        private POS pos;
-        private String derivation;
-        private BaseFormSet baseForms;
-        private Operation[] operations;
+        private final POS pos;
+        private final String derivation;
+        private final BaseFormSet baseForms;
+
         private int currentOperation;
 
-        public LookupInfo(POS pos, String derivation, Operation[] operations) {
+        public LookupInfo(POS pos, String derivation) {
             this.pos = pos;
             this.derivation = derivation;
-            this.operations = operations;
             baseForms = new BaseFormSet();
             currentOperation = -1;
         }

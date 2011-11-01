@@ -18,8 +18,8 @@ import java.util.Map;
  */
 public abstract class AbstractDelegatingOperation extends AbstractOperation {
 
-    private Map<String, Operation[]> operationSets;
-    protected Map<String, Param> params;
+    private final Map<String, Operation[]> operationSets;
+    protected final Map<String, Param> params;
 
     public AbstractDelegatingOperation(Dictionary dictionary, Map<String, Param> params) throws JWNLException {
         super(dictionary);

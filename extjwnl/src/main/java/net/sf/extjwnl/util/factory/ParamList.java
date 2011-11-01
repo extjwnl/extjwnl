@@ -14,7 +14,7 @@ import java.util.Map;
  */
 public class ParamList extends ArrayList<Param> implements Param {
 
-    private String name;
+    private final String name;
 
     public ParamList(String name) {
         this.name = name;

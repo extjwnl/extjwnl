@@ -30,16 +30,18 @@ public class MapBackedDictionary extends Dictionary {
      */
     private static final Random rand = new Random(new Date().getTime());
 
-    private Map<MapTableKey, Map<Object, DictionaryElement>> tableMap = new HashMap<MapTableKey, Map<Object, DictionaryElement>>();
-    private DictionaryCatalogSet<ObjectDictionaryFile> files;
+    private final Map<MapTableKey, Map<Object, DictionaryElement>> tableMap;
+    private final DictionaryCatalogSet<ObjectDictionaryFile> files;
 
     public MapBackedDictionary(Document doc) throws JWNLException {
         super(doc);
+        files = new DictionaryCatalogSet<ObjectDictionaryFile>(this, params, ObjectDictionaryFile.class);
+        tableMap = new HashMap<MapTableKey, Map<Object, DictionaryElement>>();
         this.load();
     }
 
     @Override
-    public void delete() throws JWNLException {
+    public synchronized void delete() throws JWNLException {
         try {
             files.delete();
         } catch (IOException e) {
@@ -72,10 +74,10 @@ public class MapBackedDictionary extends Dictionary {
         return result;
     }
 
-    // this is a very inefficient implementation, but a better
-    // one would require a custom Map implementation that allowed
-    // access to the underlying Entry array.
     public IndexWord getRandomIndexWord(POS pos) throws JWNLException {
+        // this is a very inefficient implementation, but a better
+        // one would require a custom Map implementation that allowed
+        // access to the underlying Entry array.
         int index = rand.nextInt(getTable(pos, DictionaryFileType.INDEX).size());
         Iterator<IndexWord> itr = getIndexWordIterator(pos);
         for (int i = 0; i < index && itr.hasNext(); i++) {
@@ -109,36 +111,38 @@ public class MapBackedDictionary extends Dictionary {
     }
 
     public void close() {
-        tableMap = null;
+        tableMap.clear();
         files.close();
     }
 
     @Override
-    public void edit() throws JWNLException {
-        try {
-            super.edit();
-            files.edit();
+    public synchronized void edit() throws JWNLException {
+        if (!isEditable()) {
+            try {
+                super.edit();
+                files.edit();
 
-            //update max offsets for new synset creation
-            //iteration might take time
-            for (POS pos : POS.getAllPOS()) {
-                Long maxOff = 0L;
-                Iterator<Synset> si = getSynsetIterator(pos);
-                while (si.hasNext()) {
-                    Synset s = si.next();
-                    if (maxOff < s.getOffset()) {
-                        maxOff = s.getOffset();
+                //update max offsets for new synset creation
+                //iteration might take time
+                for (POS pos : POS.getAllPOS()) {
+                    Long maxOff = 0L;
+                    Iterator<Synset> si = getSynsetIterator(pos);
+                    while (si.hasNext()) {
+                        Synset s = si.next();
+                        if (maxOff < s.getOffset()) {
+                            maxOff = s.getOffset();
+                        }
                     }
+                    maxOffset.put(pos, maxOff);
                 }
-                maxOffset.put(pos, maxOff);
+            } catch (IOException e) {
+                throw new JWNLException("EXCEPTION_001", e.getMessage(), e);
             }
-        } catch (IOException e) {
-            throw new JWNLException("EXCEPTION_001", e.getMessage(), e);
         }
     }
 
     @Override
-    public void save() throws JWNLException {
+    public synchronized void save() throws JWNLException {
         try {
             super.save();
             files.save();
@@ -188,8 +192,8 @@ public class MapBackedDictionary extends Dictionary {
     }
 
     private static final class MapTableKey {
-        private POS pos;
-        private DictionaryFileType fileType;
+        private final POS pos;
+        private final DictionaryFileType fileType;
 
         private MapTableKey(POS pos, DictionaryFileType fileType) {
             this.pos = pos;
@@ -217,40 +221,45 @@ public class MapBackedDictionary extends Dictionary {
     }
 
     private void load() throws JWNLException {
-        files = new DictionaryCatalogSet<ObjectDictionaryFile>(this, params, ObjectDictionaryFile.class);
-        if (!files.isOpen()) {
+        synchronized (Dictionary.class) {//because restore variable is static
+            Dictionary.setRestoreDictionary(this);
             try {
-                files.open();
-            } catch (Exception e) {
-                throw new JWNLException("DICTIONARY_EXCEPTION_019", e);
-            }
-        }
-        // Load all the hash tables into memory
-        if (log.isInfoEnabled()) {
-            log.info(JWNL.resolveMessage("DICTIONARY_INFO_009"));
-        }
-        if (log.isTraceEnabled()) {
-            log.trace(JWNL.resolveMessage("DICTIONARY_INFO_010", Runtime.getRuntime().freeMemory()));
-        }
-
-        for (DictionaryFileType fileType : DictionaryFileType.getAllDictionaryFileTypes()) {
-            DictionaryCatalog<ObjectDictionaryFile> catalog = files.get(fileType);
-            for (POS pos : POS.getAllPOS()) {
+                if (!files.isOpen()) {
+                    try {
+                        files.open();
+                    } catch (Exception e) {
+                        throw new JWNLException("DICTIONARY_EXCEPTION_019", e);
+                    }
+                }
+                // Load all the hash tables into memory
                 if (log.isInfoEnabled()) {
-                    log.info(JWNL.resolveMessage("DICTIONARY_INFO_011", new Object[]{pos.getLabel(), fileType.getName()}));
+                    log.info(JWNL.resolveMessage("DICTIONARY_INFO_009"));
                 }
-                putTable(pos, fileType, loadDictFile(catalog.get(pos)));
                 if (log.isTraceEnabled()) {
-                    log.trace(JWNL.resolveMessage("DICTIONARY_INFO_012", Runtime.getRuntime().freeMemory()));
+                    log.trace(JWNL.resolveMessage("DICTIONARY_INFO_010", Runtime.getRuntime().freeMemory()));
                 }
+
+                for (DictionaryFileType fileType : DictionaryFileType.getAllDictionaryFileTypes()) {
+                    DictionaryCatalog<ObjectDictionaryFile> catalog = files.get(fileType);
+                    for (POS pos : POS.getAllPOS()) {
+                        if (log.isInfoEnabled()) {
+                            log.info(JWNL.resolveMessage("DICTIONARY_INFO_011", new Object[]{pos.getLabel(), fileType.getName()}));
+                        }
+                        putTable(pos, fileType, loadDictFile(catalog.get(pos)));
+                        if (log.isTraceEnabled()) {
+                            log.trace(JWNL.resolveMessage("DICTIONARY_INFO_012", Runtime.getRuntime().freeMemory()));
+                        }
+                    }
+                }
+                files.close();
+            } finally {
+                Dictionary.setRestoreDictionary(null);
             }
         }
-        files.close();
     }
 
-    private synchronized Map<Object, DictionaryElement> loadDictFile(ObjectDictionaryFile file) throws JWNLException {
+    private Map<Object, DictionaryElement> loadDictFile(ObjectDictionaryFile file) throws JWNLException {
         try {
-            Dictionary.setRestoreDictionary(this);
             @SuppressWarnings({"unchecked", "UnnecessaryLocalVariable"})
             Map<Object, DictionaryElement> result = (Map<Object, DictionaryElement>) file.readObject();
             return result;

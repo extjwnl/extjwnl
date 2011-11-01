@@ -30,8 +30,8 @@ import java.util.Map;
  */
 public class DictionaryToMap {
 
-    private Dictionary dictionary;
-    private DictionaryCatalogSet<ObjectDictionaryFile> destinationFiles;
+    private final Dictionary dictionary;
+    private final DictionaryCatalogSet<ObjectDictionaryFile> destinationFiles;
 
     /**
      * Initialize with the given map destination directory, using the properties file(usually file_properties.xml)

@@ -27,8 +27,8 @@ public enum DictionaryFileType {
         return ALL_TYPES;
     }
 
-    private transient String name;
-    private transient DictionaryElementType elementType;
+    private final transient String name;
+    private final transient DictionaryElementType elementType;
 
     private DictionaryFileType(String type, DictionaryElementType elementType) {
         name = type;

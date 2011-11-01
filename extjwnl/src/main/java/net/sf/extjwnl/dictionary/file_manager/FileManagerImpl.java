@@ -44,7 +44,8 @@ public class FileManagerImpl implements FileManager {
     public static final String CACHE_USE_COUNT_KEY = "cache_use_count";
     private boolean cacheUseCount = false;
 
-    private Map<String, Integer> useCountCache = new HashMap<String, Integer>();
+    private final Map<String, Integer> useCountCache = new HashMap<String, Integer>();
+
     /**
      * Random number generator used by getRandomLineOffset().
      */
@@ -53,7 +54,7 @@ public class FileManagerImpl implements FileManager {
     /**
      * The catalog set.
      */
-    private DictionaryCatalogSet<RandomAccessDictionaryFile> files;
+    private final DictionaryCatalogSet<RandomAccessDictionaryFile> files;
 
     public FileManagerImpl(Dictionary dictionary, Map<String, Param> params) throws JWNLException {
         try {
@@ -62,9 +63,8 @@ public class FileManagerImpl implements FileManager {
             files.open();
 
             try {
-                Class fileClass;
                 try {
-                    fileClass = Class.forName(params.get(DictionaryCatalog.DICTIONARY_FILE_TYPE_KEY).getValue());
+                    Class fileClass = Class.forName(params.get(DictionaryCatalog.DICTIONARY_FILE_TYPE_KEY).getValue());
                     if (!RandomAccessDictionaryFile.class.isAssignableFrom(fileClass)) {
                         throw new JWNLRuntimeException("DICTIONARY_EXCEPTION_003", fileClass);
                     }
@@ -250,8 +250,8 @@ public class FileManagerImpl implements FileManager {
             while (true) {
                 midpoint = (start + stop) / 2;
                 file.seek(midpoint);
-                file.readLine();
-                offset = file.getFilePointer();
+                file.readLine();//without synchronization inside PRADF, this sometimes returned garbage.
+                offset = file.getFilePointer();//and the pointer was moved by another thread
                 if (stop == offset) { //we are at eof
                     file.seek(start);
                     offset = file.getFilePointer();
@@ -291,15 +291,17 @@ public class FileManagerImpl implements FileManager {
 
     public long getFirstLinePointer(POS pos, DictionaryFileType fileType) throws IOException {
         long offset = 0;
-        long oldOffset = -1;
         RandomAccessDictionaryFile file = getFile(pos, fileType);
-        file.seek(offset);
-        for (String line = file.readLineWord(); line == null || line.trim().length() == 0; line = file.readLineWord()) {
-            offset = getNextLinePointer(pos, fileType, offset);
-            if (oldOffset == offset) {
-                break;
+        synchronized (file) {
+            file.seek(offset);
+            long oldOffset = -1;
+            for (String line = file.readLineWord(); line == null || line.trim().length() == 0; line = file.readLineWord()) {
+                offset = getNextLinePointer(pos, fileType, offset);
+                if (oldOffset == offset) {
+                    break;
+                }
+                oldOffset = offset;
             }
-            oldOffset = offset;
         }
         return offset;
     }
@@ -312,7 +314,7 @@ public class FileManagerImpl implements FileManager {
         this.dictionary = dictionary;
     }
 
-    public void save() throws IOException, JWNLException {
+    public synchronized void save() throws IOException, JWNLException {
         files.delete();
         files.open();
 

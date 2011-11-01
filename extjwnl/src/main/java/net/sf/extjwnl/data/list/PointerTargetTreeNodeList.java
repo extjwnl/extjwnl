@@ -183,7 +183,7 @@ public class PointerTargetTreeNodeList extends LinkedList<PointerTargetTreeNode>
      * Operation that is used for finding the specified node in a tree.
      */
     public static class FindNodeOperation implements Operation {
-        private PointerTargetTreeNode node;
+        private final PointerTargetTreeNode node;
 
         public FindNodeOperation(PointerTargetTreeNode node) {
             this.node = node;
@@ -201,7 +201,7 @@ public class PointerTargetTreeNodeList extends LinkedList<PointerTargetTreeNode>
      * Operation that is used for finding the node(s) in a tree that have the specified <code>PointerTarget</code>.
      */
     public static class FindTargetOperation implements Operation {
-        private PointerTarget target;
+        private final PointerTarget target;
 
         public FindTargetOperation(PointerTarget target) {
             this.target = target;

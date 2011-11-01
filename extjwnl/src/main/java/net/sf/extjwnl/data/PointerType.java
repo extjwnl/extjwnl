@@ -243,9 +243,9 @@ public enum PointerType {
         return Collections.unmodifiableList(types);
     }
 
-    private transient String label;
-    private transient int flags;
-    private transient String key;
+    private final transient String label;
+    private final transient int flags;
+    private final transient String key;
     /**
      * The PointerType that is the revers of this PointerType
      */

@@ -21,8 +21,8 @@ import java.util.Map;
  */
 public class DictionaryCatalogSet<E extends DictionaryFile> implements Owned {
 
-    private Map<DictionaryFileType, DictionaryCatalog<E>> catalogs = new EnumMap<DictionaryFileType, DictionaryCatalog<E>>(DictionaryFileType.class);
-    private Dictionary dictionary;
+    private final Map<DictionaryFileType, DictionaryCatalog<E>> catalogs;
+    private final Dictionary dictionary;
 
     /**
      * Creates a catalog set of the specified type of file using files in the specified dictionary directory.
@@ -34,6 +34,7 @@ public class DictionaryCatalogSet<E extends DictionaryFile> implements Owned {
      */
     public DictionaryCatalogSet(Dictionary dictionary, Map<String, Param> params, Class desiredDictionaryFileType) throws JWNLException {
         this.dictionary = dictionary;
+        this.catalogs = new EnumMap<DictionaryFileType, DictionaryCatalog<E>>(DictionaryFileType.class);
         for (DictionaryFileType d : DictionaryFileType.getAllDictionaryFileTypes()) {
             DictionaryCatalog<E> cat = new DictionaryCatalog<E>(dictionary, d, desiredDictionaryFileType, params);
             catalogs.put(cat.getKey(), cat);
@@ -90,7 +91,7 @@ public class DictionaryCatalogSet<E extends DictionaryFile> implements Owned {
     }
 
     public void setDictionary(Dictionary dictionary) {
-        this.dictionary = dictionary;
+        throw new UnsupportedOperationException();
     }
 
     public void save() throws IOException, JWNLException {

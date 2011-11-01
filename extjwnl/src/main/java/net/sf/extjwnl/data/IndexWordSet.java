@@ -16,8 +16,8 @@ public class IndexWordSet {
     /**
      * Map of IndexWords in this set.
      */
-    private Map<POS, IndexWord> indexWords = new EnumMap<POS, IndexWord>(POS.class);
-    private String lemma;
+    private final Map<POS, IndexWord> indexWords = new EnumMap<POS, IndexWord>(POS.class);
+    private final String lemma;
 
     public IndexWordSet(String lemma) {
         this.lemma = lemma;
@@ -115,7 +115,7 @@ public class IndexWordSet {
         if (size() == 0) {
             str = JWNL.resolveMessage("DATA_TOSTRING_003");
         } else {
-            StringBuffer buf = new StringBuffer();
+            StringBuilder buf = new StringBuilder();
             for (POS o : getValidPOSSet()) {
                 buf.append(getIndexWord(o).toString());
             }

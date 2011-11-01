@@ -11,7 +11,7 @@ import java.util.List;
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class ValueParam extends AbstractValueParam {
-    private String value;
+    private final String value;
 
     public ValueParam(Dictionary dictionary, String value) {
         super(dictionary);

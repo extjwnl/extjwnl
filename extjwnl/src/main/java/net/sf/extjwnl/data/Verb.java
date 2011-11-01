@@ -19,7 +19,7 @@ public class Verb extends Word {
      * A bit array of all the verb frames that are valid for this word.
      * see {@link VerbFrame} for more explanation.
      */
-    private BitSet verbFrameFlags;
+    private final BitSet verbFrameFlags;
 
     public Verb(Dictionary dictionary, Synset synset, int index, String lemma, BitSet verbFrameFlags) {
         super(dictionary, synset, index, lemma);
@@ -40,7 +40,7 @@ public class Verb extends Word {
 
     private String getVerbFramesAsString() {
         String[] frames = getVerbFrames();
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         for (int i = 0; i < frames.length; i++) {
             buf.append(frames[i]);
             if (i != frames.length - 1) {

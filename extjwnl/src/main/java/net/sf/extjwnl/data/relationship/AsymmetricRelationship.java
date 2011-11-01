@@ -20,7 +20,7 @@ public class AsymmetricRelationship extends Relationship {
      * The index of the node in the relationship that represents the point
      * at which the source and target nodes' ancestries diverge.
      */
-    private int commonParentIndex;
+    private final int commonParentIndex;
     private transient int cachedRelativeTargetDepth = -1;
 
     public AsymmetricRelationship(

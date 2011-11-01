@@ -98,8 +98,8 @@ public abstract class AbstractPrincetonDictionaryFile extends AbstractDictionary
     }
 
     private static final class FileNames {
-        String windowsFileTypeName;
-        String nonWindowsFileTypeName;
+        private final String windowsFileTypeName;
+        private final String nonWindowsFileTypeName;
 
         public FileNames(String windowsFileTypeName, String nonWindowsFileTypeName) {
             this.windowsFileTypeName = windowsFileTypeName;

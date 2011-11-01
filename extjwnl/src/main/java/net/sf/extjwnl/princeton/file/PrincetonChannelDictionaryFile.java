@@ -42,32 +42,34 @@ public class PrincetonChannelDictionaryFile extends AbstractPrincetonRandomAcces
 
     public String readLine() throws IOException {
         if (isOpen()) {
-            //The following lines gratuitously lifted from java.io.RandomAccessFile.readLine()
-            StringBuffer input = new StringBuffer();
-            char c = (char) -1;
-            boolean eol = false;
+            synchronized (file) {
+                //The following lines gratuitously lifted from java.io.RandomAccessFile.readLine()
+                StringBuilder input = new StringBuilder();
+                char c = (char) -1;
+                boolean eol = false;
 
-            while (!eol) {
-                c = buffer.get((int) getFilePointer());
-                buffer.position((int) getFilePointer() + 1);
+                while (!eol) {
+                    c = buffer.get((int) getFilePointer());
+                    buffer.position((int) getFilePointer() + 1);
 
-                switch (c) {
-                    case (char) -1:
-                    case '\n':
-                        eol = true;
-                        break;
-                    case '\r':
-                        eol = true;
-                        if ((buffer.get((int) getFilePointer() + 1)) == '\n') {
-                            buffer.position((int) getFilePointer() + 1);
-                        }
-                        break;
-                    default:
-                        input.append(c);
-                        break;
+                    switch (c) {
+                        case (char) -1:
+                        case '\n':
+                            eol = true;
+                            break;
+                        case '\r':
+                            eol = true;
+                            if ((buffer.get((int) getFilePointer() + 1)) == '\n') {
+                                buffer.position((int) getFilePointer() + 1);
+                            }
+                            break;
+                        default:
+                            input.append(c);
+                            break;
+                    }
                 }
+                return ((c == -1) && (input.length() == 0)) ? null : input.toString();
             }
-            return ((c == -1) && (input.length() == 0)) ? null : input.toString();
         } else {
             throw new JWNLRuntimeException("PRINCETON_EXCEPTION_001");
         }
@@ -75,23 +77,29 @@ public class PrincetonChannelDictionaryFile extends AbstractPrincetonRandomAcces
 
     public String readLineWord() throws IOException {
         if (isOpen()) {
-            StringBuilder input = new StringBuilder();
-            int c;
-            while (((c = read()) != -1) && c != '\n' && c != '\r' && c != ' ') {
-                input.append((char) c);
+            synchronized (file) {
+                StringBuilder input = new StringBuilder();
+                int c;
+                while (((c = read()) != -1) && c != '\n' && c != '\r' && c != ' ') {
+                    input.append((char) c);
+                }
+                return input.toString();
             }
-            return input.toString();
         } else {
             throw new JWNLRuntimeException("PRINCETON_EXCEPTION_001");
         }
     }
 
     public void seek(long pos) throws IOException {
-        buffer.position((int) pos);
+        synchronized (file) {
+            buffer.position((int) pos);
+        }
     }
 
     public long getFilePointer() throws IOException {
-        return (long) buffer.position();
+        synchronized (file) {
+            return (long) buffer.position();
+        }
     }
 
     public boolean isOpen() {

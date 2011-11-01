@@ -33,11 +33,12 @@ public class DictionaryCatalog<E extends DictionaryFile> implements Owned {
      */
     public static final String DICTIONARY_FILE_TYPE_KEY = "file_type";
 
-    private Map<POS, E> files = new EnumMap<POS, E>(POS.class);
-    private DictionaryFileType fileType;
-    private Dictionary dictionary;
+    private final Map<POS, E> files;
+    private final DictionaryFileType fileType;
+    private final Dictionary dictionary;
 
     public DictionaryCatalog(Dictionary dictionary, DictionaryFileType fileType, Class desiredDictionaryFileType, Map<String, Param> params) throws JWNLException {
+        this.files = new EnumMap<POS, E>(POS.class);
         this.dictionary = dictionary;
         this.fileType = fileType;
 
@@ -126,7 +127,7 @@ public class DictionaryCatalog<E extends DictionaryFile> implements Owned {
     }
 
     public void setDictionary(Dictionary dictionary) {
-        this.dictionary = dictionary;
+        throw new UnsupportedOperationException();
     }
 
     public void save() throws IOException, JWNLException {

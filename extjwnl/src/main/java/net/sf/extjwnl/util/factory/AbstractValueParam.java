@@ -17,8 +17,8 @@ import java.util.Map;
  */
 public abstract class AbstractValueParam implements Param {
 
-    protected Dictionary dictionary;
-    private Map<String, Param> paramMap = new HashMap<String, Param>();
+    protected final Dictionary dictionary;
+    private final Map<String, Param> paramMap = new HashMap<String, Param>();
 
     protected AbstractValueParam(Dictionary dictionary) {
         this.dictionary = dictionary;

@@ -51,8 +51,8 @@ public class Examples {
     private IndexWord CAT;
     private IndexWord FUNNY;
     private IndexWord DROLL;
-    private String MORPH_PHRASE = "running-away";
-    private Dictionary dictionary;
+    private final String MORPH_PHRASE = "running-away";
+    private final Dictionary dictionary;
 
     public Examples(Dictionary dictionary) throws JWNLException {
         this.dictionary = dictionary;

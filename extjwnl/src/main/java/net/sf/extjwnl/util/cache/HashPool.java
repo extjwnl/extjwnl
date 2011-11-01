@@ -9,7 +9,7 @@ import java.util.HashMap;
  */
 public class HashPool<T> implements Pool<T> {
 
-    private HashMap<T, T> cache = new HashMap<T, T>();
+    private final HashMap<T, T> cache = new HashMap<T, T>();
 
     public T replace(T object) {
         T result = cache.get(object);

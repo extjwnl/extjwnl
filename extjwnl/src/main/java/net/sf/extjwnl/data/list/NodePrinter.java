@@ -123,7 +123,7 @@ public abstract class NodePrinter<E extends Node> {
      * Wrapper for a NodeListIterator that allows the next pointer to be moved to any index.
      */
     private static final class NodeListIteratorWrapper<E extends Node> {
-        private ListIterator<E> itr;
+        private final ListIterator<E> itr;
 
         public NodeListIteratorWrapper(ListIterator<E> itr) {
             this.itr = itr;

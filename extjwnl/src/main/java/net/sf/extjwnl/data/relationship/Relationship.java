@@ -25,14 +25,14 @@ public abstract class Relationship {
     /**
      * The nodes that comprise the relationship.
      */
-    private PointerTargetNodeList nodes;
+    private final PointerTargetNodeList nodes;
     /**
      * The relationship's type
      */
-    private PointerType type;
+    private final PointerType type;
 
-    private Synset sourceSynset;
-    private Synset targetSynset;
+    private final Synset sourceSynset;
+    private final Synset targetSynset;
 
     protected Relationship(PointerType type, PointerTargetNodeList nodes, Synset sourceSynset, Synset targetSynset) {
         this.type = type;

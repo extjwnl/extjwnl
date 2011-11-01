@@ -8,7 +8,7 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 /**
- * Contains system info as well as JWNL properties.
+ * Contains system info and JWNL properties.
  *
  * @author John Didion <jdidion@didion.net>
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
@@ -119,7 +119,7 @@ public class JWNL {
     }
 
     private static String insertParams(String str, Object[] params) {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         int startIndex = 0;
         for (int i = 0; i < params.length && startIndex <= str.length(); i++) {
             int endIndex = str.indexOf("{" + i, startIndex);
@@ -137,7 +137,7 @@ public class JWNL {
      * Used to create constants that represent the major categories of operating systems.
      */
     public static final class OS {
-        private String name;
+        private final String name;
 
         protected OS(String name) {
             this.name = name;

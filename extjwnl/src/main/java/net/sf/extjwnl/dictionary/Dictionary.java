@@ -85,13 +85,13 @@ public abstract class Dictionary {
     // temporary variable, used for loading from maps
     private static Dictionary restore;
 
-    protected Map<String, Param> params;
+    protected final Map<String, Param> params;
 
-    private Version version;
+    private final Version version;
 
-    private MorphologicalProcessor morph = null;
+    private final MorphologicalProcessor morph;
 
-    private boolean editable;
+    private volatile boolean editable;
 
     private static final String DEFAULT_FILE_DICTIONARY_PATH = "./data/wn30";
     private static final String DEFAULT_MAP_DICTIONARY_PATH = "./data/map";
@@ -105,7 +105,7 @@ public abstract class Dictionary {
     };
 
     // stores max offset for each POS
-    protected Map<POS, Long> maxOffset = new EnumMap<POS, Long>(POS.class);
+    protected final Map<POS, Long> maxOffset = new EnumMap<POS, Long>(POS.class);
 
     /**
      * Represents a version of WordNet.
@@ -113,9 +113,9 @@ public abstract class Dictionary {
     public static final class Version {
         private static final String UNSPECIFIED = "unspecified";
 
-        private String publisher;
-        private double number;
-        private Locale locale;
+        private final String publisher;
+        private final double number;
+        private final Locale locale;
 
         public Version(String publisher, double number, Locale locale) {
             if (publisher == null) {
@@ -290,38 +290,25 @@ public abstract class Dictionary {
         if (log.isInfoEnabled()) {
             log.info(JWNL.resolveMessage("DICTIONARY_INFO_002", dictionary));
         }
-        Dictionary.dictionary = dictionary;
+        synchronized (Dictionary.class) {
+            Dictionary.dictionary = dictionary;
+        }
         return dictionary;
     }
 
-    public static void uninstall() {
+    public synchronized static void uninstall() {
         if (dictionary != null) {
             dictionary.close();
             dictionary = null;
         }
     }
 
-    public static void setRestoreDictionary(Dictionary dictionary) {
+    public synchronized static void setRestoreDictionary(Dictionary dictionary) {
         restore = dictionary;
     }
 
     public static Dictionary getRestoreDictionary() {
         return restore;
-    }
-
-    /**
-     * Create a Dictionary that does not do morphological processing.
-     */
-    protected Dictionary() {
-    }
-
-    /**
-     * Create a Dictionary using the specified MorphologicalProcessor.
-     *
-     * @param morph MorphologicalProcessor to use
-     */
-    protected Dictionary(MorphologicalProcessor morph) {
-        this.morph = morph;
     }
 
     protected Dictionary(Document doc) throws JWNLException {
@@ -366,8 +353,7 @@ public abstract class Dictionary {
         }
 
         Param param = params.get(MORPH);
-        MorphologicalProcessor morph = (param == null) ? null : (MorphologicalProcessor) param.create();
-        this.setMorphologicalProcessor(morph);
+        morph = (param == null) ? null : (MorphologicalProcessor) param.create();
 
         if (params.containsKey(EDIT_MANAGE_SYMMETRIC_POINTERS)) {
             editManageSymmetricPointers = Boolean.parseBoolean(params.get(EDIT_MANAGE_SYMMETRIC_POINTERS).getValue());
@@ -493,10 +479,6 @@ public abstract class Dictionary {
         return morph;
     }
 
-    public void setMorphologicalProcessor(MorphologicalProcessor morph) {
-        this.morph = morph;
-    }
-
     /**
      * Looks up a word <var>lemma</var>. First tries a normal lookup. If that doesn't work,
      * tries looking up the stemmed form of the lemma.
@@ -559,7 +541,7 @@ public abstract class Dictionary {
      *
      * @throws JWNLException JWNLException
      */
-    public void edit() throws JWNLException {
+    public synchronized void edit() throws JWNLException {
         if (!editable) {
             editable = true;
         }
@@ -570,7 +552,7 @@ public abstract class Dictionary {
      *
      * @throws JWNLException JWNLException
      */
-    public void save() throws JWNLException {
+    public synchronized void save() throws JWNLException {
         if (!isEditable()) {
             throw new JWNLException("DICTIONARY_EXCEPTION_029");
         }
@@ -626,7 +608,7 @@ public abstract class Dictionary {
         }
     }
 
-    public void delete() throws JWNLException {
+    public synchronized void delete() throws JWNLException {
         //nop
     }
 
@@ -758,7 +740,7 @@ public abstract class Dictionary {
      * @param synset synset to remove
      * @throws JWNLException JWNLException
      */
-    public void removeSynset(Synset synset) throws JWNLException {
+    public synchronized void removeSynset(Synset synset) throws JWNLException {
         if (!isEditable()) {
             throw new JWNLException("DICTIONARY_EXCEPTION_029");
         }
@@ -817,7 +799,7 @@ public abstract class Dictionary {
      * @param indexWord index word to remove
      * @throws JWNLException JWNLException
      */
-    public void removeIndexWord(IndexWord indexWord) throws JWNLException {
+    public synchronized void removeIndexWord(IndexWord indexWord) throws JWNLException {
         if (!isEditable()) {
             throw new JWNLException("DICTIONARY_EXCEPTION_029");
         }

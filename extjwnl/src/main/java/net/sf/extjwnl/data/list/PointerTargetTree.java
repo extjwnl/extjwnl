@@ -14,7 +14,7 @@ import java.util.List;
  */
 public class PointerTargetTree {
 
-    private PointerTargetTreeNode rootNode;
+    private final PointerTargetTreeNode rootNode;
 
     public PointerTargetTree(PointerTargetTreeNode rootNode) {
         this.rootNode = rootNode;

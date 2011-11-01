@@ -72,9 +72,9 @@ public class DatabaseManagerImpl implements DatabaseManager {
 
     protected static final Random rand = new Random(new Date().getTime());
 
-    protected ConnectionManager connectionManager;
-    protected Map<POS, MinMax> minMaxIds = new EnumMap<POS, MinMax>(POS.class);
-    protected Dictionary dictionary;
+    protected final ConnectionManager connectionManager;
+    protected final Map<POS, MinMax> minMaxIds;
+    protected final Dictionary dictionary;
 
     public DatabaseManagerImpl(Dictionary dictionary, Map<String, Param> params) throws JWNLException {
         String driverClassName = params.containsKey(DRIVER) ? params.get(DRIVER).getValue() : null;
@@ -89,6 +89,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
         }
 
         this.dictionary = dictionary;
+        this.minMaxIds = new EnumMap<POS, MinMax>(POS.class);
     }
 
     public Query getIndexWordSynsetsQuery(POS pos, String lemma) throws JWNLException {
@@ -103,7 +104,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
         return createPOSStringQuery(pos, "%" + substring + "%", ALL_LEMMAS_LIKE_SQL);
     }
 
-    public Query getRandomIndexWordQuery(POS pos) throws JWNLException {
+    public synchronized Query getRandomIndexWordQuery(POS pos) throws JWNLException {
         MinMax minMax = minMaxIds.get(pos);
         if (minMax == null) {
             Query query = createPOSQuery(pos, COUNT_INDEX_WORDS_SQL);
@@ -124,9 +125,9 @@ public class DatabaseManagerImpl implements DatabaseManager {
         return createPOSIdQuery(pos, id, LEMMA_FOR_INDEX_WORD_ID_SQL);
     }
 
-    private class MinMax {
-        private int min;
-        private int max;
+    private final static class MinMax {
+        private final int min;
+        private final int max;
 
         public MinMax(int min, int max) {
             this.min = min;
@@ -234,6 +235,6 @@ public class DatabaseManagerImpl implements DatabaseManager {
     }
 
     public void setDictionary(Dictionary dictionary) {
-        this.dictionary = dictionary;
+        throw new UnsupportedOperationException();
     }
 }

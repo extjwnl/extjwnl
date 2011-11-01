@@ -20,7 +20,7 @@ import java.util.List;
  * @author Brett Walenz <bwalenz@users.sourceforge.net>
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
-public abstract class DictionaryTester {
+public class DictionaryTester {
 
     /**
      * The offset for wn30.
@@ -64,8 +64,16 @@ public abstract class DictionaryTester {
 
     protected Dictionary dictionary;
 
+    public DictionaryTester() {
+    }
+
+    public DictionaryTester(Dictionary dictionary) {
+        this.dictionary = dictionary;
+    }
+
     @Before
-    public abstract void initDictionary() throws IOException, JWNLException;
+    public void initDictionary() throws IOException, JWNLException {
+    }
 
     @Test
     public void testTank() throws JWNLException {
@@ -201,5 +209,19 @@ public abstract class DictionaryTester {
         Verb v = (Verb) w;
         Assert.assertTrue(v.getVerbFrameFlags().get(8));
         Assert.assertTrue(v.getVerbFrameFlags().get(11));
+    }
+
+    public void runAllTests() throws JWNLException, CloneNotSupportedException {
+        testTank();
+        testComplete();
+        testCycles();
+        testLexFileNumber();
+        testAntonym();
+        testExceptions();
+        testDerivedForms();
+        testRunningAway();
+        testFairSenseKey();
+        testOnline();
+        testVerbFrames();
     }
 }

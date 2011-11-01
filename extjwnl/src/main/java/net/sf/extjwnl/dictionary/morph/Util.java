@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class Util {
     public static String getLemma(String[] tokens, BitSet bits, String delimiter) {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         for (int i = 0; i < tokens.length; i++) {
             if (i != 0 && !bits.get(i - 1)) {
                 buf.append(delimiter);
@@ -36,14 +36,14 @@ public class Util {
     public static String[] split(String str) {
         char[] chars = str.toCharArray();
         List<String> tokens = new ArrayList<String>();
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         for (char aChar : chars) {
             if ((aChar >= 'a' && aChar <= 'z') || aChar == '\'') {
                 buf.append(aChar);
             } else {
                 if (buf.length() > 0) {
                     tokens.add(buf.toString());
-                    buf = new StringBuffer();
+                    buf = new StringBuilder();
                 }
             }
         }

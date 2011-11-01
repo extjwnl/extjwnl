@@ -54,8 +54,8 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
      */
     public static final String EXCEPTION_WORD_CACHE_SIZE = "exception_word_cache_size";
 
-    private FileManager fileManager = null;
-    private FileDictionaryElementFactory factory = null;
+    private final FileManager fileManager;
+    private final FileDictionaryElementFactory factory;
 
     public FileBackedDictionary(Document doc) throws JWNLException {
         super(doc);
@@ -95,7 +95,7 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
     }
 
     @Override
-    public void delete() throws JWNLException {
+    public synchronized void delete() throws JWNLException {
         try {
             fileManager.delete();
         } catch (IOException e) {
@@ -274,8 +274,8 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
 
         private boolean more = true;
 
-        protected POS pos;
-        protected DictionaryFileType fileType;
+        protected final POS pos;
+        protected final DictionaryFileType fileType;
 
         public FileLookaheadIterator(POS pos, DictionaryFileType fileType) {
             this.pos = pos;
@@ -311,11 +311,8 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
             return more;
         }
 
-        /**
-         * This method can be over-ridden to remove the currently pointed-at object
-         * from the data source backing the iterator.
-         */
         public void remove() {
+            throw new UnsupportedOperationException();
         }
 
         /**
@@ -369,7 +366,7 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
     }
 
     private class SubstringIndexFileLookaheadIterator extends IndexFileLookaheadIterator {
-        private String substring = null;
+        private final String substring;
 
         public SubstringIndexFileLookaheadIterator(POS pos, String substring) throws JWNLException {
             super(pos);
@@ -387,20 +384,22 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
     }
 
     @Override
-    public void edit() throws JWNLException {
-        if (!isCachingEnabled()) {
-            throw new JWNLException("DICTIONARY_EXCEPTION_030");
-        }
-        super.edit();
-        try {
-            fileManager.edit();
-        } catch (IOException e) {
-            throw new JWNLException("EXCEPTION_001", e.getMessage(), e);
+    public synchronized void edit() throws JWNLException {
+        if (!isEditable()) {
+            if (!isCachingEnabled()) {
+                throw new JWNLException("DICTIONARY_EXCEPTION_030");
+            }
+            super.edit();
+            try {
+                fileManager.edit();
+            } catch (IOException e) {
+                throw new JWNLException("EXCEPTION_001", e.getMessage(), e);
+            }
         }
     }
 
     @Override
-    public void save() throws JWNLException {
+    public synchronized void save() throws JWNLException {
         try {
             super.save();
             fileManager.save();
@@ -410,7 +409,7 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
     }
 
     @Override
-    public void cacheAll() throws JWNLException {
+    public synchronized void cacheAll() throws JWNLException {
         if (factory instanceof AbstractPrincetonDictionaryElementFactory) {
             ((AbstractPrincetonDictionaryElementFactory) factory).startCaching();
         }

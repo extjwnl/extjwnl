@@ -3,7 +3,6 @@ package net.sf.extjwnl.dictionary;
 import net.sf.extjwnl.JWNLException;
 import org.junit.Test;
 
-import java.awt.*;
 import java.io.FileInputStream;
 import java.io.IOException;
 

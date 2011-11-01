@@ -78,6 +78,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
      * found empirically by testing wnb.exe for crashes. It equals 15360.
      */
     public static final String CHECK_DATA_FILE_LINE_LENGTH_LIMIT_KEY = "check_data_file_line_length_limit";
+    private static final int dataFileLineLengthLimit = 15360;
     private boolean checkDataFileLineLengthLimit = true;
 
     protected RandomAccessFile raFile = null;
@@ -260,53 +261,55 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
 
     public String readLine() throws IOException {
         if (isOpen()) {
-            if (null == encoding) {
-                return raFile.readLine();
-            } else {
-                int c = -1;
-                boolean eol = false;
-                int idx = 1;
+            synchronized (file) {
+                if (null == encoding) {
+                    return raFile.readLine();
+                } else {
+                    int c = -1;
+                    boolean eol = false;
+                    int idx = 1;
 
-                while (!eol) {
-                    switch (c = read()) {
-                        case -1:
-                        case '\n':
-                            eol = true;
-                            break;
-                        case '\r':
-                            eol = true;
-                            long cur = getFilePointer();
-                            if ((read()) != '\n') {
-                                seek(cur);
+                    while (!eol) {
+                        switch (c = read()) {
+                            case -1:
+                            case '\n':
+                                eol = true;
+                                break;
+                            case '\r':
+                                eol = true;
+                                long cur = getFilePointer();
+                                if ((read()) != '\n') {
+                                    seek(cur);
+                                }
+                                break;
+                            default: {
+                                lineArr[idx - 1] = (byte) c;
+                                idx++;
+                                if (LINE_MAX == idx) {
+                                    byte[] t = new byte[LINE_MAX * 2];
+                                    System.arraycopy(lineArr, 0, t, 0, LINE_MAX);
+                                    lineArr = t;
+                                    LINE_MAX = 2 * LINE_MAX;
+                                }
+                                break;
                             }
-                            break;
-                        default: {
-                            lineArr[idx - 1] = (byte) c;
-                            idx++;
-                            if (LINE_MAX == idx) {
-                                byte[] t = new byte[LINE_MAX * 2];
-                                System.arraycopy(lineArr, 0, t, 0, LINE_MAX);
-                                lineArr = t;
-                                LINE_MAX = 2 * LINE_MAX;
-                            }
-                            break;
                         }
                     }
-                }
 
-                if ((c == -1) && (1 == idx)) {
-                    return null;
-                }
-                if (1 < idx) {
-                    ByteBuffer bb = ByteBuffer.wrap(lineArr, 0, idx - 1);
-                    try {
-                        CharBuffer cb = decoder.decode(bb);
-                        return cb.toString();
-                    } catch (MalformedInputException e) {
-                        return " ";
+                    if ((c == -1) && (1 == idx)) {
+                        return null;
                     }
-                } else {
-                    return null;
+                    if (1 < idx) {
+                        ByteBuffer bb = ByteBuffer.wrap(lineArr, 0, idx - 1);
+                        try {
+                            CharBuffer cb = decoder.decode(bb);
+                            return cb.toString();
+                        } catch (MalformedInputException e) {
+                            return " ";
+                        }
+                    } else {
+                        return null;
+                    }
                 }
             }
         } else {
@@ -316,33 +319,35 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
 
     public String readLineWord() throws IOException {
         if (isOpen()) {
-            //in data files offset needs no decoding, it is numeric
-            if (null == encoding || DictionaryFileType.DATA == getFileType()) {
-                StringBuffer input = new StringBuffer();
-                int c;
-                while (((c = raFile.read()) != -1) && c != '\n' && c != '\r' && c != ' ') {
-                    input.append((char) c);
-                }
-                return input.toString();
-            } else {
-                int idx = 1;
-                int c;
-                while (((c = raFile.read()) != -1) && c != '\n' && c != '\r' && c != ' ') {
-                    lineArr[idx - 1] = (byte) c;
-                    idx++;
-                    if (LINE_MAX == idx) {
-                        byte[] t = new byte[LINE_MAX * 2];
-                        System.arraycopy(lineArr, 0, t, 0, LINE_MAX);
-                        lineArr = t;
-                        LINE_MAX = 2 * LINE_MAX;
+            synchronized (file) {
+                //in data files offset needs no decoding, it is numeric
+                if (null == encoding || DictionaryFileType.DATA == getFileType()) {
+                    StringBuilder input = new StringBuilder();
+                    int c;
+                    while (((c = raFile.read()) != -1) && c != '\n' && c != '\r' && c != ' ') {
+                        input.append((char) c);
                     }
-                }
-                if (1 < idx) {
-                    ByteBuffer bb = ByteBuffer.wrap(lineArr, 0, idx - 1);
-                    CharBuffer cb = decoder.decode(bb);
-                    return cb.toString();
+                    return input.toString();
                 } else {
-                    return "";
+                    int idx = 1;
+                    int c;
+                    while (((c = raFile.read()) != -1) && c != '\n' && c != '\r' && c != ' ') {
+                        lineArr[idx - 1] = (byte) c;
+                        idx++;
+                        if (LINE_MAX == idx) {
+                            byte[] t = new byte[LINE_MAX * 2];
+                            System.arraycopy(lineArr, 0, t, 0, LINE_MAX);
+                            lineArr = t;
+                            LINE_MAX = 2 * LINE_MAX;
+                        }
+                    }
+                    if (1 < idx) {
+                        ByteBuffer bb = ByteBuffer.wrap(lineArr, 0, idx - 1);
+                        CharBuffer cb = decoder.decode(bb);
+                        return cb.toString();
+                    } else {
+                        return "";
+                    }
                 }
             }
         } else {
@@ -351,11 +356,15 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
     }
 
     public void seek(long pos) throws IOException {
-        raFile.seek(pos);
+        synchronized (file) {
+            raFile.seek(pos);
+        }
     }
 
     public long getFilePointer() throws IOException {
-        return raFile.getFilePointer();
+        synchronized (file) {
+            return raFile.getFilePointer();
+        }
     }
 
     public boolean isOpen() {
@@ -363,17 +372,19 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
     }
 
     public void close() {
-        try {
-            if (null != raFile) {
-                raFile.close();
+        synchronized (file) {
+            try {
+                if (null != raFile) {
+                    raFile.close();
+                }
+                super.close();
+            } catch (Exception e) {
+                if (log.isErrorEnabled()) {
+                    log.error(JWNL.resolveMessage("EXCEPTION_001", e.getMessage()), e);
+                }
+            } finally {
+                raFile = null;
             }
-            super.close();
-        } catch (Exception e) {
-            if (log.isErrorEnabled()) {
-                log.error(JWNL.resolveMessage("EXCEPTION_001", e.getMessage()), e);
-            }
-        } finally {
-            raFile = null;
         }
     }
 
@@ -389,20 +400,25 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
         } else {
             raFile = new RandomAccessFile(file, READ_ONLY);
         }
-
     }
 
     public void edit() throws IOException {
-        raFile.close();
-        raFile = new RandomAccessFile(file, READ_WRITE);
+        synchronized (file) {
+            raFile.close();
+            raFile = new RandomAccessFile(file, READ_WRITE);
+        }
     }
 
     public long length() throws IOException {
-        return raFile.length();
+        synchronized (file) {
+            return raFile.length();
+        }
     }
 
     public int read() throws IOException {
-        return raFile.read();
+        synchronized (file) {
+            return raFile.read();
+        }
     }
 
     public void save() throws IOException, JWNLException {
@@ -420,8 +436,10 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
             }
             Collections.sort(exceptions);
 
-            seek(0);
-            writeStrings(exceptions);
+            synchronized (file) {
+                seek(0);
+                writeStrings(exceptions);
+            }
         } else if (DictionaryFileType.DATA == getFileType()) {
             ArrayList<Synset> synsets = new ArrayList<Synset>();
             Iterator<Synset> si = dictionary.getSynsetIterator(getPOS());
@@ -443,30 +461,32 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
             long counter = 0;
             long total = synsets.size();
             long reportInt = (total / 20) + 1;//i.e. report every 5%
-            seek(0);
-            if (writePrincetonHeader) {
-                if (log.isInfoEnabled()) {
-                    log.info(JWNL.resolveMessage("PRINCETON_INFO_020", getFilename()));
-                }
-                raFile.writeBytes(PRINCETON_HEADER);
-            }
-            if (log.isInfoEnabled()) {
-                log.info(JWNL.resolveMessage("PRINCETON_INFO_021", getFilename()));
-            }
-            for (Synset synset : synsets) {
-                counter++;
-                if (0 == (counter % reportInt)) {
+            synchronized (file) {
+                seek(0);
+                if (writePrincetonHeader) {
                     if (log.isInfoEnabled()) {
-                        log.info(JWNL.resolveMessage("PRINCETON_INFO_014", 100 * counter / total));
+                        log.info(JWNL.resolveMessage("PRINCETON_INFO_020", getFilename()));
                     }
+                    raFile.writeBytes(PRINCETON_HEADER);
                 }
-                String renderedSynset = renderSynset(synset);
-                if (null == encoding) {
-                    raFile.write(renderedSynset.getBytes());
-                } else {
-                    raFile.write(renderedSynset.getBytes(encoding));
+                if (log.isInfoEnabled()) {
+                    log.info(JWNL.resolveMessage("PRINCETON_INFO_021", getFilename()));
                 }
-                raFile.writeBytes("\n");
+                for (Synset synset : synsets) {
+                    counter++;
+                    if (0 == (counter % reportInt)) {
+                        if (log.isInfoEnabled()) {
+                            log.info(JWNL.resolveMessage("PRINCETON_INFO_014", 100 * counter / total));
+                        }
+                    }
+                    String renderedSynset = renderSynset(synset);
+                    if (null == encoding) {
+                        raFile.write(renderedSynset.getBytes());
+                    } else {
+                        raFile.write(renderedSynset.getBytes(encoding));
+                    }
+                    raFile.writeBytes("\n");
+                }
             }
             if (log.isInfoEnabled()) {
                 log.info(JWNL.resolveMessage("PRINCETON_INFO_009", getFilename()));
@@ -486,12 +506,14 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                 log.info(JWNL.resolveMessage("PRINCETON_INFO_005", indexes.size()));
             }
             Collections.sort(indexes);
+            synchronized (file) {
 
-            seek(0);
-            if (writePrincetonHeader) {
-                raFile.writeBytes(PRINCETON_HEADER);
+                seek(0);
+                if (writePrincetonHeader) {
+                    raFile.writeBytes(PRINCETON_HEADER);
+                }
+                writeIndexStrings(indexes);
             }
-            writeIndexStrings(indexes);
         }
         if (log.isInfoEnabled()) {
             log.info(JWNL.resolveMessage("PRINCETON_INFO_012", getFilename()));
@@ -500,70 +522,82 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
 
     @Override
     public void writeLine(String line) throws IOException {
-        if (null == encoding) {
-            raFile.write(line.getBytes());
-        } else {
-            raFile.write(line.getBytes(encoding));
+        synchronized (file) {
+            byte[] bytes;
+            if (null == encoding) {
+                bytes = line.getBytes();
+            } else {
+                bytes = line.getBytes(encoding);
+            }
+            if (checkDataFileLineLengthLimit && bytes.length > dataFileLineLengthLimit) {
+                if (log.isWarnEnabled()) {
+                    log.warn(JWNL.resolveMessage("PRINCETON_WARN_009", new Object[]{getFilename(), dataFileLineLengthLimit, bytes.length}));
+                }
+            }
+            raFile.write(bytes);
+            raFile.writeBytes("\n");
         }
-        raFile.writeBytes("\n");
-
     }
 
     public void writeStrings(Collection<String> strings) throws IOException {
-        if (log.isInfoEnabled()) {
-            log.info(JWNL.resolveMessage("PRINCETON_INFO_008", getFilename()));
-        }
-        long counter = 0;
-        long total = strings.size();
-        long reportInt = (total / 20) + 1;//i.e. report every 5%
-        for (String s : strings) {
-            counter++;
-            if (0 == (counter % reportInt)) {
-                if (log.isInfoEnabled()) {
-                    log.info(JWNL.resolveMessage("PRINCETON_INFO_014", 100 * counter / total));
-                }
+        synchronized (file) {
+            if (log.isInfoEnabled()) {
+                log.info(JWNL.resolveMessage("PRINCETON_INFO_008", getFilename()));
             }
-            writeLine(s);
-        }
-        if (log.isInfoEnabled()) {
-            log.info(JWNL.resolveMessage("PRINCETON_INFO_013", getFilename()));
+            long counter = 0;
+            long total = strings.size();
+            long reportInt = (total / 20) + 1;//i.e. report every 5%
+            for (String s : strings) {
+                counter++;
+                if (0 == (counter % reportInt)) {
+                    if (log.isInfoEnabled()) {
+                        log.info(JWNL.resolveMessage("PRINCETON_INFO_014", 100 * counter / total));
+                    }
+                }
+                writeLine(s);
+            }
+            if (log.isInfoEnabled()) {
+                log.info(JWNL.resolveMessage("PRINCETON_INFO_013", getFilename()));
+            }
         }
     }
 
     public void writeIndexStrings(ArrayList<String> strings) throws IOException {
-        if (log.isInfoEnabled()) {
-            log.info(JWNL.resolveMessage("PRINCETON_INFO_008", getFilename()));
-        }
-        long counter = 0;
-        long total = strings.size();
-        long reportInt = (total / 20) + 1;//i.e. report every 5%
-        //see makedb.c FixLastRecord
-        /* Funky routine to pad the second to the last record of the
-           index file to be longer than the last record so the binary
-           search in the search code works properly. */
-        for (int i = 0; i < strings.size() - 2; i++) {
-            counter++;
-            if (0 == (counter % reportInt)) {
-                if (log.isInfoEnabled()) {
-                    log.info(JWNL.resolveMessage("PRINCETON_INFO_014", 100 * counter / total));
+        synchronized (file) {
+            if (log.isInfoEnabled()) {
+                log.info(JWNL.resolveMessage("PRINCETON_INFO_008", getFilename()));
+            }
+            long counter = 0;
+            long total = strings.size();
+            long reportInt = (total / 20) + 1;//i.e. report every 5%
+            //see makedb.c FixLastRecord
+            /* Funky routine to pad the second to the last record of the
+             index file to be longer than the last record so the binary
+             search in the search code works properly. */
+            for (int i = 0; i < strings.size() - 2; i++) {
+                counter++;
+                if (0 == (counter % reportInt)) {
+                    if (log.isInfoEnabled()) {
+                        log.info(JWNL.resolveMessage("PRINCETON_INFO_014", 100 * counter / total));
+                    }
                 }
+                writeLine(strings.get(i));
             }
-            writeLine(strings.get(i));
-        }
-        if (1 < strings.size()) {
-            String nextToLast = strings.get(strings.size() - 2);
-            String last = strings.get(strings.size() - 1);
-            while (nextToLast.length() <= last.length()) {
-                nextToLast = nextToLast + " ";
+            if (1 < strings.size()) {
+                String nextToLast = strings.get(strings.size() - 2);
+                String last = strings.get(strings.size() - 1);
+                while (nextToLast.length() <= last.length()) {
+                    nextToLast = nextToLast + " ";
+                }
+                writeLine(nextToLast);
+                writeLine(last);
             }
-            writeLine(nextToLast);
-            writeLine(last);
-        }
-        if (log.isInfoEnabled()) {
-            log.info(JWNL.resolveMessage("PRINCETON_INFO_014", 100));
-        }
-        if (log.isInfoEnabled()) {
-            log.info(JWNL.resolveMessage("PRINCETON_INFO_013", getFilename()));
+            if (log.isInfoEnabled()) {
+                log.info(JWNL.resolveMessage("PRINCETON_INFO_014", 100));
+            }
+            if (log.isInfoEnabled()) {
+                log.info(JWNL.resolveMessage("PRINCETON_INFO_013", getFilename()));
+            }
         }
     }
 

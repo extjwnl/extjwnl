@@ -17,6 +17,7 @@ import java.sql.SQLException;
  * @author John Didion <jdidion@didion.net>
  */
 public class ConnectionManager {
+
     private String driverClass;
     private String url;
     private String userName;

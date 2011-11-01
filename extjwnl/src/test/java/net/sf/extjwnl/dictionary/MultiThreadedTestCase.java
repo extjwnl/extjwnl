@@ -24,10 +24,10 @@ public class MultiThreadedTestCase extends TestCase {
     /**
      * Simple constructor.
      *
-     * @param s s
+     * @param name test name
      */
-    public MultiThreadedTestCase(final String s) {
-        super(s);
+    public MultiThreadedTestCase(final String name) {
+        super(name);
     }
 
     /**

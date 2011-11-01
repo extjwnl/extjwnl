@@ -3,6 +3,7 @@ package net.sf.extjwnl.util.cache;
 import net.sf.extjwnl.data.POS;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -15,21 +16,21 @@ public abstract class CacheSet<K, A, B> {
     public static final int DEFAULT_CACHE_CAPACITY = 1000;
 
     //K, V = Cache<A, B>
-    private Map<K, POSCache<A, B>> caches = new HashMap<K, POSCache<A, B>>();
+    private final Map<K, POSCache<A, B>> caches = new HashMap<K, POSCache<A, B>>();
 
-    public CacheSet(K[] keys) {
+    public CacheSet(List<K> keys) {
         this(keys, DEFAULT_CACHE_CAPACITY);
     }
 
-    public CacheSet(K[] keys, int size) {
+    public CacheSet(List<K> keys, int size) {
         for (K key : keys) {
             addCache(key, size);
         }
     }
 
-    public CacheSet(K[] keys, int[] sizes) {
-        for (int i = 0; i < keys.length; i++) {
-            addCache(keys[i], sizes[i]);
+    public CacheSet(List<K> keys, List<Integer> sizes) {
+        for (int i = 0; i < keys.size(); i++) {
+            addCache(keys.get(i), sizes.get(i));
         }
     }
 
@@ -64,7 +65,7 @@ public abstract class CacheSet<K, A, B> {
     public int getCacheSize(K cacheKey) {
         int result = 0;
         for (POS pos : POS.getAllPOS()) {
-            result = result + getCache(cacheKey).getCache(pos).getSize();
+            result = result + getCache(cacheKey).getCache(pos).size();
         }
         return result;
     }
@@ -77,12 +78,10 @@ public abstract class CacheSet<K, A, B> {
         return result;
     }
 
-    public int setCacheCapacity(K cacheKey, int capacity) {
-        int result = 0;
+    public void setCacheCapacity(K cacheKey, int capacity) {
         for (POS pos : POS.getAllPOS()) {
-            result = result + getCache(cacheKey).getCache(pos).setCapacity(capacity);
+            getCache(cacheKey).getCache(pos).setCapacity(capacity);
         }
-        return result;
     }
 
     public int getSize() {

@@ -24,7 +24,7 @@ public class Pointer implements Serializable {
 
     private static final Log log = LogFactory.getLog(Pointer.class);
 
-    private PointerType pointerType;
+    private final PointerType pointerType;
 
     private TargetIndex targetIndex;
 
@@ -34,7 +34,7 @@ public class Pointer implements Serializable {
      * otherwise <code>source</code> is the specific <code>Word</code> object that
      * this pointer applies to.
      */
-    private PointerTarget source;
+    private final PointerTarget source;
 
     /**
      * Cache for the target after it has been resolved.
@@ -222,9 +222,9 @@ public class Pointer implements Serializable {
      * keeping a large portion of the database resident once the target has been queried.
      */
     private static class TargetIndex implements Serializable {
-        POS pos;
-        long offset;
-        int index;
+        private final POS pos;
+        private final long offset;
+        private final int index;
 
         TargetIndex(POS pos, long offset, int index) {
             this.pos = pos;

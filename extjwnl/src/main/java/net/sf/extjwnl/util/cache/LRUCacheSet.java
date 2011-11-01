@@ -1,5 +1,7 @@
 package net.sf.extjwnl.util.cache;
 
+import java.util.List;
+
 /**
  * LeastRecentlyUsed cache set.
  *
@@ -8,15 +10,15 @@ package net.sf.extjwnl.util.cache;
  */
 public class LRUCacheSet<K, A, B> extends CacheSet<K, A, B> {
 
-    public LRUCacheSet(K[] keys) {
+    public LRUCacheSet(List<K> keys) {
         super(keys);
     }
 
-    public LRUCacheSet(K[] keys, int size) {
+    public LRUCacheSet(List<K> keys, int size) {
         super(keys, size);
     }
 
-    public LRUCacheSet(K[] keys, int[] sizes) {
+    public LRUCacheSet(List<K> keys, List<Integer> sizes) {
         super(keys, sizes);
     }
 

@@ -18,6 +18,12 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.googlecode.concurrentlinkedhashmap</groupId>
+            <artifactId>concurrentlinkedhashmap-lru</artifactId>
+            <version>1.2</version>
+        </dependency>
+
+        <dependency>
             <scope>test</scope>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -31,12 +37,14 @@
             <version>5.1.17</version>
         </dependency>
 
+        <!-- logs are nicer, but log4j blocks threads
         <dependency>
             <scope>test</scope>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <version>1.2.14</version>
         </dependency>
+        -->
 
     </dependencies>
 

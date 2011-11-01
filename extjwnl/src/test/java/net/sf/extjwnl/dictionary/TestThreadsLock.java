@@ -26,14 +26,15 @@ public class TestThreadsLock extends MultiThreadedTestCase {
     private final String properties = "./src/main/resources/net/sf/extjwnl/file_properties.xml";
     private final String wordlist = "./data/wn30/noun.exc";
     private static Dictionary d;
+    private final int threadCount = 5;
 
     /**
      * Basic constructor - called by the test runners.
      *
-     * @param s s
+     * @param name test name
      */
-    public TestThreadsLock(String s) {
-        super(s);
+    public TestThreadsLock(String name) {
+        super(name);
     }
 
     public static final String TEST_ALL_TEST_TYPE = "UNIT";
@@ -49,20 +50,15 @@ public class TestThreadsLock extends MultiThreadedTestCase {
         }
 
         @Override
-        public void runTestCase() {
-            try {
-                for (String word : list) {
-                    if (!isInterrupted()) {
-                        log.info(name + " querying for " + word);
-                        d.getMorphologicalProcessor().lookupBaseForm(POS.NOUN, word);
-                        log.info(name + " finished querying for " + word);
-                    } else {
-                        break;
-                    }
+        public void runTestCase() throws JWNLException {
+            for (String word : list) {
+                if (!isInterrupted()) {
+                    log.info(name + " querying for " + word);
+                    d.getMorphologicalProcessor().lookupBaseForm(POS.NOUN, word);
+                    log.info(name + " finished querying for " + word);
+                } else {
+                    break;
                 }
-            } catch (JWNLException e) {
-                handleException(e);
-                interruptThreads();
             }
         }
     }
@@ -79,9 +75,11 @@ public class TestThreadsLock extends MultiThreadedTestCase {
             line = reader.readLine();
         }
 
-        TestCaseRunnable t1 = new LookupThread("t1", list);
-        TestCaseRunnable t2 = new LookupThread("t2", list);
+        TestCaseRunnable[] runnables = new TestCaseRunnable[threadCount];
+        for (int i = 0; i < threadCount; i++) {
+            runnables[i] = new LookupThread("t" + (i + 1), list);
+        }
 
-        runTestCaseRunnables(new TestCaseRunnable[]{t1, t2});
+        runTestCaseRunnables(runnables);
     }
 }
