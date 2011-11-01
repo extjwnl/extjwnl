@@ -1,5 +1,5 @@
 -classpath
-'/home/aliaksandr/extjwnl/extjwnl/target/classes:/home/aliaksandr/.m2/repository/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar'
+'/home/aliaksandr/extjwnl/extjwnl/target/classes:/home/aliaksandr/.m2/repository/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar:/home/aliaksandr/.m2/repository/com/googlecode/concurrentlinkedhashmap/concurrentlinkedhashmap-lru/1.2/concurrentlinkedhashmap-lru-1.2.jar'
 -encoding
 'UTF-8'
 -protected
@@ -15,10 +15,10 @@
 -docencoding
 'UTF-8'
 -doctitle
-'extJWNL 1.6.2 API'
+'extJWNL 1.6.3 API'
 -linkoffline
 'http://download.oracle.com/javase/6/docs/api' '/home/aliaksandr/extjwnl/extjwnl/target/javadoc-bundle-options'
 -use
 -version
 -windowtitle
-'extJWNL 1.6.2 API'
+'extJWNL 1.6.3 API'
