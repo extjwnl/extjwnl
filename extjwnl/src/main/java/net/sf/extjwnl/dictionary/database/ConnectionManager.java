@@ -54,6 +54,7 @@ public class ConnectionManager {
                 DataSource ds = (DataSource) envContext.lookup(jndi);
                 if (ds != null) {
                     connection = ds.getConnection();
+                    connection.setReadOnly(true);
                     return connection;
                 }
             } catch (NamingException ne) {
@@ -63,9 +64,11 @@ public class ConnectionManager {
         registerDriver();
         if (userName == null) {
             connection = DriverManager.getConnection(url);
+            connection.setReadOnly(true);
             return connection;
         } else {
             connection = DriverManager.getConnection(url, userName, (password != null) ? password : "");
+            connection.setReadOnly(true);
             return connection;
         }
     }
