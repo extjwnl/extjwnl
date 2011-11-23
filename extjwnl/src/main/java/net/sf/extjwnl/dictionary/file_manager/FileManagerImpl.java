@@ -15,6 +15,7 @@ import net.sf.extjwnl.util.factory.Param;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
@@ -58,6 +59,17 @@ public class FileManagerImpl implements FileManager {
 
     public FileManagerImpl(Dictionary dictionary, Map<String, Param> params) throws JWNLException {
         try {
+            if (!params.containsKey(DictionaryCatalog.DICTIONARY_PATH_KEY)) {
+                throw new JWNLException("JWNL_EXCEPTION_004", DictionaryCatalog.DICTIONARY_PATH_KEY);
+            }
+
+            String path = params.get(DictionaryCatalog.DICTIONARY_PATH_KEY).getValue();
+
+            File dictionaryPath = new File(path);
+            if (!dictionaryPath.exists()) {
+                throw new JWNLException("JWNL_EXCEPTION_009", path);
+            }
+
             this.dictionary = dictionary;
             files = new DictionaryCatalogSet<RandomAccessDictionaryFile>(dictionary, params, RandomAccessDictionaryFile.class);
             files.open();
@@ -71,11 +83,6 @@ public class FileManagerImpl implements FileManager {
                 } catch (ClassNotFoundException ex) {
                     throw new JWNLRuntimeException("DICTIONARY_EXCEPTION_002", ex);
                 }
-
-                if (!params.containsKey(DictionaryCatalog.DICTIONARY_PATH_KEY)) {
-                    throw new JWNLException("DICTIONARY_EXCEPTION_052", DictionaryCatalog.DICTIONARY_PATH_KEY);
-                }
-                String path = params.get(DictionaryCatalog.DICTIONARY_PATH_KEY).getValue();
 
                 @SuppressWarnings("unchecked")
                 DictionaryFileFactory<RandomAccessDictionaryFile> factory = (DictionaryFileFactory<RandomAccessDictionaryFile>) params.get(DictionaryCatalog.DICTIONARY_FILE_TYPE_KEY).create();
