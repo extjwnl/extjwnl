@@ -176,6 +176,7 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
     }
 
     public void close() {
+        dbManager.close();
     }
 
     private abstract class DatabaseElementIterator<E extends DictionaryElement> implements Iterator<E> {

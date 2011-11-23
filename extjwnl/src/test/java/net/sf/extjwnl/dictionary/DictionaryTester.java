@@ -4,6 +4,7 @@ import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.data.*;
 import net.sf.extjwnl.data.relationship.RelationshipFinder;
 import net.sf.extjwnl.data.relationship.RelationshipList;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -73,6 +74,13 @@ public class DictionaryTester {
 
     @Before
     public void initDictionary() throws IOException, JWNLException {
+    }
+
+    @After
+    public void closeDictionary() throws IOException, JWNLException {
+        if (null != dictionary) {
+            dictionary.close();
+        }
     }
 
     @Test

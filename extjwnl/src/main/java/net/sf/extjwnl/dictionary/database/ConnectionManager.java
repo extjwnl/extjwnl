@@ -15,6 +15,7 @@ import java.sql.SQLException;
  * Connection manager for database-backed dictionaries.
  *
  * @author John Didion <jdidion@didion.net>
+ * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class ConnectionManager {
 
@@ -23,7 +24,7 @@ public class ConnectionManager {
     private String userName;
     private String password;
     private boolean registered;
-    private DataSource source = null;
+    private Connection connection;
     private String jndi;
 
     public ConnectionManager(String driverClass, String url, String userName, String password) {
@@ -43,17 +44,17 @@ public class ConnectionManager {
     }
 
     public Connection getConnection() throws SQLException, JWNLException {
-
+        if (null != connection) {
+            return connection;
+        }
         if (jndi != null) {
             try {
-                if (source != null) {
-                    return source.getConnection();
-                }
                 Context initContext = new InitialContext();
                 Context envContext = (Context) initContext.lookup("java:/comp/env");
                 DataSource ds = (DataSource) envContext.lookup(jndi);
                 if (ds != null) {
-                    return ds.getConnection();
+                    connection = ds.getConnection();
+                    return connection;
                 }
             } catch (NamingException ne) {
                 throw new JWNLException("JNDI_NAMING_EXCEPTION", ne);
@@ -61,13 +62,12 @@ public class ConnectionManager {
         }
         registerDriver();
         if (userName == null) {
-            return DriverManager.getConnection(url);
+            connection = DriverManager.getConnection(url);
+            return connection;
         } else {
-            return DriverManager.getConnection(
-                    url, userName, (password != null) ? password : "");
+            connection = DriverManager.getConnection(url, userName, (password != null) ? password : "");
+            return connection;
         }
-
-
     }
 
     private void registerDriver() throws JWNLException {
@@ -79,6 +79,17 @@ public class ConnectionManager {
             } catch (Exception e) {
                 throw new JWNLException("DICTIONARY_EXCEPTION_024", e);
             }
+        }
+    }
+
+    public void close() {
+        if (null != connection) {
+            try {
+                connection.close();
+            } catch (SQLException e) {
+                //nop
+            }
+            connection = null;
         }
     }
 }

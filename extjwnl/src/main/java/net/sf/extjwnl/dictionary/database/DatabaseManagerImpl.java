@@ -171,6 +171,12 @@ public class DatabaseManagerImpl implements DatabaseManager {
         return createPOSQuery(pos, ALL_EXCEPTIONS_SQL);
     }
 
+    @Override
+    public void close() {
+        minMaxIds.clear();
+        connectionManager.close();
+    }
+
     protected Query createPOSQuery(POS pos, String sql) throws JWNLException {
         Query query = null;
         try {

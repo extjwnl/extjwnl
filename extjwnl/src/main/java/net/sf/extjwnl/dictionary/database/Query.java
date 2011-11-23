@@ -11,6 +11,7 @@ import java.sql.SQLException;
  * Helper class to manage queries.
  *
  * @author John Didion <jdidion@didion.net>
+ * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class Query {
     private Connection connection;
@@ -32,10 +33,6 @@ public class Query {
 
     public boolean isExecuted() {
         return (results != null);
-    }
-
-    public Connection getConnection() {
-        return connection;
     }
 
     public PreparedStatement getStatement() throws SQLException {
@@ -62,14 +59,6 @@ public class Query {
             try {
                 statement.close();
                 statement = null;
-            } catch (SQLException ex) {
-                //nop
-            }
-        }
-        if (connection != null) {
-            try {
-                connection.close();
-                connection = null;
             } catch (SQLException ex) {
                 //nop
             }
