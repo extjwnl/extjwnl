@@ -28,14 +28,14 @@
             <includes>
                 <include>**</include>
             </includes>
-            <outputDirectory>/src/utilities</outputDirectory>
+            <outputDirectory>/src/utilities/src</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>${project.build.directory}/../../extjwnl/src/</directory>
             <includes>
                 <include>**</include>
             </includes>
-            <outputDirectory>/src/extjwnl</outputDirectory>
+            <outputDirectory>/src/extjwnl/src</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>${project.build.directory}/../doc/</directory>
