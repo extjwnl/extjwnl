@@ -1199,24 +1199,19 @@ public class ewn {
                         if ("-over".equals(arg)) {
                             for (POS pos : POS.getAllPOS()) {
                                 if (null != d.getMorphologicalProcessor()) {
+                                    IndexWord iw = d.getIndexWord(pos, key);
+                                    //for plurals like species, glasses
+                                    if (null != iw && key.equals(iw.getLemma())) {
+                                        printOverview(pos, iw, needGloss, needLex, needOffset, needSenseNum, needSenseKeys);
+                                    }
+
                                     List<String> forms = d.getMorphologicalProcessor().lookupAllBaseForms(pos, key);
                                     if (null != forms) {
                                         for (String form : forms) {
-                                            IndexWord iw = d.getIndexWord(pos, form);
-                                            if (null != iw) {
-                                                System.out.println("\nOverview of " + pos.getLabel() + " " + iw.getLemma());
-                                                System.out.println("\nThe " + pos.getLabel() + " " + iw.getLemma() + " has " + iw.getSenses().size() + " senses");
-                                                for (int i = 0; i < iw.getSenses().size(); i++) {
-                                                    Synset synset = iw.getSenses().get(i);
-                                                    System.out.print((i + 1) + ". ");
-                                                    int widx = synset.indexOfWord(iw.getLemma());
-                                                    if (-1 < widx) {
-                                                        Word word = synset.getWords().get(widx);
-                                                        if (0 < word.getUseCount()) {
-                                                            System.out.print("(" + word.getUseCount() + ") ");
-                                                        }
-                                                    }
-                                                    printSense("", synset, needGloss, needLex, needOffset, needSenseNum, needSenseKeys);
+                                            if (!form.equals(key)) {
+                                                iw = d.getIndexWord(pos, form);
+                                                if (null != iw) {
+                                                    printOverview(pos, iw, needGloss, needLex, needOffset, needSenseNum, needSenseKeys);
                                                 }
                                             }
                                         }
@@ -1227,6 +1222,23 @@ public class ewn {
                     }
                 }
             }
+        }
+    }
+
+    private static void printOverview(POS pos, IndexWord iw, boolean needGloss, boolean needLex, boolean needOffset, boolean needSenseNum, boolean needSenseKeys) throws JWNLException {
+        System.out.println("\nOverview of " + pos.getLabel() + " " + iw.getLemma());
+        System.out.println("\nThe " + pos.getLabel() + " " + iw.getLemma() + " has " + iw.getSenses().size() + " senses");
+        for (int i = 0; i < iw.getSenses().size(); i++) {
+            Synset synset = iw.getSenses().get(i);
+            System.out.print((i + 1) + ". ");
+            int widx = synset.indexOfWord(iw.getLemma());
+            if (-1 < widx) {
+                Word word = synset.getWords().get(widx);
+                if (0 < word.getUseCount()) {
+                    System.out.print("(" + word.getUseCount() + ") ");
+                }
+            }
+            printSense("", synset, needGloss, needLex, needOffset, needSenseNum, needSenseKeys);
         }
     }
 
