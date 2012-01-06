@@ -83,7 +83,11 @@ public class PrincetonChannelDictionaryFile extends AbstractPrincetonRandomAcces
                 while (((c = read()) != -1) && c != '\n' && c != '\r' && c != ' ') {
                     input.append((char) c);
                 }
-                return input.toString();
+                if (0 == input.length()) {
+                    return null;
+                } else {
+                    return input.toString();
+                }
             }
         } else {
             throw new JWNLRuntimeException("PRINCETON_EXCEPTION_001");

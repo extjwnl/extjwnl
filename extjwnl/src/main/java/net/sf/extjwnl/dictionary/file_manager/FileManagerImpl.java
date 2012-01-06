@@ -222,6 +222,7 @@ public class FileManagerImpl implements FileManager {
             file.seek(offset);
             do {
                 String line = file.readLineWord();
+                file.readLine();//skip the rest of the line as we're reading only the first word
                 long nextOffset = file.getFilePointer();
                 if (line == null) {
                     return -1;
@@ -264,7 +265,7 @@ public class FileManagerImpl implements FileManager {
                     offset = file.getFilePointer();
                     while (offset != stop) {
                         word = file.readLineWord();
-                        if (word.equals(target)) {
+                        if (target.equals(word)) {
                             return offset;
                         } else {
                             file.readLine();
@@ -274,13 +275,13 @@ public class FileManagerImpl implements FileManager {
                     return -1;
                 }
                 word = file.readLineWord();
-                compare = word.compareTo(target);
+                compare = target.compareTo(word);
                 /**
                  * Determines where to go within the file.
                  */
                 if (compare == 0) {
                     return offset;
-                } else if (compare > 0) {
+                } else if (compare < 0) {
                     stop = offset;
                 } else {
                     start = offset;
@@ -302,7 +303,7 @@ public class FileManagerImpl implements FileManager {
         synchronized (file) {
             file.seek(offset);
             long oldOffset = -1;
-            for (String line = file.readLineWord(); line == null || line.trim().length() == 0; line = file.readLineWord()) {
+            for (String line = file.readLineWord(); line == null; line = file.readLineWord()) {
                 offset = getNextLinePointer(pos, fileType, offset);
                 if (oldOffset == offset) {
                     break;

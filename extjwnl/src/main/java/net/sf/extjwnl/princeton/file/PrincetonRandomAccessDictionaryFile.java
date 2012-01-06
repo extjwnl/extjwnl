@@ -327,7 +327,11 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                     while (((c = raFile.read()) != -1) && c != '\n' && c != '\r' && c != ' ') {
                         input.append((char) c);
                     }
-                    return input.toString();
+                    if (0 == input.length()) {
+                        return null;
+                    } else {
+                        return input.toString();
+                    }
                 } else {
                     int idx = 1;
                     int c;
@@ -346,7 +350,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                         CharBuffer cb = decoder.decode(bb);
                         return cb.toString();
                     } else {
-                        return "";
+                        return null;
                     }
                 }
             }

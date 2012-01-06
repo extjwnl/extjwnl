@@ -122,7 +122,7 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
 
     public Iterator<IndexWord> getIndexWordIterator(final POS pos, final String substring) throws JWNLException {
         if (!isEditable()) {
-            return new SubstringIndexFileLookaheadIterator(pos, prepareQueryString(substring));
+            return new SubstringIndexFileLookaheadIterator(pos, prepareQueryString(substring.replace(' ', '_')));
         } else {
             return super.getIndexWordIterator(pos, substring);
         }
@@ -268,11 +268,11 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
      * is a line in the enumerated file.
      */
     private abstract class FileLookaheadIterator<E extends DictionaryElement> implements Iterator<E> {
-        private String currentLine = null;
-        private long currentOffset = -1;
-        private long nextOffset = 0;
+        protected String currentLine = null;
+        protected long currentOffset = -1;
+        protected long nextOffset = 0;
 
-        private boolean more = true;
+        protected boolean more = true;
 
         protected final POS pos;
         protected final DictionaryFileType fileType;
@@ -318,7 +318,7 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
         /**
          * Read the next line in the iterated file.
          */
-        protected final void nextLine() {
+        protected void nextLine() {
             try {
                 currentLine = fileManager.readLineAt(pos, fileType, nextOffset);
                 if (currentLine != null) {
@@ -333,16 +333,16 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
             more = false;
         }
 
-        protected final void nextOffset() throws JWNLException {
+        protected void nextOffset() {
             currentOffset = nextOffset;
             nextOffset = getNextOffset(currentOffset);
         }
 
-        protected long getNextOffset(long currentOffset) throws JWNLException {
+        protected long getNextOffset(long currentOffset) {
             try {
                 return fileManager.getNextLinePointer(pos, fileType, currentOffset);
             } catch (IOException ex) {
-                throw new JWNLException("DICTIONARY_EXCEPTION_008", new Object[]{pos, fileType}, ex);
+                throw new JWNLRuntimeException("DICTIONARY_EXCEPTION_008", new Object[]{pos, fileType}, ex);
             }
         }
     }
@@ -370,15 +370,50 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
 
         public SubstringIndexFileLookaheadIterator(POS pos, String substring) throws JWNLException {
             super(pos);
-            this.substring = substring;
-            nextOffset();
-        }
 
-        protected long getNextOffset(long currentOffset) throws JWNLException {
+            //reinitialize
+            this.substring = substring;
+            currentLine = null;
+            currentOffset = -1;
             try {
-                return getFileManager().getMatchingLinePointer(pos, DictionaryFileType.INDEX, currentOffset, substring);
+                nextOffset = getNextOffset(fileManager.getFirstLinePointer(pos, fileType));
             } catch (IOException ex) {
                 throw new JWNLException("DICTIONARY_EXCEPTION_008", new Object[]{pos, fileType}, ex);
+            }
+            nextLine();
+        }
+
+        protected void nextLine() {
+            try {
+                if (-1 == nextOffset) {
+                    currentLine = null;
+                } else {
+                    currentLine = fileManager.readLineAt(pos, fileType, nextOffset);
+                }
+                if (currentLine != null) {
+                    nextOffset();
+                    return;
+                }
+            } catch (IOException ex) {
+                throw new JWNLRuntimeException("DICTIONARY_EXCEPTION_008", new Object[]{pos, fileType}, ex);
+            }
+            more = false;
+        }
+
+        protected final void nextOffset() {
+            currentOffset = nextOffset;
+            nextOffset = getNextOffset(super.getNextOffset(currentOffset));//search next offset from next line
+        }
+
+        protected long getNextOffset(long currentOffset) {
+            if (null != substring) {//null == substring in the init of a super, should be skipped
+                try {
+                    return getFileManager().getMatchingLinePointer(pos, DictionaryFileType.INDEX, currentOffset, substring);
+                } catch (IOException ex) {
+                    throw new JWNLRuntimeException("DICTIONARY_EXCEPTION_008", new Object[]{pos, fileType}, ex);
+                }
+            } else {
+                return super.getNextOffset(currentOffset);
             }
         }
     }

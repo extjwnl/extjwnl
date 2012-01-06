@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -26,42 +27,45 @@ public class DictionaryTester {
     /**
      * The offset for wn30.
      */
-    protected long wn30TankOffset = 4389033;
+    protected final long wn30TankOffset = 4389033;
 
     /**
      * The offset for wn2.1.
      */
-    protected long wn21TankOffset = 4337089;
+    protected final long wn21TankOffset = 4337089;
 
     /**
      * The offset for wn 2.0.
      */
-    protected long wn20TankOffset = 4219085;
+    protected final long wn20TankOffset = 4219085;
 
     /**
      * Synset for "complete/finish" for wn2.0
      */
-    protected long wn20VerbOffset = 470712;
+    protected final long wn20VerbOffset = 470712;
 
     /**
      * Synset for "complete/finish" for wn2.1
      */
-    protected long wn21VerbOffset = 479055;
+    protected final long wn21VerbOffset = 479055;
 
     /**
      * Synset for "complete/finish" for wn3.0
      */
-    protected long wn30VerbOffset = 484166;
+    protected final long wn30VerbOffset = 484166;
 
-    protected List<Long> verbOffsets = Arrays.asList(wn20VerbOffset, wn21VerbOffset, wn30VerbOffset);
+    protected final List<Long> verbOffsets = Arrays.asList(wn20VerbOffset, wn21VerbOffset, wn30VerbOffset);
 
-    protected List<Long> nounOffsets = Arrays.asList(wn20TankOffset, wn21TankOffset, wn30TankOffset);
+    protected final List<Long> nounOffsets = Arrays.asList(wn20TankOffset, wn21TankOffset, wn30TankOffset);
 
-    String glossDefinition = "an enclosed armored military vehicle; has a cannon and moves on caterpillar treads";
+    final String glossDefinition = "an enclosed armored military vehicle; has a cannon and moves on caterpillar treads";
 
-    protected List<String> lemmas = Arrays.asList("tank", "army tank", "armored combat vehicle", "armoured combat vehicle");
+    protected final List<String> lemmas = Arrays.asList("tank", "army tank", "armored combat vehicle", "armoured combat vehicle");
 
-    protected String[] exceptions = {"bicennaries", "bicentenary", "bicentennial"};
+    protected final String[] exceptions = {"bicennaries", "bicentenary", "bicentennial"};
+
+    protected final String iteratorLemma = "stop";
+    protected final String iteratorSpacedLemma = "zoom in";
 
     protected Dictionary dictionary;
 
@@ -219,6 +223,45 @@ public class DictionaryTester {
         Assert.assertTrue(v.getVerbFrameFlags().get(11));
     }
 
+    @Test
+    public void testNonExistentIndexWordIterator() throws JWNLException {
+        Iterator<IndexWord> it = dictionary.getIndexWordIterator(POS.VERB, "??????????????");
+        Assert.assertNotNull(it);
+        int count = 0;
+        while (it.hasNext()) {
+            it.next();
+            count++;
+        }
+        Assert.assertEquals(0, count);
+    }
+
+    @Test
+    public void testIndexWordIterator() throws JWNLException {
+        Iterator<IndexWord> it = dictionary.getIndexWordIterator(POS.VERB, iteratorLemma);
+        Assert.assertNotNull(it);
+        int count = 0;
+        while (it.hasNext()) {
+            IndexWord iw = it.next();
+            Assert.assertTrue(iw.getLemma().contains(iteratorLemma));
+            count++;
+        }
+        Assert.assertEquals(9, count);
+    }
+
+    @Test
+    public void testSpacedIndexWordIterator() throws JWNLException {
+        Iterator<IndexWord> it = dictionary.getIndexWordIterator(POS.VERB, iteratorSpacedLemma);
+        Assert.assertNotNull(it);
+        int count = 0;
+        while (it.hasNext()) {
+            IndexWord iw = it.next();
+            Assert.assertTrue(iw.getLemma().contains(iteratorSpacedLemma));
+            count++;
+        }
+        Assert.assertEquals(1, count);
+    }
+
+
     public void runAllTests() throws JWNLException, CloneNotSupportedException {
         testTank();
         testComplete();
@@ -231,5 +274,8 @@ public class DictionaryTester {
         testFairSenseKey();
         testOnline();
         testVerbFrames();
+        testNonExistentIndexWordIterator();
+        testIndexWordIterator();
+        testSpacedIndexWordIterator();
     }
 }
