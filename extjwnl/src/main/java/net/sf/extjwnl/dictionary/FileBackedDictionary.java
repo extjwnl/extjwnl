@@ -287,6 +287,10 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
                 if (log.isWarnEnabled()) {
                     log.warn(JWNL.resolveMessage("DICTIONARY_EXCEPTION_007", new Object[]{this.pos, this.fileType}));
                 }
+            } catch (JWNLException ex) {
+                if (log.isWarnEnabled()) {
+                    log.warn(JWNL.resolveMessage("DICTIONARY_EXCEPTION_007", new Object[]{this.pos, this.fileType}));
+                }
             }
         }
 
@@ -297,10 +301,10 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
                 E returnVal;
                 try {
                     returnVal = parseLine(pos, currentOffset, currentLine);
+                    nextLine();
                 } catch (JWNLException e) {
                     throw new JWNLRuntimeException(e.getMessage(), e.getCause());
                 }
-                nextLine();
                 return returnVal;
             } else {
                 throw new NoSuchElementException();
@@ -318,7 +322,7 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
         /**
          * Read the next line in the iterated file.
          */
-        protected void nextLine() {
+        protected void nextLine() throws JWNLException {
             try {
                 currentLine = fileManager.readLineAt(pos, fileType, nextOffset);
                 if (currentLine != null) {
@@ -333,16 +337,16 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
             more = false;
         }
 
-        protected void nextOffset() {
+        protected void nextOffset() throws JWNLException {
             currentOffset = nextOffset;
             nextOffset = getNextOffset(currentOffset);
         }
 
-        protected long getNextOffset(long currentOffset) {
+        protected long getNextOffset(long currentOffset) throws JWNLException {
             try {
                 return fileManager.getNextLinePointer(pos, fileType, currentOffset);
             } catch (IOException ex) {
-                throw new JWNLRuntimeException("DICTIONARY_EXCEPTION_008", new Object[]{pos, fileType}, ex);
+                throw new JWNLException("DICTIONARY_EXCEPTION_008", new Object[]{pos, fileType}, ex);
             }
         }
     }
@@ -383,7 +387,7 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
             nextLine();
         }
 
-        protected void nextLine() {
+        protected void nextLine() throws JWNLException {
             try {
                 if (-1 == nextOffset) {
                     currentLine = null;
@@ -395,22 +399,22 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
                     return;
                 }
             } catch (IOException ex) {
-                throw new JWNLRuntimeException("DICTIONARY_EXCEPTION_008", new Object[]{pos, fileType}, ex);
+                throw new JWNLException("DICTIONARY_EXCEPTION_008", new Object[]{pos, fileType}, ex);
             }
             more = false;
         }
 
-        protected final void nextOffset() {
+        protected final void nextOffset() throws JWNLException {
             currentOffset = nextOffset;
             nextOffset = getNextOffset(super.getNextOffset(currentOffset));//search next offset from next line
         }
 
-        protected long getNextOffset(long currentOffset) {
+        protected long getNextOffset(long currentOffset) throws JWNLException {
             if (null != substring) {//null == substring in the init of a super, should be skipped
                 try {
                     return getFileManager().getMatchingLinePointer(pos, DictionaryFileType.INDEX, currentOffset, substring);
                 } catch (IOException ex) {
-                    throw new JWNLRuntimeException("DICTIONARY_EXCEPTION_008", new Object[]{pos, fileType}, ex);
+                    throw new JWNLException("DICTIONARY_EXCEPTION_008", new Object[]{pos, fileType}, ex);
                 }
             } else {
                 return super.getNextOffset(currentOffset);
