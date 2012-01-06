@@ -224,7 +224,7 @@ public class FileManagerImpl implements FileManager {
                 String line = file.readLineWord();
                 file.readLine();//skip the rest of the line as we're reading only the first word
                 long nextOffset = file.getFilePointer();
-                if (line == null) {
+                if (line == null || "".equals(line)) {
                     return -1;
                 }
                 file.setNextLineOffset(offset, nextOffset);
@@ -265,7 +265,7 @@ public class FileManagerImpl implements FileManager {
                     offset = file.getFilePointer();
                     while (offset != stop) {
                         word = file.readLineWord();
-                        if (target.equals(word)) {
+                        if (word.equals(target)) {
                             return offset;
                         } else {
                             file.readLine();
@@ -275,13 +275,13 @@ public class FileManagerImpl implements FileManager {
                     return -1;
                 }
                 word = file.readLineWord();
-                compare = target.compareTo(word);
+                compare = word.compareTo(target);
                 /**
                  * Determines where to go within the file.
                  */
                 if (compare == 0) {
                     return offset;
-                } else if (compare < 0) {
+                } else if (compare > 0) {
                     stop = offset;
                 } else {
                     start = offset;
@@ -303,7 +303,7 @@ public class FileManagerImpl implements FileManager {
         synchronized (file) {
             file.seek(offset);
             long oldOffset = -1;
-            for (String line = file.readLineWord(); line == null; line = file.readLineWord()) {
+            for (String line = file.readLineWord(); line == null || "".equals(line); line = file.readLineWord()) {
                 offset = getNextLinePointer(pos, fileType, offset);
                 if (oldOffset == offset) {
                     break;
