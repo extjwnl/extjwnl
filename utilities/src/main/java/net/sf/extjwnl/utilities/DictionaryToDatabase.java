@@ -32,13 +32,13 @@ public class DictionaryToDatabase {
     protected static long TIME = 0L;
 
     protected static final String[] tables = {
-            "IndexWord",
-            "Synset",
-            "SynsetWord",
-            "SynsetPointer",
-            "SynsetVerbFrame",
-            "IndexWordSynset",
-            "Exceptions"
+            "indexword",
+            "synset",
+            "synsetword",
+            "synsetpointer",
+            "synsetverbframe",
+            "indexwordsynset",
+            "exceptions"
     };
 
     /**
@@ -207,7 +207,7 @@ public class DictionaryToDatabase {
      */
     protected void storeIndexWords(Iterator<IndexWord> itr) throws SQLException {
         log.info("storing index words");
-        PreparedStatement iwStmt = connection.prepareStatement("INSERT INTO IndexWord VALUES(?,?,?)");
+        PreparedStatement iwStmt = connection.prepareStatement("INSERT INTO indexword VALUES(?,?,?)");
         int count = 0;
         while (itr.hasNext()) {
             if (count % 1000 == 0) {
@@ -233,10 +233,10 @@ public class DictionaryToDatabase {
      * @throws SQLException SQLException
      */
     protected void storeSynsets(Iterator<Synset> itr) throws SQLException {
-        PreparedStatement synsetStmt = connection.prepareStatement("INSERT INTO Synset VALUES(?,?,?,?,?,?)");
-        PreparedStatement synsetWordStmt = connection.prepareStatement("INSERT INTO SynsetWord VALUES(?,?,?,?,?,?)");
-        PreparedStatement synsetPointerStmt = connection.prepareStatement("INSERT INTO SynsetPointer VALUES(?,?,?,?,?,?,?)");
-        PreparedStatement synsetVerbFrameStmt = connection.prepareStatement("INSERT INTO SynsetVerbFrame VALUES(?,?,?,?)");
+        PreparedStatement synsetStmt = connection.prepareStatement("INSERT INTO synset VALUES(?,?,?,?,?,?)");
+        PreparedStatement synsetWordStmt = connection.prepareStatement("INSERT INTO synsetword VALUES(?,?,?,?,?,?)");
+        PreparedStatement synsetPointerStmt = connection.prepareStatement("INSERT INTO synsetpointer VALUES(?,?,?,?,?,?,?)");
+        PreparedStatement synsetVerbFrameStmt = connection.prepareStatement("INSERT INTO synsetverbframe VALUES(?,?,?,?)");
         log.info("storing synsets");
         int count = 0;
         while (itr.hasNext()) {
@@ -315,7 +315,7 @@ public class DictionaryToDatabase {
      */
     protected void storeIndexWordSynsets() throws SQLException {
         log.info("storing index word synsets");
-        PreparedStatement iwsStmt = connection.prepareStatement("INSERT INTO IndexWordSynset VALUES(?,?,?)");
+        PreparedStatement iwsStmt = connection.prepareStatement("INSERT INTO indexwordsynset VALUES(?,?,?)");
         int count = 0;
         for (Map.Entry<Integer, long[]> entry : idToSynsetOffset.entrySet()) {
             if (count % 1000 == 0) {
@@ -346,7 +346,7 @@ public class DictionaryToDatabase {
      */
     protected void storeExceptions(Iterator<Exc> itr) throws SQLException {
         log.info("storing exceptions");
-        PreparedStatement exStmt = connection.prepareStatement("INSERT INTO Exceptions VALUES(?,?,?,?)");
+        PreparedStatement exStmt = connection.prepareStatement("INSERT INTO exceptions VALUES(?,?,?,?)");
         while (itr.hasNext()) {
             Exc exc = itr.next();
             exStmt.setString(4, exc.getLemma());
