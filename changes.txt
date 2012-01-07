@@ -1,3 +1,7 @@
+1.6.4
+
+- miscellaneous bug fixes
+
 1.6.3
 
 - library is thread-safe
