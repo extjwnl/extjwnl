@@ -13,7 +13,7 @@ import java.io.IOException;
  * @author Brett Walenz <bwalenz@users.sourceforge.net>
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
-public class TestWord extends BaseDataTest {
+public class TestWord extends BaseData {
 
     private Word word;
 

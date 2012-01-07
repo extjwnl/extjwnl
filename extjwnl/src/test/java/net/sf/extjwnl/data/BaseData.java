@@ -14,7 +14,7 @@ import java.io.InputStream;
  *
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
-public class BaseDataTest {
+public class BaseData {
 
     private final String properties = "./src/test/resources/clean_file.xml";
 

@@ -13,7 +13,7 @@ import java.io.IOException;
  * @author Brett Walenz <bwalenz@users.sourceforge.net>
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
-public class TestSynset extends BaseDataTest {
+public class TestSynset extends BaseData {
 
     private Synset testObj;
     private final static String gloss = "testGloss";
