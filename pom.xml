@@ -15,7 +15,7 @@
     <groupId>net.sf.extjwnl</groupId>
     <artifactId>extjwnl-parent</artifactId>
     <packaging>pom</packaging>
-    <version>1.6.4-SNAPSHOT</version>
+    <version>1.6.4</version>
     <name>extJWNL Parent</name>
     <description>extJWNL Parent</description>
     <url>http://extjwnl.sf.net</url>
