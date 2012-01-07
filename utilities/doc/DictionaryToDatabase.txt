@@ -28,6 +28,6 @@ For example:
 
 or
 
-./bin/dict2db ./src/extjwnl/src/main/resources/net/sf/extjwnl/file_properties.xml ./src/utilities/src/main/sql/create.sql com.mysql.jdbc.Driver jdbc:mysql://localhost/jwnl?user=jwnl&password=jwnl
+./bin/dict2db ./src/extjwnl/src/main/resources/net/sf/extjwnl/file_properties.xml ./src/utilities/src/main/sql/create.sql com.mysql.jdbc.Driver jdbc:mysql://localhost/jwnl?user=jwnl\&password=jwnl
 
 Once you have loaded the data into the database, make sure you have configured database-properties.xml correctly and initialize JWNL using that file.
