@@ -7,7 +7,7 @@ import junit.framework.TestResult;
 /**
  * @author Andy Schneider http://www.javaworld.com/javaworld/jw-12-2000/jw-1221-junit.html
  */
-public class MultiThreadedTestCase extends TestCase {
+public abstract class MultiThreadedTestCase extends TestCase {
 
     /**
      * The threads that are executing.
