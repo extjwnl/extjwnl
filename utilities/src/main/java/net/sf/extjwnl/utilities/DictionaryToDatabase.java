@@ -80,6 +80,7 @@ public class DictionaryToDatabase {
             String scriptFileName = args[1];
             ConnectionManager mgr = new ConnectionManager(args[2], args[3], args.length <= 4 ? null : args[4], args.length <= 5 ? null : args[5]);
             conn = mgr.getConnection();
+            conn.setReadOnly(false);
             DictionaryToDatabase d2d = new DictionaryToDatabase(dictionary, conn);
             d2d.createTables(scriptFileName);
             d2d.insertData();

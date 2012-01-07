@@ -9,7 +9,7 @@
         <fileSet>
             <directory>${project.build.directory}/dist/bin</directory>
             <includes/>
-            <fileMode>775</fileMode>
+            <fileMode>755</fileMode>
             <outputDirectory>/bin</outputDirectory>
         </fileSet>
         <fileSet>
@@ -18,7 +18,7 @@
             <excludes>
                 <exclude>**/maven-metadata-appassembler.xml</exclude>
             </excludes>
-            <fileMode>775</fileMode>
+            <fileMode>755</fileMode>
             <outputDirectory>/lib</outputDirectory>
         </fileSet>
         <fileSet>
