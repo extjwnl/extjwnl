@@ -253,11 +253,11 @@ public class ewn {
 
                     if ("-add".equals(args[i])) {
                         if (null == key) {
-                            log.error("Missing sensekey");
+                            log.error("Missing sensekey for -add");
                             System.exit(1);
                         }
                         if (null != workWord) {
-                            log.error("Duplicate sensekey " + workWord.getSenseKey());
+                            log.error("Duplicate sensekey for -add: " + workWord.getSenseKey());
                             System.exit(1);
                         }
                         log.info("Creating " + pos.getLabel() + " synset...");
@@ -272,7 +272,7 @@ public class ewn {
 
                     if ("-remove".equals(args[i])) {
                         if (null == workWord) {
-                            log.error("Missing sensekey");
+                            log.error("Missing current word for -remove. Perhaps, word not found in synset, or synset not found.");
                             System.exit(1);
                         } else {
                             d.removeSynset(workWord.getSynset());
@@ -283,7 +283,7 @@ public class ewn {
 
                     if ("-addword".equals(args[i])) {
                         if (null == workWord) {
-                            log.error("Missing sensekey");
+                            log.error("Missing current word for -addword. Perhaps, word not found in synset, or synset not found.");
                             System.exit(1);
                         } else {
                             i++;
@@ -300,7 +300,7 @@ public class ewn {
 
                     if ("-removeword".equals(args[i])) {
                         if (null == workWord) {
-                            log.error("Missing sensekey");
+                            log.error("Missing current word for -removeword. Perhaps, word not found in synset, or synset not found.");
                             System.exit(1);
                         } else {
                             workWord.getSynset().getWords().remove(workWord);
@@ -310,7 +310,7 @@ public class ewn {
 
                     if ("-setgloss".equals(args[i])) {
                         if (null == workWord) {
-                            log.error("Missing sensekey");
+                            log.error("Missing current word for -setgloss. Perhaps, word not found in synset, or synset not found.");
                             System.exit(1);
                         } else {
                             i++;
@@ -326,7 +326,7 @@ public class ewn {
 
                     if ("-setadjclus".equals(args[i])) {
                         if (null == workWord) {
-                            log.error("Missing sensekey");
+                            log.error("Missing current word for -setadjclus. Perhaps, word not found in synset, or synset not found.");
                             System.exit(1);
                         } else {
                             i++;
@@ -342,7 +342,7 @@ public class ewn {
 
                     if ("-setverbframe".equals(args[i])) {
                         if (null == workWord) {
-                            log.error("Missing sensekey");
+                            log.error("Missing current word for -setverbframe. Perhaps, word not found in synset, or synset not found.");
                             System.exit(1);
                         } else {
                             i++;
@@ -368,7 +368,7 @@ public class ewn {
 
                     if ("-setverbframeall".equals(args[i])) {
                         if (null == workWord) {
-                            log.error("Missing sensekey");
+                            log.error("Missing current word for -setverbframeall. Perhaps, word not found in synset, or synset not found.");
                             System.exit(1);
                         } else {
                             i++;
@@ -393,7 +393,7 @@ public class ewn {
 
                     if ("-setlexfile".equals(args[i])) {
                         if (null == workWord) {
-                            log.error("Missing sensekey");
+                            log.error("Missing current word for -setlexfile. Perhaps, word not found in synset, or synset not found.");
                             System.exit(1);
                         } else {
                             i++;
@@ -412,7 +412,7 @@ public class ewn {
 
                     if ("-addptr".equals(args[i])) {
                         if (null == workWord) {
-                            log.error("Missing sensekey");
+                            log.error("Missing current word for -addptr. Perhaps, word not found in synset, or synset not found.");
                             System.exit(1);
                         } else {
                             i++;
@@ -457,7 +457,7 @@ public class ewn {
 
                     if ("-removeptr".equals(args[i])) {
                         if (null == workWord) {
-                            log.error("Missing sensekey");
+                            log.error("Missing current word for -removeptr. Perhaps, word not found in synset, or synset not found.");
                             System.exit(1);
                         } else {
                             i++;
@@ -502,7 +502,7 @@ public class ewn {
 
                     if ("-setlexid".equals(args[i])) {
                         if (null == workWord) {
-                            log.error("Missing sensekey");
+                            log.error("Missing current word for -setlexid. Perhaps, word not found in synset, or synset not found.");
                             System.exit(1);
                         } else {
                             i++;
@@ -518,7 +518,7 @@ public class ewn {
 
                     if ("-setusecount".equals(args[i])) {
                         if (null == workWord) {
-                            log.error("Missing sensekey");
+                            log.error("Missing current word for -setusecount. Perhaps, word not found in synset, or synset not found.");
                             System.exit(1);
                         } else {
                             i++;
