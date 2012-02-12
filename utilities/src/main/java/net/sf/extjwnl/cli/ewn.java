@@ -237,7 +237,7 @@ public class ewn {
                         }
                     } else if (-1 < args[i].indexOf('#')) {
                         if (2 < args[i].length()) {
-                            derivation = args[i].substring(2);
+                            derivation = args[i].substring(2).replace('_', ' ');
                             if (null == derivation) {
                                 log.error("Missing derivation");
                                 System.exit(1);
@@ -288,7 +288,7 @@ public class ewn {
                         } else {
                             i++;
                             if (i < args.length && '-' != args[i].charAt(0)) {
-                                Word tempWord = new Word(d, workWord.getSynset(), workWord.getSynset().getWords().size() + 1, args[i]);
+                                Word tempWord = new Word(d, workWord.getSynset(), workWord.getSynset().getWords().size() + 1, args[i].replace('_', ' '));
                                 workWord.getSynset().getWords().add(tempWord);
                                 key = null;
                             } else {
@@ -535,7 +535,7 @@ public class ewn {
                     if ("-addexc".equals(args[i])) {
                         i++;
                         if (i < args.length && '-' != args[i].charAt(0)) {
-                            String baseform = args[i];
+                            String baseform = args[i].replace('_', ' ');
                             Exc e = d.getException(pos, derivation);
                             if (null != e) {
                                 if (null != e.getExceptions()) {
@@ -560,7 +560,7 @@ public class ewn {
                         if (null != e) {
                             i++;
                             if (i < args.length && '-' != args[i].charAt(0)) {
-                                String baseform = args[i];
+                                String baseform = args[i].replace('_', ' ');
                                 if (null != e.getExceptions()) {
                                     if (e.getExceptions().contains(baseform)) {
                                         e.getExceptions().remove(baseform);
@@ -610,6 +610,7 @@ public class ewn {
                     }
                 } else {
                     boolean needHelp = false;
+
                     boolean needGloss = false;
                     boolean needLex = false;
                     boolean needOffset = false;
