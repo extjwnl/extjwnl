@@ -1,6 +1,7 @@
 1.6.5
 
 - miscellaneous bug fixes
+- added "argument ignored" warning in ewn
 
 1.6.4
 
