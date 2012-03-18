@@ -68,7 +68,7 @@ public class ewn {
                     "        -add                           Add a new synset identified by this sensekey\n" +
                     "        -remove                        Remove the synset\n" +
                     "        -addword word                  Add the word to the synset\n" +
-                    "        -removeword                    Remove the word from the synset\n" +
+                    "        -removeword                    Remove the word as indicated by sensekey, from the synset\n" +
                     "        -setgloss gloss                Set the gloss of the synset\n" +
                     "        -setadjclus true|false         Set the adjective cluster flag\n" +
                     "        -setverbframe [-]n             Set the verb frame flag n (minus removes the flag)\n" +
@@ -187,8 +187,10 @@ public class ewn {
                 String derivation = null;
 
                 for (int i = 0; i < args.length; i++) {
+                    boolean argProcessed = false;
                     if (null == key && '-' != args[i].charAt(0) && ((-1 < args[i].indexOf('%') && -1 < args[i].indexOf(':')))) {
                         key = args[i];
+                        argProcessed = true;
                         log.info("Searching " + key + "...");
                         if (null != key) {
                             workWord = d.getWordBySenseKey(key);
@@ -238,7 +240,7 @@ public class ewn {
                     } else if (-1 < args[i].indexOf('#')) {
                         if (2 < args[i].length()) {
                             derivation = args[i].substring(2).replace('_', ' ');
-                            if (null == derivation) {
+                            if (null == derivation || "".equals(derivation)) {
                                 log.error("Missing derivation");
                                 System.exit(1);
                             } else {
@@ -248,6 +250,7 @@ public class ewn {
                                     System.exit(1);
                                 }
                             }
+                            argProcessed = true;
                         }
                     }
 
@@ -268,6 +271,7 @@ public class ewn {
                         tempSynset.getWords().add(workWord);
                         tempSynset.setLexFileNum(lexFileNum);
                         key = null;
+                        argProcessed = true;
                     }
 
                     if ("-remove".equals(args[i])) {
@@ -279,6 +283,7 @@ public class ewn {
                             workWord = null;
                             key = null;
                         }
+                        argProcessed = true;
                     }
 
                     if ("-addword".equals(args[i])) {
@@ -296,6 +301,7 @@ public class ewn {
                                 System.exit(1);
                             }
                         }
+                        argProcessed = true;
                     }
 
                     if ("-removeword".equals(args[i])) {
@@ -306,6 +312,7 @@ public class ewn {
                             workWord.getSynset().getWords().remove(workWord);
                             key = null;
                         }
+                        argProcessed = true;
                     }
 
                     if ("-setgloss".equals(args[i])) {
@@ -322,6 +329,7 @@ public class ewn {
                                 System.exit(1);
                             }
                         }
+                        argProcessed = true;
                     }
 
                     if ("-setadjclus".equals(args[i])) {
@@ -338,6 +346,7 @@ public class ewn {
                                 System.exit(1);
                             }
                         }
+                        argProcessed = true;
                     }
 
                     if ("-setverbframe".equals(args[i])) {
@@ -364,6 +373,7 @@ public class ewn {
                                 System.exit(1);
                             }
                         }
+                        argProcessed = true;
                     }
 
                     if ("-setverbframeall".equals(args[i])) {
@@ -389,6 +399,7 @@ public class ewn {
                                 System.exit(1);
                             }
                         }
+                        argProcessed = true;
                     }
 
                     if ("-setlexfile".equals(args[i])) {
@@ -408,6 +419,7 @@ public class ewn {
                                 System.exit(1);
                             }
                         }
+                        argProcessed = true;
                     }
 
                     if ("-addptr".equals(args[i])) {
@@ -453,6 +465,7 @@ public class ewn {
                                 System.exit(1);
                             }
                         }
+                        argProcessed = true;
                     }
 
                     if ("-removeptr".equals(args[i])) {
@@ -498,6 +511,7 @@ public class ewn {
                                 System.exit(1);
                             }
                         }
+                        argProcessed = true;
                     }
 
                     if ("-setlexid".equals(args[i])) {
@@ -514,6 +528,7 @@ public class ewn {
                                 System.exit(1);
                             }
                         }
+                        argProcessed = true;
                     }
 
                     if ("-setusecount".equals(args[i])) {
@@ -530,29 +545,41 @@ public class ewn {
                                 System.exit(1);
                             }
                         }
+                        argProcessed = true;
                     }
 
                     if ("-addexc".equals(args[i])) {
                         i++;
-                        if (i < args.length && '-' != args[i].charAt(0)) {
-                            String baseform = args[i].replace('_', ' ');
-                            Exc e = d.getException(pos, derivation);
-                            if (null != e) {
-                                if (null != e.getExceptions()) {
-                                    if (!e.getExceptions().contains(baseform)) {
-                                        e.getExceptions().add(baseform);
+                        if (null != derivation) {
+                            if (null != pos) {
+                                if (i < args.length && '-' != args[i].charAt(0)) {
+                                    String baseform = args[i].replace('_', ' ');
+                                    Exc e = d.getException(pos, derivation);
+                                    if (null != e) {
+                                        if (null != e.getExceptions()) {
+                                            if (!e.getExceptions().contains(baseform)) {
+                                                e.getExceptions().add(baseform);
+                                            }
+                                        }
+                                    } else {
+                                        ArrayList<String> list = new ArrayList<String>(1);
+                                        list.add(baseform);
+                                        d.createException(pos, derivation, list);
                                     }
+                                    derivation = null;
+                                } else {
+                                    log.error("Missing baseform for addexc command for derivation " + derivation);
+                                    System.exit(1);
                                 }
                             } else {
-                                ArrayList<String> list = new ArrayList<String>(1);
-                                list.add(baseform);
-                                d.createException(pos, derivation, list);
+                                log.error("Missing pos for addexc command for derivation " + derivation);
+                                System.exit(1);
                             }
-                            derivation = null;
                         } else {
-                            log.error("Missing baseform for addexc command for derivation " + derivation);
+                            log.error("Missing derivation for addexc command");
                             System.exit(1);
                         }
+                        argProcessed = true;
                     }
 
                     if ("-removeexc".equals(args[i])) {
@@ -577,6 +604,11 @@ public class ewn {
                             System.exit(1);
                         }
                         derivation = null;
+                        argProcessed = true;
+                    }
+
+                    if (!argProcessed) {
+                        log.warn("Argument ignored: " + args[i]);
                     }
                 }
 
