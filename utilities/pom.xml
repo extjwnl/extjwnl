@@ -34,7 +34,7 @@
             <scope>runtime</scope>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.17</version>
+            <version>5.1.21</version>
         </dependency>
     </dependencies>
 
@@ -43,16 +43,6 @@
         <outputDirectory>target/classes</outputDirectory>
         <directory>target</directory>
         <finalName>${project.artifactId}-${project.version}</finalName>
-
-        <!--
-        <extensions>
-            <extension>
-                <groupId>org.apache.maven.wagon</groupId>
-                <artifactId>wagon-ssh</artifactId>
-                <version>1.0-beta-7</version>
-            </extension>
-        </extensions>
-        -->
     </build>
 
     <profiles>
@@ -68,30 +58,6 @@
 
             <build>
                 <plugins>
-                    <!--
-                    <plugin>
-                        <artifactId>maven-deploy-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>deploy-extjwnl</id>
-                                <phase>install</phase>
-                                <goals>
-                                    <goal>deploy-file</goal>
-                                </goals>
-                                <configuration>
-                                    <repositoryId>extjwnl-frs</repositoryId>
-                                    <file>${project.build.directory}/extjwnl-${project.version}.zip</file>
-                                    <packaging>zip</packaging>
-                                    <generatePom>false</generatePom>
-                                    <url>sftp://autayeu,extjwnl@frs.sourceforge.net:/home/frs/project/e/ex/extjwnl/</url>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>${project.artifactId}</artifactId>
-                                    <version>${project.version}</version>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    -->
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>appassembler-maven-plugin</artifactId>

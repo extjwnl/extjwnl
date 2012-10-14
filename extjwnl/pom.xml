@@ -34,18 +34,8 @@
             <scope>test</scope>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.17</version>
+            <version>5.1.21</version>
         </dependency>
-
-        <!-- logs are nicer, but log4j blocks threads
-        <dependency>
-            <scope>test</scope>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.14</version>
-        </dependency>
-        -->
-
     </dependencies>
 
     <build>
