@@ -13,7 +13,7 @@ public class RelationshipList extends ArrayList<Relationship> {
     /**
      * The index of the shallowest relationship.
      */
-    private int shallowestIndex = Integer.MAX_VALUE;
+    private int shallowestIndex = -1;
     /**
      * The index of the deepest relationship.
      */
@@ -23,22 +23,31 @@ public class RelationshipList extends ArrayList<Relationship> {
         super();
     }
 
+    @Override
     public boolean add(Relationship relationship) {
         int curSize = size();
         boolean success = super.add(relationship);
-        if (success) {
-            if (relationship.getDepth() < shallowestIndex) {
-                shallowestIndex = curSize;
-            }
-            if (relationship.getDepth() > deepestIndex) {
-                deepestIndex = curSize;
+        if (1 == size()) {
+            shallowestIndex = 0;
+            deepestIndex = 0;
+        } else {
+            Relationship shallowest = get(shallowestIndex);
+            Relationship deepest = get(deepestIndex);
+            if (success) {
+                if (relationship.getDepth() < shallowest.getDepth()) {
+                    shallowestIndex = curSize;
+                }
+                if (relationship.getDepth() > deepest.getDepth()) {
+                    deepestIndex = curSize;
+                }
             }
         }
         return success;
     }
 
     /**
-     * Returns the shallowest relationship in the list.
+     * Returns the shallowest relationship in the list. N.B. There can be more than one shallowest.
+     * The shallowest index is not updated on element removal.
      *
      * @return the shallowest Relationship in the list
      */
@@ -50,7 +59,8 @@ public class RelationshipList extends ArrayList<Relationship> {
     }
 
     /**
-     * Returns the deepest Relationship in the list.
+     * Returns the deepest Relationship in the list. N.B. There can be more than one deepest.
+     * The shallowest index is not updated on element removal.
      *
      * @return the deepest Relationship in the list
      */
