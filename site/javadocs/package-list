@@ -1,4 +1,5 @@
 net.sf.extjwnl
+net.sf.extjwnl.cli
 net.sf.extjwnl.data
 net.sf.extjwnl.data.list
 net.sf.extjwnl.data.relationship
@@ -12,3 +13,4 @@ net.sf.extjwnl.princeton.file
 net.sf.extjwnl.util
 net.sf.extjwnl.util.cache
 net.sf.extjwnl.util.factory
+net.sf.extjwnl.utilities
