@@ -1,5 +1,6 @@
 package net.sf.extjwnl.data.relationship;
 
+import net.sf.extjwnl.JWNL;
 import net.sf.extjwnl.data.PointerTarget;
 import net.sf.extjwnl.data.PointerType;
 import net.sf.extjwnl.data.Synset;
@@ -35,9 +36,21 @@ public abstract class Relationship {
     private final Synset targetSynset;
 
     protected Relationship(PointerType type, PointerTargetNodeList nodes, Synset sourceSynset, Synset targetSynset) {
+        if (null == type) {
+            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_058"));
+        }
         this.type = type;
+        if (null == nodes) {
+            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_059"));
+        }
         this.nodes = nodes;
+        if (null == sourceSynset) {
+            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_060"));
+        }
         this.sourceSynset = sourceSynset;
+        if (null == targetSynset) {
+            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_061"));
+        }
         this.targetSynset = targetSynset;
     }
 
@@ -79,14 +92,26 @@ public abstract class Relationship {
     /**
      * Two relationships are assumed equal if they have the same source synset, target synset, and type.
      */
-    public boolean equals(Object obj) {
-        if (obj instanceof Relationship) {
-            Relationship r = (Relationship) obj;
-            return r.getType().equals(getType())
-                    && r.getSourceSynset().equals(getSourceSynset())
-                    && r.getTargetSynset().equals(getTargetSynset());
-        }
-        return false;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Relationship)) return false;
+
+        Relationship that = (Relationship) o;
+
+        if (type != that.type) return false;
+        if (!sourceSynset.equals(that.sourceSynset)) return false;
+        if (!targetSynset.equals(that.targetSynset)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = type.hashCode();
+        result = 31 * result + sourceSynset.hashCode();
+        result = 31 * result + targetSynset.hashCode();
+        return result;
     }
 
     public PointerType getType() {
