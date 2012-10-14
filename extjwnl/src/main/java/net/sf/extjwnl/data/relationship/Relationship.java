@@ -77,7 +77,7 @@ public abstract class Relationship {
     }
 
     /**
-     * Two relationships are assumed equal if they have the same source synset, target synset, and type
+     * Two relationships are assumed equal if they have the same source synset, target synset, and type.
      */
     public boolean equals(Object obj) {
         if (obj instanceof Relationship) {
