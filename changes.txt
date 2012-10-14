@@ -2,6 +2,7 @@
 
 - miscellaneous bug fixes
 - added "argument ignored" warning in ewn
+- dependencies updated
 
 1.6.4
 
