@@ -80,7 +80,7 @@ public abstract class AbstractCachingDictionary extends Dictionary {
         return getCaches().getCacheSize(type);
     }
 
-    public int getCacheCapacity(DictionaryElementType type) {
+    public long getCacheCapacity(DictionaryElementType type) {
         return getCaches().getCacheCapacity(type);
     }
 

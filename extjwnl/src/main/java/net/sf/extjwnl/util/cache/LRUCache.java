@@ -24,11 +24,11 @@ public class LRUCache<K, V> implements Cache<K, V> {
         m = new ConcurrentLinkedHashMap.Builder<K, V>().maximumWeightedCapacity(capacity).build();
     }
 
-    public void setCapacity(int capacity) {
+    public void setCapacity(long capacity) {
         m.setCapacity(capacity);
     }
 
-    public int getCapacity() {
+    public long getCapacity() {
         return m.capacity();
     }
 

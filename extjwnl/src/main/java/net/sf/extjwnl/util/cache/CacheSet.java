@@ -70,8 +70,8 @@ public abstract class CacheSet<K, A, B> {
         return result;
     }
 
-    public int getCacheCapacity(K cacheKey) {
-        int result = 0;
+    public long getCacheCapacity(K cacheKey) {
+        long result = 0;
         for (POS pos : POS.getAllPOS()) {
             result = result + getCache(cacheKey).getCache(pos).getCapacity();
         }

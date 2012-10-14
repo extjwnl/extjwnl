@@ -16,12 +16,12 @@ public interface Cache<K, V> extends Map<K, V> {
      *
      * @return the maximum number of elements the cache can hold
      */
-    int getCapacity();
+    long getCapacity();
 
     /**
      * Sets the maximum number of elements the cache can hold.
      *
      * @param capacity capacity
      */
-    void setCapacity(int capacity);
+    void setCapacity(long capacity);
 }
