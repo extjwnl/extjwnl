@@ -1,4 +1,4 @@
-1.6.5
+1.6.6
 
 - miscellaneous bug fixes
 - added "argument ignored" warning in ewn
