@@ -17,7 +17,7 @@ public class TestThreadsDictionary extends MultiThreadedTestCase {
     private final String properties = "./src/test/resources/file_no_cache.xml";
     private static Dictionary d;
     private final int threadCount = 5;
-    private final int runCount = 10;
+    private final int runCount = 3;
 
     /**
      * Basic constructor - called by the test runners.
