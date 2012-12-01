@@ -40,6 +40,10 @@ public class IndexWord extends BaseDictionaryElement {
     private transient SynsetList synsets = null;
 
     private class SynsetList extends ArrayList<Synset> {
+        private SynsetList() {
+            super();
+        }
+
         private SynsetList(int initialCapacity) {
             super(initialCapacity);
         }
@@ -382,8 +386,14 @@ public class IndexWord extends BaseDictionaryElement {
             if (null != synsetOffsets) {
                 synchronized (this) {
                     if (null != synsetOffsets) {
+                        super.ensureCapacity(synsetOffsets.length);
                         for (long synsetOffset : synsetOffsets) {
-                            super.add(loadSynset(synsetOffset));
+                            Synset synset = loadSynset(synsetOffset);
+                            if (null != synset) {
+                                super.add(synset);
+                            } else {
+                                log.warn(JWNL.resolveMessage("DICTIONARY_WARN_004", new Object[]{synsetOffset, getLemma()}));
+                            }
                         }
                         synsetOffsets = null;
                     }
@@ -503,7 +513,7 @@ public class IndexWord extends BaseDictionaryElement {
      */
     public List<Synset> getSenses() {
         if (null == synsets) {
-            synsets = new SynsetList(synsetOffsets.length);
+            synsets = new SynsetList();
         }
         return synsets;
     }

@@ -9,7 +9,7 @@ import java.io.IOException;
  *
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
-public class TestGetFileBackedInstance extends DictionaryTester {
+public class TestGetFileBackedInstance extends DictionaryReadTester {
 
     /**
      * Data files location.

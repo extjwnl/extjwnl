@@ -38,7 +38,7 @@ public class TestThreadsDictionary extends MultiThreadedTestCase {
 
         @Override
         public void runTestCase() throws JWNLException, CloneNotSupportedException {
-            DictionaryTester dt = new DictionaryTester(d);
+            DictionaryReadTester dt = new DictionaryReadTester(d);
             for (int i = 0; i < runCount; i++) {
                 dt.runAllTests();
             }

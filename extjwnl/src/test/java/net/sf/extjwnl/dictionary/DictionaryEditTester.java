@@ -1,0 +1,668 @@
+package net.sf.extjwnl.dictionary;
+
+import net.sf.extjwnl.JWNLException;
+import net.sf.extjwnl.data.*;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+
+/**
+ * Tests dictionary editing.
+ *
+ * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
+ */
+public abstract class DictionaryEditTester {
+
+    private final String entityGloss = "that which is perceived or known or inferred to have its own distinct existence (living or nonliving)";
+    private final String entityLemma = "entity";
+    private final String physical_entityGloss = "an entity that has physical existence";
+    private final String physical_entityLemma = "physìcal entìty";//ì to test encoding
+    private final String abstractionGloss = "a general concept formed by extracting common features from specific examples";
+    private final String[] abstractionWords = {"abstraction", "abstract entity"};
+
+    private final String[] exception1 = {"alto-relievos", "alto-relievo", "alto-rilievo"};
+    private final String[] exception2 = {"aìdes-de-camp", "aìde-de-camp"};//ì to test encoding
+    private final String[] exception3 = {"altocumuli", "altocumulus"};//to test sorting
+
+    private Dictionary dictionary;
+
+    protected abstract InputStream getProperties() throws FileNotFoundException;
+
+    @Before
+    public void setUp() throws IOException, JWNLException {
+        // clean up files left previously
+        dictionary = Dictionary.getInstance(getProperties());
+        dictionary.close();
+        dictionary.delete();
+
+        dictionary = Dictionary.getInstance(getProperties());
+    }
+
+    @After
+    public void tearDown() throws IOException, JWNLException {
+        dictionary.close();
+        dictionary.delete();
+    }
+
+    @Test
+    public void testEmptyDictionary() throws IOException, JWNLException {
+        for (POS pos : POS.getAllPOS()) {
+            int synsetCount = 0;
+            Iterator<Synset> si = dictionary.getSynsetIterator(pos);
+            while (si.hasNext()) {
+                synsetCount++;
+            }
+            Assert.assertEquals(0, synsetCount);
+
+            int iwCount = 0;
+            Iterator<IndexWord> ii = dictionary.getIndexWordIterator(pos);
+            while (ii.hasNext()) {
+                iwCount++;
+            }
+            Assert.assertEquals(0, iwCount);
+
+            int excCount = 0;
+            Iterator<Exc> ei = dictionary.getExceptionIterator(pos);
+            while (ei.hasNext()) {
+                excCount++;
+            }
+            Assert.assertEquals(0, excCount);
+        }
+    }
+
+    @Test
+    public void testExceptionsCreate() throws JWNLException, FileNotFoundException {
+        dictionary.edit();
+
+        createExceptions(dictionary);
+        checkThreeExceptions(dictionary);
+    }
+
+    @Test
+    public void testExceptionsRecreate() throws JWNLException, IOException {
+        dictionary.edit();
+
+        createExceptions(dictionary);
+        saveAndReloadDictionary();
+        checkThreeExceptions(dictionary);
+    }
+
+    @Test
+    public void testExceptionsSetNull() throws JWNLException {
+        dictionary.edit();
+
+        createExceptions(dictionary);
+        checkThreeExceptions(dictionary);
+
+        Exc e3 = dictionary.getException(POS.NOUN, exception3[0]);
+        e3.setDictionary(null);
+        Assert.assertNull(e3.getDictionary());
+        testTwoExceptions(dictionary);
+        Assert.assertNull(dictionary.getException(POS.NOUN, exception3[0]));
+    }
+
+    @Test
+    public void testExceptionsSetNullRecreate() throws JWNLException, FileNotFoundException {
+        dictionary.edit();
+
+        createExceptions(dictionary);
+        checkThreeExceptions(dictionary);
+
+        Exc e3 = dictionary.getException(POS.NOUN, exception3[0]);
+        e3.setDictionary(null);
+        Assert.assertNull(e3.getDictionary());
+
+        saveAndReloadDictionary();
+        testTwoExceptions(dictionary);
+        Assert.assertNull(dictionary.getException(POS.NOUN, exception3[0]));
+    }
+
+    @Test
+    public void testExceptionsRemove() throws JWNLException {
+        dictionary.edit();
+
+        createExceptions(dictionary);
+        checkThreeExceptions(dictionary);
+
+        Exc e3 = dictionary.getException(POS.NOUN, exception3[0]);
+        dictionary.removeException(e3);
+
+        Assert.assertNull(e3.getDictionary());
+        testTwoExceptions(dictionary);
+        e3 = dictionary.getException(POS.NOUN, exception3[0]);
+        Assert.assertNull(e3);
+    }
+
+    @Test
+    public void testExceptionsRemoveRecreate() throws JWNLException, IOException {
+        dictionary.edit();
+
+        createExceptions(dictionary);
+        checkThreeExceptions(dictionary);
+
+        Exc e3 = dictionary.getException(POS.NOUN, exception3[0]);
+        dictionary.removeException(e3);
+        Assert.assertNull(e3.getDictionary());
+        testTwoExceptions(dictionary);
+        e3 = dictionary.getException(POS.NOUN, exception3[0]);
+        Assert.assertNull(e3);
+
+        saveAndReloadDictionary();
+
+        testTwoExceptions(dictionary);
+        e3 = dictionary.getException(POS.NOUN, exception3[0]);
+        Assert.assertNull(e3);
+    }
+
+    private void saveAndReloadDictionary() throws JWNLException, FileNotFoundException {
+        dictionary.save();
+        dictionary.close();
+        dictionary = Dictionary.getInstance(getProperties());
+    }
+
+    private void createExceptions(Dictionary dictionary) throws JWNLException {
+        dictionary.createException(POS.NOUN, exception1[0], Arrays.asList(exception1[1], exception1[2]));
+        dictionary.createException(POS.NOUN, exception2[0], Arrays.asList(exception2[1]));
+        dictionary.createException(POS.NOUN, exception3[0], Arrays.asList(exception3[1]));
+    }
+
+    private void checkThreeExceptions(Dictionary dictionary) throws JWNLException {
+        Exc e1 = dictionary.getException(POS.NOUN, exception1[0]);
+        Exc e2 = dictionary.getException(POS.NOUN, exception2[0]);
+        Exc e3 = dictionary.getException(POS.NOUN, exception3[0]);
+
+        Assert.assertNotNull(e1);
+        Assert.assertEquals(exception1[0], e1.getLemma());
+        Assert.assertEquals(2, e1.getExceptions().size());
+        Assert.assertEquals(exception1[1], e1.getExceptions().get(0));
+        Assert.assertEquals(exception1[2], e1.getExceptions().get(1));
+        Assert.assertNotNull(e2);
+        Assert.assertNotNull(e3);
+
+        List<Exc> exceptions = new ArrayList<Exc>(3);
+        Iterator<Exc> ei = dictionary.getExceptionIterator(POS.NOUN);
+        while (ei.hasNext()) {
+            exceptions.add(ei.next());
+        }
+        Assert.assertEquals(3, exceptions.size());
+        Assert.assertTrue(exceptions.contains(e1));
+        Assert.assertTrue(exceptions.contains(e2));
+        Assert.assertTrue(exceptions.contains(e3));
+    }
+
+    private void testTwoExceptions(Dictionary dictionary) throws JWNLException {
+        Exc e1 = dictionary.getException(POS.NOUN, exception1[0]);
+        Exc e2 = dictionary.getException(POS.NOUN, exception2[0]);
+
+        Assert.assertNotNull(e1);
+        Assert.assertEquals(exception1[0], e1.getLemma());
+        Assert.assertEquals(2, e1.getExceptions().size());
+        Assert.assertEquals(exception1[1], e1.getExceptions().get(0));
+        Assert.assertEquals(exception1[2], e1.getExceptions().get(1));
+        Assert.assertNotNull(e2);
+
+        List<Exc> exceptions = new ArrayList<Exc>(2);
+        Iterator<Exc> ei = dictionary.getExceptionIterator(POS.NOUN);
+        while (ei.hasNext()) {
+            exceptions.add(ei.next());
+        }
+        Assert.assertEquals(2, exceptions.size());
+        Assert.assertTrue(exceptions.contains(e1));
+        Assert.assertTrue(exceptions.contains(e2));
+    }
+
+    @Test
+    public void testCreateSynset() throws JWNLException {
+        dictionary.edit();
+
+        Synset synEntity = dictionary.createSynset(POS.NOUN);
+        Assert.assertNotNull(synEntity);
+        Assert.assertEquals(POS.NOUN, synEntity.getPOS());
+        Assert.assertTrue(-1 < synEntity.getOffset());
+        Assert.assertEquals(0, synEntity.getPointers().size());
+        Assert.assertEquals(0, synEntity.getWords().size());
+
+        ArrayList<Synset> synsets = new ArrayList<Synset>();
+        Iterator<Synset> si = dictionary.getSynsetIterator(POS.NOUN);
+        while (si.hasNext()) {
+            synsets.add(si.next());
+        }
+        Assert.assertEquals(1, synsets.size());
+        Assert.assertTrue(synsets.contains(synEntity));
+
+        synEntity.setGloss(entityGloss);
+        Assert.assertEquals(entityGloss, synEntity.getGloss());
+
+        int iwCount = 0;
+        Iterator<IndexWord> ii = dictionary.getIndexWordIterator(POS.NOUN);
+        while (ii.hasNext()) {
+            iwCount++;
+        }
+        Assert.assertEquals(0, iwCount);
+    }
+
+    @Test
+    public void testCreateSynsetRecreate() throws JWNLException, FileNotFoundException {
+        dictionary.edit();
+
+        Synset synEntity = dictionary.createSynset(POS.NOUN);
+        synEntity.setGloss(entityGloss);
+
+        saveAndReloadDictionary();
+
+        ArrayList<Synset> synsets = new ArrayList<Synset>();
+        Iterator<Synset> si = dictionary.getSynsetIterator(POS.NOUN);
+        while (si.hasNext()) {
+            synsets.add(si.next());
+        }
+        Assert.assertEquals(1, synsets.size());
+        Assert.assertTrue(synsets.contains(synEntity));
+
+        synEntity = synsets.get(0);
+
+        Assert.assertNotNull(synEntity);
+        Assert.assertEquals(POS.NOUN, synEntity.getPOS());
+        Assert.assertTrue(-1 < synEntity.getOffset());
+        Assert.assertEquals(0, synEntity.getPointers().size());
+        Assert.assertEquals(0, synEntity.getWords().size());
+        Assert.assertEquals(entityGloss, synEntity.getGloss());
+
+        int iwCount = 0;
+        Iterator<IndexWord> ii = dictionary.getIndexWordIterator(POS.NOUN);
+        while (ii.hasNext()) {
+            iwCount++;
+        }
+        Assert.assertEquals(0, iwCount);
+    }
+
+    @Test
+    public void testCreateWord() throws JWNLException {
+        dictionary.edit();
+        createEntityWord(dictionary);
+        checkEntityWord(dictionary);
+    }
+
+    @Test
+    public void testCreateWordRecreate() throws JWNLException, FileNotFoundException {
+        dictionary.edit();
+        createEntityWord(dictionary);
+        saveAndReloadDictionary();
+        checkEntityWord(dictionary);
+    }
+
+    private void createEntityWord(Dictionary dictionary) throws JWNLException {
+        Synset synEntity = dictionary.createSynset(POS.NOUN);
+        synEntity.setGloss(entityGloss);
+        synEntity.getWords().add(new Word(dictionary, synEntity, 1, entityLemma));
+    }
+
+    private void checkEntityWord(Dictionary dictionary) throws JWNLException {
+        IndexWord iwEntity = dictionary.getIndexWord(POS.NOUN, entityLemma);
+        Assert.assertNotNull(iwEntity);
+        Assert.assertEquals(1, iwEntity.getSenses().size());
+        Assert.assertEquals(entityLemma, iwEntity.getLemma());
+        Assert.assertEquals(POS.NOUN, iwEntity.getPOS());
+        Assert.assertNotNull(iwEntity.getSynsetOffsets());
+        Assert.assertEquals(1, iwEntity.getSynsetOffsets().length);
+
+        ArrayList<IndexWord> indexWords = new ArrayList<IndexWord>();
+        Iterator<IndexWord> ii = dictionary.getIndexWordIterator(POS.NOUN);
+        while (ii.hasNext()) {
+            indexWords.add(ii.next());
+        }
+        Assert.assertTrue(indexWords.contains(iwEntity));
+
+        Synset synEntity = iwEntity.getSenses().get(0);
+        Assert.assertEquals(1, synEntity.getWords().size());
+        Assert.assertNotNull(synEntity.getWords().get(0));
+        Assert.assertEquals(entityLemma, synEntity.getWords().get(0).getLemma());
+        Assert.assertEquals(1, synEntity.getWords().get(0).getIndex());
+        Assert.assertEquals(POS.NOUN, synEntity.getWords().get(0).getPOS());
+        Assert.assertEquals(synEntity, synEntity.getWords().get(0).getSynset());
+    }
+
+    private void createPEntityWord(Dictionary dictionary) throws JWNLException {
+        Synset synPEntity = dictionary.createSynset(POS.NOUN);
+        synPEntity.setGloss(physical_entityGloss);
+        synPEntity.getWords().add(new Word(dictionary, synPEntity, 1, physical_entityLemma));
+    }
+
+    private void checkPEntityWord(Dictionary dictionary) throws JWNLException {
+        IndexWord iwpEntity = dictionary.getIndexWord(POS.NOUN, physical_entityLemma);
+        Assert.assertNotNull(iwpEntity);
+        Assert.assertEquals(1, iwpEntity.getSenses().size());
+        Assert.assertEquals(physical_entityLemma, iwpEntity.getLemma());
+        Assert.assertEquals(POS.NOUN, iwpEntity.getPOS());
+        Assert.assertNotNull(iwpEntity.getSynsetOffsets());
+        Assert.assertEquals(1, iwpEntity.getSynsetOffsets().length);
+
+        ArrayList<IndexWord> indexWords = new ArrayList<IndexWord>();
+        Iterator<IndexWord> ii = dictionary.getIndexWordIterator(POS.NOUN);
+        while (ii.hasNext()) {
+            indexWords.add(ii.next());
+        }
+        Assert.assertTrue(indexWords.contains(iwpEntity));
+
+        Synset synPEntity = iwpEntity.getSenses().get(0);
+        Assert.assertEquals(1, synPEntity.getWords().size());
+        Assert.assertNotNull(synPEntity.getWords().get(0));
+        Assert.assertEquals(physical_entityLemma, synPEntity.getWords().get(0).getLemma());
+        Assert.assertEquals(1, synPEntity.getWords().get(0).getIndex());
+        Assert.assertEquals(POS.NOUN, synPEntity.getWords().get(0).getPOS());
+        Assert.assertEquals(synPEntity, synPEntity.getWords().get(0).getSynset());
+    }
+
+    @Test
+    public void testCreatePointer() throws JWNLException {
+        dictionary.edit();
+
+        createEntityWord(dictionary);
+        createPEntityWord(dictionary);
+        createEntityPEntityPointer(dictionary);
+
+        checkEntityWord(dictionary);
+        checkPEntityWord(dictionary);
+        checkEntityPEntityPointer(dictionary);
+        checkIterators(dictionary);
+    }
+
+    @Test
+    public void testCreatePointerRecreate() throws JWNLException, FileNotFoundException {
+        dictionary.edit();
+
+        createEntityWord(dictionary);
+        createPEntityWord(dictionary);
+        createEntityPEntityPointer(dictionary);
+
+        saveAndReloadDictionary();
+
+        checkEntityWord(dictionary);
+        checkPEntityWord(dictionary);
+        checkEntityPEntityPointer(dictionary);
+        checkIterators(dictionary);
+    }
+
+    private void createEntityPEntityPointer(Dictionary dictionary) throws JWNLException {
+        IndexWord iwEntity = dictionary.getIndexWord(POS.NOUN, entityLemma);
+        Synset synEntity = iwEntity.getSenses().get(0);
+        IndexWord iwPEntity = dictionary.getIndexWord(POS.NOUN, physical_entityLemma);
+        Synset synPEntity = iwPEntity.getSenses().get(0);
+
+        Assert.assertEquals(0, synEntity.getPointers().size());
+        Assert.assertEquals(0, synPEntity.getPointers().size());
+
+        synPEntity.getPointers().add(new Pointer(PointerType.HYPERNYM, synPEntity, synEntity));
+    }
+
+    private void checkEntityPEntityPointer(Dictionary dictionary) throws JWNLException {
+        IndexWord iwEntity = dictionary.getIndexWord(POS.NOUN, entityLemma);
+        Synset synEntity = iwEntity.getSenses().get(0);
+        IndexWord iwPEntity = dictionary.getIndexWord(POS.NOUN, physical_entityLemma);
+        Synset synPEntity = iwPEntity.getSenses().get(0);
+
+        //direct pointer
+        Assert.assertEquals(1, synPEntity.getPointers().size());
+        Assert.assertNotNull(synPEntity.getPointers().get(0));
+        Assert.assertEquals(PointerType.HYPERNYM, synPEntity.getPointers().get(0).getType());
+        Assert.assertEquals(synPEntity, synPEntity.getPointers().get(0).getSource());
+        Assert.assertEquals(synEntity, synPEntity.getPointers().get(0).getTarget());
+
+        //reverse pointer
+        Assert.assertEquals(1, synEntity.getPointers().size());
+        Assert.assertNotNull(synEntity.getPointers().get(0));
+        Assert.assertEquals(PointerType.HYPONYM, synEntity.getPointers().get(0).getType());
+        Assert.assertEquals(synEntity, synEntity.getPointers().get(0).getSource());
+        Assert.assertEquals(synPEntity, synEntity.getPointers().get(0).getTarget());
+    }
+
+    @Test
+    public void testIndexWordRemove() throws IOException, JWNLException {
+        dictionary.edit();
+
+        createEntityWord(dictionary);
+        createPEntityWord(dictionary);
+        createEntityPEntityPointer(dictionary);
+        createAbstractionWords(dictionary);
+        testAbstractionWords(dictionary);
+
+        IndexWord iwAbstraction = dictionary.getIndexWord(POS.NOUN, abstractionWords[1]);
+        dictionary.removeIndexWord(iwAbstraction);
+        iwAbstraction = dictionary.getIndexWord(POS.NOUN, abstractionWords[1]);
+        Assert.assertNull(iwAbstraction);
+
+        iwAbstraction = dictionary.getIndexWord(POS.NOUN, abstractionWords[0]);
+        Synset synAbstraction = iwAbstraction.getSenses().get(0);
+        Assert.assertEquals(1, synAbstraction.getWords().size());
+    }
+
+    @Test
+    public void testIndexWordRemoveRecreate() throws IOException, JWNLException {
+        dictionary.edit();
+
+        createEntityWord(dictionary);
+        createPEntityWord(dictionary);
+        createEntityPEntityPointer(dictionary);
+        createAbstractionWords(dictionary);
+        testAbstractionWords(dictionary);
+
+        IndexWord iwAbstraction = dictionary.getIndexWord(POS.NOUN, abstractionWords[1]);
+        dictionary.removeIndexWord(iwAbstraction);
+
+        saveAndReloadDictionary();
+
+        iwAbstraction = dictionary.getIndexWord(POS.NOUN, abstractionWords[1]);
+        Assert.assertNull(iwAbstraction);
+        iwAbstraction = dictionary.getIndexWord(POS.NOUN, abstractionWords[0]);
+        Synset synAbstraction = iwAbstraction.getSenses().get(0);
+        Assert.assertEquals(1, synAbstraction.getWords().size());
+    }
+
+    @Test
+    public void testUseCount() throws IOException, JWNLException {
+        dictionary.edit();
+
+        createEntityWord(dictionary);
+        createPEntityWord(dictionary);
+        createEntityPEntityPointer(dictionary);
+        createAbstractionWords(dictionary);
+        saveAndReloadDictionary();
+        testAbstractionWords(dictionary);
+    }
+
+    private void createAbstractionWords(Dictionary dictionary) throws JWNLException {
+        IndexWord iwEntity = dictionary.getIndexWord(POS.NOUN, entityLemma);
+        Synset synEntity = iwEntity.getSenses().get(0);
+
+        Synset synAbstraction = dictionary.createSynset(POS.NOUN);
+        synAbstraction.setGloss(abstractionGloss);
+        synAbstraction.getPointers().add(new Pointer(PointerType.HYPERNYM, synAbstraction, synEntity));
+
+        for (int i = 0; i < abstractionWords.length; i++) {
+            Word word = new Word(dictionary, synAbstraction, i + 1, abstractionWords[i]);
+            word.setUseCount(i + 1);
+            synAbstraction.getWords().add(word);
+        }
+    }
+
+    private void testAbstractionWords(Dictionary dictionary) throws JWNLException {
+        IndexWord iwEntity = dictionary.getIndexWord(POS.NOUN, entityLemma);
+        Synset synEntity = iwEntity.getSenses().get(0);
+
+        IndexWord iwAbstraction = dictionary.getIndexWord(POS.NOUN, abstractionWords[0]);
+        Synset synAbstraction = iwAbstraction.getSenses().get(0);
+        Assert.assertNotNull(synAbstraction);
+        Assert.assertEquals(2, synEntity.getPointers().size());
+        Assert.assertEquals(2, synAbstraction.getWords().size());
+
+        IndexWord[] iwAbstractions = new IndexWord[2];
+        for (int i = 0; i < abstractionWords.length; i++) {
+            iwAbstractions[i] = dictionary.getIndexWord(POS.NOUN, abstractionWords[i]);
+            Assert.assertNotNull(iwAbstractions[i]);
+            Assert.assertEquals(1, iwAbstractions[i].getSenses().size());
+            Assert.assertEquals(synAbstraction, iwAbstractions[i].getSenses().get(0));
+            Assert.assertEquals(abstractionWords[i], iwAbstractions[i].getLemma());
+            Assert.assertEquals(POS.NOUN, iwAbstractions[i].getPOS());
+            Assert.assertNotNull(iwAbstractions[i].getSynsetOffsets());
+            Assert.assertEquals(1, iwAbstractions[i].getSynsetOffsets().length);
+            Assert.assertEquals(synAbstraction.getOffset(), iwAbstractions[i].getSynsetOffsets()[0]);
+        }
+        for (int i = 0; i < abstractionWords.length; i++) {
+            Word word = synAbstraction.getWords().get(synAbstraction.indexOfWord(abstractionWords[i]));
+            Assert.assertEquals(i + 1, word.getUseCount());
+        }
+    }
+
+    @Test
+    public void testSynsetRemove() throws IOException, JWNLException {
+        dictionary.edit();
+
+        createEntityWord(dictionary);
+        createPEntityWord(dictionary);
+        createEntityPEntityPointer(dictionary);
+        checkIterators(dictionary);
+        createAbstractionWords(dictionary);
+
+        IndexWord iwAbstraction = dictionary.getIndexWord(POS.NOUN, abstractionWords[0]);
+        Synset synAbstraction = iwAbstraction.getSenses().get(0);
+        dictionary.removeSynset(synAbstraction);
+        testSynsetIterator(dictionary);
+
+        IndexWord iwEntity = dictionary.getIndexWord(POS.NOUN, entityLemma);
+        Synset synEntity = iwEntity.getSenses().get(0);
+        Assert.assertEquals(1, synEntity.getPointers().size());
+
+        IndexWord[] iwAbstractions = new IndexWord[2];
+        for (int i = 0; i < abstractionWords.length; i++) {
+            iwAbstractions[i] = dictionary.getIndexWord(POS.NOUN, abstractionWords[i]);
+            Assert.assertNull(iwAbstractions[i]);
+        }
+        testIndexWordIterator(dictionary);
+    }
+
+    @Test
+    public void testSynsetRemoveRecreate() throws IOException, JWNLException {
+        dictionary.edit();
+
+        createEntityWord(dictionary);
+        createPEntityWord(dictionary);
+        createEntityPEntityPointer(dictionary);
+        checkIterators(dictionary);
+        createAbstractionWords(dictionary);
+
+        saveAndReloadDictionary();
+
+        IndexWord iwAbstraction = dictionary.getIndexWord(POS.NOUN, abstractionWords[0]);
+        Synset synAbstraction = iwAbstraction.getSenses().get(0);
+        dictionary.edit();
+        dictionary.removeSynset(synAbstraction);
+
+        saveAndReloadDictionary();
+
+        testSynsetIterator(dictionary);
+
+        IndexWord iwEntity = dictionary.getIndexWord(POS.NOUN, entityLemma);
+        Synset synEntity = iwEntity.getSenses().get(0);
+        Assert.assertEquals(1, synEntity.getPointers().size());
+
+        IndexWord[] iwAbstractions = new IndexWord[2];
+        for (int i = 0; i < abstractionWords.length; i++) {
+            iwAbstractions[i] = dictionary.getIndexWord(POS.NOUN, abstractionWords[i]);
+            Assert.assertNull(iwAbstractions[i]);
+        }
+        testIndexWordIterator(dictionary);
+    }
+
+    private void checkIterators(Dictionary dictionary) throws JWNLException {
+        testSynsetIterator(dictionary);
+        testIndexWordIterator(dictionary);
+    }
+
+    private void testSynsetIterator(Dictionary dictionary) throws JWNLException {
+        List<Synset> synsets = new ArrayList<Synset>();
+        Iterator<Synset> si = dictionary.getSynsetIterator(POS.NOUN);
+        while (si.hasNext()) {
+            synsets.add(si.next());
+        }
+        Assert.assertEquals(2, synsets.size());
+        IndexWord iwEntity = dictionary.getIndexWord(POS.NOUN, entityLemma);
+        Synset synEntity = iwEntity.getSenses().get(0);
+        Assert.assertTrue(synsets.contains(synEntity));
+
+        IndexWord iwpEntity = dictionary.getIndexWord(POS.NOUN, physical_entityLemma);
+        Synset synPEntity = iwpEntity.getSenses().get(0);
+        Assert.assertTrue(synsets.contains(synPEntity));
+    }
+
+    private void testIndexWordIterator(Dictionary dictionary) throws JWNLException {
+        List<IndexWord> indexWords = new ArrayList<IndexWord>();
+        Iterator<IndexWord> ii = dictionary.getIndexWordIterator(POS.NOUN);
+        while (ii.hasNext()) {
+            indexWords.add(ii.next());
+        }
+        Assert.assertEquals(2, indexWords.size());
+
+        IndexWord iwEntity = dictionary.getIndexWord(POS.NOUN, entityLemma);
+        Assert.assertTrue(indexWords.contains(iwEntity));
+
+        IndexWord iwpEntity = dictionary.getIndexWord(POS.NOUN, physical_entityLemma);
+        Assert.assertTrue(indexWords.contains(iwpEntity));
+    }
+
+    @Test
+    public void testWordRemove() throws IOException, JWNLException {
+        dictionary.edit();
+
+        createEntityWord(dictionary);
+        createPEntityWord(dictionary);
+        createEntityPEntityPointer(dictionary);
+        createAbstractionWords(dictionary);
+        testAbstractionWords(dictionary);
+
+        IndexWord iwAbstraction = dictionary.getIndexWord(POS.NOUN, abstractionWords[0]);
+        Synset synAbstraction = iwAbstraction.getSenses().get(0);
+        Assert.assertEquals(2, synAbstraction.getWords().size());
+
+        synAbstraction.getWords().remove(0);
+        Assert.assertEquals(1, synAbstraction.getWords().size());
+
+        iwAbstraction = dictionary.getIndexWord(POS.NOUN, abstractionWords[0]);
+        Assert.assertNull(iwAbstraction);
+    }
+
+    @Test
+    public void testWordRemoveRecreate() throws IOException, JWNLException {
+        dictionary.edit();
+
+        createEntityWord(dictionary);
+        createPEntityWord(dictionary);
+        createEntityPEntityPointer(dictionary);
+        createAbstractionWords(dictionary);
+        testAbstractionWords(dictionary);
+
+        IndexWord iwAbstraction = dictionary.getIndexWord(POS.NOUN, abstractionWords[0]);
+        Synset synAbstraction = iwAbstraction.getSenses().get(0);
+        Assert.assertEquals(2, synAbstraction.getWords().size());
+
+        synAbstraction.getWords().remove(0);
+        Assert.assertEquals(1, synAbstraction.getWords().size());
+
+        saveAndReloadDictionary();
+
+        iwAbstraction = dictionary.getIndexWord(POS.NOUN, abstractionWords[0]);
+        Assert.assertNull(iwAbstraction);
+
+        IndexWord iwAbstractEntity = dictionary.getIndexWord(POS.NOUN, abstractionWords[1]);
+        Assert.assertNotNull(iwAbstractEntity);
+        Assert.assertEquals(1, iwAbstractEntity.getSenses().size());
+        Assert.assertTrue(iwAbstractEntity.getSenses().contains(synAbstraction));
+    }
+}

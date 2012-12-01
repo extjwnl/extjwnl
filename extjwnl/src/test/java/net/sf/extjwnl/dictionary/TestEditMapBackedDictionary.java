@@ -5,13 +5,13 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 /**
- * Tests FileBackedDictionary editing.
+ * Tests MapBackedDictionary editing.
  *
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
-public class TestCreateFileBackedDictionary extends TestCreateDictionary {
+public class TestEditMapBackedDictionary extends DictionaryEditTester {
 
-    protected static final String properties = "./src/test/resources/clean_file.xml";
+    protected static final String properties = "./src/test/resources/clean_map.xml";
 
     @Override
     protected InputStream getProperties() throws FileNotFoundException {

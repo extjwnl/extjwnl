@@ -744,6 +744,11 @@ public abstract class Dictionary {
         if (!isEditable()) {
             throw new JWNLException("DICTIONARY_EXCEPTION_029");
         }
+        //take care of pointers
+        //this will delete symmetric ones
+        synset.getPointers().clear();
+        //asymmetric ones will be checked by the synset on gets
+
         synset.setDictionary(null);
 
         //take care of index words
@@ -754,11 +759,6 @@ public abstract class Dictionary {
                 indexWord.getSenses().remove(synset);
             }
         }
-
-        //take care of pointers
-        //this will delete symmetric ones
-        synset.getPointers().clear();
-        //asymmetric ones will be checked by the synset on gets
     }
 
     /**

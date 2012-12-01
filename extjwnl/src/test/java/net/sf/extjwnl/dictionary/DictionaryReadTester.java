@@ -15,14 +15,14 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * DictionaryTester is a test suite for dictionary methods
+ * DictionaryReadTester is a test suite for dictionary methods
  * but requires an implementation of a specific dictionary to
  * function.
  *
  * @author Brett Walenz <bwalenz@users.sourceforge.net>
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
-public class DictionaryTester {
+public class DictionaryReadTester {
 
     /**
      * The offset for wn30.
@@ -69,10 +69,10 @@ public class DictionaryTester {
 
     protected Dictionary dictionary;
 
-    public DictionaryTester() {
+    public DictionaryReadTester() {
     }
 
-    public DictionaryTester(Dictionary dictionary) {
+    public DictionaryReadTester(Dictionary dictionary) {
         this.dictionary = dictionary;
     }
 
