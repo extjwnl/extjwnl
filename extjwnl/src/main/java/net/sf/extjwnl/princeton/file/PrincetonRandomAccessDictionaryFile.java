@@ -591,6 +591,9 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                 }
                 writeLine(nextToLast);
                 writeLine(last);
+            } else if (1 == strings.size()) {
+                String last = strings.get(strings.size() - 1);
+                writeLine(last);
             }
             if (log.isInfoEnabled()) {
                 log.info(JWNL.resolveMessage("PRINCETON_INFO_014", 100));

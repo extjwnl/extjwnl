@@ -365,6 +365,7 @@ public class FileManagerImpl implements FileManager {
                         for (Word w : iw.getSenses().get(i).getWords()) {
                             String key = w.getSenseKeyWithAdjClass();
                             if (0 < w.getUseCount() && !renderedKeys.contains(key)) {
+                                toRender.add(w);
                                 renderedKeys.add(key);
                             }
                         }

@@ -317,6 +317,7 @@ public abstract class TestCreateDictionary {
             Assert.assertEquals(1, iwAbstraction[i].getSynsetOffsets().length);
             Assert.assertEquals(synAbstraction.getOffset(), iwAbstraction[i].getSynsetOffsets()[0]);
         }
+        synAbstraction = iwAbstraction[0].getSenses().get(0);
         for (int i = 0; i < abstractionWords.length; i++) {
             Word word = synAbstraction.getWords().get(synAbstraction.indexOfWord(abstractionWords[i]));
             Assert.assertEquals(i + 1, word.getUseCount());

@@ -465,7 +465,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
         public Word remove(int index) {
             if (null != dictionary && dictionary.isEditable()) {
                 Word result = super.remove(index);
-                removeFromIndexWords(super.get(index));
+                removeFromIndexWords(result);
                 return result;
             } else {
                 return super.remove(index);
