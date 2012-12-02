@@ -14,15 +14,6 @@
     <name>extJWNL Utilities</name>
     <description>Utilities for extJWNL library</description>
 
-    <!--
-    <distributionManagement>
-        <repository>
-            <id>extjwnl-frs</id>
-            <url>sftp://autayeu,extjwnl@frs.sourceforge.net:/home/frs/project/e/ex/extjwnl/</url>
-        </repository>
-    </distributionManagement>
-    -->
-
     <dependencies>
         <dependency>
             <groupId>net.sf.extjwnl</groupId>
