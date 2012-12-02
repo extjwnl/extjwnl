@@ -1,3 +1,9 @@
+1.6.8
+
+- miscellaneous bug fixes
+- test code coverage increased
+- maven plugin dependencies updated
+
 1.6.7
 
 - miscellaneous bug fixes
