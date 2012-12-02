@@ -1,6 +1,5 @@
 package net.sf.extjwnl.data;
 
-import net.sf.extjwnl.JWNL;
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.dictionary.Dictionary;
 
@@ -18,18 +17,12 @@ public class AdjectiveSynset extends Synset {
      */
     private boolean isAdjectiveCluster = false;
 
-    public AdjectiveSynset(Dictionary dictionary, POS pos) throws JWNLException {
-        super(dictionary, pos);
-        if (POS.ADJECTIVE != pos) {
-            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_057"));
-        }
+    public AdjectiveSynset(Dictionary dictionary) throws JWNLException {
+        super(dictionary, POS.ADJECTIVE);
     }
 
-    public AdjectiveSynset(Dictionary dictionary, POS pos, long offset) throws JWNLException {
-        super(dictionary, pos, offset);
-        if (POS.ADJECTIVE != pos) {
-            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_057"));
-        }
+    public AdjectiveSynset(Dictionary dictionary, long offset) throws JWNLException {
+        super(dictionary, POS.ADJECTIVE, offset);
     }
 
     public boolean isAdjectiveCluster() {

@@ -17,19 +17,13 @@ public class VerbSynset extends Synset {
 
     private BitSet verbFrameFlags;
 
-    public VerbSynset(Dictionary dictionary, POS pos) throws JWNLException {
-        super(dictionary, pos);
-        if (POS.VERB != pos) {
-            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_056"));
-        }
+    public VerbSynset(Dictionary dictionary) throws JWNLException {
+        super(dictionary, POS.VERB);
         verbFrameFlags = new BitSet();
     }
 
-    public VerbSynset(Dictionary dictionary, POS pos, long offset) throws JWNLException {
-        super(dictionary, pos, offset);
-        if (POS.VERB != pos) {
-            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_056"));
-        }
+    public VerbSynset(Dictionary dictionary, long offset) throws JWNLException {
+        super(dictionary, POS.VERB, offset);
         verbFrameFlags = new BitSet();
     }
 

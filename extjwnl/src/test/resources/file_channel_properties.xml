@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jwnl_properties language="en">
     <version publisher="Princeton" number="3.0" language="en"/>
-    <dictionary class="net.sf.extjwnl.dictionary.MapBackedDictionary">
+    <dictionary class="net.sf.extjwnl.dictionary.FileBackedDictionary">
         <param name="morphological_processor" value="net.sf.extjwnl.dictionary.morph.DefaultMorphologicalProcessor">
             <param name="operations">
                 <param value="net.sf.extjwnl.dictionary.morph.LookupExceptionsOperation"/>
@@ -35,8 +35,16 @@
                 </param>
             </param>
         </param>
-        <param name="file_type" value="net.sf.extjwnl.princeton.file.PrincetonObjectDictionaryFile"/>
-        <param name="dictionary_path" value="./data/clean-map"/>
+        <param name="dictionary_element_factory"
+               value="net.sf.extjwnl.princeton.data.PrincetonWN17FileDictionaryElementFactory"/>
+        <param name="file_manager" value="net.sf.extjwnl.dictionary.file_manager.FileManagerImpl">
+            <param name="file_type" value="net.sf.extjwnl.princeton.file.PrincetonChannelDictionaryFile">
+                <!--<param name="write_princeton_header" value="true"/>-->
+                <!--<param name="encoding" value="UTF-8"/>-->
+            </param>
+            <!--<param name="cache_use_count" value="true"/>-->
+            <param name="dictionary_path" value="./data/wn30"/>
+        </param>
     </dictionary>
     <resource class="PrincetonResource"/>
 </jwnl_properties>

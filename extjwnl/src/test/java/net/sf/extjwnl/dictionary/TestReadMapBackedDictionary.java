@@ -10,7 +10,7 @@ import java.io.IOException;
  *
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
-public class TestReadMapBackedDictionary extends DictionaryReadTester {
+public abstract class TestReadMapBackedDictionary extends DictionaryReadTester {
 
     /**
      * Properties location.

@@ -52,6 +52,144 @@ public abstract class DictionaryEditTester {
         dictionary.close();
         dictionary.delete();
     }
+    
+    @Test(expected = JWNLException.class)
+    public void testSaveReadOnly() throws JWNLException {
+        dictionary.save();
+    }
+
+    @Test(expected = JWNLException.class)
+    public void testAddElementReadOnly() throws JWNLException {
+        dictionary.addElement(null);
+    }
+
+    @Test(expected = JWNLException.class)
+    public void testAddElementAlien() throws JWNLException {
+        dictionary.addElement(new Synset(null, POS.NOUN));
+    }
+
+    @Test
+    public void testAddElementExc() throws JWNLException {
+        dictionary.edit();
+        final Exc exc = new Exc(dictionary, POS.NOUN, "test", Arrays.asList("tests"));
+        dictionary.addElement(exc);
+        
+        List<Exc> excs = new ArrayList<Exc>(1);
+        Iterator<Exc> i = dictionary.getExceptionIterator(POS.NOUN);
+        while (i.hasNext()) {
+            excs.add(i.next());
+        }
+        Assert.assertEquals(1, excs.size());
+        Assert.assertEquals(exc, excs.get(0));
+    }
+
+    @Test
+    public void testAddElementIndexWord() throws JWNLException {
+        dictionary.edit();
+        final Synset s = new Synset(dictionary, POS.NOUN);
+        final IndexWord iw = new IndexWord(dictionary, "test", POS.NOUN, s);
+        dictionary.addElement(iw);
+
+        List<IndexWord> indexWords = new ArrayList<IndexWord>(1);
+        Iterator<IndexWord> i = dictionary.getIndexWordIterator(POS.NOUN);
+        while (i.hasNext()) {
+            indexWords.add(i.next());
+        }
+        Assert.assertEquals(1, indexWords.size());
+        Assert.assertEquals(iw, indexWords.get(0));
+
+        List<Synset> synsets = new ArrayList<Synset>(1);
+        Iterator<Synset> ii = dictionary.getSynsetIterator(POS.NOUN);
+        while (ii.hasNext()) {
+            synsets.add(ii.next());
+        }
+        Assert.assertEquals(1, synsets.size());
+        Assert.assertEquals(s, synsets.get(0));
+    }
+
+    @Test(expected = JWNLException.class)
+    public void testRemoveReadOnly() throws JWNLException {
+        dictionary.removeElement(null);
+    }
+
+    @Test(expected = JWNLException.class)
+    public void testCreateExceptionReadOnly() throws JWNLException {
+        dictionary.createException(null, null, null);
+    }
+
+    @Test(expected = JWNLException.class)
+    public void testAddExceptionReadOnly() throws JWNLException {
+        dictionary.addException(null);
+    }
+
+    @Test(expected = JWNLException.class)
+    public void testAddExceptionAlien() throws JWNLException {
+        dictionary.addException(new Exc(null, POS.NOUN, "test", Arrays.asList("tests")));
+    }
+
+    @Test(expected = JWNLException.class)
+    public void testRemoveExceptionReadOnly() throws JWNLException {
+        dictionary.removeException(new Exc(null, POS.NOUN, "test", Arrays.asList("tests")));
+    }
+
+    @Test(expected = JWNLException.class)
+    public void testCreateSynsetReadOnly() throws JWNLException {
+        dictionary.createSynset(null);
+    }
+
+    @Test
+    public void testCreateVerbSynset() throws JWNLException {
+        dictionary.edit();
+        Assert.assertTrue(dictionary.createSynset(POS.VERB) instanceof VerbSynset);
+    }
+
+    @Test
+    public void testCreateAdjectiveSynset() throws JWNLException {
+        dictionary.edit();
+        Assert.assertTrue(dictionary.createSynset(POS.ADJECTIVE) instanceof AdjectiveSynset);
+    }
+
+    @Test
+    public void testCreateNounSynset() throws JWNLException {
+        dictionary.edit();
+        Assert.assertTrue(dictionary.createSynset(POS.NOUN) instanceof Synset);
+    }
+
+    @Test(expected = JWNLException.class)
+    public void testAddSynsetReadOnly() throws JWNLException {
+        dictionary.addSynset(null);
+    }
+
+    @Test(expected = JWNLException.class)
+    public void testAddSynsetAlien() throws JWNLException {
+        dictionary.edit();
+        dictionary.addSynset(new Synset(null, POS.NOUN));
+    }
+
+    @Test(expected = JWNLException.class)
+    public void testRemoveSynsetReadOnly() throws JWNLException {
+        dictionary.removeSynset(new Synset(null, POS.NOUN));
+    }
+
+    @Test(expected = JWNLException.class)
+    public void testCreateIndexWordReadOnly() throws JWNLException {
+        dictionary.createIndexWord(null, null, null);
+    }
+
+    @Test(expected = JWNLException.class)
+    public void testAddIndexWordReadOnly() throws JWNLException {
+        dictionary.addIndexWord(null);
+    }
+
+    @Test(expected = JWNLException.class)
+    public void testAddIndexWordAlien() throws JWNLException {
+        dictionary.addIndexWord(new IndexWord(null, "test", POS.NOUN, new Synset(null, POS.NOUN)));
+    }
+
+    @Test(expected = JWNLException.class)
+    public void testRemoveIndexWordReadOnly() throws JWNLException {
+        dictionary.removeIndexWord(new IndexWord(null, "test", POS.NOUN, new Synset(null, POS.NOUN)));
+    }
 
     @Test
     public void testEmptyDictionary() throws IOException, JWNLException {
@@ -308,6 +446,7 @@ public abstract class DictionaryEditTester {
     private void checkEntityWord(Dictionary dictionary) throws JWNLException {
         IndexWord iwEntity = dictionary.getIndexWord(POS.NOUN, entityLemma);
         Assert.assertNotNull(iwEntity);
+        Assert.assertFalse(iwEntity.getSenses().isEmpty());
         Assert.assertEquals(1, iwEntity.getSenses().size());
         Assert.assertEquals(entityLemma, iwEntity.getLemma());
         Assert.assertEquals(POS.NOUN, iwEntity.getPOS());
@@ -477,6 +616,51 @@ public abstract class DictionaryEditTester {
         saveAndReloadDictionary();
         testAbstractionWords(dictionary);
     }
+
+    @Test
+    public void testIndexWordSubstringIterator() throws IOException, JWNLException {
+        dictionary.edit();
+
+        createEntityWord(dictionary);
+        createPEntityWord(dictionary);
+        createEntityPEntityPointer(dictionary);
+        createAbstractionWords(dictionary);
+
+        Iterator<IndexWord> i = dictionary.getIndexWordIterator(POS.NOUN, "abstract");
+        List<IndexWord> indexWords = new ArrayList<IndexWord>(2);
+        List<String> lemmas = new ArrayList<String>(2);
+        while (i.hasNext()) {
+            indexWords.add(i.next());
+            lemmas.add(indexWords.get(indexWords.size() - 1).getLemma());
+        }
+        Assert.assertEquals(2, indexWords.size());
+        Assert.assertTrue(lemmas.contains(abstractionWords[0]));
+        Assert.assertTrue(lemmas.contains(abstractionWords[1]));
+    }
+
+    @Test
+    public void testIndexWordSubstringIteratorRecreate() throws IOException, JWNLException {
+        dictionary.edit();
+
+        createEntityWord(dictionary);
+        createPEntityWord(dictionary);
+        createEntityPEntityPointer(dictionary);
+        createAbstractionWords(dictionary);
+
+        saveAndReloadDictionary();
+
+        Iterator<IndexWord> i = dictionary.getIndexWordIterator(POS.NOUN, "abstract");
+        List<IndexWord> indexWords = new ArrayList<IndexWord>(2);
+        List<String> lemmas = new ArrayList<String>(2);
+        while (i.hasNext()) {
+            indexWords.add(i.next());
+            lemmas.add(indexWords.get(indexWords.size() - 1).getLemma());
+        }
+        Assert.assertEquals(2, indexWords.size());
+        Assert.assertTrue(lemmas.contains(abstractionWords[0]));
+        Assert.assertTrue(lemmas.contains(abstractionWords[1]));
+    }
+
 
     private void createAbstractionWords(Dictionary dictionary) throws JWNLException {
         IndexWord iwEntity = dictionary.getIndexWord(POS.NOUN, entityLemma);

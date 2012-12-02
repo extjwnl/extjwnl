@@ -8,7 +8,7 @@ import java.util.*;
  * @author Brett Walenz <bwalenz@users.sourceforge.net>
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
-public class LexFileIdFileNameMap implements Map<Long, String> {
+public abstract class LexFileIdFileNameMap implements Map<Long, String> {
 
     /**
      * A mapping of id's to files.

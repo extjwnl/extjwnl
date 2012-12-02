@@ -45,26 +45,27 @@ public class PrincetonChannelDictionaryFile extends AbstractPrincetonRandomAcces
             synchronized (file) {
                 //The following lines gratuitously lifted from java.io.RandomAccessFile.readLine()
                 StringBuilder input = new StringBuilder();
-                char c = (char) -1;
+                int c = -1;
                 boolean eol = false;
 
                 while (!eol) {
-                    c = buffer.get((int) getFilePointer());
-                    buffer.position((int) getFilePointer() + 1);
+                    c = read();
 
                     switch (c) {
-                        case (char) -1:
-                        case '\n':
+                        case -1:
+                        case (int) '\n':
                             eol = true;
                             break;
-                        case '\r':
+                        case (int) '\r':
                             eol = true;
-                            if ((buffer.get((int) getFilePointer() + 1)) == '\n') {
-                                buffer.position((int) getFilePointer() + 1);
+                            if (buffer.position() < (buffer.limit() - 1)) {
+                                if ((buffer.get(buffer.position() + 1)) == '\n') {
+                                    buffer.position(buffer.position() + 1);
+                                }
                             }
                             break;
                         default:
-                            input.append(c);
+                            input.append((char) c);
                             break;
                     }
                 }
@@ -139,7 +140,11 @@ public class PrincetonChannelDictionaryFile extends AbstractPrincetonRandomAcces
     }
 
     public int read() throws IOException {
-        return (int) buffer.get();
+        if (buffer.position() < buffer.limit()) {
+            return (int) buffer.get();
+        } else {
+            return -1;
+        }
     }
 
     public int getOffsetLength() {

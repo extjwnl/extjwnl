@@ -62,9 +62,9 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory extends Abst
 
         Synset synset;
         if (POS.VERB == pos) {
-            synset = new VerbSynset(dictionary, POS.getPOSForKey(synsetPOS), offset);
+            synset = new VerbSynset(dictionary, offset);
         } else if (POS.ADJECTIVE == pos) {
-            synset = new AdjectiveSynset(dictionary, pos, offset);
+            synset = new AdjectiveSynset(dictionary, offset);
         } else {
             synset = new Synset(dictionary, POS.getPOSForKey(synsetPOS), offset);
         }

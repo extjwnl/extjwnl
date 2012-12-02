@@ -710,9 +710,9 @@ public abstract class Dictionary {
             throw new JWNLException("DICTIONARY_EXCEPTION_029");
         }
         if (POS.VERB == pos) {
-            return new VerbSynset(this, pos, createNewOffset(pos));
+            return new VerbSynset(this, createNewOffset(pos));
         } else if (POS.ADJECTIVE == pos) {
-            return new AdjectiveSynset(this, pos, createNewOffset(pos));
+            return new AdjectiveSynset(this, createNewOffset(pos));
         } else {
             return new Synset(this, pos, createNewOffset(pos));
         }

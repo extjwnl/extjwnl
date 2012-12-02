@@ -12,36 +12,53 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-        TestWord.class,
-        TestSynset.class,
+        TestAdjSynset.class,
         TestExc.class,
+        TestIndexWord.class,
+        TestIndexWordSet.class,
+        TestRelationshipList.class,
         TestSummary.class,
-        TestReadFileBackedDictionary.class,
-//        TestReadMapBackedDictionary.class,
-        TestReadDatabaseBackedDictionary.class,
+        TestSynset.class,
+        TestVerbSynset.class,
+        TestWord.class,
+
         TestEditFileBackedDictionary.class,
-        TestGetFileBackedInstance.class,
         TestEditMapBackedDictionary.class,
+        TestGetDatabaseBackedInstance.class,
+        TestGetFileBackedInstance.class,
+        TestReadDatabaseBackedDictionary.class,
+        TestReadFileBackedDictionary.class,
+        TestReadFileChannelBackedDictionary.class,
+//        TestReadMapBackedDictionary.class,
         TestThreads.class,
-        TestThreadsLock.class,
-        TestThreadsDictionary.class
+        TestThreadsDictionary.class,
+        TestThreadsLock.class
 })
 public class JWNLSuite {
 
     public static void main(String[] args) {
         Class[] classes = new Class[]{
-                TestWord.class,
-                TestSynset.class,
+                TestAdjSynset.class,
                 TestExc.class,
+                TestIndexWord.class,
+                TestIndexWordSet.class,
+                TestRelationshipList.class,
                 TestSummary.class,
-                TestReadFileBackedDictionary.class,
-//                TestReadMapBackedDictionary.class,
-                TestReadDatabaseBackedDictionary.class,
+                TestSynset.class,
+                TestVerbSynset.class,
+                TestWord.class,
+
                 TestEditFileBackedDictionary.class,
                 TestEditMapBackedDictionary.class,
+                TestGetDatabaseBackedInstance.class,
+                TestGetFileBackedInstance.class,
+                TestReadDatabaseBackedDictionary.class,
+                TestReadFileBackedDictionary.class,
+                TestReadFileChannelBackedDictionary.class,
+//        TestReadMapBackedDictionary.class,
                 TestThreads.class,
-                TestThreadsLock.class,
-                TestThreadsDictionary.class
+                TestThreadsDictionary.class,
+                TestThreadsLock.class
         };
         String[] names = new String[classes.length];
         for (int i = 0; i < classes.length; i++) {

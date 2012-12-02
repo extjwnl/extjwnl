@@ -173,13 +173,14 @@ public class IndexWord extends BaseDictionaryElement {
         public Synset remove(int index) {
             loadAllSynsets();
             if (null != dictionary && dictionary.isEditable()) {
+                Dictionary d = dictionary;
                 Synset result = super.remove(index);
                 if (null != result) {
                     removeWordsFromSynset(result, lemma);
                 }
                 if (0 == super.size()) {
                     try {
-                        dictionary.removeIndexWord(IndexWord.this);
+                        d.removeIndexWord(IndexWord.this);
                     } catch (JWNLException e) {
                         if (log.isErrorEnabled()) {
                             log.error(JWNL.resolveMessage("EXCEPTION_001", e.getMessage()), e);
@@ -196,13 +197,14 @@ public class IndexWord extends BaseDictionaryElement {
         public boolean remove(Object o) {
             loadAllSynsets();
             if (null != dictionary && dictionary.isEditable()) {
+                Dictionary d = dictionary;
                 boolean result = super.remove(o);
                 if (o instanceof Synset) {
                     removeWordsFromSynset((Synset) o, lemma);
                 }
                 if (0 == size()) {
                     try {
-                        dictionary.removeIndexWord(IndexWord.this);
+                        d.removeIndexWord(IndexWord.this);
                     } catch (JWNLException e) {
                         if (log.isErrorEnabled()) {
                             log.error(JWNL.resolveMessage("EXCEPTION_001", e.getMessage()), e);
@@ -363,9 +365,9 @@ public class IndexWord extends BaseDictionaryElement {
         }
 
         private void addWord(Synset synset, String lemma) {
-            if (null != dictionary && dictionary.isEditable()) {
+            if (null != synset.getDictionary() && synset.getDictionary().isEditable()) {
                 if (!synset.containsWord(lemma)) {
-                    synset.getWords().add(new Word(IndexWord.this.dictionary, synset, synset.getWords().size() + 1, lemma));
+                    synset.getWords().add(new Word(synset.getDictionary(), synset, synset.getWords().size() + 1, lemma));
                 }
             }
         }
@@ -432,6 +434,9 @@ public class IndexWord extends BaseDictionaryElement {
         this(dictionary, lemma, pos);
         if (null == synset) {
             throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_042"));
+        }
+        if (synset.getPOS() != pos) {
+            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_062"));
         }
         this.synsets = new SynsetList(1);
         this.synsets.add(synset);

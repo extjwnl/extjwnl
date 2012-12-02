@@ -42,7 +42,7 @@
                 <param name="write_princeton_header" value="true"/>
                 <param name="encoding" value="UTF-8"/>
             </param>
-            <param name="dictionary_path" value="./data/clean"/>
+            <param name="dictionary_path" value="./data/clean-file"/>
             <param name="cache_use_count" value="true"/>
         </param>
     </dictionary>

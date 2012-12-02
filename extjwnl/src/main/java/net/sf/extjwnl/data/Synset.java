@@ -191,11 +191,10 @@ public class Synset extends PointerTarget implements DictionaryElement {
             Pointer result = super.remove(index);
             if (null != dictionary && dictionary.isEditable() && dictionary.getManageSymmetricPointers()) {
                 //delete symmetric pointer from the target
-                Pointer pointer = get(index);
-                if (null != pointer.getType().getSymmetricType()) {
-                    for (Pointer p : pointer.getTargetSynset().getPointers()) {
-                        if (offset == p.getTargetOffset() && pointer.getType().getSymmetricType().equals(p.getType())) {
-                            pointer.getTargetSynset().getPointers().remove(p);
+                if (null != result.getType().getSymmetricType()) {
+                    for (Pointer p : result.getTargetSynset().getPointers()) {
+                        if (offset == p.getTargetOffset() && result.getType().getSymmetricType().equals(p.getType())) {
+                            result.getTargetSynset().getPointers().remove(p);
                             break;
                         }
                     }
@@ -535,7 +534,9 @@ public class Synset extends PointerTarget implements DictionaryElement {
                     if (null == iw) {
                         dictionary.createIndexWord(word.getPOS(), word.getLemma(), Synset.this);
                     } else {
-                        iw.getSenses().add(Synset.this);
+                        if (!iw.getSenses().contains(Synset.this)) {
+                            iw.getSenses().add(Synset.this);
+                        }
                     }
                 } catch (JWNLException e) {
                     if (log.isErrorEnabled()) {

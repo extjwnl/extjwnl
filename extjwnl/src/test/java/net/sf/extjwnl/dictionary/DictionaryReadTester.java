@@ -108,6 +108,11 @@ public class DictionaryReadTester {
     }
 
     @Test
+    public void testRandomIndexWord() throws JWNLException {
+        Assert.assertNotNull(dictionary.getRandomIndexWord(POS.NOUN));
+    }
+
+    @Test
     public void testComplete() throws JWNLException {
         IndexWord iw = dictionary.getIndexWord(POS.VERB, "complete");
         Assert.assertNotNull("IndexWord loaded", iw);
@@ -120,12 +125,18 @@ public class DictionaryReadTester {
         }
         Assert.assertNotNull("Synset search", synset);
         Assert.assertEquals("Words testing", 2, synset.getWords().size());
-        Assert.assertEquals("Use count testing", 52, synset.getWords().get(0).getUseCount());
+        final Word word = synset.getWords().get(0);
+        Assert.assertEquals("Use count testing", 52, word.getUseCount());
         int[] indices = synset.getVerbFrameIndices();
         Assert.assertNotNull(indices);
         Assert.assertEquals("Verb synset frame size test", 2, indices.length);
         Assert.assertEquals("Verb synset frame test", 2, indices[0]);
         Assert.assertEquals("Verb synset frame test", 33, indices[1]);
+        Assert.assertTrue(word instanceof Verb);
+        Verb v = (Verb) word;
+        Assert.assertEquals(4, v.getVerbFrameIndices().length);
+        Assert.assertEquals(4, v.getVerbFrames().length);
+        Assert.assertNotNull(v.toString());
     }
 
     @Test
@@ -180,7 +191,7 @@ public class DictionaryReadTester {
         Synset sB = getSynsetBySenseKey("inventor%1:18:00::");
         Synset sU = getSynsetBySenseKey("invent%2:36:00::");
 
-        RelationshipList list = RelationshipFinder.findRelationships(sU, sB, PointerType.NOMINALIZATION);
+        RelationshipFinder.findRelationships(sU, sB, PointerType.NOMINALIZATION);
     }
 
     @Test
@@ -261,6 +272,30 @@ public class DictionaryReadTester {
         Assert.assertEquals(1, count);
     }
 
+    @Test
+    public void testMorphoLookupBaseFormNull() throws JWNLException {
+        Assert.assertNull(dictionary.getMorphologicalProcessor().lookupBaseForm(null, null));
+    }
+
+    @Test
+    public void testMorphoLookupBaseForm() throws JWNLException {
+        IndexWord iw = dictionary.getMorphologicalProcessor().lookupBaseForm(POS.NOUN, "copies");
+        Assert.assertNotNull(iw);
+        Assert.assertEquals("copy", iw.getLemma());
+    }
+
+    @Test
+    public void testMorphoLookupAllBaseFormsNull() throws JWNLException {
+        Assert.assertEquals(0, dictionary.getMorphologicalProcessor().lookupAllBaseForms(null, null).size());
+    }
+
+    @Test
+    public void testMorphoLookupAllBaseForms() throws JWNLException {
+        List<String> baseForms = dictionary.getMorphologicalProcessor().lookupAllBaseForms(POS.NOUN, "copies");
+        Assert.assertNotNull(baseForms);
+        Assert.assertEquals(1, baseForms.size());
+        Assert.assertTrue(baseForms.contains("copy"));
+    }
 
     public void runAllTests() throws JWNLException, CloneNotSupportedException {
         testTank();

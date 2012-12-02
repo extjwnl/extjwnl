@@ -94,7 +94,7 @@ public class DefaultMorphologicalProcessor implements MorphologicalProcessor {
      * @throws JWNLException JWNLException
      */
     public List<String> lookupAllBaseForms(POS pos, String derivation) throws JWNLException {
-        if (null == derivation || "".equals(derivation)) {
+        if (null == pos || null == derivation || "".equals(derivation)) {
             return Collections.emptyList();
         }
 

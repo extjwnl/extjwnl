@@ -17,21 +17,40 @@ import java.io.InputStream;
 public class BaseData {
 
     private final String properties = "./src/test/resources/clean_file.xml";
+    private final String mapProperties = "./src/test/resources/clean_map.xml";
 
     protected Dictionary dictionary;
+    protected Dictionary mapDictionary;
 
     protected InputStream getProperties() throws IOException {
         return new FileInputStream(properties);
     }
 
+    protected InputStream getMapProperties() throws IOException {
+        return new FileInputStream(mapProperties);
+    }
+
     @Before
     public void setUp() throws JWNLException, IOException {
         dictionary = Dictionary.getInstance(getProperties());
+        mapDictionary = Dictionary.getInstance(getMapProperties());
+
+        dictionary.close();
+        dictionary.delete();
+
+        mapDictionary.close();
+        mapDictionary.delete();
+
+        dictionary = Dictionary.getInstance(getProperties());
+        mapDictionary = Dictionary.getInstance(getMapProperties());
     }
 
     @After
     public void tearDown() throws JWNLException {
         dictionary.close();
         dictionary.delete();
+
+        mapDictionary.close();
+        mapDictionary.delete();
     }
 }

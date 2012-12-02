@@ -99,7 +99,7 @@ public class Word extends PointerTarget {
         if (' ' == lemma.charAt(0) || ' ' == lemma.charAt(lemma.length() - 1)) {
             throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_055"));
         }
-        this.lemma = lemma.trim();
+        this.lemma = lemma;
     }
 
     /**

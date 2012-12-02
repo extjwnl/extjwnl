@@ -44,9 +44,9 @@ public abstract class AbstractPrincetonDatabaseDictionaryElementFactory extends 
         if (synsets.next()) {
             Synset synset;
             if (POS.VERB == pos) {
-                synset = new VerbSynset(dictionary, pos, offset);
+                synset = new VerbSynset(dictionary, offset);
             } else if (POS.ADJECTIVE == pos) {
-                synset = new AdjectiveSynset(dictionary, pos, offset);
+                synset = new AdjectiveSynset(dictionary, offset);
             } else {
                 synset = new Synset(dictionary, pos, offset);
             }

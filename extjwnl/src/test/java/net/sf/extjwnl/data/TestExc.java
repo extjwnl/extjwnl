@@ -32,6 +32,7 @@ public class TestExc extends BaseData {
     @Test
     public void testGetPOS() {
         Assert.assertEquals(pos, testObj.getPOS());
+        Assert.assertNotNull(testObj.toString());
     }
 
     @Test
@@ -42,12 +43,23 @@ public class TestExc extends BaseData {
     @Test
     public void testGetExceptions() {
         Assert.assertEquals(2, testObj.getExceptions().size());
+        Assert.assertEquals(DictionaryElementType.EXCEPTION, testObj.getType());
         Assert.assertEquals(exc1, testObj.getExceptions().get(0));
         Assert.assertEquals(exc2, testObj.getExceptions().get(1));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testConstructor() throws JWNLException {
-        testObj = new Exc(null, null, null, null);
+        new Exc(null, null, null, null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructor2() throws JWNLException {
+        new Exc(null, POS.NOUN, null, null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructor3() throws JWNLException {
+        new Exc(null, POS.NOUN, lemma, null);
     }
 }
