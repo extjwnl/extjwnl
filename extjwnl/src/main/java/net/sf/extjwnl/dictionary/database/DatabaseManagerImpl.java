@@ -62,7 +62,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
                     "WHERE s.synset_id = svf.synset_id AND s.pos = ? AND s.file_offset = ?";
 
     protected static final String ALL_SYNSETS_SQL =
-            "SELECT offset FROM synset WHERE pos = ?";
+            "SELECT file_offset FROM synset WHERE pos = ?";
 
     protected static final String EXCEPTION_SQL =
             "SELECT base FROM exceptions WHERE pos = ? AND derivation = ?";

@@ -297,6 +297,85 @@ public class DictionaryReadTester {
         Assert.assertTrue(baseForms.contains("copy"));
     }
 
+    @Test
+    public void testExceptionIterator() throws JWNLException {
+        Iterator<Exc> i = dictionary.getExceptionIterator(POS.NOUN);
+        Assert.assertNotNull(i);
+        Assert.assertTrue(i.hasNext());
+        Exc e = i.next();
+        Assert.assertNotNull(e);
+        Assert.assertNotNull(e.getLemma());
+        Assert.assertNotNull(e.getExceptions());
+        Assert.assertTrue(0 < e.getExceptions().size());
+        Assert.assertEquals(POS.NOUN, e.getPOS());
+        Assert.assertEquals(DictionaryElementType.EXCEPTION, e.getType());
+
+        e = i.next();
+        Assert.assertNotNull(e);
+        Assert.assertNotNull(e.getLemma());
+        Assert.assertNotNull(e.getExceptions());
+        Assert.assertTrue(0 < e.getExceptions().size());
+        Assert.assertEquals(POS.NOUN, e.getPOS());
+        Assert.assertEquals(DictionaryElementType.EXCEPTION, e.getType());
+
+        i = dictionary.getExceptionIterator(POS.VERB);
+        Assert.assertNotNull(i);
+        Assert.assertTrue(i.hasNext());
+        e = i.next();
+        Assert.assertNotNull(e);
+        Assert.assertNotNull(e.getLemma());
+        Assert.assertNotNull(e.getExceptions());
+        Assert.assertTrue(0 < e.getExceptions().size());
+        Assert.assertEquals(POS.VERB, e.getPOS());
+        Assert.assertEquals(DictionaryElementType.EXCEPTION, e.getType());
+
+        e = i.next();
+        Assert.assertNotNull(e);
+        Assert.assertNotNull(e.getLemma());
+        Assert.assertNotNull(e.getExceptions());
+        Assert.assertTrue(0 < e.getExceptions().size());
+        Assert.assertEquals(POS.VERB, e.getPOS());
+        Assert.assertEquals(DictionaryElementType.EXCEPTION, e.getType());
+    }
+
+
+    @Test
+    public void testSynsetIterator() throws JWNLException {
+        Iterator<Synset> i = dictionary.getSynsetIterator(POS.NOUN);
+        Assert.assertNotNull(i);
+        Assert.assertTrue(i.hasNext());
+        Synset s = i.next();
+        Assert.assertNotNull(s);
+        Assert.assertNotNull(s.getGloss());
+        Assert.assertNotNull(s.getOffset());
+        Assert.assertEquals(POS.NOUN, s.getPOS());
+        Assert.assertEquals(DictionaryElementType.SYNSET, s.getType());
+
+        s = i.next();
+        Assert.assertNotNull(s);
+        Assert.assertNotNull(s.getGloss());
+        Assert.assertNotNull(s.getOffset());
+        Assert.assertEquals(POS.NOUN, s.getPOS());
+        Assert.assertEquals(DictionaryElementType.SYNSET, s.getType());
+
+        i = dictionary.getSynsetIterator(POS.VERB);
+        Assert.assertNotNull(i);
+        Assert.assertTrue(i.hasNext());
+        s = i.next();
+        Assert.assertNotNull(s);
+        Assert.assertNotNull(s.getGloss());
+        Assert.assertNotNull(s.getOffset());
+        Assert.assertEquals(POS.VERB, s.getPOS());
+        Assert.assertEquals(DictionaryElementType.SYNSET, s.getType());
+
+        s = i.next();
+        Assert.assertNotNull(s);
+        Assert.assertNotNull(s.getGloss());
+        Assert.assertNotNull(s.getOffset());
+        Assert.assertEquals(POS.VERB, s.getPOS());
+        Assert.assertEquals(DictionaryElementType.SYNSET, s.getType());
+    }
+
     public void runAllTests() throws JWNLException, CloneNotSupportedException {
         testTank();
         testComplete();
@@ -312,5 +391,7 @@ public class DictionaryReadTester {
         testNonExistentIndexWordIterator();
         testIndexWordIterator();
         testSpacedIndexWordIterator();
+        testExceptionIterator();
+        testSynsetIterator();
     }
 }
