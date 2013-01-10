@@ -1,6 +1,7 @@
 1.6.9
 
 - fixed synset iterator in database-backed dictionary
+- maven dependencies updated
 
 1.6.8
 
