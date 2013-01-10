@@ -1,3 +1,7 @@
+1.6.9
+
+- fixed synset iterator in database-backed dictionary
+
 1.6.8
 
 - miscellaneous bug fixes
