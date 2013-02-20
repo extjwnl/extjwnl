@@ -1049,7 +1049,7 @@ public class ewn {
                             IndexWord iw = d.lookupIndexWord(p, key);
                             if (null != iw) {
                                 System.out.println("\nDerived forms of " + p.getLabel() + " " + iw.getLemma());
-                                tracePointers(iw, PointerType.NOMINALIZATION, 1, needSense, needGloss, needLex, needOffset, needSenseNum, needSenseKeys);
+                                tracePointers(iw, PointerType.DERIVATION, 1, needSense, needGloss, needLex, needOffset, needSenseNum, needSenseKeys);
                             }
                         }//deri
 
@@ -1445,7 +1445,7 @@ public class ewn {
         }
 
         if (POS.NOUN == iw.getPOS() || POS.VERB == iw.getPOS()) {
-            if (hasPointer(iw, PointerType.NOMINALIZATION)) {
+            if (hasPointer(iw, PointerType.DERIVATION)) {
                 System.out.println("\t-deri" + iw.getPOS().getKey() + "\tDerived Forms");
             }
         }

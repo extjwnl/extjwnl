@@ -191,7 +191,22 @@ public class DictionaryReadTester {
         Synset sB = getSynsetBySenseKey("inventor%1:18:00::");
         Synset sU = getSynsetBySenseKey("invent%2:36:00::");
 
-        RelationshipFinder.findRelationships(sU, sB, PointerType.NOMINALIZATION);
+        RelationshipList list = RelationshipFinder.findRelationships(sU, sB, PointerType.DERIVATION);
+        Assert.assertNotNull(list);
+        Assert.assertEquals(1, list.size());
+        Assert.assertEquals(PointerType.DERIVATION, list.get(0).getType());
+        Assert.assertEquals(sU.getOffset(), list.get(0).getSourceSynset().getOffset());
+        Assert.assertEquals(sB.getOffset(), list.get(0).getTargetSynset().getOffset());
+
+        sB = getSynsetBySenseKey("adduct%2:35:00::");
+        sU = getSynsetBySenseKey("adducent%3:00:00::");
+
+        list = RelationshipFinder.findRelationships(sU, sB, PointerType.DERIVATION);
+        Assert.assertNotNull(list);
+        Assert.assertEquals(1, list.size());
+        Assert.assertEquals(PointerType.DERIVATION, list.get(0).getType());
+        Assert.assertEquals(sU.getOffset(), list.get(0).getSourceSynset().getOffset());
+        Assert.assertEquals(sB.getOffset(), list.get(0).getTargetSynset().getOffset());
     }
 
     @Test

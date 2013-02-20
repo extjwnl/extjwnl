@@ -77,7 +77,7 @@ public enum PointerType {
     PERTAINYM("\\", "PERTAINYM", PointerTypeFlags.ADJ | PointerTypeFlags.ADV | PointerTypeFlags.LEXICAL),
     ATTRIBUTE("=", "ATTRIBUTE", PointerTypeFlags.N | PointerTypeFlags.ADJ),
     VERB_GROUP("$", "VERB_GROUP", PointerTypeFlags.V),
-    NOMINALIZATION("+", "NOMINALIZATION", PointerTypeFlags.N | PointerTypeFlags.V),
+    DERIVATION("+", "DERIVATION", PointerTypeFlags.N | PointerTypeFlags.V | PointerTypeFlags.ADJ | PointerTypeFlags.ADV),
     DOMAIN_ALL(";", "DOMAIN_ALL", PointerTypeFlags.N | PointerTypeFlags.V | PointerTypeFlags.ADJ | PointerTypeFlags.ADV | PointerTypeFlags.LEXICAL),
     MEMBER_ALL("-", "MEMBER_ALL", PointerTypeFlags.N),
     CATEGORY(";c", "CATEGORY_DOMAIN", PointerTypeFlags.N | PointerTypeFlags.V | PointerTypeFlags.ADJ | PointerTypeFlags.ADV | PointerTypeFlags.LEXICAL),
@@ -104,7 +104,7 @@ public enum PointerType {
     private static final List<PointerType> ALL_TYPES = Collections.unmodifiableList(Arrays.asList(
             ANTONYM, HYPERNYM, HYPONYM, ENTAILMENT, SIMILAR_TO, MEMBER_HOLONYM, SUBSTANCE_HOLONYM,
             PART_HOLONYM, MEMBER_MERONYM, SUBSTANCE_MERONYM, PART_MERONYM,
-            CAUSE, PARTICIPLE_OF, SEE_ALSO, PERTAINYM, ATTRIBUTE, VERB_GROUP, NOMINALIZATION,
+            CAUSE, PARTICIPLE_OF, SEE_ALSO, PERTAINYM, ATTRIBUTE, VERB_GROUP, DERIVATION,
             CATEGORY, USAGE, REGION, CATEGORY_MEMBER, USAGE_MEMBER, REGION_MEMBER,
             INSTANCE_HYPERNYM, INSTANCES_HYPONYM
     ));
@@ -121,7 +121,7 @@ public enum PointerType {
         setSymmetric(CATEGORY, CATEGORY_MEMBER);
         setSymmetric(REGION, REGION_MEMBER);
         setSymmetric(USAGE, USAGE_MEMBER);
-        setSymmetric(NOMINALIZATION, NOMINALIZATION);
+        setSymmetric(DERIVATION, DERIVATION);
         setSymmetric(INSTANCE_HYPERNYM, INSTANCES_HYPONYM);
     }
 
@@ -193,8 +193,8 @@ public enum PointerType {
         if (VERB_GROUP.getKey().equals(key)) {
             return VERB_GROUP;
         }
-        if (NOMINALIZATION.getKey().equals(key)) {
-            return NOMINALIZATION;
+        if (DERIVATION.getKey().equals(key)) {
+            return DERIVATION;
         }
         if (DOMAIN_ALL.getKey().equals(key)) {
             return DOMAIN_ALL;

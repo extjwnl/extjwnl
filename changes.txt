@@ -1,3 +1,7 @@
+1.6.10
+
+- PointerType.NOMINALIZATION renamed to PointerType.DERIVATION, scope extended to all parts of speech
+
 1.6.9
 
 - fixed synset iterator in database-backed dictionary
