@@ -7,7 +7,6 @@
         <version>1.6.11-SNAPSHOT</version>
     </parent>
 
-    <groupId>net.sf.extjwnl</groupId>
     <artifactId>extjwnl</artifactId>
     <packaging>jar</packaging>
     <version>1.6.11-SNAPSHOT</version>
@@ -17,6 +16,12 @@
     </description>
 
     <dependencies>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+
         <dependency>
             <groupId>com.googlecode.concurrentlinkedhashmap</groupId>
             <artifactId>concurrentlinkedhashmap-lru</artifactId>
