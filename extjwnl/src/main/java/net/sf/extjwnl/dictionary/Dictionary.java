@@ -96,6 +96,7 @@ public abstract class Dictionary {
     private static final String DEFAULT_FILE_DICTIONARY_PATH = "./data/wn30";
     private static final String DEFAULT_MAP_DICTIONARY_PATH = "./data/map";
     private static final String DEFAULT_DB_DICTIONARY_PATH = "jdbc:mysql://localhost/jwnl?user=root";
+    private static final String DEFAULT_RESOURCE_CONFIG_PATH = "extjwnl_resource_properties.xml";
 
     private static final Comparator<Word> wordLexIdComparator = new Comparator<Word>() {
         @Override
@@ -284,6 +285,28 @@ public abstract class Dictionary {
         } catch (IOException e) {
             throw new JWNLException("IO error opening properties file", e);
         }
+    }
+
+    /**
+     * Returns FileBackedDictionary instance configured from classpath by default.
+     *
+     * @return FileBackedDictionary instance configured from classpath by default
+     * @throws JWNLException JWNLException
+     */
+    public static Dictionary getDefaultResourceInstance() throws JWNLException {
+        return getResourceInstance(DEFAULT_RESOURCE_CONFIG_PATH);
+    }
+
+    /**
+     * Returns FileBackedDictionary instance configured from classpath.
+     *
+     * @return FileBackedDictionary instance configured from classpath
+     * @param propertiesPath path to properties, for example "net/sf/extjwnl/data/wordnet/wn31/res_properties.xml"
+     * @throws JWNLException JWNLException
+     */
+    public static Dictionary getResourceInstance(String propertiesPath) throws JWNLException {
+        InputStream properties = Dictionary.class.getClassLoader().getResourceAsStream(propertiesPath);
+        return getInstance(properties);
     }
 
     public static Dictionary setInstance(Dictionary dictionary) {

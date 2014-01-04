@@ -21,6 +21,7 @@ public abstract class AbstractDictionaryFile implements DictionaryFile {
 
     protected final Dictionary dictionary;
     protected final Map<String, Param> params;
+    protected String path;
     protected File file;
     protected POS pos;
 
@@ -39,6 +40,7 @@ public abstract class AbstractDictionaryFile implements DictionaryFile {
         this(dictionary, params);
         this.pos = pos;
         this.fileType = fileType;
+        this.path = path;
         file = new File(path, getFilename());
     }
 

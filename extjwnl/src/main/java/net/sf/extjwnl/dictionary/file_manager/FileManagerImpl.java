@@ -39,6 +39,11 @@ public class FileManagerImpl implements FileManager {
     private RandomAccessDictionaryFile senseIndex;
 
     /**
+     * Whether to check dictionary path existence.
+     */
+    public static final String CHECK_PATH_KEY = "check_path";
+
+    /**
      * Whether to cache use counts, default false. Setting this parameter to <code>true</true> speeds up elements
      * loading from files considerably, at the expense of some amount of memory.
      */
@@ -63,11 +68,18 @@ public class FileManagerImpl implements FileManager {
                 throw new JWNLException("JWNL_EXCEPTION_004", DictionaryCatalog.DICTIONARY_PATH_KEY);
             }
 
+            boolean checkPath = true;
+            if (params.containsKey(CHECK_PATH_KEY)) {
+                checkPath = Boolean.parseBoolean(params.get(CHECK_PATH_KEY).getValue());
+            }
+
             String path = params.get(DictionaryCatalog.DICTIONARY_PATH_KEY).getValue();
 
-            File dictionaryPath = new File(path);
-            if (!dictionaryPath.exists()) {
-                throw new JWNLException("JWNL_EXCEPTION_009", path);
+            if (checkPath) {
+                File dictionaryPath = new File(path);
+                if (!dictionaryPath.exists()) {
+                    throw new JWNLException("JWNL_EXCEPTION_009", path);
+                }
             }
 
             this.dictionary = dictionary;
