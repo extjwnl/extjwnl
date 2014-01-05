@@ -39,6 +39,7 @@ public abstract class AbstractValueParam implements Param {
      * If the value of this parameter is a class name, and that class is creatable, this method will create
      * an instance of it using this Param parameters.
      */
+    @SuppressWarnings("unchecked")
     public Object create() throws JWNLException {
         try {
             Class clazz = Class.forName(getValue());

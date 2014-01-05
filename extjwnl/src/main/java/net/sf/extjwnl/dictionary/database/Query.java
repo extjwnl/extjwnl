@@ -14,7 +14,7 @@ import java.sql.SQLException;
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class Query {
-    private Connection connection;
+    private final Connection connection;
     private PreparedStatement statement;
     private ResultSet results;
     private final String sql;

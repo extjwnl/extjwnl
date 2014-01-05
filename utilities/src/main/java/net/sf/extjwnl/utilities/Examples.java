@@ -1,6 +1,5 @@
 package net.sf.extjwnl.utilities;
 
-import net.sf.extjwnl.JWNL;
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.data.IndexWord;
 import net.sf.extjwnl.data.POS;

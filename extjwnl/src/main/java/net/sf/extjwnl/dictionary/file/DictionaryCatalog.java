@@ -55,6 +55,7 @@ public class DictionaryCatalog<E extends DictionaryFile> implements Owned {
             Class fileClass;
             try {
                 fileClass = Class.forName(params.get(DICTIONARY_FILE_TYPE_KEY).getValue());
+                //noinspection unchecked
                 if (!desiredDictionaryFileType.isAssignableFrom(fileClass)) {
                     throw new JWNLRuntimeException("DICTIONARY_EXCEPTION_003", fileClass);
                 }

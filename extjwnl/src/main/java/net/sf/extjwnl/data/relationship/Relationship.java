@@ -152,7 +152,7 @@ public abstract class Relationship {
     }
 
     private static class StringBufferOutputStream extends OutputStream {
-        private StringWriter writer = new StringWriter();
+        private final StringWriter writer = new StringWriter();
 
         public void write(int b) throws IOException {
             writer.write(b);
