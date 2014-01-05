@@ -1,7 +1,5 @@
 package net.sf.extjwnl.dictionary;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 /**
@@ -11,10 +9,8 @@ import java.io.InputStream;
  */
 public class TestEditFileBackedDictionary extends DictionaryEditTester {
 
-    protected static final String properties = "./src/test/resources/clean_file.xml";
-
     @Override
-    protected InputStream getProperties() throws FileNotFoundException {
-        return new FileInputStream(properties);
+    protected InputStream getProperties() {
+        return TestEditFileBackedDictionary.class.getClassLoader().getResourceAsStream("test_clean_file.xml");
     }
 }

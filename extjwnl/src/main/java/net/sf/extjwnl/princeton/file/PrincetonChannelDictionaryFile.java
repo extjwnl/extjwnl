@@ -36,14 +36,22 @@ public class PrincetonChannelDictionaryFile extends PrincetonCharBufferFile impl
     }
 
     public void openFile() throws IOException {
-        FileChannel channel = new FileInputStream(file).getChannel();
-        size = channel.size();
-        if (null != encoding) {
-            buffer = Charset.forName(encoding).newDecoder().decode(channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size()));
-        } else {
-            buffer = Charset.defaultCharset().newDecoder().decode(channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size()));
+        FileInputStream stream = new FileInputStream(file);
+        try {
+            FileChannel channel = stream.getChannel();
+            try {
+                size = channel.size();
+                if (null != encoding) {
+                    buffer = Charset.forName(encoding).newDecoder().decode(channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size()));
+                } else {
+                    buffer = Charset.defaultCharset().newDecoder().decode(channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size()));
+                }
+            } finally {
+                channel.close();
+            }
+        } finally {
+            stream.close();
         }
-        channel.close();
     }
 
     public long length() throws IOException {

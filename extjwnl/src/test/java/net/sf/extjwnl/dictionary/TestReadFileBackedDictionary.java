@@ -1,8 +1,9 @@
 package net.sf.extjwnl.dictionary;
 
 import net.sf.extjwnl.JWNLException;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 
 /**
@@ -13,12 +14,16 @@ import java.io.IOException;
  */
 public class TestReadFileBackedDictionary extends DictionaryReadTester {
 
-    /**
-     * Properties location.
-     */
-    protected String properties = "./src/main/resources/net/sf/extjwnl/file_properties.xml";
+    @BeforeClass
+    public static void initDictionary() throws IOException, JWNLException {
+        s_dictionary = Dictionary.getInstance(
+                TestReadFileBackedDictionary.class.getClassLoader().getResourceAsStream("test_file_properties.xml"));
+    }
 
-    public void initDictionary() throws IOException, JWNLException {
-        dictionary = Dictionary.getInstance(new FileInputStream(properties));
+    @AfterClass
+    public static void closeDictionary() throws IOException, JWNLException {
+        if (null != s_dictionary) {
+            s_dictionary.close();
+        }
     }
 }

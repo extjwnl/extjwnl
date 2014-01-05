@@ -93,7 +93,7 @@ public class DictionaryToMap {
         int count = 0;
         for (Iterator<? extends DictionaryElement> itr = getIterator(pos, fileType); itr.hasNext(); itr.next()) {
             if (++count % 10000 == 0) {
-                System.out.println("Counted and cached word " + count + "...");
+                System.out.println("Counted and cached element " + count + "...");
             }
         }
 
@@ -113,20 +113,14 @@ public class DictionaryToMap {
     }
 
     public static void main(String args[]) {
-        String destinationDirectory = null;
-        String propertyFile = null;
         if (args.length == 2) {
-            destinationDirectory = args[1];
-            propertyFile = args[0];
+            try {
+                (new DictionaryToMap(args[0], args[1])).convert();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         } else {
             System.out.println("Usage: DictionaryToMap <properties file> <destination directory>");
-            System.exit(0);
-        }
-        try {
-            (new DictionaryToMap(propertyFile, destinationDirectory)).convert();
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.exit(-1);
         }
     }
 }

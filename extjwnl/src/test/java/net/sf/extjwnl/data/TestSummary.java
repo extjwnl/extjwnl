@@ -6,7 +6,6 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.List;
@@ -22,7 +21,7 @@ public class TestSummary {
 
     @BeforeClass
     public static void runOnceBeforeAllTests() throws FileNotFoundException, JWNLException {
-        dic = Dictionary.getInstance(new FileInputStream("./src/main/resources/net/sf/extjwnl/file_properties.xml"));
+        dic = Dictionary.getInstance(TestSummary.class.getClassLoader().getResourceAsStream("test_file_properties.xml"));
     }
 
     @Test

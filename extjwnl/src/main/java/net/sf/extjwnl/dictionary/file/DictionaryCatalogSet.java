@@ -43,20 +43,22 @@ public class DictionaryCatalogSet<E extends DictionaryFile> implements Owned {
 
     public void open() throws IOException {
         if (!isOpen()) {
-            for (Iterator<DictionaryCatalog<E>> itr = getCatalogIterator(); itr.hasNext();) {
+            for (Iterator<DictionaryCatalog<E>> itr = getCatalogIterator(); itr.hasNext(); ) {
                 itr.next().open();
             }
         }
     }
 
-    public void delete() throws IOException {
-        for (Iterator<DictionaryCatalog<E>> itr = getCatalogIterator(); itr.hasNext();) {
-            itr.next().delete();
+    public boolean delete() throws IOException {
+        boolean result = true;
+        for (Iterator<DictionaryCatalog<E>> itr = getCatalogIterator(); itr.hasNext(); ) {
+            result = result && itr.next().delete();
         }
+        return result;
     }
 
     public boolean isOpen() {
-        for (Iterator<DictionaryCatalog<E>> itr = getCatalogIterator(); itr.hasNext();) {
+        for (Iterator<DictionaryCatalog<E>> itr = getCatalogIterator(); itr.hasNext(); ) {
             if (!itr.next().isOpen()) {
                 return false;
             }
@@ -65,7 +67,7 @@ public class DictionaryCatalogSet<E extends DictionaryFile> implements Owned {
     }
 
     public void close() {
-        for (Iterator<DictionaryCatalog<E>> itr = getCatalogIterator(); itr.hasNext();) {
+        for (Iterator<DictionaryCatalog<E>> itr = getCatalogIterator(); itr.hasNext(); ) {
             itr.next().close();
         }
     }
@@ -101,7 +103,7 @@ public class DictionaryCatalogSet<E extends DictionaryFile> implements Owned {
     }
 
     public void edit() throws IOException {
-        for (Iterator<DictionaryCatalog<E>> itr = getCatalogIterator(); itr.hasNext();) {
+        for (Iterator<DictionaryCatalog<E>> itr = getCatalogIterator(); itr.hasNext(); ) {
             itr.next().edit();
         }
     }

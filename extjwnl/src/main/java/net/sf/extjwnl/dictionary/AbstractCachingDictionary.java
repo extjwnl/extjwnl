@@ -231,8 +231,8 @@ public abstract class AbstractCachingDictionary extends Dictionary {
     }
 
     private void resolvePointers(POS pos) throws JWNLException {
-        if (log.isInfoEnabled()) {
-            log.info(JWNL.resolveMessage("DICTIONARY_INFO_013", pos.getLabel()));
+        if (log.isDebugEnabled()) {
+            log.debug(JWNL.resolveMessage("DICTIONARY_INFO_013", pos.getLabel()));
         }
 
         {
@@ -298,41 +298,41 @@ public abstract class AbstractCachingDictionary extends Dictionary {
     }
 
     protected void cachePOS(POS pos) throws JWNLException {
-        if (log.isInfoEnabled()) {
-            log.info(JWNL.resolveMessage("DICTIONARY_INFO_003", pos.getLabel()));
+        if (log.isDebugEnabled()) {
+            log.debug(JWNL.resolveMessage("DICTIONARY_INFO_003", pos.getLabel()));
         }
 
         {
-            if (log.isInfoEnabled()) {
-                log.info(JWNL.resolveMessage("DICTIONARY_INFO_007"));
+            if (log.isDebugEnabled()) {
+                log.debug(JWNL.resolveMessage("DICTIONARY_INFO_007"));
             }
             int count = 0;
             Iterator<Exc> ei = getExceptionIterator(pos);
             while (ei.hasNext()) {
                 if (count % 10000 == 0) {
-                    if (log.isInfoEnabled()) {
-                        log.info(JWNL.resolveMessage("DICTIONARY_INFO_005", count));
+                    if (log.isDebugEnabled()) {
+                        log.debug(JWNL.resolveMessage("DICTIONARY_INFO_005", count));
                     }
                 }
                 count++;
                 ei.next();
             }
-            if (log.isInfoEnabled()) {
-                log.info(JWNL.resolveMessage("DICTIONARY_INFO_006", count));
+            if (log.isDebugEnabled()) {
+                log.debug(JWNL.resolveMessage("DICTIONARY_INFO_006", count));
             }
         }
 
         {
-            if (log.isInfoEnabled()) {
-                log.info(JWNL.resolveMessage("DICTIONARY_INFO_008"));
+            if (log.isDebugEnabled()) {
+                log.debug(JWNL.resolveMessage("DICTIONARY_INFO_008"));
             }
             int count = 0;
             maxOffset.put(pos, 0L);
             Iterator<Synset> si = getSynsetIterator(pos);
             while (si.hasNext()) {
                 if (count % 10000 == 0) {
-                    if (log.isInfoEnabled()) {
-                        log.info(JWNL.resolveMessage("DICTIONARY_INFO_005", count));
+                    if (log.isDebugEnabled()) {
+                        log.debug(JWNL.resolveMessage("DICTIONARY_INFO_005", count));
                     }
                 }
                 count++;
@@ -341,28 +341,28 @@ public abstract class AbstractCachingDictionary extends Dictionary {
                     maxOffset.put(pos, s.getOffset());
                 }
             }
-            if (log.isInfoEnabled()) {
-                log.info(JWNL.resolveMessage("DICTIONARY_INFO_006", count));
+            if (log.isDebugEnabled()) {
+                log.debug(JWNL.resolveMessage("DICTIONARY_INFO_006", count));
             }
         }
 
         {
-            if (log.isInfoEnabled()) {
-                log.info(JWNL.resolveMessage("DICTIONARY_INFO_004"));
+            if (log.isDebugEnabled()) {
+                log.debug(JWNL.resolveMessage("DICTIONARY_INFO_004"));
             }
             int count = 0;
             Iterator<IndexWord> ii = getIndexWordIterator(pos);
             while (ii.hasNext()) {
                 if (count % 10000 == 0) {
-                    if (log.isInfoEnabled()) {
-                        log.info(JWNL.resolveMessage("DICTIONARY_INFO_005", count));
+                    if (log.isDebugEnabled()) {
+                        log.debug(JWNL.resolveMessage("DICTIONARY_INFO_005", count));
                     }
                 }
                 count++;
                 ii.next();
             }
-            if (log.isInfoEnabled()) {
-                log.info(JWNL.resolveMessage("DICTIONARY_INFO_006", count));
+            if (log.isDebugEnabled()) {
+                log.debug(JWNL.resolveMessage("DICTIONARY_INFO_006", count));
             }
         }
     }

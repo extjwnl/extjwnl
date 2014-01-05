@@ -13,6 +13,10 @@
     <name>extJWNL Utilities</name>
     <description>Utilities for extJWNL library</description>
 
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>commons-logging</groupId>
@@ -27,10 +31,31 @@
         </dependency>
 
         <dependency>
+            <scope>test</scope>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+        </dependency>
+
+        <dependency>
+            <scope>test</scope>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.3.174</version>
+        </dependency>
+
+        <dependency>
             <scope>runtime</scope>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>5.1.22</version>
+        </dependency>
+
+        <dependency>
+            <scope>test</scope>
+            <groupId>net.sf.extjwnl</groupId>
+            <artifactId>extjwnl-data-wn30</artifactId>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
@@ -39,6 +64,148 @@
         <outputDirectory>target/classes</outputDirectory>
         <directory>target</directory>
         <finalName>${project.artifactId}-${project.version}</finalName>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+            </testResource>
+        </testResources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack-wordnet</id>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>net.sf.extjwnl</groupId>
+                                    <artifactId>extjwnl-data-wn30</artifactId>
+                                    <version>1.0-SNAPSHOT</version>
+                                    <type>jar</type>
+                                    <overWrite>true</overWrite>
+                                    <includes>net/sf/extjwnl/data/wordnet/wn30/*.*</includes>
+                                    <outputDirectory>${project.build.directory}/data/wn30</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>create-data-folders</id>
+                        <phase>generate-test-resources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <echo message="Creating data folders..." />
+                                <mkdir dir="${project.build.directory}/data" />
+                                <mkdir dir="${project.build.directory}/data/db" />
+                                <mkdir dir="${project.build.directory}/data/map" />
+                                <mkdir dir="${project.build.directory}/data/wn30" />
+                            </target>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>convert-data</id>
+                        <phase>pre-integration-test</phase>
+                        <configuration>
+                            <target>
+                                <property name="test_classpath" refid="maven.test.classpath"/>
+
+                                <taskdef resource="net/sf/antcontrib/antcontrib.properties" />
+
+                                <if>
+                                    <available file="${project.build.directory}/data/db/wordnet.h2.db"/>
+                                    <then>
+                                        <echo>Using existing database</echo>
+                                    </then>
+
+                                    <else>
+                                        <echo>The database does not exist, converting</echo>
+
+                                        <java classname="net.sf.extjwnl.utilities.DictionaryToDatabase"
+                                              fork="false"
+                                              failonerror="true">
+
+                                            <arg value="${project.build.testOutputDirectory}/test_file_properties.xml"/>
+                                            <arg value="./src/main/sql/create.sql"/>
+                                            <arg value="org.h2.Driver"/>
+                                            <arg value="jdbc:h2:${project.build.directory}/data/db/wordnet"/>
+                                            <arg value=""/>
+                                            <arg value=""/>
+
+                                            <classpath>
+                                                <pathelement path="${test_classpath}"/>
+                                            </classpath>
+                                        </java>
+                                        <echo>The database converted</echo>
+                                    </else>
+                                </if>
+
+                                <if>
+                                    <available file="${project.build.directory}/data/map/data.noun"/>
+                                    <then>
+                                        <echo>Using existing map</echo>
+                                    </then>
+
+                                    <else>
+                                        <echo>The map does not exist, converting</echo>
+
+                                        <java classname="net.sf.extjwnl.utilities.DictionaryToMap"
+                                              fork="false"
+                                              failonerror="true">
+
+                                            <arg value="${project.build.testOutputDirectory}/test_file_properties.xml"/>
+                                            <arg value="${project.build.directory}/data/map"/>
+
+                                            <classpath>
+                                                <pathelement path="${test_classpath}"/>
+                                            </classpath>
+                                        </java>
+                                        <echo>The database converted</echo>
+                                    </else>
+                                </if>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>ant-contrib</groupId>
+                        <artifactId>ant-contrib</artifactId>
+                        <version>20020829</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+        </plugins>
     </build>
 
     <profiles>

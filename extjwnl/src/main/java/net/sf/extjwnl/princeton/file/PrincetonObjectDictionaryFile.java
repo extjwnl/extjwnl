@@ -51,16 +51,16 @@ public class PrincetonObjectDictionaryFile extends AbstractPrincetonDictionaryFi
     public void save() throws IOException {
         if (dictionary instanceof MapBackedDictionary) {
             MapBackedDictionary dic = (MapBackedDictionary) dictionary;
-            if (log.isInfoEnabled()) {
-                log.info(JWNL.resolveMessage("PRINCETON_INFO_004", getFilename()));
+            if (log.isDebugEnabled()) {
+                log.debug(JWNL.resolveMessage("PRINCETON_INFO_004", getFilename()));
             }
             Map<Object, ? extends DictionaryElement> map = dic.getTable(getPOS(), getFileType());
 
             getOutputStream().reset();
             writeObject(map);
 
-            if (log.isInfoEnabled()) {
-                log.info(JWNL.resolveMessage("PRINCETON_INFO_012", getFilename()));
+            if (log.isDebugEnabled()) {
+                log.debug(JWNL.resolveMessage("PRINCETON_INFO_012", getFilename()));
             }
         }
     }

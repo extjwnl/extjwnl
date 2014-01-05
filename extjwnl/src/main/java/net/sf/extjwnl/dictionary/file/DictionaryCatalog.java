@@ -85,10 +85,12 @@ public class DictionaryCatalog<E extends DictionaryFile> implements Owned {
         }
     }
 
-    public void delete() throws IOException {
+    public boolean delete() throws IOException {
+        boolean result = true;
         for (Iterator<E> itr = getFileIterator(); itr.hasNext();) {
-            itr.next().delete();
+            result = result && itr.next().delete();
         }
+        return result;
     }
 
     public boolean isOpen() {

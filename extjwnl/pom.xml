@@ -15,6 +15,10 @@
         in WordNet format
     </description>
 
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>commons-logging</groupId>
@@ -37,9 +41,9 @@
 
         <dependency>
             <scope>test</scope>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.22</version>
+            <groupId>net.sf.extjwnl</groupId>
+            <artifactId>extjwnl-data-wn30</artifactId>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
@@ -66,10 +70,71 @@
                 </includes>
             </resource>
         </resources>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+            </testResource>
+        </testResources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>generate-test-resources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <echo message="Creating data folders..." />
+                                <mkdir dir="${project.build.directory}/data" />
+                                <mkdir dir="${project.build.directory}/data/clean-file" />
+                                <mkdir dir="${project.build.directory}/data/clean-map" />
+                                <mkdir dir="${project.build.directory}/data/wn30" />
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack-wordnet</id>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>net.sf.extjwnl</groupId>
+                                    <artifactId>extjwnl-data-wn30</artifactId>
+                                    <version>1.0-SNAPSHOT</version>
+                                    <type>jar</type>
+                                    <overWrite>true</overWrite>
+                                    <includes>net/sf/extjwnl/data/wordnet/wn30/*.*</includes>
+                                    <outputDirectory>${project.build.directory}/data/wn30</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <systemProperties>
+                        <property>
+                            <name>extjwnl.testDataFolder</name>
+                            <value>${project.build.directory}/data/wn30</value>
+                        </property>
+                    </systemProperties>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.jacoco</groupId>

@@ -95,9 +95,9 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
     }
 
     @Override
-    public synchronized void delete() throws JWNLException {
+    public synchronized boolean delete() throws JWNLException {
         try {
-            fileManager.delete();
+            return fileManager.delete();
         } catch (IOException e) {
             throw new JWNLException("EXCEPTION_001", e.getMessage(), e);
         }

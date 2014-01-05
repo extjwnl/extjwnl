@@ -124,8 +124,8 @@ public class FileManagerImpl implements FileManager {
     }
 
     private void cacheUseCounts() throws IOException {
-        if (log.isInfoEnabled()) {
-            log.info(JWNL.resolveMessage("PRINCETON_INFO_018"));
+        if (log.isDebugEnabled()) {
+            log.debug(JWNL.resolveMessage("PRINCETON_INFO_018"));
         }
         String line = revCntList.readLine();
         while (null != line && !"".equals(line)) {
@@ -137,8 +137,8 @@ public class FileManagerImpl implements FileManager {
             useCountCache.put(senseKey, useCnt);
             line = revCntList.readLine();
         }
-        if (log.isInfoEnabled()) {
-            log.info(JWNL.resolveMessage("PRINCETON_INFO_019"));
+        if (log.isDebugEnabled()) {
+            log.debug(JWNL.resolveMessage("PRINCETON_INFO_019"));
         }
     }
 
@@ -149,11 +149,12 @@ public class FileManagerImpl implements FileManager {
         senseIndex.close();
     }
 
-    public void delete() throws IOException {
-        files.delete();
-        cntList.delete();
-        revCntList.delete();
-        senseIndex.delete();
+    public boolean delete() throws IOException {
+        boolean result = files.delete();
+        result = result && cntList.delete();
+        result = result && revCntList.delete();
+        result = result && senseIndex.delete();
+        return result;
     }
 
     public void edit() throws IOException {
@@ -363,8 +364,8 @@ public class FileManagerImpl implements FileManager {
         files.save();
 
         {
-            if (log.isInfoEnabled()) {
-                log.info(JWNL.resolveMessage("PRINCETON_INFO_004", revCntList.getFile().getName()));
+            if (log.isDebugEnabled()) {
+                log.debug(JWNL.resolveMessage("PRINCETON_INFO_004", revCntList.getFile().getName()));
             }
             //cntlist.rev
             ArrayList<Word> toRender = new ArrayList<Word>();
@@ -394,8 +395,8 @@ public class FileManagerImpl implements FileManager {
             });
 
             revCntList.seek(0);
-            if (log.isInfoEnabled()) {
-                log.info(JWNL.resolveMessage("PRINCETON_INFO_008", revCntList.getFile().getName()));
+            if (log.isDebugEnabled()) {
+                log.debug(JWNL.resolveMessage("PRINCETON_INFO_008", revCntList.getFile().getName()));
             }
             long counter = 0;
             long total = toRender.size();
@@ -403,17 +404,17 @@ public class FileManagerImpl implements FileManager {
             for (Word word : toRender) {
                 counter++;
                 if (0 == (counter % reportInt)) {
-                    if (log.isInfoEnabled()) {
-                        log.info(JWNL.resolveMessage("PRINCETON_INFO_014", 100 * counter / total));
+                    if (log.isDebugEnabled()) {
+                        log.debug(JWNL.resolveMessage("PRINCETON_INFO_014", 100 * counter / total));
                     }
                 }
                 revCntList.writeLine(word.getSenseKeyWithAdjClass() + " " + word.getIndex() + " " + word.getUseCount());
             }
-            if (log.isInfoEnabled()) {
-                log.info(JWNL.resolveMessage("PRINCETON_INFO_013", revCntList.getFile().getName()));
+            if (log.isDebugEnabled()) {
+                log.debug(JWNL.resolveMessage("PRINCETON_INFO_013", revCntList.getFile().getName()));
             }
-            if (log.isInfoEnabled()) {
-                log.info(JWNL.resolveMessage("PRINCETON_INFO_012", revCntList.getFile().getName()));
+            if (log.isDebugEnabled()) {
+                log.debug(JWNL.resolveMessage("PRINCETON_INFO_012", revCntList.getFile().getName()));
             }
 
 
@@ -426,8 +427,8 @@ public class FileManagerImpl implements FileManager {
             });
 
             cntList.seek(0);
-            if (log.isInfoEnabled()) {
-                log.info(JWNL.resolveMessage("PRINCETON_INFO_008", cntList.getFile().getName()));
+            if (log.isDebugEnabled()) {
+                log.debug(JWNL.resolveMessage("PRINCETON_INFO_008", cntList.getFile().getName()));
             }
             counter = 0;
             total = toRender.size();
@@ -435,17 +436,17 @@ public class FileManagerImpl implements FileManager {
             for (Word word : toRender) {
                 counter++;
                 if (0 == (counter % reportInt)) {
-                    if (log.isInfoEnabled()) {
-                        log.info(JWNL.resolveMessage("PRINCETON_INFO_014", 100 * counter / total));
+                    if (log.isDebugEnabled()) {
+                        log.debug(JWNL.resolveMessage("PRINCETON_INFO_014", 100 * counter / total));
                     }
                 }
                 cntList.writeLine(word.getUseCount() + " " + word.getSenseKeyWithAdjClass() + " " + word.getIndex());
             }
-            if (log.isInfoEnabled()) {
-                log.info(JWNL.resolveMessage("PRINCETON_INFO_013", cntList.getFile().getName()));
+            if (log.isDebugEnabled()) {
+                log.debug(JWNL.resolveMessage("PRINCETON_INFO_013", cntList.getFile().getName()));
             }
-            if (log.isInfoEnabled()) {
-                log.info(JWNL.resolveMessage("PRINCETON_INFO_012", cntList.getFile().getName()));
+            if (log.isDebugEnabled()) {
+                log.debug(JWNL.resolveMessage("PRINCETON_INFO_012", cntList.getFile().getName()));
             }
 
         }
@@ -453,8 +454,8 @@ public class FileManagerImpl implements FileManager {
 
         {
             //sense index
-            if (log.isInfoEnabled()) {
-                log.info(JWNL.resolveMessage("PRINCETON_INFO_004", senseIndex.getFile().getName()));
+            if (log.isDebugEnabled()) {
+                log.debug(JWNL.resolveMessage("PRINCETON_INFO_004", senseIndex.getFile().getName()));
             }
             Set<String> senseIndexContent = new TreeSet<String>();
             for (POS pos : POS.getAllPOS()) {
@@ -482,8 +483,8 @@ public class FileManagerImpl implements FileManager {
 
             senseIndex.seek(0);
             senseIndex.writeStrings(senseIndexContent);
-            if (log.isInfoEnabled()) {
-                log.info(JWNL.resolveMessage("PRINCETON_INFO_012", senseIndex.getFile().getName()));
+            if (log.isDebugEnabled()) {
+                log.debug(JWNL.resolveMessage("PRINCETON_INFO_012", senseIndex.getFile().getName()));
             }
         }
     }

@@ -62,38 +62,30 @@ public class DictionaryToDatabase {
      *
      * @param args args
      */
-    public static void main(String args[]) {
+    public static void main(String args[]) throws JWNLException, SQLException, IOException {
         if (args.length < 4) {
             System.out.println("Usage: DictionaryToDatabase <property file> <create tables script> <driver class> <connection url> [username [password]]");
-            System.exit(0);
+        } else {
+            importWordnet(args[0], args[1], args[2], args[3], args.length <= 4 ? null : args[4], args.length <= 5 ? null : args[5]);
         }
-        Dictionary dictionary = null;
-        try {
-            dictionary = Dictionary.getInstance(new FileInputStream(args[0]));
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.exit(-1);
-        }
+    }
+
+    public static void importWordnet(String propertyFile, String tablesScript, String driverClass, String connectionURL, String username, String password) throws IOException, JWNLException, SQLException {
+        Dictionary dictionary = Dictionary.getInstance(new FileInputStream(propertyFile));
         Connection conn = null;
 
         try {
-            String scriptFileName = args[1];
-            ConnectionManager mgr = new ConnectionManager(args[2], args[3], args.length <= 4 ? null : args[4], args.length <= 5 ? null : args[5]);
+            ConnectionManager mgr = new ConnectionManager(driverClass, connectionURL, username, password);
             conn = mgr.getConnection();
             conn.setReadOnly(false);
             DictionaryToDatabase d2d = new DictionaryToDatabase(dictionary, conn);
-            d2d.createTables(scriptFileName);
+            d2d.createTables(tablesScript);
             d2d.insertData();
         } catch (Exception e) {
             e.printStackTrace();
-            System.exit(-1);
         } finally {
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
+            if (null != conn) {
+                conn.close();
             }
         }
     }
@@ -163,40 +155,68 @@ public class DictionaryToDatabase {
      * @throws SQLException  SQLException
      */
     public void insertData() throws JWNLException, SQLException {
-        if (null != connection.getMetaData() && connection.getMetaData().getDatabaseProductName().contains("MySQL")) {
-
-            Statement s = connection.createStatement();
+        Statement s = connection.createStatement();
+        try {
             log.info("disabling autocommit...");
             connection.setAutoCommit(false);
-            log.info("disabling keys...");
 
-            for (String table : tables) {
-                String sql = "ALTER TABLE `" + table + "` DISABLE KEYS;";
+            if (null != connection.getMetaData() && connection.getMetaData().getDatabaseProductName().contains("MySQL")) {
+                log.info("disabling keys...");
+                for (String table : tables) {
+                    String sql = "ALTER TABLE `" + table + "` DISABLE KEYS;";
+                    log.debug(sql);
+                    s.execute(sql);
+                }
+            } else if (null != connection.getMetaData() && connection.getMetaData().getDatabaseProductName().contains("H2")) {
+                log.info("disabling keys...");
+                String sql = "SET REFERENTIAL_INTEGRITY FALSE;";
                 log.debug(sql);
                 s.execute(sql);
+            } else if (null != connection.getMetaData() && connection.getMetaData().getDatabaseProductName().contains("Postgres")) {
+                log.info("disabling keys...");
+                for (String table : tables) {
+                    String sql = "ALTER TABLE " + table + " DISABLE TRIGGER ALL;";
+                    log.debug(sql);
+                    s.execute(sql);
+                }
             }
-        }
-        TIME = System.currentTimeMillis();
-        for (POS pos : POS.getAllPOS()) {
-            log.info("inserting data for pos " + pos);
-            storeIndexWords(dictionary.getIndexWordIterator(pos));
-            storeSynsets(dictionary.getSynsetIterator(pos));
-            storeIndexWordSynsets();
-            storeExceptions(dictionary.getExceptionIterator(pos));
-            idToSynsetOffset.clear();
-            synsetOffsetToId.clear();
-            log.info("done inserting data for pos " + pos);
-        }
-        if (null != connection.getMetaData() && connection.getMetaData().getDatabaseProductName().contains("MySQL")) {
-            Statement s = connection.createStatement();
-            log.info("enabling keys...");
-            for (String table : tables) {
-                String sql = "ALTER TABLE `" + table + "` ENABLE KEYS;";
+
+            TIME = System.currentTimeMillis();
+            for (POS pos : POS.getAllPOS()) {
+                log.info("inserting data for pos " + pos);
+                storeIndexWords(dictionary.getIndexWordIterator(pos));
+                storeSynsets(dictionary.getSynsetIterator(pos));
+                storeIndexWordSynsets();
+                storeExceptions(dictionary.getExceptionIterator(pos));
+                idToSynsetOffset.clear();
+                synsetOffsetToId.clear();
+                log.info("done inserting data for pos " + pos);
+            }
+
+            if (null != connection.getMetaData() && connection.getMetaData().getDatabaseProductName().contains("MySQL")) {
+                log.info("enabling keys...");
+                for (String table : tables) {
+                    String sql = "ALTER TABLE `" + table + "` ENABLE KEYS;";
+                    log.debug(sql);
+                    s.execute(sql);
+                }
+            } else if (null != connection.getMetaData() && connection.getMetaData().getDatabaseProductName().contains("H2")) {
+                log.info("disabling keys...");
+                String sql = "SET REFERENTIAL_INTEGRITY TRUE;";
                 log.debug(sql);
                 s.execute(sql);
+            } else if (null != connection.getMetaData() && connection.getMetaData().getDatabaseProductName().contains("Postgres")) {
+                log.info("disabling keys...");
+                for (String table : tables) {
+                    String sql = "ALTER TABLE " + table + " ENABLE TRIGGER ALL;";
+                    log.debug(sql);
+                    s.execute(sql);
+                }
             }
             log.info("committing...");
             connection.commit();
+        } finally {
+            s.close();
         }
     }
 
@@ -210,8 +230,11 @@ public class DictionaryToDatabase {
         log.info("storing index words");
         PreparedStatement iwStmt = connection.prepareStatement("INSERT INTO indexword VALUES(?,?,?)");
         int count = 0;
+        int batch = 0;
         while (itr.hasNext()) {
-            if (count % 1000 == 0) {
+            if (count % 10000 == 0) {
+                batch = count;
+                iwStmt.executeBatch();
                 log.info("indexword: " + count);
             }
             count++;
@@ -220,8 +243,11 @@ public class DictionaryToDatabase {
             iwStmt.setInt(1, id);
             iwStmt.setString(2, iw.getLemma());
             iwStmt.setString(3, iw.getPOS().getKey());
-            iwStmt.execute();
+            iwStmt.addBatch();
             idToSynsetOffset.put(id, iw.getSynsetOffsets());
+        }
+        if (batch < count) {
+            iwStmt.executeBatch();
         }
         log.info("indexword: " + count);
         log.info("stored index words");
@@ -239,9 +265,15 @@ public class DictionaryToDatabase {
         PreparedStatement synsetPointerStmt = connection.prepareStatement("INSERT INTO synsetpointer VALUES(?,?,?,?,?,?,?)");
         PreparedStatement synsetVerbFrameStmt = connection.prepareStatement("INSERT INTO synsetverbframe VALUES(?,?,?,?)");
         log.info("storing synsets");
+        int batch = 0;
         int count = 0;
         while (itr.hasNext()) {
-            if (count % 1000 == 0) {
+            if (count % 10000 == 0) {
+                batch = count;
+                synsetStmt.executeBatch();
+                synsetWordStmt.executeBatch();
+                synsetPointerStmt.executeBatch();
+                synsetVerbFrameStmt.executeBatch();
                 log.info("synset: " + count);
             }
             count++;
@@ -254,7 +286,7 @@ public class DictionaryToDatabase {
             synsetStmt.setString(4, synset.getPOS().getKey());
             synsetStmt.setBoolean(5, POS.ADJECTIVE == synset.getPOS() && synset.isAdjectiveCluster());
             synsetStmt.setString(6, synset.getGloss());
-            synsetStmt.execute();
+            synsetStmt.addBatch();
             List<Word> words = synset.getWords();
             synsetWordStmt.setInt(2, id);
 
@@ -266,7 +298,7 @@ public class DictionaryToDatabase {
                 for (int i = allWordFrames.nextSetBit(0); i >= 0; i = allWordFrames.nextSetBit(i + 1)) {
                     synsetVerbFrameStmt.setInt(1, nextId());
                     synsetVerbFrameStmt.setInt(3, i);
-                    synsetVerbFrameStmt.execute();
+                    synsetVerbFrameStmt.addBatch();
                 }
             }
 
@@ -279,7 +311,7 @@ public class DictionaryToDatabase {
                 synsetWordStmt.setInt(5, word.getUseCount());
                 synsetWordStmt.setLong(6, word.getLexId());
 
-                synsetWordStmt.execute();
+                synsetWordStmt.addBatch();
                 if (word instanceof Verb) {
                     synsetVerbFrameStmt.setInt(4, word.getIndex());
                     BitSet bits = ((Verb) word).getVerbFrameFlags();
@@ -287,7 +319,7 @@ public class DictionaryToDatabase {
                         if (null != allWordFrames && !allWordFrames.get(i)) {
                             synsetVerbFrameStmt.setInt(1, nextId());
                             synsetVerbFrameStmt.setInt(3, i);
-                            synsetVerbFrameStmt.execute();
+                            synsetVerbFrameStmt.addBatch();
                         }
                     }
                 }
@@ -302,8 +334,14 @@ public class DictionaryToDatabase {
                 synsetPointerStmt.setString(5, pointer.getTargetPOS().getKey());
                 synsetPointerStmt.setInt(6, pointer.getSourceIndex());
                 synsetPointerStmt.setInt(7, pointer.getTargetIndex());
-                synsetPointerStmt.execute();
+                synsetPointerStmt.addBatch();
             }
+        }
+        if (batch < count) {
+            synsetStmt.executeBatch();
+            synsetWordStmt.executeBatch();
+            synsetPointerStmt.executeBatch();
+            synsetVerbFrameStmt.executeBatch();
         }
         log.info("synset: " + count);
         log.info("stored synsets");
@@ -318,8 +356,11 @@ public class DictionaryToDatabase {
         log.info("storing index word synsets");
         PreparedStatement iwsStmt = connection.prepareStatement("INSERT INTO indexwordsynset VALUES(?,?,?)");
         int count = 0;
+        int batch = 0;
         for (Map.Entry<Integer, long[]> entry : idToSynsetOffset.entrySet()) {
             if (count % 1000 == 0) {
+                batch = count;
+                iwsStmt.executeBatch();
                 log.info("index word synset: " + count);
             }
             count++;
@@ -331,8 +372,11 @@ public class DictionaryToDatabase {
                 int synsetId = synsetOffsetToId.get(offset);
                 iwsStmt.setInt(1, nextId());
                 iwsStmt.setLong(3, synsetId);
-                iwsStmt.execute();
+                iwsStmt.addBatch();
             }
+        }
+        if (batch < count) {
+            iwsStmt.executeBatch();
         }
         log.info("index word synset: " + count);
         log.info("stored index word synsets");
@@ -355,9 +399,10 @@ public class DictionaryToDatabase {
                 exStmt.setInt(1, nextId());
                 exStmt.setString(2, exc.getPOS().getKey());
                 exStmt.setString(3, (String) o);
-                exStmt.execute();
+                exStmt.addBatch();
             }
         }
+        exStmt.executeBatch();
         log.info("stored exceptions");
     }
 }

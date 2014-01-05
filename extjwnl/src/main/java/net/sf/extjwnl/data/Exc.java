@@ -26,10 +26,13 @@ public class Exc extends BaseDictionaryElement {
     private POS pos;
 
     /**
-     * The excepted word
+     * The lemma (derivation) of the exception word, e.g. aardwolves
      */
     private String lemma;
 
+    /**
+     * The normalized form, e.g. aardwolf
+     */
     private List<String> exceptions;
 
     /**
@@ -73,18 +76,18 @@ public class Exc extends BaseDictionaryElement {
     }
 
     /**
-     * Returns the lemma (derivation) of the exception word.
+     * Returns the lemma (derivation) of the exception word, e.g. aardwolves
      *
-     * @return the lemma (derivation) of the exception word
+     * @return the lemma (derivation) of the exception word, e.g. aardwolves
      */
     public String getLemma() {
         return lemma;
     }
 
     /**
-     * Returns list of exceptions (base forms).
+     * Returns list of exceptions (base forms), e.g. aardwolf
      *
-     * @return list of exceptions (base forms)
+     * @return list of exceptions (base forms), e.g. aardwolf
      */
     public List<String> getExceptions() {
         return exceptions;

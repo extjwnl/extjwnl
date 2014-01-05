@@ -8,7 +8,6 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
 /**
@@ -22,7 +21,7 @@ public class TestRelationshipList {
 
     @BeforeClass
     public static void runOnceBeforeAllTests() throws FileNotFoundException, JWNLException {
-        dic = Dictionary.getInstance(new FileInputStream("./src/main/resources/net/sf/extjwnl/file_properties.xml"));
+        dic = Dictionary.getInstance(TestRelationshipList.class.getClassLoader().getResourceAsStream("test_file_properties.xml"));
     }
 
     @Test

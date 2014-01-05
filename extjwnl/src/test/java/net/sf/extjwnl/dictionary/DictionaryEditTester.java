@@ -22,20 +22,20 @@ import java.util.List;
  */
 public abstract class DictionaryEditTester {
 
-    private final String entityGloss = "that which is perceived or known or inferred to have its own distinct existence (living or nonliving)";
-    private final String entityLemma = "entity";
-    private final String physical_entityGloss = "an entity that has physical existence";
-    private final String physical_entityLemma = "physìcal entìty";//ì to test encoding
-    private final String abstractionGloss = "a general concept formed by extracting common features from specific examples";
-    private final String[] abstractionWords = {"abstraction", "abstract entity"};
+    private final static String entityGloss = "that which is perceived or known or inferred to have its own distinct existence (living or nonliving)";
+    private final static String entityLemma = "entity";
+    private final static String physical_entityGloss = "an entity that has physical existence";
+    private final static String physical_entityLemma = "physìcal entìty";//ì to test encoding
+    private final static String abstractionGloss = "a general concept formed by extracting common features from specific examples";
+    private final static String[] abstractionWords = {"abstraction", "abstract entity"};
 
-    private final String[] exception1 = {"alto-relievos", "alto-relievo", "alto-rilievo"};
-    private final String[] exception2 = {"aìdes-de-camp", "aìde-de-camp"};//ì to test encoding
-    private final String[] exception3 = {"altocumuli", "altocumulus"};//to test sorting
+    private final static String[] exception1 = {"alto-relievos", "alto-relievo", "alto-rilievo"};
+    private final static String[] exception2 = {"aìdes-de-camp", "aìde-de-camp"};//ì to test encoding
+    private final static String[] exception3 = {"altocumuli", "altocumulus"};//to test sorting
 
     private Dictionary dictionary;
 
-    protected abstract InputStream getProperties() throws FileNotFoundException;
+    protected abstract InputStream getProperties();
 
     @Before
     public void setUp() throws IOException, JWNLException {
@@ -52,7 +52,7 @@ public abstract class DictionaryEditTester {
         dictionary.close();
         dictionary.delete();
     }
-    
+
     @Test(expected = JWNLException.class)
     public void testSaveReadOnly() throws JWNLException {
         dictionary.save();
@@ -73,7 +73,7 @@ public abstract class DictionaryEditTester {
         dictionary.edit();
         final Exc exc = new Exc(dictionary, POS.NOUN, "test", Arrays.asList("tests"));
         dictionary.addElement(exc);
-        
+
         List<Exc> excs = new ArrayList<Exc>(1);
         Iterator<Exc> i = dictionary.getExceptionIterator(POS.NOUN);
         while (i.hasNext()) {
@@ -152,7 +152,7 @@ public abstract class DictionaryEditTester {
     @Test
     public void testCreateNounSynset() throws JWNLException {
         dictionary.edit();
-        Assert.assertTrue(dictionary.createSynset(POS.NOUN) instanceof Synset);
+        Assert.assertNotNull(dictionary.createSynset(POS.NOUN));
     }
 
     @Test(expected = JWNLException.class)

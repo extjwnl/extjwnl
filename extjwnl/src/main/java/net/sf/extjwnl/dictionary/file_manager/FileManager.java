@@ -110,7 +110,7 @@ public interface FileManager extends Owned {
      *
      * @throws IOException IOException
      */
-    void delete() throws IOException;
+    boolean delete() throws IOException;
 
     /**
      * Reopens files for writing.

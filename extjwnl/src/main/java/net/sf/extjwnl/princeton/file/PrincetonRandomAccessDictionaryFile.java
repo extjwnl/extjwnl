@@ -422,8 +422,8 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
     }
 
     public void save() throws IOException, JWNLException {
-        if (log.isInfoEnabled()) {
-            log.info(JWNL.resolveMessage("PRINCETON_INFO_004", getFilename()));
+        if (log.isDebugEnabled()) {
+            log.debug(JWNL.resolveMessage("PRINCETON_INFO_004", getFilename()));
         }
         if (DictionaryFileType.EXCEPTION == getFileType()) {
             ArrayList<String> exceptions = new ArrayList<String>();
@@ -431,8 +431,8 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
             while (ei.hasNext()) {
                 exceptions.add(renderException(ei.next()));
             }
-            if (log.isInfoEnabled()) {
-                log.info(JWNL.resolveMessage("PRINCETON_INFO_005", exceptions.size()));
+            if (log.isDebugEnabled()) {
+                log.debug(JWNL.resolveMessage("PRINCETON_INFO_005", exceptions.size()));
             }
             Collections.sort(exceptions);
 
@@ -447,16 +447,16 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                 synsets.add(si.next());
             }
 
-            if (log.isInfoEnabled()) {
-                log.info(JWNL.resolveMessage("PRINCETON_INFO_005", synsets.size()));
+            if (log.isDebugEnabled()) {
+                log.debug(JWNL.resolveMessage("PRINCETON_INFO_005", synsets.size()));
             }
             Collections.sort(synsets, synsetOffsetComparator);
 
-            if (log.isInfoEnabled()) {
-                log.info(JWNL.resolveMessage("PRINCETON_INFO_007", synsets.size()));
+            if (log.isDebugEnabled()) {
+                log.debug(JWNL.resolveMessage("PRINCETON_INFO_007", synsets.size()));
             }
-            if (log.isInfoEnabled()) {
-                log.info(JWNL.resolveMessage("PRINCETON_INFO_008", getFilename()));
+            if (log.isDebugEnabled()) {
+                log.debug(JWNL.resolveMessage("PRINCETON_INFO_008", getFilename()));
             }
             long counter = 0;
             long total = synsets.size();
@@ -464,19 +464,19 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
             synchronized (file) {
                 seek(0);
                 if (writePrincetonHeader) {
-                    if (log.isInfoEnabled()) {
-                        log.info(JWNL.resolveMessage("PRINCETON_INFO_020", getFilename()));
+                    if (log.isDebugEnabled()) {
+                        log.debug(JWNL.resolveMessage("PRINCETON_INFO_020", getFilename()));
                     }
                     raFile.writeBytes(PRINCETON_HEADER);
                 }
-                if (log.isInfoEnabled()) {
-                    log.info(JWNL.resolveMessage("PRINCETON_INFO_021", getFilename()));
+                if (log.isDebugEnabled()) {
+                    log.debug(JWNL.resolveMessage("PRINCETON_INFO_021", getFilename()));
                 }
                 for (Synset synset : synsets) {
                     counter++;
                     if (0 == (counter % reportInt)) {
-                        if (log.isInfoEnabled()) {
-                            log.info(JWNL.resolveMessage("PRINCETON_INFO_014", 100 * counter / total));
+                        if (log.isDebugEnabled()) {
+                            log.debug(JWNL.resolveMessage("PRINCETON_INFO_014", 100 * counter / total));
                         }
                     }
                     String renderedSynset = renderSynset(synset);
@@ -488,22 +488,22 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                     raFile.writeBytes("\n");
                 }
             }
-            if (log.isInfoEnabled()) {
-                log.info(JWNL.resolveMessage("PRINCETON_INFO_009", getFilename()));
+            if (log.isDebugEnabled()) {
+                log.debug(JWNL.resolveMessage("PRINCETON_INFO_009", getFilename()));
             }
         } else if (DictionaryFileType.INDEX == getFileType()) {
             ArrayList<String> indexes = new ArrayList<String>();
 
-            if (log.isInfoEnabled()) {
-                log.info(JWNL.resolveMessage("PRINCETON_INFO_011", getFilename()));
+            if (log.isDebugEnabled()) {
+                log.debug(JWNL.resolveMessage("PRINCETON_INFO_011", getFilename()));
             }
             Iterator<IndexWord> ii = dictionary.getIndexWordIterator(getPOS());
             while (ii.hasNext()) {
                 indexes.add(renderIndexWord(ii.next()));
             }
 
-            if (log.isInfoEnabled()) {
-                log.info(JWNL.resolveMessage("PRINCETON_INFO_005", indexes.size()));
+            if (log.isDebugEnabled()) {
+                log.debug(JWNL.resolveMessage("PRINCETON_INFO_005", indexes.size()));
             }
             Collections.sort(indexes);
             synchronized (file) {
@@ -515,8 +515,8 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                 writeIndexStrings(indexes);
             }
         }
-        if (log.isInfoEnabled()) {
-            log.info(JWNL.resolveMessage("PRINCETON_INFO_012", getFilename()));
+        if (log.isDebugEnabled()) {
+            log.debug(JWNL.resolveMessage("PRINCETON_INFO_012", getFilename()));
         }
     }
 
@@ -541,8 +541,8 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
 
     public void writeStrings(Collection<String> strings) throws IOException {
         synchronized (file) {
-            if (log.isInfoEnabled()) {
-                log.info(JWNL.resolveMessage("PRINCETON_INFO_008", getFilename()));
+            if (log.isDebugEnabled()) {
+                log.debug(JWNL.resolveMessage("PRINCETON_INFO_008", getFilename()));
             }
             long counter = 0;
             long total = strings.size();
@@ -550,22 +550,22 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
             for (String s : strings) {
                 counter++;
                 if (0 == (counter % reportInt)) {
-                    if (log.isInfoEnabled()) {
-                        log.info(JWNL.resolveMessage("PRINCETON_INFO_014", 100 * counter / total));
+                    if (log.isDebugEnabled()) {
+                        log.debug(JWNL.resolveMessage("PRINCETON_INFO_014", 100 * counter / total));
                     }
                 }
                 writeLine(s);
             }
-            if (log.isInfoEnabled()) {
-                log.info(JWNL.resolveMessage("PRINCETON_INFO_013", getFilename()));
+            if (log.isDebugEnabled()) {
+                log.debug(JWNL.resolveMessage("PRINCETON_INFO_013", getFilename()));
             }
         }
     }
 
     public void writeIndexStrings(ArrayList<String> strings) throws IOException {
         synchronized (file) {
-            if (log.isInfoEnabled()) {
-                log.info(JWNL.resolveMessage("PRINCETON_INFO_008", getFilename()));
+            if (log.isDebugEnabled()) {
+                log.debug(JWNL.resolveMessage("PRINCETON_INFO_008", getFilename()));
             }
             long counter = 0;
             long total = strings.size();
@@ -577,8 +577,8 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
             for (int i = 0; i < strings.size() - 2; i++) {
                 counter++;
                 if (0 == (counter % reportInt)) {
-                    if (log.isInfoEnabled()) {
-                        log.info(JWNL.resolveMessage("PRINCETON_INFO_014", 100 * counter / total));
+                    if (log.isDebugEnabled()) {
+                        log.debug(JWNL.resolveMessage("PRINCETON_INFO_014", 100 * counter / total));
                     }
                 }
                 writeLine(strings.get(i));
@@ -595,11 +595,11 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                 String last = strings.get(strings.size() - 1);
                 writeLine(last);
             }
-            if (log.isInfoEnabled()) {
-                log.info(JWNL.resolveMessage("PRINCETON_INFO_014", 100));
+            if (log.isDebugEnabled()) {
+                log.debug(JWNL.resolveMessage("PRINCETON_INFO_014", 100));
             }
-            if (log.isInfoEnabled()) {
-                log.info(JWNL.resolveMessage("PRINCETON_INFO_013", getFilename()));
+            if (log.isDebugEnabled()) {
+                log.debug(JWNL.resolveMessage("PRINCETON_INFO_013", getFilename()));
             }
         }
     }
@@ -846,8 +846,8 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                 synsets.add(si.next());
             }
 
-            if (log.isInfoEnabled()) {
-                log.info(JWNL.resolveMessage("PRINCETON_INFO_005", synsets.size()));
+            if (log.isDebugEnabled()) {
+                log.debug(JWNL.resolveMessage("PRINCETON_INFO_005", synsets.size()));
             }
             Collections.sort(synsets, synsetOffsetComparator);
 
@@ -860,8 +860,8 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                         log.warn(JWNL.resolveMessage("PRINCETON_WARN_010", offsetLength));
                     }
                 }
-                if (log.isInfoEnabled()) {
-                    log.info(JWNL.resolveMessage("PRINCETON_INFO_006", new Object[]{synsets.size(), getFilename()}));
+                if (log.isDebugEnabled()) {
+                    log.debug(JWNL.resolveMessage("PRINCETON_INFO_006", new Object[]{synsets.size(), getFilename()}));
                 }
                 long offset = 0;
                 if (writePrincetonHeader) {

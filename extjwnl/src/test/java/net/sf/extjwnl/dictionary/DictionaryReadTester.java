@@ -4,12 +4,10 @@ import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.data.*;
 import net.sf.extjwnl.data.relationship.RelationshipFinder;
 import net.sf.extjwnl.data.relationship.RelationshipList;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -67,24 +65,21 @@ public class DictionaryReadTester {
     protected final String iteratorLemma = "stop";
     protected final String iteratorSpacedLemma = "zoom in";
 
+    protected static Dictionary s_dictionary;
     protected Dictionary dictionary;
+
+    @Before
+    public void setup() {
+        if (null != s_dictionary) {
+            dictionary = s_dictionary;
+        }
+    }
 
     public DictionaryReadTester() {
     }
 
     public DictionaryReadTester(Dictionary dictionary) {
         this.dictionary = dictionary;
-    }
-
-    @Before
-    public void initDictionary() throws IOException, JWNLException {
-    }
-
-    @After
-    public void closeDictionary() throws IOException, JWNLException {
-        if (null != dictionary) {
-            dictionary.close();
-        }
     }
 
     @Test

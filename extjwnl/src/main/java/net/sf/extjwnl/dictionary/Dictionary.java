@@ -585,8 +585,8 @@ public abstract class Dictionary {
         if (checkLexIds) {
             //fixing word lex ids
             for (POS pos : POS.getAllPOS()) {
-                if (log.isInfoEnabled()) {
-                    log.info(JWNL.resolveMessage("PRINCETON_INFO_015", pos.getLabel()));
+                if (log.isDebugEnabled()) {
+                    log.debug(JWNL.resolveMessage("PRINCETON_INFO_015", pos.getLabel()));
                 }
                 Iterator<IndexWord> ii = getIndexWordIterator(pos);
                 while (ii.hasNext()) {
@@ -624,15 +624,15 @@ public abstract class Dictionary {
                         }
                     }
                 }
-                if (log.isInfoEnabled()) {
-                    log.info(JWNL.resolveMessage("PRINCETON_INFO_016", pos.getLabel()));
+                if (log.isDebugEnabled()) {
+                    log.debug(JWNL.resolveMessage("PRINCETON_INFO_016", pos.getLabel()));
                 }
             }
         }
     }
 
-    public synchronized void delete() throws JWNLException {
-        //nop
+    public synchronized boolean delete() throws JWNLException {
+        return false;
     }
 
     /**
