@@ -243,19 +243,19 @@
                                     <programs>
                                         <program>
                                             <mainClass>net.sf.extjwnl.utilities.DictionaryToDatabase</mainClass>
-                                            <name>dict2db</name>
+                                            <id>dict2db</id>
                                         </program>
                                         <program>
                                             <mainClass>net.sf.extjwnl.utilities.DictionaryToMap</mainClass>
-                                            <name>dict2map</name>
+                                            <id>dict2map</id>
                                         </program>
                                         <program>
                                             <mainClass>net.sf.extjwnl.utilities.Examples</mainClass>
-                                            <name>examples</name>
+                                            <id>examples</id>
                                         </program>
                                         <program>
                                             <mainClass>net.sf.extjwnl.cli.ewn</mainClass>
-                                            <name>ewn</name>
+                                            <id>ewn</id>
                                         </program>
                                     </programs>
                                 </configuration>

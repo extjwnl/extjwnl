@@ -195,6 +195,7 @@ public abstract class Dictionary {
      * @return dictionary
      * @throws JWNLException various JWNL exceptions, depending on where this fails
      */
+    @SuppressWarnings("unchecked")
     public static Dictionary getInstance(InputSource properties) throws JWNLException {
         // parse the properties file
         Document doc;
