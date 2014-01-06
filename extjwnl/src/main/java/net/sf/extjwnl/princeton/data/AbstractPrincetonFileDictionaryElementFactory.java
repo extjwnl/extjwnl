@@ -5,8 +5,8 @@ import net.sf.extjwnl.data.*;
 import net.sf.extjwnl.dictionary.Dictionary;
 import net.sf.extjwnl.util.TokenizerParser;
 import net.sf.extjwnl.util.factory.Param;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -19,7 +19,7 @@ import java.util.*;
  */
 public abstract class AbstractPrincetonFileDictionaryElementFactory extends AbstractPrincetonDictionaryElementFactory implements FileDictionaryElementFactory {
 
-    private static final Log log = LogFactory.getLog(AbstractPrincetonFileDictionaryElementFactory.class);
+    private static final Logger log = LoggerFactory.getLogger(AbstractPrincetonFileDictionaryElementFactory.class);
 
     protected AbstractPrincetonFileDictionaryElementFactory(Dictionary dictionary, Map<String, Param> params) {
         super(dictionary, params);

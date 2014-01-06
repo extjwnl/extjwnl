@@ -7,8 +7,8 @@ import net.sf.extjwnl.dictionary.Dictionary;
 import net.sf.extjwnl.dictionary.file.DictionaryFileFactory;
 import net.sf.extjwnl.dictionary.file.DictionaryFileType;
 import net.sf.extjwnl.util.factory.Param;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -28,7 +28,7 @@ import java.util.*;
  */
 public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandomAccessDictionaryFile implements DictionaryFileFactory<PrincetonRandomAccessDictionaryFile> {
 
-    private static final Log log = LogFactory.getLog(PrincetonRandomAccessDictionaryFile.class);
+    private static final Logger log = LoggerFactory.getLogger(PrincetonRandomAccessDictionaryFile.class);
 
     /**
      * Whether to add standard princeton header to files on save, default: false.

@@ -5,8 +5,8 @@ import net.sf.extjwnl.JWNLRuntimeException;
 import net.sf.extjwnl.dictionary.AbstractCachingDictionary;
 import net.sf.extjwnl.dictionary.Dictionary;
 import net.sf.extjwnl.util.ResourceBundleSet;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.*;
@@ -30,7 +30,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
 
     private static final long serialVersionUID = 4L;
 
-    private static final Log log = LogFactory.getLog(Synset.class);
+    private static final Logger log = LoggerFactory.getLogger(Synset.class);
 
     protected final POS pos;
     protected final PointerList pointers;

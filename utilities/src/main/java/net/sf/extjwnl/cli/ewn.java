@@ -5,8 +5,8 @@ import net.sf.extjwnl.data.*;
 import net.sf.extjwnl.data.list.PointerTargetTreeNode;
 import net.sf.extjwnl.data.list.PointerTargetTreeNodeList;
 import net.sf.extjwnl.dictionary.Dictionary;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.text.DecimalFormat;
@@ -20,7 +20,7 @@ import java.util.*;
  */
 public class ewn {
 
-    private static final Log log = LogFactory.getLog(ewn.class);
+    private static final Logger log = LoggerFactory.getLogger(ewn.class);
 
     public static final String USAGE =
             "usage browse: ewn word [-hgla] [-n#] -searchtype [-searchtype...]\n" +

@@ -5,8 +5,8 @@ import net.sf.extjwnl.data.*;
 import net.sf.extjwnl.dictionary.AbstractCachingDictionary;
 import net.sf.extjwnl.dictionary.Dictionary;
 import net.sf.extjwnl.dictionary.database.ConnectionManager;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -26,7 +26,7 @@ import java.util.*;
  */
 public class DictionaryToDatabase {
 
-    private static final Log log = LogFactory.getLog(DictionaryToDatabase.class);
+    private static final Logger log = LoggerFactory.getLogger(DictionaryToDatabase.class);
 
     protected static int INTERNAL_ID = 0;
     protected static long TIME = 0L;

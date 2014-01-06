@@ -6,8 +6,8 @@ import net.sf.extjwnl.dictionary.file.DictionaryCatalog;
 import net.sf.extjwnl.dictionary.file.DictionaryCatalogSet;
 import net.sf.extjwnl.dictionary.file.DictionaryFileType;
 import net.sf.extjwnl.dictionary.file.ObjectDictionaryFile;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 import java.io.IOException;
@@ -22,7 +22,7 @@ import java.util.*;
  */
 public class MapBackedDictionary extends MapDictionary {
 
-    private static final Log log = LogFactory.getLog(MapBackedDictionary.class);
+    private static final Logger log = LoggerFactory.getLogger(MapBackedDictionary.class);
 
     private final DictionaryCatalogSet<ObjectDictionaryFile> files;
 

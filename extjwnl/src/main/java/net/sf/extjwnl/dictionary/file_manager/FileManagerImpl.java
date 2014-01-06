@@ -11,8 +11,8 @@ import net.sf.extjwnl.dictionary.file.*;
 import net.sf.extjwnl.princeton.file.PrincetonRandomAccessDictionaryFile;
 import net.sf.extjwnl.util.TokenizerParser;
 import net.sf.extjwnl.util.factory.Param;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,7 +29,7 @@ import java.util.*;
  */
 public class FileManagerImpl implements FileManager {
 
-    private static final Log log = LogFactory.getLog(FileManagerImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(FileManagerImpl.class);
 
     private Dictionary dictionary;
 

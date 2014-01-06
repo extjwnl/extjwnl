@@ -9,8 +9,8 @@ import net.sf.extjwnl.dictionary.file.DictionaryFileFactory;
 import net.sf.extjwnl.dictionary.file.DictionaryFileType;
 import net.sf.extjwnl.dictionary.file.ObjectDictionaryFile;
 import net.sf.extjwnl.util.factory.Param;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.HashMap;
@@ -24,7 +24,7 @@ import java.util.Map;
  */
 public class PrincetonObjectDictionaryFile extends AbstractPrincetonDictionaryFile implements ObjectDictionaryFile, DictionaryFileFactory<PrincetonObjectDictionaryFile> {
 
-    private static final Log log = LogFactory.getLog(PrincetonObjectDictionaryFile.class);
+    private static final Logger log = LoggerFactory.getLogger(PrincetonObjectDictionaryFile.class);
 
     private ObjectInputStream in = null;
     private ObjectOutputStream out = null;

@@ -3,8 +3,8 @@ package net.sf.extjwnl.dictionary;
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.data.Exc;
 import net.sf.extjwnl.data.POS;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,7 +19,7 @@ import java.util.List;
  */
 public class LongTestThreadsLock extends MultiThreadedTestCase {
 
-    private static final Log log = LogFactory.getLog(LongTestThreadsLock.class);
+    private static final Logger log = LoggerFactory.getLogger(LongTestThreadsLock.class);
 
     private static final int threadCount = 5;
 

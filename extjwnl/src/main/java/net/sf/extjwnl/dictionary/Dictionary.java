@@ -7,8 +7,8 @@ import net.sf.extjwnl.util.factory.NameValueParam;
 import net.sf.extjwnl.util.factory.Param;
 import net.sf.extjwnl.util.factory.ParamList;
 import net.sf.extjwnl.util.factory.ValueParam;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -32,7 +32,7 @@ import java.util.*;
  */
 public abstract class Dictionary {
 
-    private static final Log log = LogFactory.getLog(Dictionary.class);
+    private static final Logger log = LoggerFactory.getLogger(Dictionary.class);
 
     // messages for static methods
     private static final String STATIC_MESSAGES = "net.sf.extjwnl.dictionary.messages_static";

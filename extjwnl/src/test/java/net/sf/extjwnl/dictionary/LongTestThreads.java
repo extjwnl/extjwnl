@@ -3,8 +3,8 @@ package net.sf.extjwnl.dictionary;
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.data.IndexWord;
 import net.sf.extjwnl.data.POS;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.junit.Assert;
 
 import java.io.FileNotFoundException;
@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class LongTestThreads extends MultiThreadedTestCase {
 
-    private static final Log log = LogFactory.getLog(LongTestThreads.class);
+    private static final Logger log = LoggerFactory.getLogger(LongTestThreads.class);
 
     private static Dictionary dictionary;
 

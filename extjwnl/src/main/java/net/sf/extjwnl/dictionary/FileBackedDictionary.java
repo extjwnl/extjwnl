@@ -6,8 +6,8 @@ import net.sf.extjwnl.data.*;
 import net.sf.extjwnl.dictionary.file.DictionaryFileType;
 import net.sf.extjwnl.dictionary.file_manager.FileManager;
 import net.sf.extjwnl.princeton.data.AbstractPrincetonDictionaryElementFactory;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 import java.io.IOException;
@@ -23,7 +23,7 @@ import java.util.NoSuchElementException;
  */
 public class FileBackedDictionary extends AbstractCachingDictionary {
 
-    private static final Log log = LogFactory.getLog(FileBackedDictionary.class);
+    private static final Logger log = LoggerFactory.getLogger(FileBackedDictionary.class);
     /**
      * File manager install parameter. The value should be the class of FileManager to use.
      */

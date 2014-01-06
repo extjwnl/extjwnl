@@ -5,8 +5,8 @@ import net.sf.extjwnl.JWNLRuntimeException;
 import net.sf.extjwnl.data.*;
 import net.sf.extjwnl.util.cache.CacheSet;
 import net.sf.extjwnl.util.cache.LRUCacheSet;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 import java.util.Iterator;
@@ -20,7 +20,7 @@ import java.util.NoSuchElementException;
  */
 public abstract class AbstractCachingDictionary extends Dictionary {
 
-    private static final Log log = LogFactory.getLog(AbstractCachingDictionary.class);
+    private static final Logger log = LoggerFactory.getLogger(AbstractCachingDictionary.class);
 
     public static final class IndexWordIterator implements Iterator<IndexWord> {
         private final Iterator<IndexWord> itr;
