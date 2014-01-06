@@ -14,19 +14,9 @@ import java.util.ResourceBundle;
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class JWNL {
-    // OS types
-    public static final OS WINDOWS = new OS("windows");
-    public static final OS UNIX = new OS("unix");
-    public static final OS MAC = new OS("mac");
-    public static final OS UNDEFINED = new OS("undefined");
-
-    public static final OS[] DEFINED_OS_ARRAY = {WINDOWS, UNIX, MAC};
-    public static final String OS_PROPERTY_NAME = "os.name";
-
     private static final String CORE_RESOURCE = "JWNLResource";
 
     private static ResourceBundleSet bundle;
-    private static OS currentOS = UNDEFINED;
 
     private static boolean initialized = false;
 
@@ -41,13 +31,6 @@ public class JWNL {
             //bundle.setLocale(Locale.getDefault());//enable when enough translations will be available.
             bundle.setLocale(new Locale("en", ""));
 
-            // set the OS
-            String os = System.getProperty(OS_PROPERTY_NAME);
-            for (OS definedOS : DEFINED_OS_ARRAY) {
-                if (definedOS.matches(os)) {
-                    currentOS = definedOS;
-                }
-            }
             initialized = true;
         }
     }
@@ -67,15 +50,6 @@ public class JWNL {
      */
     public static void initialize(InputStream propertiesStream) throws JWNLException {
         Dictionary.setInstance(Dictionary.getInstance(propertiesStream));
-    }
-
-    /**
-     * Returns the current OS.
-     *
-     * @return the current OS
-     */
-    public static OS getOS() {
-        return currentOS;
     }
 
     public static ResourceBundle getResourceBundle() {
@@ -131,31 +105,5 @@ public class JWNL {
         }
         buf.append(str.substring(startIndex, str.length()));
         return buf.toString();
-    }
-
-    /**
-     * Used to create constants that represent the major categories of operating systems.
-     */
-    public static final class OS {
-        private final String name;
-
-        protected OS(String name) {
-            this.name = name;
-        }
-
-        public String toString() {
-            return resolveMessage("JWNL_TOSTRING_001", name);
-        }
-
-        /**
-         * Returns true if <var>testOS</var> is a version of this OS. For example, calling
-         * WINDOWS.matches("Windows 95") returns true.
-         *
-         * @param testOS OS string
-         * @return true if <var>testOS</var> is a version of this OS
-         */
-        public boolean matches(String testOS) {
-            return testOS.toLowerCase().contains(name.toLowerCase());
-        }
     }
 }

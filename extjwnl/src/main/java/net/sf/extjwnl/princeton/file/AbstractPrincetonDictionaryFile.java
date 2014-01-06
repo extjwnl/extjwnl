@@ -12,9 +12,7 @@ import java.util.Map;
 
 /**
  * <code>AbstractDictionaryFile</code> that uses file names compatible with Princeton's distribution of WordNet.
- * The filenames associated are:
- * WINDOWS: <noun, verb, adj, adv>.<idx, dat, exc>
- * MAC, UNIX: <index, data>.<noun, verb, adj, adv>, <noun, verb, adj, adv>.exc
+ * The filenames associated are: <index, data>.<noun, verb, adj, adv>, <noun, verb, adj, adv>.exc
  *
  * @author John Didion <jdidion@didion.net>
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
@@ -26,7 +24,7 @@ public abstract class AbstractPrincetonDictionaryFile extends AbstractDictionary
     private static final String ADVERB_EXT = "adv";
 
     private static final Map<POS, String> posToExtMap;
-    private static final Map<DictionaryFileType, FileNames> fileTypeToFileNameMap;
+    private static final Map<DictionaryFileType, String> fileTypeToFileNameMap;
 
     static {
         posToExtMap = new EnumMap<POS, String>(POS.class);
@@ -35,10 +33,10 @@ public abstract class AbstractPrincetonDictionaryFile extends AbstractDictionary
         posToExtMap.put(POS.ADJECTIVE, ADJECTIVE_EXT);
         posToExtMap.put(POS.ADVERB, ADVERB_EXT);
 
-        fileTypeToFileNameMap = new EnumMap<DictionaryFileType, FileNames>(DictionaryFileType.class);
-        fileTypeToFileNameMap.put(DictionaryFileType.INDEX, new FileNames("idx", "index"));
-        fileTypeToFileNameMap.put(DictionaryFileType.DATA, new FileNames("dat", "data"));
-        fileTypeToFileNameMap.put(DictionaryFileType.EXCEPTION, new FileNames("exc", "exc"));
+        fileTypeToFileNameMap = new EnumMap<DictionaryFileType, String>(DictionaryFileType.class);
+        fileTypeToFileNameMap.put(DictionaryFileType.INDEX, "index");
+        fileTypeToFileNameMap.put(DictionaryFileType.DATA, "data");
+        fileTypeToFileNameMap.put(DictionaryFileType.EXCEPTION, "exc");
     }
 
     protected AbstractPrincetonDictionaryFile(Dictionary dictionary, Map<String, Param> params) {
@@ -51,11 +49,11 @@ public abstract class AbstractPrincetonDictionaryFile extends AbstractDictionary
 
     protected String getFilename() {
         if (null != getPOS()) {
-            String posString = getExtension(getPOS());
-            if (getFileType() == DictionaryFileType.EXCEPTION || (JWNL.getOS().equals(JWNL.WINDOWS) && getDictionary().getVersion().getNumber() < 2.1)) {
-                return makeWindowsFilename(posString, getFileNames(getFileType()).windowsFileTypeName);
+            String posString = posToExtMap.get(getPOS());
+            if (getFileType() == DictionaryFileType.EXCEPTION) {
+                return posString + "." + fileTypeToFileNameMap.get(getFileType());
             } else {
-                return makeNonWindowsFilename(posString, getFileNames(getFileType()).nonWindowsFileTypeName);
+                return fileTypeToFileNameMap.get(getFileType()) + "." + posString;
             }
         } else {
             if (DictionaryFileType.REVCNTLIST.equals(getFileType())) {
@@ -63,47 +61,10 @@ public abstract class AbstractPrincetonDictionaryFile extends AbstractDictionary
             } else if (DictionaryFileType.CNTLIST.equals(getFileType())) {
                 return "cntlist";
             } else if (DictionaryFileType.INDEX.equals(getFileType())) {
-                if (JWNL.getOS().equals(JWNL.WINDOWS) && getDictionary().getVersion().getNumber() < 2.1) {
-                    return makeWindowsFilename("sense", getFileNames(getFileType()).windowsFileTypeName);
-                } else {
-                    return makeNonWindowsFilename("sense", getFileNames(getFileType()).nonWindowsFileTypeName);
-                }
+                return fileTypeToFileNameMap.get(getFileType()) + ".sense";
             } else {
                 throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_054", new Object[]{getPOS(), getFileType()}));
             }
-        }
-    }
-
-    /**
-     * Makes a windows file type string. Typically of the form "data.noun" or "index.noun".
-     *
-     * @param posStr      the part of speech
-     * @param fileTypeStr the file type, data, index, etc.
-     * @return Windows file type string.
-     */
-    private String makeWindowsFilename(String posStr, String fileTypeStr) {
-        return posStr + "." + fileTypeStr;
-    }
-
-    private String makeNonWindowsFilename(String posStr, String fileTypeStr) {
-        return fileTypeStr + "." + posStr;
-    }
-
-    private String getExtension(POS pos) {
-        return posToExtMap.get(pos);
-    }
-
-    private FileNames getFileNames(DictionaryFileType type) {
-        return fileTypeToFileNameMap.get(type);
-    }
-
-    private static final class FileNames {
-        private final String windowsFileTypeName;
-        private final String nonWindowsFileTypeName;
-
-        public FileNames(String windowsFileTypeName, String nonWindowsFileTypeName) {
-            this.windowsFileTypeName = windowsFileTypeName;
-            this.nonWindowsFileTypeName = nonWindowsFileTypeName;
         }
     }
 }
