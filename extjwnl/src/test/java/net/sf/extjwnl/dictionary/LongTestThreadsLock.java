@@ -60,7 +60,7 @@ public class LongTestThreadsLock extends MultiThreadedTestCase {
 
     public void testThreadedLookup() throws IOException, JWNLException {
         Dictionary d = Dictionary.getInstance(
-                LongTestThreadsDictionary.class.getClassLoader().getResourceAsStream("test_file_properties.xml"));
+                LongTestThreadsDictionary.class.getResourceAsStream("/test_file_properties.xml"));
 
         List<String> list = new ArrayList<String>();
         Iterator<Exc> exceptions = d.getExceptionIterator(POS.NOUN);

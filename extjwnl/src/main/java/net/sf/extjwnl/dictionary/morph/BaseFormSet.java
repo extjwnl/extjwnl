@@ -1,6 +1,7 @@
 package net.sf.extjwnl.dictionary.morph;
 
 import net.sf.extjwnl.JWNLRuntimeException;
+import net.sf.extjwnl.dictionary.Dictionary;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,15 +14,17 @@ import java.util.List;
  */
 public class BaseFormSet {
 
+    private final Dictionary dictionary;
     private final List<String> forms = new ArrayList<String>();
     private final boolean allowDuplicates;
     private int index = -1;
 
-    public BaseFormSet() {
-        this(false);
+    public BaseFormSet(Dictionary dictionary) {
+        this(dictionary, false);
     }
 
-    public BaseFormSet(boolean allowDuplicates) {
+    public BaseFormSet(Dictionary dictionary, boolean allowDuplicates) {
+        this.dictionary = dictionary;
         this.allowDuplicates = allowDuplicates;
     }
 
@@ -58,7 +61,7 @@ public class BaseFormSet {
 
     public String getCurrentForm() {
         if (!isCurrentFormAvailable()) {
-            throw new JWNLRuntimeException("DICTIONARY_EXCEPTION_012");
+            throw new JWNLRuntimeException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_012"));
         }
         return getForm(index);
     }
@@ -69,7 +72,7 @@ public class BaseFormSet {
 
     public String getNextForm() {
         if (!isMoreFormsAvailable()) {
-            throw new JWNLRuntimeException("DICTIONARY_EXCEPTION_013");
+            throw new JWNLRuntimeException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_013"));
         }
         return getForm(++index);
     }

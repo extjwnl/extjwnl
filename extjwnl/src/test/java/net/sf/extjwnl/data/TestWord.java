@@ -28,32 +28,32 @@ public class TestWord extends BaseData {
 
     @Test(expected = IllegalArgumentException.class)
     public void testCreate() {
-        word = new Word(null, null, -1, null);
+        word = new Word(dictionary, null, -1, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testCreate2() throws JWNLException {
-        word = new Word(null, new Synset(null, POS.NOUN), -1, null);
+        word = new Word(dictionary, new Synset(dictionary, POS.NOUN), -1, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testCreate3() throws JWNLException {
-        word = new Word(null, new Synset(null, POS.NOUN), 1, null);
+        word = new Word(dictionary, new Synset(dictionary, POS.NOUN), 1, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testCreate35() throws JWNLException {
-        word = new Word(null, new Synset(null, POS.NOUN), 1, "");
+        word = new Word(dictionary, new Synset(dictionary, POS.NOUN), 1, "");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testCreate4() throws JWNLException {
-        word = new Word(null, new Synset(null, POS.NOUN), 1, " a");
+        word = new Word(dictionary, new Synset(null, POS.NOUN), 1, " a");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testCreate5() throws JWNLException {
-        word = new Word(null, new Synset(null, POS.NOUN), 1, "a ");
+        word = new Word(dictionary, new Synset(dictionary, POS.NOUN), 1, "a ");
     }
 
     @Test

@@ -1,5 +1,6 @@
 package net.sf.extjwnl.data.relationship;
 
+import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.data.IndexWord;
 import net.sf.extjwnl.data.PointerType;
 import net.sf.extjwnl.data.PointerUtils;
@@ -52,7 +53,7 @@ public class RelationshipFinder {
      * @throws CloneNotSupportedException CloneNotSupportedException
      */
     public static RelationshipList findRelationships(
-            Synset sourceSynset, Synset targetSynset, PointerType type) throws CloneNotSupportedException {
+            Synset sourceSynset, Synset targetSynset, PointerType type) throws CloneNotSupportedException, JWNLException {
 
         return (type.isSymmetric()) ?
                 findSymmetricRelationships(sourceSynset, targetSynset, type) :
@@ -72,7 +73,7 @@ public class RelationshipFinder {
      * @throws CloneNotSupportedException CloneNotSupportedException
      */
     public static RelationshipList findRelationships(
-            Synset sourceSynset, Synset targetSynset, PointerType type, int depth) throws CloneNotSupportedException {
+            Synset sourceSynset, Synset targetSynset, PointerType type, int depth) throws CloneNotSupportedException, JWNLException {
 
         return (type.isSymmetric()) ?
                 findSymmetricRelationships(sourceSynset, targetSynset, type, depth) :
@@ -90,7 +91,7 @@ public class RelationshipFinder {
      * @throws CloneNotSupportedException CloneNotSupportedException
      */
     private static RelationshipList findAsymmetricRelationships(
-            Synset sourceSynset, Synset targetSynset, PointerType type) throws CloneNotSupportedException {
+            Synset sourceSynset, Synset targetSynset, PointerType type) throws CloneNotSupportedException, JWNLException {
 
         return findAsymmetricRelationships(sourceSynset, targetSynset, type, DEFAULT_ASYMMETRIC_SEARCH_DEPTH);
     }
@@ -107,7 +108,7 @@ public class RelationshipFinder {
      * @throws CloneNotSupportedException CloneNotSupportedException
      */
     private static RelationshipList findAsymmetricRelationships(
-            Synset sourceSynset, Synset targetSynset, PointerType type, int depth) throws CloneNotSupportedException {
+            Synset sourceSynset, Synset targetSynset, PointerType type, int depth) throws CloneNotSupportedException, JWNLException {
 
         // We run the reversal function on the trees to get linear (non-branching)
         // paths from the source word to its deepest ancestor (i.e. if there are
@@ -196,7 +197,7 @@ public class RelationshipFinder {
      * @return list of symmetric relationships between source and target
      */
     private static RelationshipList findSymmetricRelationships(
-            Synset sourceSynset, Synset targetSynset, PointerType type) {
+            Synset sourceSynset, Synset targetSynset, PointerType type) throws JWNLException {
 
         return findSymmetricRelationships(sourceSynset, targetSynset, type, DEFAULT_SYMMETRIC_SEARCH_DEPTH);
     }
@@ -211,7 +212,7 @@ public class RelationshipFinder {
      * @return list of symmetric relationships between source and target
      */
     private static RelationshipList findSymmetricRelationships(
-            final Synset sourceSynset, final Synset targetSynset, PointerType type, int depth) {
+            final Synset sourceSynset, final Synset targetSynset, PointerType type, int depth) throws JWNLException {
 
         PointerTargetTree tree = new PointerTargetTree(
                 sourceSynset, PointerUtils.makePointerTargetTreeList(sourceSynset, type, null, depth, false));

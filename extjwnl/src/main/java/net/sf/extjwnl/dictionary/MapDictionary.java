@@ -99,6 +99,7 @@ public class MapDictionary extends Dictionary {
     public synchronized void edit() throws JWNLException {
         if (!isEditable()) {
             super.edit();
+            resolveAllPointers();
 
             //update max offsets for new synset creation
             //iteration might take time

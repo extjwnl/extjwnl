@@ -64,7 +64,7 @@ public class TokenizerOperation extends AbstractDelegatingOperation {
         }
 
         for (int i = 0; i < tokens.length; i++) {
-            tokenForms[i] = new BaseFormSet();
+            tokenForms[i] = new BaseFormSet(dictionary);
             tokenForms[i].add(tokens[i]);
             delegate(pos, tokens[i], tokenForms[i], TOKEN_OPERATIONS);
         }

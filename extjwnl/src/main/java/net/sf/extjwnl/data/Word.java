@@ -1,8 +1,8 @@
 package net.sf.extjwnl.data;
 
-import net.sf.extjwnl.JWNL;
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.dictionary.Dictionary;
+import net.sf.extjwnl.util.ResourceBundleSet;
 
 import java.io.IOException;
 import java.util.*;
@@ -86,18 +86,18 @@ public class Word extends PointerTarget {
     public Word(Dictionary dictionary, Synset synset, int index, String lemma) {
         super(dictionary);
         if (null == synset) {
-            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_042"));
+            throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_042"));
         }
         this.synset = synset;
         if (index < 1) {
-            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_045"));
+            throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_045"));
         }
         this.index = index;
         if (null == lemma || "".equals(lemma)) {
-            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_046"));
+            throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_046"));
         }
         if (' ' == lemma.charAt(0) || ' ' == lemma.charAt(lemma.length() - 1)) {
-            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_055"));
+            throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_055"));
         }
         this.lemma = lemma;
     }
@@ -116,7 +116,7 @@ public class Word extends PointerTarget {
     }
 
     public String toString() {
-        return JWNL.resolveMessage("DATA_TOSTRING_005", new Object[]{getPOS(), getLemma(), getSynset(), getIndex()});
+        return ResourceBundleSet.insertParams("[Word: {0} [Lemma: {1}] {2} [Index: {3}]]", new Object[]{getPOS(), getLemma(), getSynset(), getIndex()});
     }
 
     /**
@@ -440,7 +440,7 @@ public class Word extends PointerTarget {
      *
      * @return sense key
      */
-    public String getSenseKey() {
+    public String getSenseKey() throws JWNLException {
         int ss_type = getPOS().getId();
         if (POS.ADJECTIVE == getSynset().getPOS() && getSynset().isAdjectiveCluster()) {
             ss_type = POS.ADJECTIVE_SATELLITE_ID;
@@ -483,7 +483,7 @@ public class Word extends PointerTarget {
      *
      * @return sense key
      */
-    public String getSenseKeyWithAdjClass() {
+    public String getSenseKeyWithAdjClass() throws JWNLException {
         int ss_type = getPOS().getId();
         if (POS.ADJECTIVE == getSynset().getPOS() && getSynset().isAdjectiveCluster()) {
             ss_type = POS.ADJECTIVE_SATELLITE_ID;

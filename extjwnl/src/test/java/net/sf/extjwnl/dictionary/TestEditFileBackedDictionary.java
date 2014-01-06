@@ -11,6 +11,6 @@ public class TestEditFileBackedDictionary extends DictionaryEditTester {
 
     @Override
     protected InputStream getProperties() {
-        return TestEditFileBackedDictionary.class.getClassLoader().getResourceAsStream("test_clean_file.xml");
+        return TestEditFileBackedDictionary.class.getResourceAsStream("/test_clean_file.xml");
     }
 }

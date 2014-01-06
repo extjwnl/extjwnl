@@ -1,10 +1,10 @@
 package net.sf.extjwnl.data.list;
 
-import net.sf.extjwnl.JWNL;
 import net.sf.extjwnl.data.PointerTarget;
 import net.sf.extjwnl.data.PointerType;
 import net.sf.extjwnl.data.Synset;
 import net.sf.extjwnl.data.Word;
+import net.sf.extjwnl.util.ResourceBundleSet;
 
 /**
  * A node in a <code>PointerTargetNodeList</code>.
@@ -93,7 +93,7 @@ public class PointerTargetNode implements Node {
     }
 
     public String toString() {
-        return JWNL.resolveMessage("DATA_TOSTRING_014", new Object[]{getPointerTarget(), getType()});
+        return ResourceBundleSet.insertParams("[PointerTargetNode: {0} {1}]", new Object[]{getPointerTarget(), getType()});
     }
 
     public int hashCode() {

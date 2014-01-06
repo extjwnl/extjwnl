@@ -8,14 +8,13 @@ http://extjwnl.sourceforge.net/
 
 2. Current Release
 
-This release is an upgrade form the last version of JWNL. It
-contains several improvements, such as:
+This release contains several features:
  * writing dictionaries
  * encodings (including UTF-8)
  * Java generics
  * huge dictionaries
  * instance dictionaries
- * Maven
+ * Maven support
  * documentation improvements
  * improved unit test coverage
  * enhanced database support

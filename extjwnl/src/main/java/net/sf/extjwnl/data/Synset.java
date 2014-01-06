@@ -1,9 +1,10 @@
 package net.sf.extjwnl.data;
 
-import net.sf.extjwnl.JWNL;
 import net.sf.extjwnl.JWNLException;
+import net.sf.extjwnl.JWNLRuntimeException;
 import net.sf.extjwnl.dictionary.AbstractCachingDictionary;
 import net.sf.extjwnl.dictionary.Dictionary;
+import net.sf.extjwnl.util.ResourceBundleSet;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -119,7 +120,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
         @Override
         public Pointer set(int index, Pointer pointer) {
             if (null == pointer) {
-                throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_043"));
+                throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_043"));
             }
             Pointer result = super.set(index, pointer);
             checkPointers();
@@ -129,15 +130,19 @@ public class Synset extends PointerTarget implements DictionaryElement {
         @Override
         public boolean add(Pointer pointer) {
             if (null == pointer) {
-                throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_043"));
+                throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_043"));
             }
             boolean result = super.add(pointer);
 
             if (null != dictionary && dictionary.isEditable() && dictionary.getManageSymmetricPointers()) {
                 if (null != pointer.getType().getSymmetricType()) {
-                    Pointer symmetric = new Pointer(pointer.getType().getSymmetricType(), pointer.getTarget(), pointer.getSource());
-                    if (!pointer.getTarget().getSynset().getPointers().contains(symmetric)) {
-                        pointer.getTarget().getSynset().getPointers().add(symmetric);
+                    try {
+                        Pointer symmetric = new Pointer(pointer.getType().getSymmetricType(), pointer.getTarget(), pointer.getSource());
+                        if (!pointer.getTarget().getSynset().getPointers().contains(symmetric)) {
+                            pointer.getTarget().getSynset().getPointers().add(symmetric);
+                        }
+                    } catch (JWNLException e) {
+                        throw new JWNLRuntimeException(e);
                     }
                 }
             }
@@ -148,15 +153,19 @@ public class Synset extends PointerTarget implements DictionaryElement {
         @Override
         public void add(int index, Pointer pointer) {
             if (null == pointer) {
-                throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_043"));
+                throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_043"));
             }
             super.add(index, pointer);
 
             if (null != dictionary && dictionary.isEditable() && dictionary.getManageSymmetricPointers()) {
                 if (null != pointer.getType().getSymmetricType()) {
-                    Pointer symmetric = new Pointer(pointer.getType().getSymmetricType(), pointer.getTarget(), pointer.getSource());
-                    if (!pointer.getTarget().getSynset().getPointers().contains(symmetric)) {
-                        pointer.getTarget().getSynset().getPointers().add(symmetric);
+                    try {
+                        Pointer symmetric = new Pointer(pointer.getType().getSymmetricType(), pointer.getTarget(), pointer.getSource());
+                        if (!pointer.getTarget().getSynset().getPointers().contains(symmetric)) {
+                            pointer.getTarget().getSynset().getPointers().add(symmetric);
+                        }
+                    } catch (JWNLException e) {
+                        throw new JWNLRuntimeException(e);
                     }
                 }
             }
@@ -192,11 +201,15 @@ public class Synset extends PointerTarget implements DictionaryElement {
             if (null != dictionary && dictionary.isEditable() && dictionary.getManageSymmetricPointers()) {
                 //delete symmetric pointer from the target
                 if (null != result.getType().getSymmetricType()) {
-                    for (Pointer p : result.getTargetSynset().getPointers()) {
-                        if (offset == p.getTargetOffset() && result.getType().getSymmetricType().equals(p.getType())) {
-                            result.getTargetSynset().getPointers().remove(p);
-                            break;
+                    try {
+                        for (Pointer p : result.getTargetSynset().getPointers()) {
+                            if (offset == p.getTargetOffset() && result.getType().getSymmetricType().equals(p.getType())) {
+                                result.getTargetSynset().getPointers().remove(p);
+                                break;
+                            }
                         }
+                    } catch (JWNLException e) {
+                        throw new JWNLRuntimeException(e);
                     }
                 }
             }
@@ -210,13 +223,17 @@ public class Synset extends PointerTarget implements DictionaryElement {
                 Pointer pointer = (Pointer) o;
                 //delete symmetric pointer from the target
                 if (null != pointer.getType().getSymmetricType()) {
-                    if (null != pointer.getTargetSynset()) {
-                        for (Pointer p : pointer.getTargetSynset().getPointers()) {
-                            if (offset == p.getTargetOffset() && pointer.getType().getSymmetricType().equals(p.getType())) {
-                                pointer.getTargetSynset().getPointers().remove(p);
-                                break;
+                    try {
+                        if (null != pointer.getTargetSynset()) {
+                            for (Pointer p : pointer.getTargetSynset().getPointers()) {
+                                if (offset == p.getTargetOffset() && pointer.getType().getSymmetricType().equals(p.getType())) {
+                                    pointer.getTargetSynset().getPointers().remove(p);
+                                    break;
+                                }
                             }
                         }
+                    } catch (JWNLException e) {
+                        throw new JWNLRuntimeException(e);
                     }
                 }
             }
@@ -231,11 +248,15 @@ public class Synset extends PointerTarget implements DictionaryElement {
                 for (Pointer pointer : copy) {
                     //delete symmetric pointer from the target
                     if (null != pointer.getType().getSymmetricType() && dictionary.getManageSymmetricPointers()) {
-                        for (Pointer p : pointer.getTargetSynset().getPointers()) {
-                            if (offset == p.getTargetOffset() && pointer.getType().getSymmetricType().equals(p.getType())) {
-                                pointer.getTargetSynset().getPointers().remove(p);
-                                break;
+                        try {
+                            for (Pointer p : pointer.getTargetSynset().getPointers()) {
+                                if (offset == p.getTargetOffset() && pointer.getType().getSymmetricType().equals(p.getType())) {
+                                    pointer.getTargetSynset().getPointers().remove(p);
+                                    break;
+                                }
                             }
+                        } catch (JWNLException e) {
+                            throw new JWNLRuntimeException(e);
                         }
                     }
                 }
@@ -252,11 +273,15 @@ public class Synset extends PointerTarget implements DictionaryElement {
                 for (Pointer pointer : copy) {
                     //delete symmetric pointer from the target
                     if (null != pointer.getType().getSymmetricType() && dictionary.getManageSymmetricPointers()) {
-                        for (Pointer p : pointer.getTargetSynset().getPointers()) {
-                            if (offset == p.getTargetOffset() && pointer.getType().getSymmetricType().equals(p.getType())) {
-                                pointer.getTargetSynset().getPointers().remove(p);
-                                break;
+                        try {
+                            for (Pointer p : pointer.getTargetSynset().getPointers()) {
+                                if (offset == p.getTargetOffset() && pointer.getType().getSymmetricType().equals(p.getType())) {
+                                    pointer.getTargetSynset().getPointers().remove(p);
+                                    break;
+                                }
                             }
+                        } catch (JWNLException e) {
+                            throw new JWNLRuntimeException(e);
                         }
                     }
                 }
@@ -306,11 +331,15 @@ public class Synset extends PointerTarget implements DictionaryElement {
                         if (copy.contains(pointer)) {
                             //delete symmetric pointer from the target
                             if (null != pointer.getType().getSymmetricType() && dictionary.getManageSymmetricPointers()) {
-                                for (Pointer p : pointer.getTargetSynset().getPointers()) {
-                                    if (offset == p.getTargetOffset() && pointer.getType().getSymmetricType().equals(p.getType())) {
-                                        pointer.getTargetSynset().getPointers().remove(p);
-                                        break;
+                                try {
+                                    for (Pointer p : pointer.getTargetSynset().getPointers()) {
+                                        if (offset == p.getTargetOffset() && pointer.getType().getSymmetricType().equals(p.getType())) {
+                                            pointer.getTargetSynset().getPointers().remove(p);
+                                            break;
+                                        }
                                     }
+                                } catch (JWNLException e) {
+                                    throw new JWNLRuntimeException(e);
                                 }
                             }
                         }
@@ -333,11 +362,15 @@ public class Synset extends PointerTarget implements DictionaryElement {
                         if (!copy.contains(pointer)) {
                             //delete symmetric pointer from the target
                             if (null != pointer.getType().getSymmetricType() && dictionary.getManageSymmetricPointers()) {
-                                for (Pointer p : pointer.getTargetSynset().getPointers()) {
-                                    if (offset == p.getTargetOffset() && pointer.getType().getSymmetricType().equals(p.getType())) {
-                                        pointer.getTargetSynset().getPointers().remove(p);
-                                        break;
+                                try {
+                                    for (Pointer p : pointer.getTargetSynset().getPointers()) {
+                                        if (offset == p.getTargetOffset() && pointer.getType().getSymmetricType().equals(p.getType())) {
+                                            pointer.getTargetSynset().getPointers().remove(p);
+                                            break;
+                                        }
                                     }
+                                } catch (JWNLException e) {
+                                    throw new JWNLRuntimeException(e);
                                 }
                             }
                         }
@@ -357,16 +390,20 @@ public class Synset extends PointerTarget implements DictionaryElement {
                         List<Pointer> toDelete = null;
                         for (int i = 0; i < super.size(); i++) {
                             Pointer pointer = super.get(i);
-                            if (dictionary != pointer.getSource().getDictionary() || null == pointer.getTarget() || dictionary != pointer.getTarget().getDictionary()) {
-                                if (null == toDelete) {
-                                    toDelete = new ArrayList<Pointer>();
+                            try {
+                                if (dictionary != pointer.getSource().getDictionary() || null == pointer.getTarget() || dictionary != pointer.getTarget().getDictionary()) {
+                                    if (null == toDelete) {
+                                        toDelete = new ArrayList<Pointer>();
+                                    }
+                                    toDelete.add(pointer);
                                 }
-                                toDelete.add(pointer);
+                            } catch (JWNLException e) {
+                                throw new JWNLRuntimeException(e);
                             }
                         }
                         if (null != toDelete) {
                             if (log.isWarnEnabled() && 0 < toDelete.size()) {
-                                log.warn(JWNL.resolveMessage("DICTIONARY_WARN_002", Synset.this.getOffset()));
+                                log.warn(dictionary.getMessages().resolveMessage("DICTIONARY_WARN_002", Synset.this.getOffset()));
                             }
                             for (Pointer pointer : toDelete) {
                                 remove(pointer);
@@ -387,10 +424,10 @@ public class Synset extends PointerTarget implements DictionaryElement {
         @Override
         public Word set(int index, Word word) {
             if (null == word) {
-                throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_044"));
+                throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_044"));
             }
             if (Synset.this.dictionary != word.getDictionary()) {
-                throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_040"));
+                throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_040"));
             }
             if (null != dictionary && dictionary.isEditable()) {
                 Word result = super.set(index, word);
@@ -417,10 +454,10 @@ public class Synset extends PointerTarget implements DictionaryElement {
         @Override
         public void add(int index, Word word) {
             if (null == word) {
-                throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_044"));
+                throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_044"));
             }
             if (Synset.this.dictionary != word.getDictionary()) {
-                throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_040"));
+                throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_040"));
             }
             if (null != dictionary && dictionary.isEditable()) {
                 super.add(index, word);
@@ -520,7 +557,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
                     }
                 } catch (JWNLException e) {
                     if (log.isErrorEnabled()) {
-                        log.error(JWNL.resolveMessage("EXCEPTION_001", e.getMessage()), e);
+                        log.error(dictionary.getMessages().resolveMessage("EXCEPTION_001", e.getMessage()), e);
                     }
                 }
             }
@@ -541,7 +578,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
                 } catch (JWNLException e) {
                     if (log.isErrorEnabled()) {
                         if (log.isErrorEnabled()) {
-                            log.error(JWNL.resolveMessage("EXCEPTION_001", e.getMessage()), e);
+                            log.error(dictionary.getMessages().resolveMessage("EXCEPTION_001", e.getMessage()), e);
                         }
                     }
                 }
@@ -552,7 +589,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
     public Synset(Dictionary dictionary, POS pos) throws JWNLException {
         super(dictionary);
         if (null == pos) {
-            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_041"));
+            throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_041"));
         }
         this.pos = pos;
         pointers = new PointerList();
@@ -566,7 +603,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
     public Synset(Dictionary dictionary, POS pos, long offset) throws JWNLException {
         super(dictionary);
         if (null == pos) {
-            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_041"));
+            throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_041"));
         }
         this.pos = pos;
         pointers = new PointerList();
@@ -614,7 +651,8 @@ public class Synset extends PointerTarget implements DictionaryElement {
             words.append(" -- (").append(getGloss()).append(")");
         }
 
-        return JWNL.resolveMessage("DATA_TOSTRING_009", new Object[]{getOffset(), getPOS(), words.toString()});
+        return ResourceBundleSet.insertParams("[Synset: [Offset: {0}] {1} Words: {2}]",
+                new Object[]{getOffset(), getPOS(), words.toString()});
     }
 
     @Override
@@ -641,7 +679,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
 
     public void setGloss(String gloss) {
         if (null == gloss) {
-            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_048"));
+            throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_048"));
         }
         this.gloss = gloss;
     }
@@ -661,7 +699,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
                 Synset oldSynset = acd.getSynsetAt(pos, offset);
                 if (null != oldSynset) {
                     if (log.isWarnEnabled()) {
-                        log.warn(JWNL.resolveMessage("DICTIONARY_WARN_003", oldSynset));
+                        log.warn(dictionary.getMessages().resolveMessage("DICTIONARY_WARN_003", oldSynset));
                     }
                 }
                 acd.clearSynset(pos, this.offset);
@@ -710,7 +748,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
      */
     public boolean containsWord(String lemma) {
         if (null == lemma) {
-            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_046"));
+            throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_046"));
         }
         for (Word word : words) {
             if (word.getLemma().equalsIgnoreCase(lemma)) {
@@ -728,7 +766,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
      */
     public int indexOfWord(String lemma) {
         if (null == lemma) {
-            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_046"));
+            throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_046"));
         }
         for (int i = 0; i < words.size(); i++) {
             if (words.get(i).getLemma().equalsIgnoreCase(lemma)) {

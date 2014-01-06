@@ -18,7 +18,7 @@ public class ITReadMapBackedDictionary extends DictionaryReadTester {
     @BeforeClass
     public static void initDictionary() throws IOException, JWNLException {
         dictionary = Dictionary.getInstance(
-                ITReadMapBackedDictionary.class.getClassLoader().getResourceAsStream("test_map_properties.xml"));
+                ITReadMapBackedDictionary.class.getResourceAsStream("/test_map_properties.xml"));
     }
 
     @AfterClass

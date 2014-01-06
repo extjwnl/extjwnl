@@ -1,8 +1,8 @@
 package net.sf.extjwnl.data.list;
 
-import net.sf.extjwnl.JWNL;
 import net.sf.extjwnl.data.PointerTarget;
 import net.sf.extjwnl.data.PointerType;
+import net.sf.extjwnl.util.ResourceBundleSet;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,7 +72,8 @@ public class PointerTargetTreeNode extends PointerTargetNode {
     }
 
     public String toString() {
-        return JWNL.resolveMessage("DATA_TOSTRING_015",
+        return ResourceBundleSet.insertParams(
+                "[PointerTargetTreeNode: {0} {1} [Has Parent? {2}] [Has Children? {3}] [Has Pointers? {4}]]",
                 new Object[]{
                         getPointerTarget(),
                         getType(),

@@ -1,8 +1,8 @@
 package net.sf.extjwnl.dictionary;
 
-import net.sf.extjwnl.JWNL;
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.data.*;
+import net.sf.extjwnl.util.ResourceBundleSet;
 import net.sf.extjwnl.util.factory.NameValueParam;
 import net.sf.extjwnl.util.factory.Param;
 import net.sf.extjwnl.util.factory.ParamList;
@@ -14,9 +14,11 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -24,33 +26,35 @@ import java.util.*;
 
 /**
  * Abstract representation of a WordNet dictionary.
- * See the architecture documentation for information on subclassing Dictionary.
  *
  * @author John Didion <jdidion@didion.net>
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public abstract class Dictionary {
 
-    static {
-        JWNL.initialize();
-    }
-
     private static final Log log = LogFactory.getLog(Dictionary.class);
 
-    /**
-     * Morphological processor class install parameter. The value should be the
-     * class of MorphologicalProcessor to use.
-     */
-    public static final String MORPH = "morphological_processor";
+    // messages for static methods
+    private static final String STATIC_MESSAGES = "net.sf.extjwnl.dictionary.messages_static";
+    private static final ResourceBundleSet staticMessages = new ResourceBundleSet(STATIC_MESSAGES);
+
+    // messages for dictionary
+    private static final String MESSAGES = "net.sf.extjwnl.dictionary.messages";
+    private final ResourceBundleSet messages = new ResourceBundleSet(MESSAGES);
 
     /**
-     * Whether to add symmetric pointers automatically, default true.
+     * Parameter name: class of the morphological processor to use.
+     */
+    public static final String MORPHOLOGICAL_PROCESSOR = "morphological_processor";
+
+    /**
+     * Parameter name: whether to add symmetric pointers automatically, default true.
      */
     public static final String EDIT_MANAGE_SYMMETRIC_POINTERS = "edit_manage_symmetric_pointers";
     private boolean editManageSymmetricPointers = true;
 
     /**
-     * Whether to check for alien pointers (pointing nowhere, or to another dictionary), default true.
+     * Parameter name: whether to check for alien pointers (pointing nowhere, or to another dictionary), default true.
      */
     public static final String EDIT_CHECK_ALIEN_POINTERS = "edit_check_alien_pointers";
     private boolean editCheckAlienPointers = true;
@@ -72,15 +76,10 @@ public abstract class Dictionary {
     private static final String NUMBER_ATTRIBUTE = "number";
 
     /**
-     * Whether to check and fix lexicographer ids, default true.
+     * Parameter name: whether to check and fix lexicographer ids, default true.
      */
     public static final String CHECK_LEX_IDS_KEY = "check_lex_ids";
     private boolean checkLexIds = true;
-
-    /**
-     * The singleton instance of the dictionary to be used throughout the system.
-     */
-    private static Dictionary dictionary = null;
 
     // temporary variable, used for loading from maps
     private static Dictionary restore;
@@ -96,7 +95,11 @@ public abstract class Dictionary {
     private static final String DEFAULT_FILE_DICTIONARY_PATH = "./data/wn30";
     private static final String DEFAULT_MAP_DICTIONARY_PATH = "./data/map";
     private static final String DEFAULT_DB_DICTIONARY_PATH = "jdbc:mysql://localhost/jwnl?user=root";
-    private static final String DEFAULT_RESOURCE_CONFIG_PATH = "extjwnl_resource_properties.xml";
+
+    /**
+     * Default name of the configuration file for resource instance creation.
+     */
+    public static final String DEFAULT_RESOURCE_CONFIG_PATH = "extjwnl_resource_properties.xml";
 
     private static final Comparator<Word> wordLexIdComparator = new Comparator<Word>() {
         @Override
@@ -108,10 +111,12 @@ public abstract class Dictionary {
     // stores max offset for each POS
     protected final Map<POS, Long> maxOffset = new EnumMap<POS, Long>(POS.class);
 
+    private final String[] verbFrames;
+
     /**
      * Represents a version of WordNet.
      */
-    public static final class Version {
+    public final class Version {
         private static final String UNSPECIFIED = "unspecified";
 
         private final String publisher;
@@ -147,16 +152,12 @@ public abstract class Dictionary {
         }
 
         public String toString() {
-            return JWNL.resolveMessage("JWNL_TOSTRING_002", new Object[]{publisher, number, locale});
+            return messages.resolveMessage("JWNL_TOSTRING_002", new Object[]{publisher, number, locale});
         }
 
         public int hashCode() {
             return publisher.hashCode() ^ (int) (number * 100);
         }
-    }
-
-    public static Dictionary getInstance() {
-        return dictionary;
     }
 
     /**
@@ -167,25 +168,10 @@ public abstract class Dictionary {
      * @throws JWNLException various JWNL exceptions, depending on where this fails
      */
     public static Dictionary getInstance(InputStream properties) throws JWNLException {
-        try {
-            // find the properties file
-            if (properties == null || properties.available() <= 0) {
-                throw new JWNLException("JWNL_EXCEPTION_001");
-            }
-        } catch (IOException e) {
-            throw new JWNLException("JWNL_EXCEPTION_001", e);
+        if (null == properties) {
+            throw new IllegalArgumentException();
         }
-
-        Dictionary result = getInstance(new InputSource(properties));
-
-        // do this in a separate try/catch since parse can also throw an IOException
-        try {
-            properties.close();
-        } catch (IOException e) {
-            //hush it
-        }
-
-        return result;
+        return getInstance(new InputSource(properties));
     }
 
     /**
@@ -204,8 +190,12 @@ public abstract class Dictionary {
             factory.setValidating(false);
             DocumentBuilder docBuilder = factory.newDocumentBuilder();
             doc = docBuilder.parse(properties);
-        } catch (Exception e) {
-            throw new JWNLException("JWNL_EXCEPTION_002", e);
+        } catch (IOException e) {
+            throw new JWNLException(staticMessages.resolveMessage("DICTIONARY_ERROR_PARSING_PROPERTIES"), e);
+        } catch (ParserConfigurationException e) {
+            throw new JWNLException(staticMessages.resolveMessage("DICTIONARY_ERROR_PARSING_PROPERTIES"), e);
+        } catch (SAXException e) {
+            throw new JWNLException(staticMessages.resolveMessage("DICTIONARY_ERROR_PARSING_PROPERTIES"), e);
         }
 
         org.w3c.dom.Element root = doc.getDocumentElement();
@@ -213,7 +203,7 @@ public abstract class Dictionary {
         // parse dictionary
         NodeList dictionaryNodeList = root.getElementsByTagName(DICTIONARY_TAG);
         if (dictionaryNodeList.getLength() == 0) {
-            throw new JWNLException("JWNL_EXCEPTION_005");
+            throw new JWNLException(staticMessages.resolveMessage("DICTIONARY_PROPERTIES_MUST_SPECIFY_DICTIONARY"));
         }
         Node dictionaryNode = dictionaryNodeList.item(0);
         String dictionaryClassName = getAttribute(dictionaryNode, CLASS_ATTRIBUTE);
@@ -223,15 +213,15 @@ public abstract class Dictionary {
             Constructor c = clazz.getConstructor(Document.class);
             dictionary = (Dictionary) c.newInstance(doc);
         } catch (ClassNotFoundException e) {
-            throw new JWNLException("UTILS_EXCEPTION_005", dictionaryClassName, e);
+            throw new JWNLException(staticMessages.resolveMessage("DICTIONARY_UNABLE_TO_CREATE_INSTANCE", dictionaryClassName), e);
         } catch (NoSuchMethodException e) {
-            throw new JWNLException("UTILS_EXCEPTION_005", dictionaryClassName, e);
+            throw new JWNLException(staticMessages.resolveMessage("DICTIONARY_UNABLE_TO_CREATE_INSTANCE", dictionaryClassName), e);
         } catch (InstantiationException e) {
-            throw new JWNLException("UTILS_EXCEPTION_005", dictionaryClassName, e);
+            throw new JWNLException(staticMessages.resolveMessage("DICTIONARY_UNABLE_TO_CREATE_INSTANCE", dictionaryClassName), e);
         } catch (IllegalAccessException e) {
-            throw new JWNLException("UTILS_EXCEPTION_005", dictionaryClassName, e);
+            throw new JWNLException(staticMessages.resolveMessage("DICTIONARY_UNABLE_TO_CREATE_INSTANCE", dictionaryClassName), e);
         } catch (InvocationTargetException e) {
-            throw new JWNLException("UTILS_EXCEPTION_005", dictionaryClassName, e);
+            throw new JWNLException(staticMessages.resolveMessage("DICTIONARY_UNABLE_TO_CREATE_INSTANCE", dictionaryClassName), e);
         }
 
         return dictionary;
@@ -246,11 +236,11 @@ public abstract class Dictionary {
      */
     public static Dictionary getFileBackedInstance(String dictionaryPath) throws JWNLException {
         try {
-            String properties = getTextFromStream(JWNL.class.getResourceAsStream("file_properties.xml"));
+            String properties = getResourceProperties("file_properties.xml");
             properties = properties.replace(DEFAULT_FILE_DICTIONARY_PATH, dictionaryPath);
             return getInstance(new InputSource(new StringReader(properties)));
         } catch (IOException e) {
-            throw new JWNLException("IO error opening properties file", e);
+            throw new JWNLException(staticMessages.resolveMessage("DICTIONARY_IO_ERROR_OPENING_PROPERTIES"), e);
         }
     }
 
@@ -263,11 +253,11 @@ public abstract class Dictionary {
      */
     public static Dictionary getMapBackedInstance(String dictionaryPath) throws JWNLException {
         try {
-            String properties = getTextFromStream(JWNL.class.getResourceAsStream("map_properties.xml"));
+            String properties = getResourceProperties("map_properties.xml");
             properties = properties.replace(DEFAULT_MAP_DICTIONARY_PATH, dictionaryPath);
             return getInstance(new InputSource(new StringReader(properties)));
         } catch (IOException e) {
-            throw new JWNLException("IO error opening properties file", e);
+            throw new JWNLException(staticMessages.resolveMessage("DICTIONARY_IO_ERROR_OPENING_PROPERTIES"), e);
         }
     }
 
@@ -280,18 +270,18 @@ public abstract class Dictionary {
      */
     public static Dictionary getDatabaseBackedInstance(String dbURL) throws JWNLException {
         try {
-            String properties = getTextFromStream(JWNL.class.getResourceAsStream("database_properties.xml"));
+            String properties = getResourceProperties("database_properties.xml");
             properties = properties.replace(DEFAULT_DB_DICTIONARY_PATH, dbURL);
             return getInstance(new InputSource(new StringReader(properties)));
         } catch (IOException e) {
-            throw new JWNLException("IO error opening properties file", e);
+            throw new JWNLException(staticMessages.resolveMessage("DICTIONARY_IO_ERROR_OPENING_PROPERTIES"), e);
         }
     }
 
     /**
-     * Returns FileBackedDictionary instance configured from classpath by default.
+     * Returns Dictionary instance configured from classpath by default.
      *
-     * @return FileBackedDictionary instance configured from classpath by default
+     * @return Dictionary instance configured from classpath by default
      * @throws JWNLException JWNLException
      */
     public static Dictionary getDefaultResourceInstance() throws JWNLException {
@@ -299,32 +289,15 @@ public abstract class Dictionary {
     }
 
     /**
-     * Returns FileBackedDictionary instance configured from classpath.
+     * Returns Dictionary instance configured from classpath.
      *
-     * @return FileBackedDictionary instance configured from classpath
-     * @param propertiesPath path to properties, for example "net/sf/extjwnl/data/wordnet/wn31/res_properties.xml"
+     * @param propertiesPath path to properties, for example "/net/sf/extjwnl/data/wordnet/wn31/res_properties.xml"
+     * @return Dictionary instance configured from classpath
      * @throws JWNLException JWNLException
      */
     public static Dictionary getResourceInstance(String propertiesPath) throws JWNLException {
-        InputStream properties = Dictionary.class.getClassLoader().getResourceAsStream(propertiesPath);
+        InputStream properties = Dictionary.class.getResourceAsStream(propertiesPath);
         return getInstance(properties);
-    }
-
-    public static Dictionary setInstance(Dictionary dictionary) {
-        if (log.isInfoEnabled()) {
-            log.info(JWNL.resolveMessage("DICTIONARY_INFO_002", dictionary));
-        }
-        synchronized (Dictionary.class) {
-            Dictionary.dictionary = dictionary;
-        }
-        return dictionary;
-    }
-
-    public synchronized static void uninstall() {
-        if (dictionary != null) {
-            dictionary.close();
-            dictionary = null;
-        }
     }
 
     public synchronized static void setRestoreDictionary(Dictionary dictionary) {
@@ -338,19 +311,22 @@ public abstract class Dictionary {
     protected Dictionary(Document doc) throws JWNLException {
         org.w3c.dom.Element root = doc.getDocumentElement();
 
+        // set messages locale
+        messages.setLocale(getLocale(getAttribute(root, LANGUAGE_ATTRIBUTE), getAttribute(root, COUNTRY_ATTRIBUTE)));
+
         // add additional resources
         NodeList resourceNodes = root.getElementsByTagName(RESOURCE_TAG);
         for (int i = 0; i < resourceNodes.getLength(); i++) {
             String resource = getAttribute(resourceNodes.item(i), CLASS_ATTRIBUTE);
             if (resource != null) {
-                JWNL.getResourceBundleSet().addResource(resource);
+                messages.addResource(resource);
             }
         }
 
         // parse version information
         NodeList versionNodes = root.getElementsByTagName(VERSION_TAG);
         if (versionNodes.getLength() == 0) {
-            throw new JWNLException("JWNL_EXCEPTION_003");
+            throw new JWNLException(messages.resolveMessage("EXC_PROPERTIES_FILE_MUST_SPECIFY_VERSION"));
         }
         Node version = versionNodes.item(0);
 
@@ -362,9 +338,6 @@ public abstract class Dictionary {
 
         // parse dictionary
         NodeList dictionaryNodeList = root.getElementsByTagName(DICTIONARY_TAG);
-        if (dictionaryNodeList.getLength() == 0) {
-            throw new JWNLException("JWNL_EXCEPTION_005");
-        }
         Node dictionaryNode = dictionaryNodeList.item(0);
 
         params = new HashMap<String, Param>();
@@ -376,7 +349,7 @@ public abstract class Dictionary {
             checkLexIds = Boolean.parseBoolean(params.get(CHECK_LEX_IDS_KEY).getValue());
         }
 
-        Param param = params.get(MORPH);
+        Param param = params.get(MORPHOLOGICAL_PROCESSOR);
         morph = (param == null) ? null : (MorphologicalProcessor) param.create();
 
         if (params.containsKey(EDIT_MANAGE_SYMMETRIC_POINTERS)) {
@@ -386,10 +359,17 @@ public abstract class Dictionary {
         if (params.containsKey(EDIT_CHECK_ALIEN_POINTERS)) {
             editCheckAlienPointers = Boolean.parseBoolean(params.get(EDIT_CHECK_ALIEN_POINTERS).getValue());
         }
+
+        // initialize verb frames
+        int framesCount = Integer.parseInt(messages.resolveMessage("NUMBER_OF_VERB_FRAMES"));
+        verbFrames = new String[framesCount];
+        for (int i = 1; i <= framesCount; i++) {
+            verbFrames[i - 1] = messages.resolveMessage("VERB_FRAME_" + i);
+        }
     }
 
     /**
-     * Returns an Iterator over all the IndexWords of part-of-speech <var>pos</var> in the database.
+     * Returns an Iterator over all the IndexWords of part-of-speech <var>pos</var>.
      *
      * @param pos The part-of-speech
      * @return iterator over <code>IndexWord</code>s
@@ -409,20 +389,79 @@ public abstract class Dictionary {
     public abstract Iterator<IndexWord> getIndexWordIterator(POS pos, String substring) throws JWNLException;
 
     /**
-     * Looks up a word in the database. The search is case-independent,
+     * Looks up a word. The search is case-independent,
      * and phrases are separated by spaces ("look up", not "look_up").
      * Note: this method does not subject <var>lemma</var> to any
      * morphological processing. If you want this, use {@link #lookupIndexWord(POS, String)}.
      *
-     * @param pos   The part-of-speech.
-     * @param lemma The orthographic representation of the word.
+     * @param pos   The part-of-speech
+     * @param lemma The orthographic representation of the word
      * @return An IndexWord representing the word, or <code>null</code> if
-     *         no such entry exists.
+     * no such entry exists
      * @throws JWNLException JWNLException
      */
     public abstract IndexWord getIndexWord(POS pos, String lemma) throws JWNLException;
 
+    /**
+     * Returns a random index word of a specified <var>pos</var>.
+     *
+     * @param pos part of speech
+     * @return a random index word of a specified <var>pos</var>
+     * @throws JWNLException JWNLException
+     */
     public abstract IndexWord getRandomIndexWord(POS pos) throws JWNLException;
+
+    /**
+     * Returns an iterator over all the synsets of part-of-speech <var>pos</var>.
+     *
+     * @param pos The part-of-speech.
+     * @return An iterator over <code>Synset</code>s.
+     * @throws JWNLException JWNLException
+     */
+    public abstract Iterator<Synset> getSynsetIterator(POS pos) throws JWNLException;
+
+    /**
+     * Returns the <code>Synset</code> at offset <var>offset</var>.
+     *
+     * @param pos    The part-of-speech file to look in
+     * @param offset The offset of the synset in the file
+     * @return A synset containing the parsed line from the database
+     * @throws JWNLException JWNLException
+     */
+    public abstract Synset getSynsetAt(POS pos, long offset) throws JWNLException;
+
+    /**
+     * Returns an iterator over all the exceptions.
+     *
+     * @param pos the part-of-speech
+     * @return an iterator over <code>Exc</code>s
+     * @throws JWNLException JWNLException
+     */
+    public abstract Iterator<Exc> getExceptionIterator(POS pos) throws JWNLException;
+
+    /**
+     * Looks up <var>derivation</var> in the exceptions file of part-of-speech <var>
+     * pos</var> and return an Exc object containing the results.
+     *
+     * @param pos        the exception file to look in
+     * @param derivation the word to look up
+     * @return the Exc object
+     * @throws JWNLException JWNLException
+     */
+    public abstract Exc getException(POS pos, String derivation) throws JWNLException;
+
+    /**
+     * Shuts down the dictionary, freeing resources.
+     */
+    public abstract void close();
+
+    public ResourceBundleSet getMessages() {
+        return messages;
+    }
+
+    public MorphologicalProcessor getMorphologicalProcessor() {
+        return morph;
+    }
 
     /**
      * Returns a word by specified <var>senseKey</var> or null if not found.
@@ -455,62 +494,12 @@ public abstract class Dictionary {
     }
 
     /**
-     * Returns an Iterator over all the Synsets of part-of-speech <var>pos</var>
-     * in the database.
-     *
-     * @param pos The part-of-speech.
-     * @return An iterator over <code>Synset</code>s.
-     * @throws JWNLException JWNLException
-     */
-    public abstract Iterator<Synset> getSynsetIterator(POS pos) throws JWNLException;
-
-    /**
-     * Returns the <code>Synset</code> at offset <var>offset</var> from the database.
-     *
-     * @param pos    The part-of-speech file to look in
-     * @param offset The offset of the synset in the file
-     * @return A synset containing the parsed line from the database
-     * @throws JWNLException JWNLException
-     */
-    public abstract Synset getSynsetAt(POS pos, long offset) throws JWNLException;
-
-    /**
-     * Returns an Iterator over all the Exceptions in the database.
-     *
-     * @param pos the part-of-speech
-     * @return Iterator An iterator over <code>Exc</code>s
-     * @throws JWNLException JWNLException
-     */
-    public abstract Iterator<Exc> getExceptionIterator(POS pos) throws JWNLException;
-
-    /**
-     * Looks up <var>derivation</var> in the exceptions file of part-of-speech <var>
-     * pos</var> and return an Exc object containing the results.
-     *
-     * @param pos        the exception file to look in
-     * @param derivation the word to look up
-     * @return Exc the Exc object
-     * @throws JWNLException JWNLException
-     */
-    public abstract Exc getException(POS pos, String derivation) throws JWNLException;
-
-    /**
-     * Shuts down the dictionary
-     */
-    public abstract void close();
-
-    public MorphologicalProcessor getMorphologicalProcessor() {
-        return morph;
-    }
-
-    /**
      * Looks up a word <var>lemma</var>. First tries a normal lookup. If that doesn't work,
      * tries looking up the stemmed form of the lemma.
      *
      * @param pos   the part-of-speech of the word to look up
      * @param lemma the lemma to look up
-     * @return IndexWord the IndexWord found by the lookup procedure, or null
-     *         if an IndexWord is not found
+     * @return the IndexWord found by the lookup procedure, or null
      * @throws JWNLException JWNLException
      */
     public IndexWord lookupIndexWord(POS pos, String lemma) throws JWNLException {
@@ -543,9 +532,9 @@ public abstract class Dictionary {
     }
 
     /**
-     * Returns the current WordNet version.
+     * Returns the current dictionary version.
      *
-     * @return current WordNet version
+     * @return current dictionary version
      */
     public Version getVersion() {
         return version;
@@ -578,16 +567,16 @@ public abstract class Dictionary {
      */
     public synchronized void save() throws JWNLException {
         if (!isEditable()) {
-            throw new JWNLException("DICTIONARY_EXCEPTION_029");
+            throw new JWNLException(messages.resolveMessage("DICTIONARY_EXCEPTION_029"));
         }
         if (log.isInfoEnabled()) {
-            log.info(JWNL.resolveMessage("PRINCETON_INFO_022"));
+            log.info(messages.resolveMessage("DICTIONARY_INFO_014"));
         }
         if (checkLexIds) {
             //fixing word lex ids
             for (POS pos : POS.getAllPOS()) {
                 if (log.isDebugEnabled()) {
-                    log.debug(JWNL.resolveMessage("PRINCETON_INFO_015", pos.getLabel()));
+                    log.debug(messages.resolveMessage("DICTIONARY_INFO_015", pos.getLabel()));
                 }
                 Iterator<IndexWord> ii = getIndexWordIterator(pos);
                 while (ii.hasNext()) {
@@ -626,12 +615,18 @@ public abstract class Dictionary {
                     }
                 }
                 if (log.isDebugEnabled()) {
-                    log.debug(JWNL.resolveMessage("PRINCETON_INFO_016", pos.getLabel()));
+                    log.debug(messages.resolveMessage("DICTIONARY_INFO_016", pos.getLabel()));
                 }
             }
         }
     }
 
+    /**
+     * Deletes dictionary files.
+     *
+     * @return true if deleted
+     * @throws JWNLException JWNLException
+     */
     public synchronized boolean delete() throws JWNLException {
         return false;
     }
@@ -644,10 +639,10 @@ public abstract class Dictionary {
      */
     public void addElement(DictionaryElement element) throws JWNLException {
         if (!isEditable()) {
-            throw new JWNLException("DICTIONARY_EXCEPTION_029");
+            throw new JWNLException(messages.resolveMessage("DICTIONARY_EXCEPTION_029"));
         }
         if (this != element.getDictionary()) {
-            throw new JWNLException("DICTIONARY_EXCEPTION_040");
+            throw new JWNLException(messages.resolveMessage("DICTIONARY_EXCEPTION_040"));
         }
         if (element instanceof Exc) {
             addException((Exc) element);
@@ -666,7 +661,7 @@ public abstract class Dictionary {
      */
     public void removeElement(DictionaryElement element) throws JWNLException {
         if (!isEditable()) {
-            throw new JWNLException("DICTIONARY_EXCEPTION_029");
+            throw new JWNLException(messages.resolveMessage("DICTIONARY_EXCEPTION_029"));
         }
         if (element instanceof Exc) {
             removeException((Exc) element);
@@ -688,7 +683,7 @@ public abstract class Dictionary {
      */
     public Exc createException(POS pos, String lemma, List<String> exceptions) throws JWNLException {
         if (!isEditable()) {
-            throw new JWNLException("DICTIONARY_EXCEPTION_029");
+            throw new JWNLException(messages.resolveMessage("DICTIONARY_EXCEPTION_029"));
         }
         return new Exc(this, pos, lemma, exceptions);
     }
@@ -701,10 +696,10 @@ public abstract class Dictionary {
      */
     public void addException(Exc exc) throws JWNLException {
         if (!isEditable()) {
-            throw new JWNLException("DICTIONARY_EXCEPTION_029");
+            throw new JWNLException(messages.resolveMessage("DICTIONARY_EXCEPTION_029"));
         }
         if (this != exc.getDictionary()) {
-            throw new JWNLException("DICTIONARY_EXCEPTION_040");
+            throw new JWNLException(messages.resolveMessage("DICTIONARY_EXCEPTION_040"));
         }
         exc.setDictionary(this);
     }
@@ -717,7 +712,7 @@ public abstract class Dictionary {
      */
     public void removeException(Exc exc) throws JWNLException {
         if (!isEditable()) {
-            throw new JWNLException("DICTIONARY_EXCEPTION_029");
+            throw new JWNLException(messages.resolveMessage("DICTIONARY_EXCEPTION_029"));
         }
         exc.setDictionary(null);
     }
@@ -731,7 +726,7 @@ public abstract class Dictionary {
      */
     public Synset createSynset(POS pos) throws JWNLException {
         if (!isEditable()) {
-            throw new JWNLException("DICTIONARY_EXCEPTION_029");
+            throw new JWNLException(messages.resolveMessage("DICTIONARY_EXCEPTION_029"));
         }
         if (POS.VERB == pos) {
             return new VerbSynset(this, createNewOffset(pos));
@@ -750,10 +745,10 @@ public abstract class Dictionary {
      */
     public void addSynset(Synset synset) throws JWNLException {
         if (!isEditable()) {
-            throw new JWNLException("DICTIONARY_EXCEPTION_029");
+            throw new JWNLException(messages.resolveMessage("DICTIONARY_EXCEPTION_029"));
         }
         if (this != synset.getDictionary()) {
-            throw new JWNLException("DICTIONARY_EXCEPTION_040");
+            throw new JWNLException(messages.resolveMessage("DICTIONARY_EXCEPTION_040"));
         }
         synset.setDictionary(this);
     }
@@ -766,7 +761,7 @@ public abstract class Dictionary {
      */
     public synchronized void removeSynset(Synset synset) throws JWNLException {
         if (!isEditable()) {
-            throw new JWNLException("DICTIONARY_EXCEPTION_029");
+            throw new JWNLException(messages.resolveMessage("DICTIONARY_EXCEPTION_029"));
         }
         //take care of pointers
         //this will delete symmetric ones
@@ -796,7 +791,7 @@ public abstract class Dictionary {
      */
     public IndexWord createIndexWord(POS pos, String lemma, Synset synset) throws JWNLException {
         if (!isEditable()) {
-            throw new JWNLException("DICTIONARY_EXCEPTION_029");
+            throw new JWNLException(messages.resolveMessage("DICTIONARY_EXCEPTION_029"));
         }
         return new IndexWord(this, lemma, pos, synset);
     }
@@ -809,10 +804,10 @@ public abstract class Dictionary {
      */
     public void addIndexWord(IndexWord indexWord) throws JWNLException {
         if (!isEditable()) {
-            throw new JWNLException("DICTIONARY_EXCEPTION_029");
+            throw new JWNLException(messages.resolveMessage("DICTIONARY_EXCEPTION_029"));
         }
         if (this != indexWord.getDictionary()) {
-            throw new JWNLException("DICTIONARY_EXCEPTION_040");
+            throw new JWNLException(messages.resolveMessage("DICTIONARY_EXCEPTION_040"));
         }
         indexWord.setDictionary(this);
     }
@@ -825,7 +820,7 @@ public abstract class Dictionary {
      */
     public synchronized void removeIndexWord(IndexWord indexWord) throws JWNLException {
         if (!isEditable()) {
-            throw new JWNLException("DICTIONARY_EXCEPTION_029");
+            throw new JWNLException(messages.resolveMessage("DICTIONARY_EXCEPTION_029"));
         }
 
         indexWord.setDictionary(null);
@@ -851,6 +846,44 @@ public abstract class Dictionary {
         return editCheckAlienPointers;
     }
 
+
+    /**
+     * Returns the frames at the indexes encoded in <var>l</var>.
+     * Verb Frames are encoded within <code>Word</code>s as a long. Each bit represents
+     * the frame at its corresponding index. If the bit is set, that verb
+     * frame is valid for the word.
+     *
+     * @param bits frame flags
+     * @return the frames at the indexes encoded in <var>l</var>
+     */
+    public String[] getFrames(BitSet bits) {
+        int[] indices = getVerbFrameIndices(bits);
+        String[] frames = new String[indices.length];
+        for (int i = 0; i < indices.length; i++) {
+            frames[i] = verbFrames[indices[i] - 1];
+        }
+        return frames;
+    }
+
+    /**
+     * Returns the verb frame indices for a synset. This is the collection
+     * of f_num values for a synset definition. In the case of a synset, this
+     * is only the values that are true for all words with the synset. In other
+     * words, only the sentence frames that belong to all words.
+     *
+     * @param bits the bit set
+     * @return an integer collection
+     */
+    public int[] getVerbFrameIndices(BitSet bits) {
+        int[] indices = new int[bits.cardinality()];
+        int index = 0;
+        for (int i = bits.nextSetBit(0); i >= 0; i = bits.nextSetBit(i + 1)) {
+            indices[index++] = i;
+        }
+
+        return indices;
+    }
+
     /**
      * Prepares the lemma for being used in a lookup operation.
      * Specifically, this method trims whitespace and converts the lemma
@@ -863,7 +896,37 @@ public abstract class Dictionary {
         return lemma.trim().toLowerCase();
     }
 
-    private static List<Param> getParams(Dictionary dictionary, NodeList list) throws JWNLException {
+    protected void resolveAllPointers() throws JWNLException {
+        for (POS pos : POS.getAllPOS()) {
+            resolvePointers(pos);
+        }
+    }
+
+    protected void resolvePointers(POS pos) throws JWNLException {
+        if (log.isDebugEnabled()) {
+            log.debug(getMessages().resolveMessage("DICTIONARY_INFO_013", pos.getLabel()));
+        }
+
+        {
+            Iterator<Synset> si = getSynsetIterator(pos);
+            while (si.hasNext()) {
+                Synset s = si.next();
+                for (Pointer p : s.getPointers()) {
+                    p.getTarget();//resolve pointers
+                }
+            }
+        }
+
+        {
+            Iterator<IndexWord> ii = getIndexWordIterator(pos);
+            while (ii.hasNext()) {
+                IndexWord iw = ii.next();
+                iw.getSenses().iterator();//resolve pointers
+            }
+        }
+    }
+
+    private List<Param> getParams(Dictionary dictionary, NodeList list) throws JWNLException {
         List<Param> params = new ArrayList<Param>();
         for (int i = 0; i < list.getLength(); i++) {
             Node n = list.item(i);
@@ -871,7 +934,7 @@ public abstract class Dictionary {
                 String name = getAttribute(n, NAME_ATTRIBUTE);
                 String value = getAttribute(n, VALUE_ATTRIBUTE);
                 if (name == null && value == null) {
-                    throw new JWNLException("JWNL_EXCEPTION_008");
+                    throw new JWNLException(messages.resolveMessage("JWNL_EXCEPTION_008"));
                 } else {
                     Param param;
                     if (value == null) {
@@ -903,7 +966,7 @@ public abstract class Dictionary {
         if (language == null) {
             return Locale.getDefault();
         } else if (country == null) {
-            return new Locale(language, "");
+            return new Locale(language);
         } else {
             return new Locale(language, country);
         }
@@ -915,19 +978,30 @@ public abstract class Dictionary {
         return result;
     }
 
-    private static String getTextFromStream(InputStream inputStream) throws IOException {
-        BufferedReader fileCheck;
-        fileCheck = new BufferedReader(new InputStreamReader(inputStream));
-        StringBuilder fileText = new StringBuilder();
-        String line;
-        while (null != (line = fileCheck.readLine())) {
-            fileText.append(line).append("\n");
-        }
+    private static String getResourceProperties(String resourceName) throws IOException {
+        InputStream inputStream = Dictionary.class.getResourceAsStream(resourceName);
         try {
-            fileCheck.close();
-        } catch (IOException e) {
-            // doesn't matter.
+            BufferedReader fileCheck = new BufferedReader(new InputStreamReader(inputStream));
+            try {
+                StringBuilder fileText = new StringBuilder();
+                String line;
+                while (null != (line = fileCheck.readLine())) {
+                    fileText.append(line).append("\n");
+                }
+                return fileText.toString();
+            } finally {
+                try {
+                    fileCheck.close();
+                } catch (IOException e) {
+                    // doesn't matter.
+                }
+            }
+        } finally {
+            try {
+                inputStream.close();
+            } catch (IOException e) {
+                // doesn't matter.
+            }
         }
-        return fileText.toString();
     }
 }

@@ -14,9 +14,11 @@ import net.sf.extjwnl.data.relationship.RelationshipList;
 import net.sf.extjwnl.dictionary.Dictionary;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 /**
- * A class to demonstrate the functionality of the JWNL package.
+ * A class to demonstrate the functionality of the library.
  *
  * @author John Didion <jdidion@didion.net>
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
@@ -24,24 +26,23 @@ import java.io.FileInputStream;
 public class Examples {
     private static final String USAGE = "Usage: Examples <properties file>";
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FileNotFoundException {
         if (args.length != 1) {
             System.out.println(USAGE);
-            System.exit(-1);
-        }
-
-        String propsFile = args[0];
-        try {
-            //old-style, static singletone instance
-            //JWNL.initialize(new FileInputStream(propsFile));
-            //Dictionary dictionary = Dictionary.getInstance();
-
-            //new style, instance dictionary
-            Dictionary dictionary = Dictionary.getInstance(new FileInputStream(propsFile));
-            new Examples(dictionary).go();
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.exit(-1);
+        } else {
+            FileInputStream inputStream = new FileInputStream(args[0]);
+            try {
+                Dictionary dictionary = Dictionary.getInstance(inputStream);
+                new Examples(dictionary).go();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    // nop
+                }
+            }
         }
     }
 

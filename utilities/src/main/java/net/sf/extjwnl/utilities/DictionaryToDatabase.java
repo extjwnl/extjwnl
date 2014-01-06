@@ -75,7 +75,7 @@ public class DictionaryToDatabase {
         Connection conn = null;
 
         try {
-            ConnectionManager mgr = new ConnectionManager(driverClass, connectionURL, username, password);
+            ConnectionManager mgr = new ConnectionManager(dictionary, driverClass, connectionURL, username, password);
             conn = mgr.getConnection();
             conn.setReadOnly(false);
             DictionaryToDatabase d2d = new DictionaryToDatabase(dictionary, conn);
@@ -259,7 +259,7 @@ public class DictionaryToDatabase {
      * @param itr itr
      * @throws SQLException SQLException
      */
-    protected void storeSynsets(Iterator<Synset> itr) throws SQLException {
+    protected void storeSynsets(Iterator<Synset> itr) throws SQLException, JWNLException {
         PreparedStatement synsetStmt = connection.prepareStatement("INSERT INTO synset VALUES(?,?,?,?,?,?)");
         PreparedStatement synsetWordStmt = connection.prepareStatement("INSERT INTO synsetword VALUES(?,?,?,?,?,?)");
         PreparedStatement synsetPointerStmt = connection.prepareStatement("INSERT INTO synsetpointer VALUES(?,?,?,?,?,?,?)");

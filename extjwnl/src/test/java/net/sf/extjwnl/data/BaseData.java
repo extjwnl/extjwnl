@@ -18,7 +18,7 @@ public abstract class BaseData {
     protected Dictionary mapDictionary;
 
     protected InputStream getProperties() throws IOException {
-        return BaseData.class.getClassLoader().getResourceAsStream("net/sf/extjwnl/mem_properties.xml");
+        return Dictionary.class.getResourceAsStream("/net/sf/extjwnl/dictionary/mem_properties.xml");
     }
 
     @Before

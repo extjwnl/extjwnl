@@ -1,8 +1,8 @@
 package net.sf.extjwnl.data;
 
-import net.sf.extjwnl.JWNL;
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.dictionary.Dictionary;
+import net.sf.extjwnl.util.ResourceBundleSet;
 
 import java.util.List;
 
@@ -47,13 +47,13 @@ public class Exc extends BaseDictionaryElement {
     public Exc(Dictionary dictionary, POS pos, String lemma, List<String> exceptions) throws JWNLException {
         super(dictionary);
         if (null == pos) {
-            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_041"));
+            throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_041"));
         }
         if (null == lemma || "".equals(lemma)) {
-            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_046"));
+            throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_046"));
         }
         if (null == exceptions || 0 == exceptions.size()) {
-            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_039"));
+            throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_039"));
         }
         this.pos = pos;
         this.lemma = lemma;
@@ -135,6 +135,6 @@ public class Exc extends BaseDictionaryElement {
             }
         }
 
-        return JWNL.resolveMessage("DATA_TOSTRING_001", new Object[]{getLemma(), str.toString()});
+        return ResourceBundleSet.insertParams("Exc: [Lemma: {0}] Exceptions: {1}]", new Object[]{getLemma(), str.toString()});
     }
 }

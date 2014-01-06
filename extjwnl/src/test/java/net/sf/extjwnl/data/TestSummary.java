@@ -21,7 +21,7 @@ public class TestSummary {
 
     @BeforeClass
     public static void runOnceBeforeAllTests() throws FileNotFoundException, JWNLException {
-        dic = Dictionary.getInstance(TestSummary.class.getClassLoader().getResourceAsStream("test_file_properties.xml"));
+        dic = Dictionary.getInstance(TestSummary.class.getResourceAsStream("/test_file_properties.xml"));
     }
 
     @Test

@@ -48,7 +48,7 @@ public class DefaultMorphologicalProcessor implements MorphologicalProcessor {
         this.dictionary = dictionary;
         ParamList operationParams = (ParamList) params.get(OPERATIONS);
         if (operationParams == null) {
-            throw new JWNLException("DICTIONARY_EXCEPTION_026");
+            throw new JWNLException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_026"));
         }
         @SuppressWarnings("unchecked")
         List<Operation> operations = (List<Operation>) operationParams.create();
@@ -160,7 +160,7 @@ public class DefaultMorphologicalProcessor implements MorphologicalProcessor {
         public LookupInfo(POS pos, String derivation) {
             this.pos = pos;
             this.derivation = derivation;
-            baseForms = new BaseFormSet();
+            baseForms = new BaseFormSet(dictionary);
             currentOperation = -1;
         }
 
@@ -170,7 +170,7 @@ public class DefaultMorphologicalProcessor implements MorphologicalProcessor {
 
         public boolean executeNextOperation() throws JWNLException {
             if (!isNextOperationAvailable()) {
-                throw new JWNLRuntimeException("DICTIONARY_EXCEPTION_027");
+                throw new JWNLRuntimeException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_027"));
             }
             Operation o = operations[++currentOperation];
             return o.execute(pos, derivation, baseForms);

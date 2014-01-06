@@ -33,15 +33,15 @@ public class DetachSuffixesOperation extends AbstractDelegatingOperation {
         for (Param p : params.values()) {
             POS pos = POS.getPOSForLabel(p.getName());
             if (pos != null) {
-                suffixMap.put(pos, getSuffixArray(p.getValue()));
+                suffixMap.put(pos, getSuffixArray(dictionary, p.getValue()));
             }
         }
     }
 
-    private String[][] getSuffixArray(String suffixes) throws JWNLException {
+    private String[][] getSuffixArray(Dictionary dictionary, String suffixes) throws JWNLException {
         StringTokenizer tokenizer = new StringTokenizer(suffixes, "|=", true);
         if (!"|".equals(tokenizer.nextToken())) {
-            throw new JWNLException("DICTIONARY_EXCEPTION_028");
+            throw new JWNLException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_028"));
         }
         List<String[]> suffixList = new ArrayList<String[]>();
         while (tokenizer.hasMoreTokens()) {

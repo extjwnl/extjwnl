@@ -31,7 +31,7 @@ public class TestSynset extends BaseData {
 
     @Test
     public void testConstructor() throws JWNLException {
-        testObj = new Synset(null, POS.NOUN, offset);
+        testObj = new Synset(dictionary, POS.NOUN, offset);
     }
 
     @Test
@@ -144,7 +144,7 @@ public class TestSynset extends BaseData {
 
     @Test(expected = IllegalArgumentException.class)
     public void testSetWord2() throws JWNLException {
-        testObj.getWords().set(0, new Word(null, new Synset(null, POS.NOUN), 0, "test"));
+        testObj.getWords().set(0, new Word(dictionary, new Synset(dictionary, POS.NOUN), 0, "test"));
     }
 
     @Test
@@ -175,7 +175,7 @@ public class TestSynset extends BaseData {
 
     @Test(expected = IllegalArgumentException.class)
     public void testAddWord2() throws JWNLException {
-        testObj.getWords().add(new Word(null, new Synset(null, POS.NOUN), 0, "test"));
+        testObj.getWords().add(new Word(null, new Synset(dictionary, POS.NOUN), 0, "test"));
     }
 
     @Test
@@ -214,7 +214,7 @@ public class TestSynset extends BaseData {
 
     @Test(expected = IllegalArgumentException.class)
     public void testCreateSynset() throws JWNLException {
-        new Synset(null, null);
+        new Synset(dictionary, null);
     }
 
     @Test

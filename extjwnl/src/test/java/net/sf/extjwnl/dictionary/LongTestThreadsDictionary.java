@@ -43,7 +43,7 @@ public class LongTestThreadsDictionary extends MultiThreadedTestCase {
 
     public void testThreaded() throws IOException, JWNLException {
         Dictionary d = Dictionary.getInstance(
-                LongTestThreadsDictionary.class.getClassLoader().getResourceAsStream("test_file_properties.xml"));
+                LongTestThreadsDictionary.class.getResourceAsStream("/test_file_properties.xml"));
 
         TestCaseRunnable[] runnables = new TestCaseRunnable[threadCount];
         for (int i = 0; i < threadCount; i++) {

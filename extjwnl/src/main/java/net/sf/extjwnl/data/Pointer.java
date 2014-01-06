@@ -1,9 +1,8 @@
 package net.sf.extjwnl.data;
 
-import net.sf.extjwnl.JWNL;
 import net.sf.extjwnl.JWNLException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import net.sf.extjwnl.JWNLRuntimeException;
+import net.sf.extjwnl.util.ResourceBundleSet;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -21,8 +20,6 @@ import java.io.Serializable;
 public class Pointer implements Serializable {
 
     private static final long serialVersionUID = 4L;
-
-    private static final Log log = LogFactory.getLog(Pointer.class);
 
     private final PointerType pointerType;
 
@@ -57,7 +54,8 @@ public class Pointer implements Serializable {
 
     public String toString() {
         String targetMsg = (target == null) ? targetIndex.toString() : target.toString();
-        return JWNL.resolveMessage("DATA_TOSTRING_012", new Object[]{getSourceIndex(), getSource(), targetMsg});
+        return ResourceBundleSet.insertParams("[PointerTarget: [Source Index: {0}] Source: {1} Target: {2}]",
+                new Object[]{getSourceIndex(), getSource(), targetMsg});
     }
 
     public int getSourceIndex() {
@@ -91,25 +89,13 @@ public class Pointer implements Serializable {
      *
      * @return actual target of this pointer
      */
-    public PointerTarget getTarget() {
-        try {
-            if (null == target && null != source.getDictionary()) {
-                Synset syn = source.getDictionary().getSynsetAt(targetIndex.pos, targetIndex.offset);
-                target = (targetIndex.index == 0) ? syn : (null == syn ? null : syn.getWords().get(targetIndex.index - 1));
-                if (null != target && source.getDictionary().isEditable()) {
-                    targetIndex = null;
-                }
+    public PointerTarget getTarget() throws JWNLException {
+        if (null == target && null != source.getDictionary()) {
+            Synset syn = source.getDictionary().getSynsetAt(targetIndex.pos, targetIndex.offset);
+            target = (targetIndex.index == 0) ? syn : (null == syn ? null : syn.getWords().get(targetIndex.index - 1));
+            if (null != target && source.getDictionary().isEditable()) {
+                targetIndex = null;
             }
-        } catch (JWNLException e) {
-            if (log.isErrorEnabled()) {
-                log.error(JWNL.resolveMessage("EXCEPTION_001", e.getMessage()), e);
-            }
-        } catch (IndexOutOfBoundsException e) {
-            if (log.isErrorEnabled()) {
-                log.error(JWNL.resolveMessage("EXCEPTION_001", e.getMessage()), e);
-                log.error(JWNL.resolveMessage("EXCEPTION_002", new Object[]{source.getSynset().getOffset(), targetIndex.offset, targetIndex.index}));
-            }
-            throw e;
         }
         return target;
     }
@@ -129,7 +115,7 @@ public class Pointer implements Serializable {
      *
      * @return the synset that is a) the target of this pointer, or b) the synset that contains the target of this pointer.
      */
-    public Synset getTargetSynset() {
+    public Synset getTargetSynset() throws JWNLException {
         if (null == getTarget()) {
             return null;
         }
@@ -141,7 +127,7 @@ public class Pointer implements Serializable {
      *
      * @return offset of the target synset
      */
-    public long getTargetOffset() {
+    public long getTargetOffset() throws JWNLException {
         if (null == target) {
             if (null != source.getDictionary() && source.getDictionary().isEditable()) {
                 return getTarget().getSynset().getOffset();
@@ -153,7 +139,7 @@ public class Pointer implements Serializable {
         }
     }
 
-    public int getTargetIndex() {
+    public int getTargetIndex() throws JWNLException {
         if (null == target) {
             if (null != source.getDictionary() && source.getDictionary().isEditable()) {
                 return getTarget().getIndex();
@@ -165,7 +151,7 @@ public class Pointer implements Serializable {
         }
     }
 
-    public POS getTargetPOS() {
+    public POS getTargetPOS() throws JWNLException {
         if (null == target) {
             if (null != source.getDictionary() && source.getDictionary().isEditable()) {
                 return getTarget().getSynset().getPOS();
@@ -199,10 +185,14 @@ public class Pointer implements Serializable {
                 return false;
             }
         } else {
-            if (!target.getPOS().equals(pointer.getTargetPOS())
-                    || target.getIndex() != pointer.getTargetIndex()
-                    || target.getSynset().getOffset() != pointer.getTargetOffset()) {
-                return false;
+            try {
+                if (!target.getPOS().equals(pointer.getTargetPOS())
+                        || target.getIndex() != pointer.getTargetIndex()
+                        || target.getSynset().getOffset() != pointer.getTargetOffset()) {
+                    return false;
+                }
+            } catch (JWNLException e) {
+                throw new JWNLRuntimeException(e);
             }
         }
 
@@ -233,7 +223,7 @@ public class Pointer implements Serializable {
         }
 
         public String toString() {
-            return JWNL.resolveMessage("DATA_TOSTRING_013", new Object[]{pos, offset, index});
+            return ResourceBundleSet.insertParams("[TargetIndex: {0} [Offset: {1}] [Index: {2}]]", new Object[]{pos, offset, index});
         }
 
         @Override
@@ -272,7 +262,11 @@ public class Pointer implements Serializable {
 
     private void writeObject(java.io.ObjectOutputStream oos) throws IOException {
         boolean wasNull = null == targetIndex;
-        this.targetIndex = new TargetIndex(getTargetPOS(), getTargetOffset(), getTargetIndex());
+        try {
+            this.targetIndex = new TargetIndex(getTargetPOS(), getTargetOffset(), getTargetIndex());
+        } catch (JWNLException e) {
+            throw new JWNLRuntimeException(e);
+        }
         oos.defaultWriteObject();
         if (wasNull) {
             this.targetIndex = null;

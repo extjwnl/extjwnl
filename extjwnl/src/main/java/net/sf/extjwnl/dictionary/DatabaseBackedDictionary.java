@@ -62,7 +62,7 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
                         cacheIndexWord(word);
                     }
                 } catch (SQLException e) {
-                    throw new JWNLException("DICTIONARY_EXCEPTION_023", e);
+                    throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_023"), e);
                 } finally {
                     if (query != null) {
                         query.close();
@@ -91,8 +91,8 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
             query.execute();
             query.getResults().next();
             lemma = query.getResults().getString(1);
-        } catch (SQLException ex) {
-            throw new JWNLException("DICTIONARY_EXCEPTION_023", ex);
+        } catch (SQLException e) {
+            throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_023"), e);
         } finally {
             query.close();
         }
@@ -121,7 +121,7 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
                     cacheSynset(synset);
                 }
             } catch (SQLException e) {
-                throw new JWNLException("DICTIONARY_EXCEPTION_023", e);
+                throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_023"), e);
             } finally {
                 if (query != null) {
                     query.close();
@@ -160,7 +160,7 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
                     cacheException(exc);
                 }
             } catch (SQLException e) {
-                throw new JWNLException("DICTIONARY_EXCEPTION_023", e);
+                throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_023"), e);
             } finally {
                 if (query != null) {
                     query.close();

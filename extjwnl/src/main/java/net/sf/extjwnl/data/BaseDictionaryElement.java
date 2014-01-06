@@ -17,6 +17,9 @@ public abstract class BaseDictionaryElement implements DictionaryElement {
     protected transient Dictionary dictionary;
 
     protected BaseDictionaryElement(Dictionary dictionary) {
+        if (null == dictionary) {
+            throw new IllegalArgumentException();
+        }
         this.dictionary = dictionary;
     }
 

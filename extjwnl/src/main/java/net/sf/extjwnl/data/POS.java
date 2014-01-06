@@ -1,6 +1,6 @@
 package net.sf.extjwnl.data;
 
-import net.sf.extjwnl.JWNL;
+import net.sf.extjwnl.util.ResourceBundleSet;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -15,10 +15,10 @@ import java.util.List;
  */
 public enum POS {
 
-    NOUN(1, "n", "NOUN"),
-    VERB(2, "v", "VERB"),
-    ADJECTIVE(3, "a", "ADJECTIVE"),
-    ADVERB(4, "r", "ADVERB");
+    NOUN(1, "n", "noun"),
+    VERB(2, "v", "verb"),
+    ADJECTIVE(3, "a", "adjective"),
+    ADVERB(4, "r", "adverb");
 
     public static final String ADJECTIVE_SATELLITE_KEY = "s";
     public static final int ADJECTIVE_SATELLITE_ID = 5;
@@ -103,14 +103,13 @@ public enum POS {
     private final transient String key;
 
     private POS(int id, String key, String label) {
-        JWNL.initialize();
         this.id = id;
         this.key = key;
-        this.label = JWNL.resolveMessage(label);
+        this.label = label;
     }
 
     public String toString() {
-        return JWNL.resolveMessage("DATA_TOSTRING_010", getLabel());
+        return ResourceBundleSet.insertParams("[POS: {0}]", new String[] {getLabel()});
     }
 
     /**

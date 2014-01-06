@@ -1,6 +1,6 @@
 package net.sf.extjwnl.data;
 
-import net.sf.extjwnl.JWNL;
+import net.sf.extjwnl.util.ResourceBundleSet;
 
 import java.util.*;
 
@@ -58,36 +58,36 @@ public enum PointerType {
 //    "@i", 			/* 38 INSTANCE (noun) */
 //    "~i",			/* 39 INSTANCES (noun) */
 
-    ANTONYM("!", "ANTONYM", PointerTypeFlags.N | PointerTypeFlags.V | PointerTypeFlags.ADJ | PointerTypeFlags.ADV | PointerTypeFlags.LEXICAL),
-    HYPERNYM("@", "HYPERNYM", PointerTypeFlags.N | PointerTypeFlags.V),
-    HYPONYM("~", "HYPONYM", PointerTypeFlags.N | PointerTypeFlags.V),
-    ENTAILMENT("*", "ENTAILMENT", PointerTypeFlags.V),
-    SIMILAR_TO("&", "SIMILAR", PointerTypeFlags.ADJ),
-    MEMBER_HOLONYM("#m", "MEMBER_HOLONYM", PointerTypeFlags.N),
-    SUBSTANCE_HOLONYM("#s", "SUBSTANCE_HOLONYM", PointerTypeFlags.N),
-    PART_HOLONYM("#p", "PART_HOLONYM", PointerTypeFlags.N),
-    MEMBER_MERONYM("%m", "MEMBER_MERONYM", PointerTypeFlags.N),
-    SUBSTANCE_MERONYM("%s", "SUBSTANCE_MERONYM", PointerTypeFlags.N),
-    PART_MERONYM("%p", "PART_MERONYM", PointerTypeFlags.N),
+    ANTONYM("!", "antonym", PointerTypeFlags.N | PointerTypeFlags.V | PointerTypeFlags.ADJ | PointerTypeFlags.ADV | PointerTypeFlags.LEXICAL),
+    HYPERNYM("@", "hypernym", PointerTypeFlags.N | PointerTypeFlags.V),
+    HYPONYM("~", "hyponym", PointerTypeFlags.N | PointerTypeFlags.V),
+    ENTAILMENT("*", "entailment", PointerTypeFlags.V),
+    SIMILAR_TO("&", "similar", PointerTypeFlags.ADJ),
+    MEMBER_HOLONYM("#m", "member holonym", PointerTypeFlags.N),
+    SUBSTANCE_HOLONYM("#s", "substance holonym", PointerTypeFlags.N),
+    PART_HOLONYM("#p", "part holonym", PointerTypeFlags.N),
+    MEMBER_MERONYM("%m", "member meronym", PointerTypeFlags.N),
+    SUBSTANCE_MERONYM("%s", "substance meronym", PointerTypeFlags.N),
+    PART_MERONYM("%p", "part meronym", PointerTypeFlags.N),
     //    "#",			/* 12 MERONYM (noun) */
 //    "%",			/* 13 HOLONYM (noun) */
-    CAUSE(">", "CAUSE", PointerTypeFlags.V),
-    PARTICIPLE_OF("<", "PARTICIPLE_OF", PointerTypeFlags.ADJ | PointerTypeFlags.LEXICAL),
-    SEE_ALSO("^", "ALSO_SEE", PointerTypeFlags.N | PointerTypeFlags.V | PointerTypeFlags.ADJ | PointerTypeFlags.LEXICAL),
-    PERTAINYM("\\", "PERTAINYM", PointerTypeFlags.ADJ | PointerTypeFlags.ADV | PointerTypeFlags.LEXICAL),
-    ATTRIBUTE("=", "ATTRIBUTE", PointerTypeFlags.N | PointerTypeFlags.ADJ),
-    VERB_GROUP("$", "VERB_GROUP", PointerTypeFlags.V),
-    DERIVATION("+", "DERIVATION", PointerTypeFlags.N | PointerTypeFlags.V | PointerTypeFlags.ADJ | PointerTypeFlags.ADV),
-    DOMAIN_ALL(";", "DOMAIN_ALL", PointerTypeFlags.N | PointerTypeFlags.V | PointerTypeFlags.ADJ | PointerTypeFlags.ADV | PointerTypeFlags.LEXICAL),
-    MEMBER_ALL("-", "MEMBER_ALL", PointerTypeFlags.N),
-    CATEGORY(";c", "CATEGORY_DOMAIN", PointerTypeFlags.N | PointerTypeFlags.V | PointerTypeFlags.ADJ | PointerTypeFlags.ADV | PointerTypeFlags.LEXICAL),
-    USAGE(";u", "USAGE_DOMAIN", PointerTypeFlags.N | PointerTypeFlags.V | PointerTypeFlags.ADJ | PointerTypeFlags.ADV | PointerTypeFlags.LEXICAL),
-    REGION(";r", "REGION_DOMAIN", PointerTypeFlags.N | PointerTypeFlags.V | PointerTypeFlags.ADJ | PointerTypeFlags.ADV | PointerTypeFlags.LEXICAL),
-    CATEGORY_MEMBER("-c", "CATEGORY_MEMBER", PointerTypeFlags.N),
-    USAGE_MEMBER("-u", "USAGE_MEMBER", PointerTypeFlags.N),
-    REGION_MEMBER("-r", "REGION_MEMBER", PointerTypeFlags.N),
-    INSTANCE_HYPERNYM("@i", "INSTANCE_HYPERNYM", PointerTypeFlags.N | PointerTypeFlags.V),
-    INSTANCES_HYPONYM("~i", "INSTANCES_HYPONYM", PointerTypeFlags.N | PointerTypeFlags.V);
+    CAUSE(">", "cause", PointerTypeFlags.V),
+    PARTICIPLE_OF("<", "participle of", PointerTypeFlags.ADJ | PointerTypeFlags.LEXICAL),
+    SEE_ALSO("^", "also see", PointerTypeFlags.N | PointerTypeFlags.V | PointerTypeFlags.ADJ | PointerTypeFlags.LEXICAL),
+    PERTAINYM("\\", "pertainym", PointerTypeFlags.ADJ | PointerTypeFlags.ADV | PointerTypeFlags.LEXICAL),
+    ATTRIBUTE("=", "attribute", PointerTypeFlags.N | PointerTypeFlags.ADJ),
+    VERB_GROUP("$", "verb group", PointerTypeFlags.V),
+    DERIVATION("+", "derivation", PointerTypeFlags.N | PointerTypeFlags.V | PointerTypeFlags.ADJ | PointerTypeFlags.ADV),
+    DOMAIN_ALL(";", "domain", PointerTypeFlags.N | PointerTypeFlags.V | PointerTypeFlags.ADJ | PointerTypeFlags.ADV | PointerTypeFlags.LEXICAL),
+    MEMBER_ALL("-", "member", PointerTypeFlags.N),
+    CATEGORY(";c", "category domain", PointerTypeFlags.N | PointerTypeFlags.V | PointerTypeFlags.ADJ | PointerTypeFlags.ADV | PointerTypeFlags.LEXICAL),
+    USAGE(";u", "usage domain", PointerTypeFlags.N | PointerTypeFlags.V | PointerTypeFlags.ADJ | PointerTypeFlags.ADV | PointerTypeFlags.LEXICAL),
+    REGION(";r", "region domain", PointerTypeFlags.N | PointerTypeFlags.V | PointerTypeFlags.ADJ | PointerTypeFlags.ADV | PointerTypeFlags.LEXICAL),
+    CATEGORY_MEMBER("-c", "member of category domain", PointerTypeFlags.N),
+    USAGE_MEMBER("-u", "member of usage domain", PointerTypeFlags.N),
+    REGION_MEMBER("-r", "member of region domain", PointerTypeFlags.N),
+    INSTANCE_HYPERNYM("@i", "instance hypernym", PointerTypeFlags.N | PointerTypeFlags.V),
+    INSTANCES_HYPONYM("~i", "instances hyponym", PointerTypeFlags.N | PointerTypeFlags.V);
 
     private static final Map<POS, Integer> POS_TO_MASK_MAP = new EnumMap<POS, Integer>(POS.class);
 
@@ -252,14 +252,14 @@ public enum PointerType {
     private transient PointerType symmetricType;
 
     private PointerType(String key, String label, int flags) {
-        JWNL.initialize();
         this.key = key;
-        this.label = JWNL.resolveMessage(label);
+        this.label = label;
         this.flags = flags;
     }
 
     public String toString() {
-        return JWNL.resolveMessage("DATA_TOSTRING_011", new Object[]{getLabel(), getKey(), getFlagsAsString()});
+        return ResourceBundleSet.insertParams("[PointerType: [Label: {0}] [Key: {1}] Applies To: {2}]",
+                new Object[]{getLabel(), getKey(), getFlagsAsString()});
     }
 
     public String getKey() {
@@ -331,19 +331,19 @@ public enum PointerType {
         if (flagStringCache == null) {
             String str = "";
             if ((flags & PointerTypeFlags.N) != 0) {
-                str += JWNL.resolveMessage("NOUN") + ", ";
+                str += "noun" + ", ";
             }
             if ((flags & PointerTypeFlags.V) != 0) {
-                str += JWNL.resolveMessage("VERB") + ", ";
+                str += "verb" + ", ";
             }
             if ((flags & PointerTypeFlags.ADJ) != 0) {
-                str += JWNL.resolveMessage("ADJECTIVE") + ", ";
+                str += "adjective" + ", ";
             }
             if ((flags & PointerTypeFlags.ADV) != 0) {
-                str += JWNL.resolveMessage("ADVERB") + ", ";
+                str += "adverb" + ", ";
             }
             if ((flags & PointerTypeFlags.LEXICAL) != 0) {
-                str += JWNL.resolveMessage("LEXICAL") + ", ";
+                str += "lexical" + ", ";
             }
             flagStringCache = str.substring(0, str.length() - 2);
         }

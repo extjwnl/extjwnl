@@ -1,6 +1,5 @@
 package net.sf.extjwnl.data.relationship;
 
-import net.sf.extjwnl.JWNL;
 import net.sf.extjwnl.data.PointerTarget;
 import net.sf.extjwnl.data.PointerType;
 import net.sf.extjwnl.data.Synset;
@@ -37,19 +36,19 @@ public abstract class Relationship {
 
     protected Relationship(PointerType type, PointerTargetNodeList nodes, Synset sourceSynset, Synset targetSynset) {
         if (null == type) {
-            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_058"));
+            throw new IllegalArgumentException("Type must be not null");
         }
         this.type = type;
         if (null == nodes) {
-            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_059"));
+            throw new IllegalArgumentException("Nodes must be not null");
         }
         this.nodes = nodes;
         if (null == sourceSynset) {
-            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_060"));
+            throw new IllegalArgumentException("Source synset must be not null");
         }
         this.sourceSynset = sourceSynset;
         if (null == targetSynset) {
-            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_061"));
+            throw new IllegalArgumentException("Target synset must be not null");
         }
         this.targetSynset = targetSynset;
     }

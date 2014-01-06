@@ -83,9 +83,9 @@ public class DatabaseManagerImpl implements DatabaseManager {
         String password = params.containsKey(PASSWORD) ? params.get(PASSWORD).getValue() : null;
         String jndi = params.containsKey(JNDI) ? params.get(JNDI).getValue() : null;
         if (null != jndi && jndi.trim().length() > 0) {
-            connectionManager = new ConnectionManager(jndi.trim());
+            connectionManager = new ConnectionManager(dictionary, jndi.trim());
         } else {
-            connectionManager = new ConnectionManager(driverClassName, url, userName, password);
+            connectionManager = new ConnectionManager(dictionary, driverClassName, url, userName, password);
         }
 
         this.dictionary = dictionary;
@@ -114,7 +114,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
                 minMax = new MinMax(query.getResults().getInt(1), query.getResults().getInt(2));
                 minMaxIds.put(pos, minMax);
             } catch (SQLException ex) {
-                throw new JWNLException("DICTIONARY_EXCEPTION_023", ex);
+                throw new JWNLException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_023"), ex);
             } finally {
                 if (query != null) {
                     query.close();
@@ -187,7 +187,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
             if (query != null) {
                 query.close();
             }
-            throw new JWNLException("DICTIONARY_EXCEPTION_023", ex);
+            throw new JWNLException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_023"), ex);
         }
     }
 
@@ -202,7 +202,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
             if (query != null) {
                 query.close();
             }
-            throw new JWNLException("DICTIONARY_EXCEPTION_023", ex);
+            throw new JWNLException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_023"), ex);
         }
     }
 
@@ -217,7 +217,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
             if (query != null) {
                 query.close();
             }
-            throw new JWNLException("DICTIONARY_EXCEPTION_023", ex);
+            throw new JWNLException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_023"), ex);
         }
     }
 
@@ -232,7 +232,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
             if (query != null) {
                 query.close();
             }
-            throw new JWNLException("DICTIONARY_EXCEPTION_023", ex);
+            throw new JWNLException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_023"), ex);
         }
     }
 

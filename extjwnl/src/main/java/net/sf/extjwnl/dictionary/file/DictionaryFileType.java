@@ -1,7 +1,7 @@
 package net.sf.extjwnl.dictionary.file;
 
-import net.sf.extjwnl.JWNL;
 import net.sf.extjwnl.data.DictionaryElementType;
+import net.sf.extjwnl.util.ResourceBundleSet;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -44,6 +44,6 @@ public enum DictionaryFileType {
     }
 
     public String toString() {
-        return JWNL.resolveMessage("DICTIONARY_TOSTRING_002", getName());
+        return ResourceBundleSet.insertParams("[DictionaryFile: {0}]", new String[]{getName()});
     }
 }

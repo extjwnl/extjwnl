@@ -21,7 +21,7 @@ public class TestRelationshipList {
 
     @BeforeClass
     public static void runOnceBeforeAllTests() throws FileNotFoundException, JWNLException {
-        dic = Dictionary.getInstance(TestRelationshipList.class.getClassLoader().getResourceAsStream("test_file_properties.xml"));
+        dic = Dictionary.getInstance(TestRelationshipList.class.getResourceAsStream("/test_file_properties.xml"));
     }
 
     @Test

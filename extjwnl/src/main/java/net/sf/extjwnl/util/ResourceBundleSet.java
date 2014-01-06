@@ -6,42 +6,23 @@ import java.util.*;
  * A ResourceBundle that is a proxy to multiple ResourceBundles.
  *
  * @author John Didion <jdidion@didion.net>
+ * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class ResourceBundleSet extends ResourceBundle {
 
-    private Locale locale = Locale.getDefault();
-    private final Set<String> resources = new HashSet<String>();
+    private Locale locale = null;
+    private final List<String> resources = new ArrayList<String>();
 
     public ResourceBundleSet(String resource) {
         addResource(resource);
-    }
-
-    public ResourceBundleSet(String[] resources) {
-        for (String resource : resources) {
-            addResource(resource);
-        }
     }
 
     public void addResource(String resource) {
         resources.add(resource);
     }
 
-    public String[] getResources() {
-        return resources.toArray(new String[resources.size()]);
-    }
-
     public void setLocale(Locale locale) {
         this.locale = locale;
-    }
-
-    protected Object handleGetObject(String key) {
-        for (String resource : resources) {
-            ResourceBundle bundle = getBndl(resource);
-            if (bundle.containsKey(key)) {
-                return bundle.getString(key);
-            }
-        }
-        return key;
     }
 
     public Enumeration<String> getKeys() {
@@ -55,11 +36,7 @@ public class ResourceBundleSet extends ResourceBundle {
                         currentEnum = getBndl(itr.next()).getKeys();
                     }
                 }
-                //noinspection SimplifiableIfStatement
-                if (currentEnum != null) {
-                    return currentEnum.hasMoreElements();
-                }
-                return false;
+                return currentEnum != null && currentEnum.hasMoreElements();
             }
 
 
@@ -69,7 +46,68 @@ public class ResourceBundleSet extends ResourceBundle {
         };
     }
 
+    /**
+     * Resolves <var>msg</var>.
+     *
+     * @param msg message to resolve
+     * @return resolved message
+     */
+    public String resolveMessage(String msg) {
+        return resolveMessage(msg, new Object[0]);
+    }
+
+    /**
+     * Resolves <var>msg</var>.
+     *
+     * @param msg message to resolve
+     * @param obj parameter to insert into the resolved message
+     * @return resolved message
+     */
+    public String resolveMessage(String msg, Object obj) {
+        return resolveMessage(msg, new Object[]{obj});
+    }
+
+    /**
+     * Resolves <var>msg</var>
+     *
+     * @param msg    message to resolve
+     * @param params parameters to insert into the resolved message
+     * @return resolved message
+     */
+    public String resolveMessage(String msg, Object[] params) {
+        return insertParams(getString(msg), params);
+    }
+
+    public static String insertParams(String str, Object[] params) {
+        StringBuilder buf = new StringBuilder();
+        int startIndex = 0;
+        for (int i = 0; i < params.length && startIndex <= str.length(); i++) {
+            int endIndex = str.indexOf("{" + i, startIndex);
+            if (endIndex != -1) {
+                buf.append(str.substring(startIndex, endIndex));
+                buf.append(params[i] == null ? null : params[i].toString());
+                startIndex = endIndex + 3;
+            }
+        }
+        buf.append(str.substring(startIndex, str.length()));
+        return buf.toString();
+    }
+
+    protected Object handleGetObject(String key) {
+        for (String resource : resources) {
+            ResourceBundle bundle = getBndl(resource);
+            if (bundle.containsKey(key)) {
+                return bundle.getString(key);
+            }
+        }
+        return key;
+    }
+
     private ResourceBundle getBndl(String bundle) {
-        return ResourceBundle.getBundle(bundle, locale);
+        if (null != locale) {
+            return ResourceBundle.getBundle(bundle, locale);
+        } else {
+            return ResourceBundle.getBundle(bundle);
+        }
     }
 }

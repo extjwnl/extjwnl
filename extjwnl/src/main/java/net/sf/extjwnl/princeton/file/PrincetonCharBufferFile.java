@@ -59,7 +59,7 @@ public abstract class PrincetonCharBufferFile extends AbstractPrincetonRandomAcc
                 return ((c == -1) && (input.length() == 0)) ? null : input.toString();
             }
         } else {
-            throw new JWNLRuntimeException("PRINCETON_EXCEPTION_001");
+            throw new JWNLRuntimeException(dictionary.getMessages().resolveMessage("PRINCETON_EXCEPTION_001"));
         }
     }
 
@@ -74,7 +74,7 @@ public abstract class PrincetonCharBufferFile extends AbstractPrincetonRandomAcc
                 return input.toString();
             }
         } else {
-            throw new JWNLRuntimeException("PRINCETON_EXCEPTION_001");
+            throw new JWNLRuntimeException(dictionary.getMessages().resolveMessage("PRINCETON_EXCEPTION_001"));
         }
     }
 

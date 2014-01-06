@@ -1,6 +1,5 @@
 package net.sf.extjwnl.princeton.file;
 
-import net.sf.extjwnl.JWNL;
 import net.sf.extjwnl.JWNLRuntimeException;
 import net.sf.extjwnl.data.DictionaryElement;
 import net.sf.extjwnl.data.POS;
@@ -52,7 +51,7 @@ public class PrincetonObjectDictionaryFile extends AbstractPrincetonDictionaryFi
         if (dictionary instanceof MapBackedDictionary) {
             MapBackedDictionary dic = (MapBackedDictionary) dictionary;
             if (log.isDebugEnabled()) {
-                log.debug(JWNL.resolveMessage("PRINCETON_INFO_004", getFilename()));
+                log.debug(dictionary.getMessages().resolveMessage("PRINCETON_INFO_004", getFilename()));
             }
             Map<Object, ? extends DictionaryElement> map = dic.getTable(getPOS(), getFileType());
 
@@ -60,7 +59,7 @@ public class PrincetonObjectDictionaryFile extends AbstractPrincetonDictionaryFi
             writeObject(map);
 
             if (log.isDebugEnabled()) {
-                log.debug(JWNL.resolveMessage("PRINCETON_INFO_012", getFilename()));
+                log.debug(dictionary.getMessages().resolveMessage("PRINCETON_INFO_012", getFilename()));
             }
         }
     }
@@ -80,7 +79,7 @@ public class PrincetonObjectDictionaryFile extends AbstractPrincetonDictionaryFi
             super.close();
         } catch (Exception e) {
             if (log.isErrorEnabled()) {
-                log.error(JWNL.resolveMessage("EXCEPTION_001", e.getMessage()), e);
+                log.error(dictionary.getMessages().resolveMessage("EXCEPTION_001", e.getMessage()), e);
             }
         } finally {
             in = null;
@@ -148,7 +147,7 @@ public class PrincetonObjectDictionaryFile extends AbstractPrincetonDictionaryFi
                 return new HashMap<Object, DictionaryElement>();
             }
         } else {
-            throw new JWNLRuntimeException("PRINCETON_EXCEPTION_001");
+            throw new JWNLRuntimeException(dictionary.getMessages().resolveMessage("PRINCETON_EXCEPTION_001"));
         }
     }
 
@@ -156,7 +155,7 @@ public class PrincetonObjectDictionaryFile extends AbstractPrincetonDictionaryFi
         if (isOpen() && canWrite()) {
             getOutputStream().writeObject(obj);
         } else {
-            throw new JWNLRuntimeException("PRINCETON_EXCEPTION_002");
+            throw new JWNLRuntimeException(dictionary.getMessages().resolveMessage("PRINCETON_EXCEPTION_002"));
         }
     }
 

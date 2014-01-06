@@ -1,9 +1,7 @@
 package net.sf.extjwnl.data;
 
-import net.sf.extjwnl.JWNL;
+import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.data.list.*;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -17,8 +15,6 @@ import java.util.Set;
  * @author John Didion <jdidion@didion.net>
  */
 public class PointerUtils {
-
-    private static final Log log = LogFactory.getLog(PointerUtils.class);
 
     /**
      * Representation of infinite depth. Used to tell the pointer operations to
@@ -35,7 +31,7 @@ public class PointerUtils {
      * @param synset synset
      * @return the immediate parents of <code>synset</code>
      */
-    public static PointerTargetNodeList getDirectHypernyms(Synset synset) {
+    public static PointerTargetNodeList getDirectHypernyms(Synset synset) throws JWNLException {
         return getPointerTargets(synset, PointerType.HYPERNYM);
     }
 
@@ -45,7 +41,7 @@ public class PointerUtils {
      * @param synset synset
      * @return all of the ancestors of <code>synset</code>
      */
-    public static PointerTargetTree getHypernymTree(Synset synset) {
+    public static PointerTargetTree getHypernymTree(Synset synset) throws JWNLException {
         return getHypernymTree(synset, INFINITY);
     }
 
@@ -56,7 +52,7 @@ public class PointerUtils {
      * @param depth  depth
      * @return all of the ancestors of <code>synset</code> to depth <code>depth</code>
      */
-    public static PointerTargetTree getHypernymTree(Synset synset, int depth) {
+    public static PointerTargetTree getHypernymTree(Synset synset, int depth) throws JWNLException {
         return new PointerTargetTree(synset, makePointerTargetTreeList(synset, PointerType.HYPERNYM, depth));
     }
 
@@ -66,7 +62,7 @@ public class PointerUtils {
      * @param synset synset
      * @return the immediate children of <code>synset</code>
      */
-    public static PointerTargetNodeList getDirectHyponyms(Synset synset) {
+    public static PointerTargetNodeList getDirectHyponyms(Synset synset) throws JWNLException {
         return getPointerTargets(synset, PointerType.HYPONYM);
     }
 
@@ -76,7 +72,7 @@ public class PointerUtils {
      * @param synset synset
      * @return all of the children of <code>synset</code>
      */
-    public static PointerTargetTree getHyponymTree(Synset synset) {
+    public static PointerTargetTree getHyponymTree(Synset synset) throws JWNLException {
         return getHyponymTree(synset, INFINITY);
     }
 
@@ -87,7 +83,7 @@ public class PointerUtils {
      * @param depth  depth
      * @return all of the children of <code>synset</code> to depth <code>depth</code>
      */
-    public static PointerTargetTree getHyponymTree(Synset synset, int depth) {
+    public static PointerTargetTree getHyponymTree(Synset synset, int depth) throws JWNLException {
         return new PointerTargetTree(synset, makePointerTargetTreeList(synset, PointerType.HYPONYM, depth));
     }
 
@@ -97,7 +93,7 @@ public class PointerUtils {
      * @param synset synset
      * @return <code>synset</code>'s siblings (the hyponyms of its hypernyms)
      */
-    public static PointerTargetNodeList getCoordinateTerms(Synset synset) {
+    public static PointerTargetNodeList getCoordinateTerms(Synset synset) throws JWNLException {
         PointerTargetNodeList list = new PointerTargetNodeList();
         for (PointerTargetNode o : getDirectHypernyms(synset)) {
             list.addAll(getPointerTargets(o.getSynset(), PointerType.HYPONYM));
@@ -111,7 +107,7 @@ public class PointerUtils {
      * @param synset synset
      * @return the words that mean the opposite of <code>synset</code>
      */
-    public static PointerTargetNodeList getAntonyms(Synset synset) {
+    public static PointerTargetNodeList getAntonyms(Synset synset) throws JWNLException {
         return getPointerTargets(synset, PointerType.ANTONYM);
     }
 
@@ -121,7 +117,7 @@ public class PointerUtils {
      * @param synset synset
      * @return the words that mean the opposite of <code>synset</code> and the immediate synonyms of those words
      */
-    public static PointerTargetTree getExtendedAntonyms(Synset synset) {
+    public static PointerTargetTree getExtendedAntonyms(Synset synset) throws JWNLException {
         return getExtendedAntonyms(synset, 1);
     }
 
@@ -132,7 +128,7 @@ public class PointerUtils {
      * @param depth  depth
      * @return all antonyms of <code>synset</code>, and all synonyms of those antonyms to depth <code>depth</code>
      */
-    public static PointerTargetTree getExtendedAntonyms(Synset synset, int depth) {
+    public static PointerTargetTree getExtendedAntonyms(Synset synset, int depth) throws JWNLException {
         PointerTargetTreeNodeList list = new PointerTargetTreeNodeList();
         if (synset.getPOS() == POS.ADJECTIVE) {
             PointerTargetNodeList antonyms = getAntonyms(synset);
@@ -147,7 +143,7 @@ public class PointerUtils {
      * @param synset synset
      * @return the immediate antonyms of all words that mean the same as <code>synset</code>
      */
-    public static PointerTargetTree getIndirectAntonyms(Synset synset) {
+    public static PointerTargetTree getIndirectAntonyms(Synset synset) throws JWNLException {
         return getIndirectAntonyms(synset, 1);
     }
 
@@ -158,7 +154,7 @@ public class PointerUtils {
      * @param depth  depth
      * @return the antonyms of all words that mean the same as <code>synset</code> to depth <code>depth</code>
      */
-    public static PointerTargetTree getIndirectAntonyms(Synset synset, int depth) {
+    public static PointerTargetTree getIndirectAntonyms(Synset synset, int depth) throws JWNLException {
         PointerTargetTreeNodeList list = new PointerTargetTreeNodeList();
         if (synset.getPOS() == POS.ADJECTIVE) {
             PointerTargetNodeList synonyms = getSynonyms(synset);
@@ -173,7 +169,7 @@ public class PointerUtils {
      * @param synset synset
      * @return the attributes of <code>synset</code>
      */
-    public static PointerTargetNodeList getAttributes(Synset synset) {
+    public static PointerTargetNodeList getAttributes(Synset synset) throws JWNLException {
         return getPointerTargets(synset, PointerType.ATTRIBUTE);
     }
 
@@ -183,7 +179,7 @@ public class PointerUtils {
      * @param synset synset
      * @return what words are related to <code>synset</code>
      */
-    public static PointerTargetNodeList getAlsoSees(Synset synset) {
+    public static PointerTargetNodeList getAlsoSees(Synset synset) throws JWNLException {
         return getPointerTargets(synset, PointerType.SEE_ALSO);
     }
 
@@ -194,7 +190,7 @@ public class PointerUtils {
      * @param depth  depth
      * @return all See Also relations to depth <code>depth</code>
      */
-    public static PointerTargetTree getAlsoSeeTree(Synset synset, int depth) {
+    public static PointerTargetTree getAlsoSeeTree(Synset synset, int depth) throws JWNLException {
         return new PointerTargetTree(synset, makePointerTargetTreeList(synset, PointerType.SEE_ALSO, depth));
     }
 
@@ -204,7 +200,7 @@ public class PointerUtils {
      * @param synset synset
      * @return meronyms of <code>synset</code>
      */
-    public static PointerTargetNodeList getMeronyms(Synset synset) {
+    public static PointerTargetNodeList getMeronyms(Synset synset) throws JWNLException {
         PointerTargetNodeList list = new PointerTargetNodeList();
         list.addAll(getPartMeronyms(synset));
         list.addAll(getMemberMeronyms(synset));
@@ -218,7 +214,7 @@ public class PointerUtils {
      * @param synset synset
      * @return part meronyms of <code>synset</code>
      */
-    public static PointerTargetNodeList getPartMeronyms(Synset synset) {
+    public static PointerTargetNodeList getPartMeronyms(Synset synset) throws JWNLException {
         return getPointerTargets(synset, PointerType.PART_MERONYM);
     }
 
@@ -228,7 +224,7 @@ public class PointerUtils {
      * @param synset synset
      * @return member meronyms of <code>synset</code>
      */
-    public static PointerTargetNodeList getMemberMeronyms(Synset synset) {
+    public static PointerTargetNodeList getMemberMeronyms(Synset synset) throws JWNLException {
         return getPointerTargets(synset, PointerType.MEMBER_MERONYM);
     }
 
@@ -238,7 +234,7 @@ public class PointerUtils {
      * @param synset synset
      * @return substance meronyms of <code>synset</code>
      */
-    public static PointerTargetNodeList getSubstanceMeronyms(Synset synset) {
+    public static PointerTargetNodeList getSubstanceMeronyms(Synset synset) throws JWNLException {
         return getPointerTargets(synset, PointerType.SUBSTANCE_MERONYM);
     }
 
@@ -248,7 +244,7 @@ public class PointerUtils {
      * @param synset synset
      * @return meronyms of <code>synset</code> and of all its ancestors
      */
-    public static PointerTargetTree getInheritedMeronyms(Synset synset) {
+    public static PointerTargetTree getInheritedMeronyms(Synset synset) throws JWNLException {
         return getInheritedMeronyms(synset, INFINITY, INFINITY);
     }
 
@@ -262,7 +258,7 @@ public class PointerUtils {
      * @param pointerDepth  pointer depth
      * @return meronyms
      */
-    public static PointerTargetTree getInheritedMeronyms(Synset synset, int pointerDepth, int ancestorDepth) {
+    public static PointerTargetTree getInheritedMeronyms(Synset synset, int pointerDepth, int ancestorDepth) throws JWNLException {
         PointerType[] types = new PointerType[3];
         types[0] = PointerType.PART_MERONYM;
         types[1] = PointerType.MEMBER_MERONYM;
@@ -276,7 +272,7 @@ public class PointerUtils {
      * @param synset synset
      * @return part meronyms of <code>synset</code> and of all its ancestors
      */
-    public static PointerTargetTree getInheritedPartMeronyms(Synset synset) {
+    public static PointerTargetTree getInheritedPartMeronyms(Synset synset) throws JWNLException {
         return getInheritedPartMeronyms(synset, INFINITY, INFINITY);
     }
 
@@ -290,7 +286,7 @@ public class PointerUtils {
      * @param pointerDepth  pointer depth
      * @return part meronyms
      */
-    public static PointerTargetTree getInheritedPartMeronyms(Synset synset, int pointerDepth, int ancestorDepth) {
+    public static PointerTargetTree getInheritedPartMeronyms(Synset synset, int pointerDepth, int ancestorDepth) throws JWNLException {
         return makeInheritedTree(synset, PointerType.PART_MERONYM, null, pointerDepth, ancestorDepth);
     }
 
@@ -300,7 +296,7 @@ public class PointerUtils {
      * @param synset synset
      * @return member meronyms
      */
-    public static PointerTargetTree getInheritedMemberMeronyms(Synset synset) {
+    public static PointerTargetTree getInheritedMemberMeronyms(Synset synset) throws JWNLException {
         return getInheritedMemberMeronyms(synset, INFINITY, INFINITY);
     }
 
@@ -314,7 +310,7 @@ public class PointerUtils {
      * @param pointerDepth  pointer depth
      * @return member meronyms
      */
-    public static PointerTargetTree getInheritedMemberMeronyms(Synset synset, int pointerDepth, int ancestorDepth) {
+    public static PointerTargetTree getInheritedMemberMeronyms(Synset synset, int pointerDepth, int ancestorDepth) throws JWNLException {
         return makeInheritedTree(synset, PointerType.MEMBER_MERONYM, null, pointerDepth, ancestorDepth);
     }
 
@@ -324,7 +320,7 @@ public class PointerUtils {
      * @param synset synset
      * @return substance meronyms of <code>synset</code> and of its ancestors
      */
-    public static PointerTargetTree getInheritedSubstanceMeronyms(Synset synset) {
+    public static PointerTargetTree getInheritedSubstanceMeronyms(Synset synset) throws JWNLException {
         return getInheritedSubstanceMeronyms(synset, INFINITY, INFINITY);
     }
 
@@ -338,7 +334,7 @@ public class PointerUtils {
      * @param pointerDepth  pointer depth
      * @return substance meronyms
      */
-    public static PointerTargetTree getInheritedSubstanceMeronyms(Synset synset, int pointerDepth, int ancestorDepth) {
+    public static PointerTargetTree getInheritedSubstanceMeronyms(Synset synset, int pointerDepth, int ancestorDepth) throws JWNLException {
         return makeInheritedTree(synset, PointerType.SUBSTANCE_MERONYM, null, pointerDepth, ancestorDepth);
     }
 
@@ -348,7 +344,7 @@ public class PointerUtils {
      * @param synset synset
      * @return holonyms of <code>synset</code>
      */
-    public static PointerTargetNodeList getHolonyms(Synset synset) {
+    public static PointerTargetNodeList getHolonyms(Synset synset) throws JWNLException {
         PointerTargetNodeList list = new PointerTargetNodeList();
         list.addAll(getPartHolonyms(synset));
         list.addAll(getMemberHolonyms(synset));
@@ -362,7 +358,7 @@ public class PointerUtils {
      * @param synset synset
      * @return part holonyms of <code>synset</code>
      */
-    public static PointerTargetNodeList getPartHolonyms(Synset synset) {
+    public static PointerTargetNodeList getPartHolonyms(Synset synset) throws JWNLException {
         return getPointerTargets(synset, PointerType.PART_HOLONYM);
     }
 
@@ -372,7 +368,7 @@ public class PointerUtils {
      * @param synset synset
      * @return member holonyms of <code>synset</code>
      */
-    public static PointerTargetNodeList getMemberHolonyms(Synset synset) {
+    public static PointerTargetNodeList getMemberHolonyms(Synset synset) throws JWNLException {
         return getPointerTargets(synset, PointerType.MEMBER_HOLONYM);
     }
 
@@ -382,7 +378,7 @@ public class PointerUtils {
      * @param synset synset
      * @return substance holonyms of <code>synset</code>
      */
-    public static PointerTargetNodeList getSubstanceHolonyms(Synset synset) {
+    public static PointerTargetNodeList getSubstanceHolonyms(Synset synset) throws JWNLException {
         return getPointerTargets(synset, PointerType.SUBSTANCE_HOLONYM);
     }
 
@@ -392,7 +388,7 @@ public class PointerUtils {
      * @param synset synset
      * @return holonyms
      */
-    public static PointerTargetTree getInheritedHolonyms(Synset synset) {
+    public static PointerTargetTree getInheritedHolonyms(Synset synset) throws JWNLException {
         return getInheritedHolonyms(synset, INFINITY, INFINITY);
     }
 
@@ -405,7 +401,7 @@ public class PointerUtils {
      * @param pointerDepth  pointer depth
      * @return holonyms
      */
-    public static PointerTargetTree getInheritedHolonyms(Synset synset, int pointerDepth, int ancestorDepth) {
+    public static PointerTargetTree getInheritedHolonyms(Synset synset, int pointerDepth, int ancestorDepth) throws JWNLException {
         PointerType[] types = new PointerType[3];
         types[0] = PointerType.PART_HOLONYM;
         types[1] = PointerType.MEMBER_HOLONYM;
@@ -419,7 +415,7 @@ public class PointerUtils {
      * @param synset synset
      * @return part holonyms of <code>synset</code> and of all its ancestors
      */
-    public static PointerTargetTree getInheritedPartHolonyms(Synset synset) {
+    public static PointerTargetTree getInheritedPartHolonyms(Synset synset) throws JWNLException {
         return getInheritedPartHolonyms(synset, INFINITY, INFINITY);
     }
 
@@ -432,7 +428,7 @@ public class PointerUtils {
      * @param ancestorDepth ancestor depth
      * @return part holonyms
      */
-    public static PointerTargetTree getInheritedPartHolonyms(Synset synset, int pointerDepth, int ancestorDepth) {
+    public static PointerTargetTree getInheritedPartHolonyms(Synset synset, int pointerDepth, int ancestorDepth) throws JWNLException {
         return makeInheritedTree(synset, PointerType.PART_HOLONYM, null, pointerDepth, ancestorDepth);
     }
 
@@ -442,7 +438,7 @@ public class PointerUtils {
      * @param synset synset
      * @return member holonyms of <code>synset</code> and of all its ancestors
      */
-    public static PointerTargetTree getInheritedMemberHolonyms(Synset synset) {
+    public static PointerTargetTree getInheritedMemberHolonyms(Synset synset) throws JWNLException {
         return getInheritedMemberHolonyms(synset, INFINITY, INFINITY);
     }
 
@@ -455,7 +451,7 @@ public class PointerUtils {
      * @param ancestorDepth ancestor depth
      * @return member holonyms of each synset
      */
-    public static PointerTargetTree getInheritedMemberHolonyms(Synset synset, int pointerDepth, int ancestorDepth) {
+    public static PointerTargetTree getInheritedMemberHolonyms(Synset synset, int pointerDepth, int ancestorDepth) throws JWNLException {
         return makeInheritedTree(synset, PointerType.MEMBER_HOLONYM, null, pointerDepth, ancestorDepth);
     }
 
@@ -465,7 +461,7 @@ public class PointerUtils {
      * @param synset synset
      * @return substance holonyms of <code>synset</code> and of all its ancestors
      */
-    public static PointerTargetTree getInheritedSubstanceHolonyms(Synset synset) {
+    public static PointerTargetTree getInheritedSubstanceHolonyms(Synset synset) throws JWNLException {
         return getInheritedSubstanceHolonyms(synset, INFINITY, INFINITY);
     }
 
@@ -478,7 +474,7 @@ public class PointerUtils {
      * @param ancestorDepth ancestor depth
      * @return substance holonyms
      */
-    public static PointerTargetTree getInheritedSubstanceHolonyms(Synset synset, int pointerDepth, int ancestorDepth) {
+    public static PointerTargetTree getInheritedSubstanceHolonyms(Synset synset, int pointerDepth, int ancestorDepth) throws JWNLException {
         return makeInheritedTree(synset, PointerType.SUBSTANCE_HOLONYM, null, pointerDepth, ancestorDepth);
     }
 
@@ -488,7 +484,7 @@ public class PointerUtils {
      * @param synset synset
      * @return direct entailments of <code>synset</code>
      */
-    public static PointerTargetNodeList getEntailments(Synset synset) {
+    public static PointerTargetNodeList getEntailments(Synset synset) throws JWNLException {
         return getPointerTargets(synset, PointerType.ENTAILMENT);
     }
 
@@ -498,7 +494,7 @@ public class PointerUtils {
      * @param synset synset
      * @return all entailments for <code>synset</code>
      */
-    public static PointerTargetTree getEntailmentTree(Synset synset) {
+    public static PointerTargetTree getEntailmentTree(Synset synset) throws JWNLException {
         return getEntailmentTree(synset, INFINITY);
     }
 
@@ -509,7 +505,7 @@ public class PointerUtils {
      * @param depth  depth
      * @return all entailments for <code>synset</code> to depth <code>depth</code>
      */
-    public static PointerTargetTree getEntailmentTree(Synset synset, int depth) {
+    public static PointerTargetTree getEntailmentTree(Synset synset, int depth) throws JWNLException {
         return new PointerTargetTree(synset, makePointerTargetTreeList(synset, PointerType.ENTAILMENT, depth));
     }
 
@@ -519,7 +515,7 @@ public class PointerUtils {
      * @param synset synset
      * @return direct cause links of <code>synset</code>
      */
-    public static PointerTargetNodeList getCauses(Synset synset) {
+    public static PointerTargetNodeList getCauses(Synset synset) throws JWNLException {
         return getPointerTargets(synset, PointerType.CAUSE);
     }
 
@@ -529,7 +525,7 @@ public class PointerUtils {
      * @param synset synset
      * @return all cause links for <code>synset</code>
      */
-    public static PointerTargetTree getCauseTree(Synset synset) {
+    public static PointerTargetTree getCauseTree(Synset synset) throws JWNLException {
         return getCauseTree(synset, INFINITY);
     }
 
@@ -540,7 +536,7 @@ public class PointerUtils {
      * @param depth  depth
      * @return all cause links for <code>synset</code> to depth <code>depth</code>
      */
-    public static PointerTargetTree getCauseTree(Synset synset, int depth) {
+    public static PointerTargetTree getCauseTree(Synset synset, int depth) throws JWNLException {
         return new PointerTargetTree(synset, makePointerTargetTreeList(synset, PointerType.CAUSE, depth));
     }
 
@@ -550,7 +546,7 @@ public class PointerUtils {
      * @param synset synset
      * @return the group that this verb belongs to
      */
-    public static PointerTargetNodeList getVerbGroup(Synset synset) {
+    public static PointerTargetNodeList getVerbGroup(Synset synset) throws JWNLException {
         // We need to go through all this hassle because
         // 1. a verb does not always have links to all the verbs in its group
         // 2. two verbs in the same group sometimes have reciprocal links, and we want
@@ -580,7 +576,7 @@ public class PointerUtils {
      * @param synset synset
      * @return participle of links of <code>synset</code>
      */
-    public static PointerTargetNodeList getParticipleOf(Synset synset) {
+    public static PointerTargetNodeList getParticipleOf(Synset synset) throws JWNLException {
         return getPointerTargets(synset, PointerType.PARTICIPLE_OF);
     }
 
@@ -591,7 +587,7 @@ public class PointerUtils {
      * @param synset synset
      * @return the synonyms for <var>synset</var>
      */
-    public static PointerTargetNodeList getSynonyms(Synset synset) {
+    public static PointerTargetNodeList getSynonyms(Synset synset) throws JWNLException {
         return getPointerTargets(synset, PointerType.SIMILAR_TO);
     }
 
@@ -602,7 +598,7 @@ public class PointerUtils {
      * @param depth  depth
      * @return all the synonyms of <code>synset</code> to depth <code>depth</code>
      */
-    public static PointerTargetTree getSynonymTree(Synset synset, int depth) {
+    public static PointerTargetTree getSynonymTree(Synset synset, int depth) throws JWNLException {
         return new PointerTargetTree(synset, makePointerTargetTreeList(synset, PointerType.SIMILAR_TO, null, depth, false));
     }
 
@@ -612,7 +608,7 @@ public class PointerUtils {
      * @param synset synset
      * @return the pertainyms for <var>synset</var>
      */
-    public static PointerTargetNodeList getPertainyms(Synset synset) {
+    public static PointerTargetNodeList getPertainyms(Synset synset) throws JWNLException {
         return getPointerTargets(synset, PointerType.PERTAINYM);
     }
 
@@ -623,7 +619,7 @@ public class PointerUtils {
      * @param type   pointer type
      * @return all the pointer targets of <var>synset</var> of type <var>type</var>
      */
-    private static PointerTargetNodeList getPointerTargets(Synset synset, PointerType type) {
+    private static PointerTargetNodeList getPointerTargets(Synset synset, PointerType type) throws JWNLException {
         return new PointerTargetNodeList(synset.getTargets(type), type);
     }
 
@@ -635,7 +631,7 @@ public class PointerUtils {
      * @param searchType the pointer type to include in the pointer lists
      * @return a nested list of pointer targets to depth <var>depth</var>, starting at <code>synset</code>
      */
-    public static PointerTargetTreeNodeList makePointerTargetTreeList(Synset synset, PointerType searchType) {
+    public static PointerTargetTreeNodeList makePointerTargetTreeList(Synset synset, PointerType searchType) throws JWNLException {
         return makePointerTargetTreeList(synset, searchType, INFINITY);
     }
 
@@ -648,7 +644,7 @@ public class PointerUtils {
      * @param depth      depth
      * @return a nested list of pointer targets to depth <var>depth</var>, starting at <code>synset</code>
      */
-    public static PointerTargetTreeNodeList makePointerTargetTreeList(Synset synset, PointerType searchType, int depth) {
+    public static PointerTargetTreeNodeList makePointerTargetTreeList(Synset synset, PointerType searchType, int depth) throws JWNLException {
         return makePointerTargetTreeList(synset, searchType, null, depth, true);
     }
 
@@ -665,7 +661,7 @@ public class PointerUtils {
      */
     public static PointerTargetTreeNodeList makePointerTargetTreeList(Synset synset, PointerType searchType,
                                                                       PointerType labelType, int depth,
-                                                                      boolean allowRedundancies) {
+                                                                      boolean allowRedundancies) throws JWNLException {
         PointerType[] searchTypes = new PointerType[1];
         searchTypes[0] = searchType;
         return makePointerTargetTreeList(synset, searchTypes, labelType, depth, allowRedundancies);
@@ -680,7 +676,7 @@ public class PointerUtils {
      * @param searchTypes the pointer types to include in the pointer lists
      * @return a nested list of pointer targets to depth <var>depth</var>, starting at <code>synset</code>
      */
-    public static PointerTargetTreeNodeList makePointerTargetTreeList(Synset synset, PointerType[] searchTypes) {
+    public static PointerTargetTreeNodeList makePointerTargetTreeList(Synset synset, PointerType[] searchTypes) throws JWNLException {
         return makePointerTargetTreeList(synset, searchTypes, INFINITY);
     }
 
@@ -694,7 +690,7 @@ public class PointerUtils {
      * @param depth       depth
      * @return a nested list of pointer targets to depth <var>depth</var>, starting at <code>synset</code>
      */
-    public static PointerTargetTreeNodeList makePointerTargetTreeList(Synset synset, PointerType[] searchTypes, int depth) {
+    public static PointerTargetTreeNodeList makePointerTargetTreeList(Synset synset, PointerType[] searchTypes, int depth) throws JWNLException {
         return makePointerTargetTreeList(synset, searchTypes, null, depth, true);
     }
 
@@ -712,7 +708,7 @@ public class PointerUtils {
      */
     public static PointerTargetTreeNodeList makePointerTargetTreeList(Synset synset, PointerType[] searchTypes,
                                                                       PointerType labelType, int depth,
-                                                                      boolean allowRedundancies) {
+                                                                      boolean allowRedundancies) throws JWNLException {
         return makePointerTargetTreeList(synset, searchTypes, labelType, depth, allowRedundancies, null);
     }
 
@@ -730,7 +726,7 @@ public class PointerUtils {
      */
     public static PointerTargetTreeNodeList makePointerTargetTreeList(PointerTargetNodeList list, PointerType searchType,
                                                                       PointerType labelType, int depth,
-                                                                      boolean allowRedundancies) {
+                                                                      boolean allowRedundancies) throws JWNLException {
         PointerType[] searchTypes = new PointerType[1];
         searchTypes[0] = searchType;
         return makePointerTargetTreeList(list, searchTypes, labelType, depth, allowRedundancies);
@@ -750,7 +746,7 @@ public class PointerUtils {
      */
     public static PointerTargetTreeNodeList makePointerTargetTreeList(PointerTargetNodeList list, PointerType[] searchTypes,
                                                                       PointerType labelType, int depth,
-                                                                      boolean allowRedundancies) {
+                                                                      boolean allowRedundancies) throws JWNLException {
         PointerTargetTreeNodeList treeList = new PointerTargetTreeNodeList();
         for (PointerTargetNode node : list) {
             treeList.add(node.getPointerTarget(),
@@ -763,7 +759,7 @@ public class PointerUtils {
     private static PointerTargetTreeNodeList makePointerTargetTreeList(Synset synset, PointerType[] searchTypes,
                                                                        PointerType labelType, int depth,
                                                                        boolean allowRedundancies,
-                                                                       PointerTargetTreeNode parent) {
+                                                                       PointerTargetTreeNode parent) throws JWNLException {
         depth--;
         PointerTargetTreeNodeList list = new PointerTargetTreeNodeList();
         for (PointerType type : searchTypes) {
@@ -785,9 +781,6 @@ public class PointerUtils {
                                     currentParent = currentParent.getParent();
                                 } else {
                                     //cycle
-                                    if (log.isWarnEnabled()) {
-                                        log.warn(JWNL.resolveMessage("DICTIONARY_WARN_001", currentParent));
-                                    }
                                     break;
                                 }
                             }
@@ -812,7 +805,7 @@ public class PointerUtils {
      * @param searchType the pointer type to include in the pointer lists
      * @return a hypernym tree starting at <var>synset</var>
      */
-    public static PointerTargetTree makeInheritedTree(Synset synset, PointerType searchType) {
+    public static PointerTargetTree makeInheritedTree(Synset synset, PointerType searchType) throws JWNLException {
         return makeInheritedTree(synset, searchType, null, INFINITY, INFINITY);
     }
 
@@ -828,7 +821,7 @@ public class PointerUtils {
      * @return a hypernym tree starting at <var>synset</var>
      */
     public static PointerTargetTree makeInheritedTree(Synset synset, PointerType searchType, PointerType labelType,
-                                                      int pointerDepth, int ancestorDepth) {
+                                                      int pointerDepth, int ancestorDepth) throws JWNLException {
         return makeInheritedTree(synset, searchType, labelType, pointerDepth, ancestorDepth, true);
     }
 
@@ -845,7 +838,7 @@ public class PointerUtils {
      * @return a hypernym tree starting at <var>synset</var>
      */
     public static PointerTargetTree makeInheritedTree(Synset synset, PointerType searchType, PointerType labelType,
-                                                      int pointerDepth, int ancestorDepth, boolean allowRedundancies) {
+                                                      int pointerDepth, int ancestorDepth, boolean allowRedundancies) throws JWNLException {
         PointerType[] searchTypes = new PointerType[1];
         searchTypes[0] = searchType;
         return makeInheritedTree(synset, searchTypes, labelType, pointerDepth, ancestorDepth, allowRedundancies);
@@ -860,7 +853,7 @@ public class PointerUtils {
      * @param searchTypes the pointer types to include in the pointer lists
      * @return hypernym tree starting at <var>synset</var>
      */
-    public static PointerTargetTree makeInheritedTree(Synset synset, PointerType[] searchTypes) {
+    public static PointerTargetTree makeInheritedTree(Synset synset, PointerType[] searchTypes) throws JWNLException {
         return makeInheritedTree(synset, searchTypes, null, INFINITY, INFINITY);
     }
 
@@ -876,7 +869,7 @@ public class PointerUtils {
      * @return hypernym tree starting at <var>synset</var>
      */
     public static PointerTargetTree makeInheritedTree(Synset synset, PointerType[] searchTypes, PointerType labelType,
-                                                      int pointerDepth, int ancestorDepth) {
+                                                      int pointerDepth, int ancestorDepth) throws JWNLException {
         return makeInheritedTree(synset, searchTypes, labelType, pointerDepth, ancestorDepth, true);
     }
 
@@ -893,7 +886,7 @@ public class PointerUtils {
      * @return hypernym tree starting at <var>synset</var>
      */
     public static PointerTargetTree makeInheritedTree(Synset synset, PointerType[] searchTypes, PointerType labelType,
-                                                      int pointerDepth, int ancestorDepth, boolean allowRedundancies) {
+                                                      int pointerDepth, int ancestorDepth, boolean allowRedundancies) throws JWNLException {
         PointerTargetTree hypernyms = getHypernymTree(synset, INFINITY);
         return makeInheritedTree(hypernyms, searchTypes, labelType, pointerDepth, ancestorDepth, allowRedundancies);
     }
@@ -911,7 +904,7 @@ public class PointerUtils {
      */
     public static PointerTargetTree makeInheritedTree(PointerTargetTree tree, PointerType[] searchTypes,
                                                       PointerType labelType, int pointerDepth, int ancestorDepth,
-                                                      boolean allowRedundancies) {
+                                                      boolean allowRedundancies) throws JWNLException {
         PointerTargetTreeNode root = tree.getRootNode();
         root.setPointerTreeList(makePointerTargetTreeList(root.getSynset(), searchTypes, labelType, pointerDepth, allowRedundancies));
         root.setChildTreeList(makeInheritedTreeList(root.getChildTreeList(), searchTypes, labelType, pointerDepth,
@@ -933,7 +926,7 @@ public class PointerUtils {
     public static PointerTargetTreeNodeList makeInheritedTreeList(PointerTargetTreeNodeList list,
                                                                   PointerType[] searchTypes, PointerType labelType,
                                                                   int pointerDepth, int ancestorDepth,
-                                                                  boolean allowRedundancies) {
+                                                                  boolean allowRedundancies) throws JWNLException {
         ancestorDepth--;
         PointerTargetTreeNodeList inherited = new PointerTargetTreeNodeList();
         if (null != list) {//AA: cycle with "period"...

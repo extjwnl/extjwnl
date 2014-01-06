@@ -23,6 +23,9 @@ public abstract class PointerTarget implements Serializable, Owned {
     protected transient Dictionary dictionary;
 
     protected PointerTarget(Dictionary dictionary) {
+        if (null == dictionary) {
+            throw new IllegalArgumentException();
+        }
         this.dictionary = dictionary;
     }
 
@@ -68,7 +71,7 @@ public abstract class PointerTarget implements Serializable, Owned {
      *
      * @return all the pointer targets of this synset
      */
-    public List<PointerTarget> getTargets() {
+    public List<PointerTarget> getTargets() throws JWNLException {
         return collectTargets(getPointers());
     }
 
@@ -78,7 +81,7 @@ public abstract class PointerTarget implements Serializable, Owned {
      * @param type pointer type
      * @return all the targets of the pointers of type <var>type</var>
      */
-    public List<PointerTarget> getTargets(PointerType type) {
+    public List<PointerTarget> getTargets(PointerType type) throws JWNLException {
         return collectTargets(getPointers(type));
     }
 
@@ -88,7 +91,7 @@ public abstract class PointerTarget implements Serializable, Owned {
      * @param pointers pointer to return targets of
      * @return all the targets of <var>pointers</var>
      */
-    private List<PointerTarget> collectTargets(List<Pointer> pointers) {
+    private List<PointerTarget> collectTargets(List<Pointer> pointers) throws JWNLException {
         List<PointerTarget> targets = new ArrayList<PointerTarget>(pointers.size());
         for (Pointer pointer : pointers) {
             targets.add(pointer.getTarget());

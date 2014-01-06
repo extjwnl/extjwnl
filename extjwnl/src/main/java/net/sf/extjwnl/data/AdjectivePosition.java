@@ -1,6 +1,6 @@
 package net.sf.extjwnl.data;
 
-import net.sf.extjwnl.JWNL;
+import net.sf.extjwnl.util.ResourceBundleSet;
 
 /**
  * Adjective positions denote a restriction on the on the syntactic position the
@@ -11,10 +11,10 @@ import net.sf.extjwnl.JWNL;
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public enum AdjectivePosition {
-    NONE("none", "NONE"),
-    PREDICATIVE("p", "AP_PREDICATIVE"),
-    ATTRIBUTIVE("a", "AP_ATTRIBUTIVE"),
-    IMMEDIATE_POSTNOMINAL("ip", "AP_IMMEDIATE_POSTNOMINAL");
+    NONE("none", "none"),
+    PREDICATIVE("p", "predicative"),
+    ATTRIBUTIVE("a", "attributive"),
+    IMMEDIATE_POSTNOMINAL("ip", "immediate postnominal");
 
     public static AdjectivePosition getAdjectivePositionForKey(String key) {
         if (NONE.getKey().equals(key)) {
@@ -36,9 +36,8 @@ public enum AdjectivePosition {
     private transient final String label;
 
     private AdjectivePosition(String key, String label) {
-        JWNL.initialize();
         this.key = key;
-        this.label = JWNL.resolveMessage(label);
+        this.label = label;
     }
 
     public String getKey() {
@@ -50,6 +49,6 @@ public enum AdjectivePosition {
     }
 
     public String toString() {
-        return JWNL.resolveMessage("DATA_TOSTRING_006", label);
+        return ResourceBundleSet.insertParams("[AdjectivePosition: {0}]", new String[]{label});
     }
 }

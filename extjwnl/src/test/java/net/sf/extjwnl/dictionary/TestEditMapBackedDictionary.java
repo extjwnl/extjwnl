@@ -11,6 +11,6 @@ public class TestEditMapBackedDictionary extends DictionaryEditTester {
 
     @Override
     protected InputStream getProperties() {
-        return TestEditMapBackedDictionary.class.getClassLoader().getResourceAsStream("test_clean_map.xml");
+        return TestEditMapBackedDictionary.class.getResourceAsStream("/test_clean_map.xml");
     }
 }

@@ -1,6 +1,6 @@
 package net.sf.extjwnl.data;
 
-import net.sf.extjwnl.JWNL;
+import net.sf.extjwnl.util.ResourceBundleSet;
 
 import java.util.*;
 
@@ -113,7 +113,7 @@ public class IndexWordSet {
     public String toString() {
         String str;
         if (size() == 0) {
-            str = JWNL.resolveMessage("DATA_TOSTRING_003");
+            str = "<empty>";
         } else {
             StringBuilder buf = new StringBuilder();
             for (POS o : getValidPOSSet()) {
@@ -121,7 +121,7 @@ public class IndexWordSet {
             }
             str = buf.toString();
         }
-        return JWNL.resolveMessage("DATA_TOSTRING_004", str);
+        return ResourceBundleSet.insertParams("[IndexWordSet: {0}]", new String[]{str});
     }
 
     public String getLemma() {

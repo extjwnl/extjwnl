@@ -1,6 +1,5 @@
 package net.sf.extjwnl.dictionary;
 
-import net.sf.extjwnl.JWNL;
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.JWNLRuntimeException;
 import net.sf.extjwnl.data.*;
@@ -99,7 +98,7 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
         try {
             return fileManager.delete();
         } catch (IOException e) {
-            throw new JWNLException("EXCEPTION_001", e.getMessage(), e);
+            throw new JWNLException(getMessages().resolveMessage("EXCEPTION_001", e.getMessage()), e);
         }
     }
 
@@ -145,7 +144,7 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
                         word = parseAndCacheIndexWordLine(pos, getFileManager().readLineAt(pos, DictionaryFileType.INDEX, offset));
                     }
                 } catch (IOException e) {
-                    throw new JWNLException("DICTIONARY_EXCEPTION_004", lemma, e);
+                    throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_004", lemma), e);
                 }
             }
         }
@@ -157,7 +156,7 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
             long offset = getFileManager().getRandomLinePointer(pos, DictionaryFileType.INDEX);
             return parseAndCacheIndexWordLine(pos, getFileManager().readLineAt(pos, DictionaryFileType.INDEX, offset));
         } catch (IOException e) {
-            throw new JWNLException("DICTIONARY_EXCEPTION_004", e);
+            throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_004", "random"), e);
         }
     }
 
@@ -205,7 +204,7 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
                     cacheSynset(synset);
                 }
             } catch (IOException e) {
-                throw new JWNLException("DICTIONARY_EXCEPTION_005", offset, e);
+                throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_005", offset), e);
             }
         }
         return synset;
@@ -248,7 +247,7 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
                         exc = parseAndCacheExceptionLine(pos, getFileManager().readLineAt(pos, DictionaryFileType.EXCEPTION, offset));
                     }
                 } catch (IOException ex) {
-                    throw new JWNLException("DICTIONARY_EXCEPTION_006", ex);
+                    throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_006", ex.getMessage()), ex);
                 }
             }
         }
@@ -285,11 +284,11 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
                 nextLine();
             } catch (IOException ex) {
                 if (log.isWarnEnabled()) {
-                    log.warn(JWNL.resolveMessage("DICTIONARY_EXCEPTION_007", new Object[]{this.pos, this.fileType}));
+                    log.warn(getMessages().resolveMessage("DICTIONARY_EXCEPTION_007", new Object[]{this.pos, this.fileType}));
                 }
             } catch (JWNLException ex) {
                 if (log.isWarnEnabled()) {
-                    log.warn(JWNL.resolveMessage("DICTIONARY_EXCEPTION_007", new Object[]{this.pos, this.fileType}));
+                    log.warn(getMessages().resolveMessage("DICTIONARY_EXCEPTION_007", new Object[]{this.pos, this.fileType}));
                 }
             }
         }
@@ -331,7 +330,7 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
                 }
             } catch (Exception e) {
                 if (log.isErrorEnabled()) {
-                    log.error(JWNL.resolveMessage("EXCEPTION_001", e.getMessage()), e);
+                    log.error(getMessages().resolveMessage("EXCEPTION_001", e.getMessage()), e);
                 }
             }
             more = false;
@@ -346,7 +345,7 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
             try {
                 return fileManager.getNextLinePointer(pos, fileType, currentOffset);
             } catch (IOException ex) {
-                throw new JWNLException("DICTIONARY_EXCEPTION_008", new Object[]{pos, fileType}, ex);
+                throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_008", new Object[]{pos, fileType}), ex);
             }
         }
     }
@@ -382,7 +381,7 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
             try {
                 nextOffset = getNextOffset(fileManager.getFirstLinePointer(pos, fileType));
             } catch (IOException ex) {
-                throw new JWNLException("DICTIONARY_EXCEPTION_008", new Object[]{pos, fileType}, ex);
+                throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_008", new Object[]{pos, fileType}), ex);
             }
             nextLine();
         }
@@ -399,7 +398,7 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
                     return;
                 }
             } catch (IOException ex) {
-                throw new JWNLException("DICTIONARY_EXCEPTION_008", new Object[]{pos, fileType}, ex);
+                throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_008", new Object[]{pos, fileType}), ex);
             }
             more = false;
         }
@@ -414,7 +413,7 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
                 try {
                     return getFileManager().getMatchingLinePointer(pos, DictionaryFileType.INDEX, currentOffset, substring);
                 } catch (IOException ex) {
-                    throw new JWNLException("DICTIONARY_EXCEPTION_008", new Object[]{pos, fileType}, ex);
+                    throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_008", new Object[]{pos, fileType}), ex);
                 }
             } else {
                 return super.getNextOffset(currentOffset);
@@ -426,13 +425,13 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
     public synchronized void edit() throws JWNLException {
         if (!isEditable()) {
             if (!isCachingEnabled()) {
-                throw new JWNLException("DICTIONARY_EXCEPTION_030");
+                throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_030"));
             }
             super.edit();
             try {
                 fileManager.edit();
             } catch (IOException e) {
-                throw new JWNLException("EXCEPTION_001", e.getMessage(), e);
+                throw new JWNLException(getMessages().resolveMessage("EXCEPTION_001", e.getMessage()), e);
             }
         }
     }
@@ -443,7 +442,7 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
             super.save();
             fileManager.save();
         } catch (IOException e) {
-            throw new JWNLException("EXCEPTION_001", e.getMessage(), e);
+            throw new JWNLException(getMessages().resolveMessage("EXCEPTION_001", e.getMessage()), e);
         }
     }
 

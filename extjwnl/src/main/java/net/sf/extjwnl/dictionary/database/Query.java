@@ -1,6 +1,7 @@
 package net.sf.extjwnl.dictionary.database;
 
 import net.sf.extjwnl.JWNLRuntimeException;
+import net.sf.extjwnl.dictionary.Dictionary;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,19 +15,22 @@ import java.sql.SQLException;
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class Query {
+
+    private final Dictionary dictionary;
     private final Connection connection;
     private PreparedStatement statement;
     private ResultSet results;
     private final String sql;
 
-    public Query(String sql, Connection conn) {
-        connection = conn;
+    public Query(Dictionary dictionary, String sql, Connection conn) {
+        this.dictionary = dictionary;
+        this.connection = conn;
         this.sql = sql;
     }
 
     public ResultSet execute() throws SQLException {
         if (isExecuted()) {
-            throw new JWNLRuntimeException("DICTIONARY_EXCEPTION_025");
+            throw new JWNLRuntimeException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_025"));
         }
         return (results = (getStatement().execute()) ? getStatement().getResultSet() : null);
     }

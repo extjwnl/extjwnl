@@ -59,14 +59,7 @@
                 <directory>src/main/resources</directory>
                 <filtering>false</filtering>
                 <includes>
-                    <include>*.properties</include>
-                </includes>
-            </resource>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>false</filtering>
-                <includes>
-                    <include>net/sf/extjwnl/*.xml</include>
+                    <include>**/*</include>
                 </includes>
             </resource>
         </resources>

@@ -1,13 +1,12 @@
 package net.sf.extjwnl.data;
 
-import net.sf.extjwnl.JWNL;
 import net.sf.extjwnl.dictionary.Dictionary;
+import net.sf.extjwnl.util.ResourceBundleSet;
 
 import java.util.BitSet;
 
 /**
- * A <code>Verb</code> is a subclass of <code>Word</code> that can have 1 or more
- * <code>VerbFrame</code>s (use cases of the verb).
+ * A <code>Verb</code> is a subclass of <code>Word</code> that can have 1 or more verb frames (use cases of the verb).
  *
  * @author John Didion <jdidion@didion.net>
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
@@ -15,9 +14,9 @@ import java.util.BitSet;
 public class Verb extends Word {
 
     private static final long serialVersionUID = 4L;
+
     /**
      * A bit array of all the verb frames that are valid for this word.
-     * see {@link VerbFrame} for more explanation.
      */
     private final BitSet verbFrameFlags;
 
@@ -31,11 +30,11 @@ public class Verb extends Word {
     }
 
     public int[] getVerbFrameIndices() {
-        return VerbFrame.getVerbFrameIndices(verbFrameFlags);
+        return dictionary.getVerbFrameIndices(verbFrameFlags);
     }
 
     public String[] getVerbFrames() {
-        return VerbFrame.getFrames(getVerbFrameFlags());
+        return dictionary.getFrames(getVerbFrameFlags());
     }
 
     private String getVerbFramesAsString() {
@@ -51,7 +50,8 @@ public class Verb extends Word {
     }
 
     public String toString() {
-        return JWNL.resolveMessage("DATA_TOSTRING_008", new Object[]{getPOS(), getLemma(), getSynset(),
+        return ResourceBundleSet.insertParams("[Word: {0} [Lemma: {1}] {2} [Index: {3}] VerbFrames: {4}]",
+                new Object[]{getPOS(), getLemma(), getSynset(),
                 getIndex(),
                 getVerbFramesAsString()});
     }

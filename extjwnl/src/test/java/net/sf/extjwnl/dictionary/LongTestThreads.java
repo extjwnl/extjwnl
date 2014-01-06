@@ -1,6 +1,5 @@
 package net.sf.extjwnl.dictionary;
 
-import net.sf.extjwnl.JWNL;
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.data.IndexWord;
 import net.sf.extjwnl.data.POS;
@@ -40,7 +39,7 @@ public class LongTestThreads extends MultiThreadedTestCase {
     }
 
     public void testThreadedLookupAllIndexWords() throws FileNotFoundException, JWNLException {
-        dictionary = Dictionary.getInstance(LongTestThreads.class.getClassLoader().getResourceAsStream("test_file_properties.xml"));
+        dictionary = Dictionary.getInstance(LongTestThreads.class.getResourceAsStream("/test_file_properties.xml"));
 
         List<String> words = new ArrayList<String>(Arrays.asList(list));
         List<String> notwords = new ArrayList<String>(Arrays.asList(notlist));

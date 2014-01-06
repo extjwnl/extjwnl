@@ -50,16 +50,16 @@ public class TestExc extends BaseData {
 
     @Test(expected = IllegalArgumentException.class)
     public void testConstructor() throws JWNLException {
-        new Exc(null, null, null, null);
+        new Exc(dictionary, null, null, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testConstructor2() throws JWNLException {
-        new Exc(null, POS.NOUN, null, null);
+        new Exc(dictionary, POS.NOUN, null, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testConstructor3() throws JWNLException {
-        new Exc(null, POS.NOUN, lemma, null);
+        new Exc(dictionary, POS.NOUN, lemma, null);
     }
 }

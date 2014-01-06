@@ -15,12 +15,12 @@ public class TestIndexWord extends BaseData {
 
     @Test(expected = IllegalArgumentException.class)
     public void testConstructorNullLemma() throws JWNLException {
-        new IndexWord(null, null, POS.NOUN);
+        new IndexWord(dictionary, null, POS.NOUN);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testConstructorNullPOS() throws JWNLException {
-        new IndexWord(null, "test", null);
+        new IndexWord(dictionary, "test", null);
     }
 
     @Test
@@ -40,51 +40,51 @@ public class TestIndexWord extends BaseData {
 
     @Test(expected = IllegalArgumentException.class)
     public void testConstructorNullSynset() throws JWNLException {
-        new IndexWord(null, "test", POS.NOUN, (Synset) null);
+        new IndexWord(dictionary, "test", POS.NOUN, (Synset) null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testConstructorSynsetPOS() throws JWNLException {
-        Synset s = new Synset(null, POS.NOUN);
-        new IndexWord(null, "test", POS.VERB, s);
+        Synset s = new Synset(dictionary, POS.NOUN);
+        new IndexWord(dictionary, "test", POS.VERB, s);
     }
 
     @Test
     public void testConstructorSynset() throws JWNLException {
-        Synset s = new Synset(null, POS.NOUN);
-        IndexWord iw = new IndexWord(null, "test", POS.NOUN, s);
+        Synset s = new Synset(dictionary, POS.NOUN);
+        IndexWord iw = new IndexWord(dictionary, "test", POS.NOUN, s);
         Assert.assertEquals(1, iw.getSenses().size());
         Assert.assertEquals(s, iw.getSenses().get(0));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testConstructorSynsetNullOffset() throws JWNLException {
-        new IndexWord(null, "test", POS.VERB, (long[]) null);
+        new IndexWord(dictionary, "test", POS.VERB, (long[]) null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testConstructorSynsetOffset0() throws JWNLException {
-        new IndexWord(null, "test", POS.VERB, new long[] {});
+        new IndexWord(dictionary, "test", POS.VERB, new long[] {});
     }
 
     @Test
     public void testType() throws JWNLException {
-        IndexWord iw = new IndexWord(null, "test", POS.NOUN, new long[] {1});
+        IndexWord iw = new IndexWord(dictionary, "test", POS.NOUN, new long[] {1});
         Assert.assertEquals(DictionaryElementType.INDEX_WORD, iw.getType());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testSynsetSetNull() throws JWNLException {
-        Synset s = new Synset(null, POS.NOUN);
-        IndexWord iw = new IndexWord(null, "test", POS.NOUN, s);
+        Synset s = new Synset(dictionary, POS.NOUN);
+        IndexWord iw = new IndexWord(dictionary, "test", POS.NOUN, s);
         iw.getSenses().set(0, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testSynsetSetAlien() throws JWNLException {
-        Synset s = new Synset(dictionary, POS.NOUN);
+        Synset s = new Synset(mapDictionary, POS.NOUN);
         IndexWord iw = new IndexWord(dictionary, "test", POS.NOUN, s);
-        iw.getSenses().set(0, new Synset(null, POS.NOUN));
+        iw.getSenses().set(0, new Synset(dictionary, POS.NOUN));
     }
 
     @Test
@@ -119,7 +119,7 @@ public class TestIndexWord extends BaseData {
         s.setGloss("test gloss");
         IndexWord iws = new IndexWord(dictionary, "test", POS.NOUN, s);
 
-        iws.getSenses().add(0, new Synset(null, POS.NOUN));
+        iws.getSenses().add(0, new Synset(mapDictionary, POS.NOUN));
     }
 
     @Test
@@ -141,14 +141,14 @@ public class TestIndexWord extends BaseData {
 
     @Test(expected = IllegalArgumentException.class)
     public void testSynsetAddAlien() throws JWNLException {
-        Synset s = new Synset(dictionary, POS.NOUN);
-        new IndexWord(null, "test", POS.NOUN, s);
+        Synset s = new Synset(mapDictionary, POS.NOUN);
+        new IndexWord(dictionary, "test", POS.NOUN, s);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testSynsetAddNull() throws JWNLException {
-        Synset s = new Synset(null, POS.NOUN);
-        IndexWord iw = new IndexWord(null, "test", POS.NOUN, s);
+        Synset s = new Synset(dictionary, POS.NOUN);
+        IndexWord iw = new IndexWord(dictionary, "test", POS.NOUN, s);
         iw.getSenses().add(null);
     }
 

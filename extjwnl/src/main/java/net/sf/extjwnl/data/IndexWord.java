@@ -1,8 +1,8 @@
 package net.sf.extjwnl.data;
 
-import net.sf.extjwnl.JWNL;
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.dictionary.Dictionary;
+import net.sf.extjwnl.util.ResourceBundleSet;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -116,10 +116,10 @@ public class IndexWord extends BaseDictionaryElement {
         @Override
         public Synset set(int index, Synset synset) {
             if (null == synset) {
-                throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_042"));
+                throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_042"));
             }
             if (IndexWord.this.dictionary != synset.getDictionary()) {
-                throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_040"));
+                throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_040"));
             }
             loadAllSynsets();
             if (null != dictionary && dictionary.isEditable()) {
@@ -137,10 +137,10 @@ public class IndexWord extends BaseDictionaryElement {
         @Override
         public boolean add(Synset synset) {
             if (null == synset) {
-                throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_042"));
+                throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_042"));
             }
             if (IndexWord.this.dictionary != synset.getDictionary()) {
-                throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_040"));
+                throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_040"));
             }
             loadAllSynsets();
             if (null != dictionary && dictionary.isEditable()) {
@@ -155,10 +155,10 @@ public class IndexWord extends BaseDictionaryElement {
         @Override
         public void add(int index, Synset synset) {
             if (null == synset) {
-                throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_042"));
+                throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_042"));
             }
             if (IndexWord.this.dictionary != synset.getDictionary()) {
-                throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_040"));
+                throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_040"));
             }
             loadAllSynsets();
             if (null != dictionary && dictionary.isEditable()) {
@@ -183,7 +183,7 @@ public class IndexWord extends BaseDictionaryElement {
                         d.removeIndexWord(IndexWord.this);
                     } catch (JWNLException e) {
                         if (log.isErrorEnabled()) {
-                            log.error(JWNL.resolveMessage("EXCEPTION_001", e.getMessage()), e);
+                            log.error(dictionary.getMessages().resolveMessage("EXCEPTION_001", e.getMessage()), e);
                         }
                     }
                 }
@@ -207,7 +207,7 @@ public class IndexWord extends BaseDictionaryElement {
                         d.removeIndexWord(IndexWord.this);
                     } catch (JWNLException e) {
                         if (log.isErrorEnabled()) {
-                            log.error(JWNL.resolveMessage("EXCEPTION_001", e.getMessage()), e);
+                            log.error(dictionary.getMessages().resolveMessage("EXCEPTION_001", e.getMessage()), e);
                         }
                     }
                 }
@@ -327,7 +327,7 @@ public class IndexWord extends BaseDictionaryElement {
                         dictionary.removeIndexWord(IndexWord.this);
                     } catch (JWNLException e) {
                         if (log.isErrorEnabled()) {
-                            log.error(JWNL.resolveMessage("EXCEPTION_001", e.getMessage()), e);
+                            log.error(dictionary.getMessages().resolveMessage("EXCEPTION_001", e.getMessage()), e);
                         }
                     }
                 }
@@ -354,7 +354,7 @@ public class IndexWord extends BaseDictionaryElement {
                         dictionary.removeIndexWord(IndexWord.this);
                     } catch (JWNLException e) {
                         if (log.isErrorEnabled()) {
-                            log.error(JWNL.resolveMessage("EXCEPTION_001", e.getMessage()), e);
+                            log.error(dictionary.getMessages().resolveMessage("EXCEPTION_001", e.getMessage()), e);
                         }
                     }
                 }
@@ -394,7 +394,7 @@ public class IndexWord extends BaseDictionaryElement {
                             if (null != synset) {
                                 super.add(synset);
                             } else {
-                                log.warn(JWNL.resolveMessage("DICTIONARY_WARN_004", new Object[]{synsetOffset, getLemma()}));
+                                log.warn(dictionary.getMessages().resolveMessage("DICTIONARY_WARN_004", new Object[]{synsetOffset, getLemma()}));
                             }
                         }
                         synsetOffsets = null;
@@ -408,7 +408,7 @@ public class IndexWord extends BaseDictionaryElement {
                 return null == dictionary ? null : dictionary.getSynsetAt(pos, offset);
             } catch (JWNLException e) {
                 if (log.isErrorEnabled()) {
-                    log.error(JWNL.resolveMessage("EXCEPTION_001", e.getMessage()), e);
+                    log.error(dictionary.getMessages().resolveMessage("EXCEPTION_001", e.getMessage()), e);
                 }
             }
             return null;
@@ -418,10 +418,10 @@ public class IndexWord extends BaseDictionaryElement {
     protected IndexWord(Dictionary dictionary, String lemma, POS pos) throws JWNLException {
         super(dictionary);
         if (null == lemma) {
-            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_046"));
+            throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_046"));
         }
         if (null == pos) {
-            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_041"));
+            throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_041"));
         }
         this.lemma = lemma.toLowerCase();
         this.pos = pos;
@@ -433,10 +433,10 @@ public class IndexWord extends BaseDictionaryElement {
     public IndexWord(Dictionary dictionary, String lemma, POS pos, Synset synset) throws JWNLException {
         this(dictionary, lemma, pos);
         if (null == synset) {
-            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_042"));
+            throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_042"));
         }
         if (synset.getPOS() != pos) {
-            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_062"));
+            throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_062"));
         }
         this.synsets = new SynsetList(1);
         this.synsets.add(synset);
@@ -445,7 +445,7 @@ public class IndexWord extends BaseDictionaryElement {
     public IndexWord(Dictionary dictionary, String lemma, POS pos, long[] synsetOffsets) throws JWNLException {
         this(dictionary, lemma, pos);
         if (null == synsetOffsets || 0 == synsetOffsets.length) {
-            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_047"));
+            throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_047"));
         }
         this.synsetOffsets = synsetOffsets;
     }
@@ -487,7 +487,7 @@ public class IndexWord extends BaseDictionaryElement {
     }
 
     public String toString() {
-        return JWNL.resolveMessage("DATA_TOSTRING_002", new Object[]{getLemma(), getPOS()});
+        return ResourceBundleSet.insertParams("[IndexWord: [Lemma: {0}] {1}]", new Object[]{getLemma(), getPOS()});
     }
 
     /**

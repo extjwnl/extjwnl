@@ -1,6 +1,5 @@
 package net.sf.extjwnl.princeton.file;
 
-import net.sf.extjwnl.JWNL;
 import net.sf.extjwnl.data.POS;
 import net.sf.extjwnl.dictionary.Dictionary;
 import net.sf.extjwnl.dictionary.file.AbstractDictionaryFile;
@@ -63,7 +62,7 @@ public abstract class AbstractPrincetonDictionaryFile extends AbstractDictionary
             } else if (DictionaryFileType.INDEX.equals(getFileType())) {
                 return fileTypeToFileNameMap.get(getFileType()) + ".sense";
             } else {
-                throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_054", new Object[]{getPOS(), getFileType()}));
+                throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_054", new Object[]{getPOS(), getFileType()}));
             }
         }
     }

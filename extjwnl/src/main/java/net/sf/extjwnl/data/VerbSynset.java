@@ -1,6 +1,5 @@
 package net.sf.extjwnl.data;
 
-import net.sf.extjwnl.JWNL;
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.dictionary.Dictionary;
 
@@ -33,7 +32,7 @@ public class VerbSynset extends Synset {
      * @return all Verb Frames that are valid for all the words in this synset
      */
     public String[] getVerbFrames() {
-        return VerbFrame.getFrames(verbFrameFlags);
+        return dictionary.getFrames(verbFrameFlags);
     }
 
     public BitSet getVerbFrameFlags() {
@@ -42,12 +41,12 @@ public class VerbSynset extends Synset {
 
     public void setVerbFrameFlags(BitSet verbFrameFlags) {
         if (null == verbFrameFlags) {
-            throw new IllegalArgumentException(JWNL.resolveMessage("DICTIONARY_EXCEPTION_050"));
+            throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_050"));
         }
         this.verbFrameFlags = verbFrameFlags;
     }
 
     public int[] getVerbFrameIndices() {
-        return VerbFrame.getVerbFrameIndices(verbFrameFlags);
+        return dictionary.getVerbFrameIndices(verbFrameFlags);
     }
 }

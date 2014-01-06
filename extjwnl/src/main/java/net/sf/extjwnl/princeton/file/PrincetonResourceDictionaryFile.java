@@ -40,7 +40,7 @@ public class PrincetonResourceDictionaryFile extends PrincetonCharBufferFile imp
     }
 
     public void openFile() throws IOException {
-        InputStream input = PrincetonResourceDictionaryFile.class.getClassLoader().getResourceAsStream(path + "/" + getFilename());
+        InputStream input = PrincetonResourceDictionaryFile.class.getResourceAsStream(path + "/" + getFilename());
         try {
             // data.noun is about 16M
             ByteArrayOutputStream output = new ByteArrayOutputStream(16 * 1024 * 1024);

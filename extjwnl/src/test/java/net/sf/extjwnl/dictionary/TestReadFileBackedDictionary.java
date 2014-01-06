@@ -17,7 +17,7 @@ public class TestReadFileBackedDictionary extends DictionaryReadTester {
     @BeforeClass
     public static void initDictionary() throws IOException, JWNLException {
         s_dictionary = Dictionary.getInstance(
-                TestReadFileBackedDictionary.class.getClassLoader().getResourceAsStream("test_file_properties.xml"));
+                TestReadFileBackedDictionary.class.getResourceAsStream("/test_file_properties.xml"));
     }
 
     @AfterClass

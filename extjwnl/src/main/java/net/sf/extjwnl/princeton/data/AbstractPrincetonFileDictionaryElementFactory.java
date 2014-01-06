@@ -1,6 +1,5 @@
 package net.sf.extjwnl.princeton.data;
 
-import net.sf.extjwnl.JWNL;
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.data.*;
 import net.sf.extjwnl.dictionary.Dictionary;
@@ -48,7 +47,7 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory extends Abst
             synsetOffsets[i] = tokenizer.nextLong();
         }
         if (log.isTraceEnabled()) {
-            log.trace(JWNL.resolveMessage("PRINCETON_INFO_003", new Object[]{lemma, pos}));
+            log.trace(dictionary.getMessages().resolveMessage("PRINCETON_INFO_003", new Object[]{lemma, pos}));
         }
         return new IndexWord(dictionary, lemma, pos, synsetOffsets);
     }
@@ -137,7 +136,7 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory extends Abst
         synset.setGloss(gloss);
 
         if (log.isTraceEnabled()) {
-            log.trace(JWNL.resolveMessage("PRINCETON_INFO_002", new Object[]{pos, offset}));
+            log.trace(dictionary.getMessages().resolveMessage("PRINCETON_INFO_002", new Object[]{pos, offset}));
         }
         return synset;
     }
@@ -151,7 +150,7 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory extends Abst
         }
         exceptions.trimToSize();
         if (log.isTraceEnabled()) {
-            log.trace(JWNL.resolveMessage("PRINCETON_INFO_001", new Object[]{pos, lemma}));
+            log.trace(dictionary.getMessages().resolveMessage("PRINCETON_INFO_001", new Object[]{pos, lemma}));
         }
         return new Exc(dictionary, pos, lemma, exceptions);
     }

@@ -34,6 +34,7 @@ public abstract class DictionaryEditTester {
     private final static String[] exception3 = {"altocumuli", "altocumulus"};//to test sorting
 
     private Dictionary dictionary;
+    private Dictionary mapDictionary;
 
     protected abstract InputStream getProperties();
 
@@ -44,7 +45,16 @@ public abstract class DictionaryEditTester {
         dictionary.close();
         dictionary.delete();
 
+        // to decrease probability of "Access is denied" messages from file system on Windows
+        try {
+            Thread.sleep(1000L);
+        } catch (InterruptedException e) {
+            //
+        }
+
         dictionary = Dictionary.getInstance(getProperties());
+
+        mapDictionary = Dictionary.getResourceInstance("/net/sf/extjwnl/dictionary/mem_properties.xml");
     }
 
     @After
@@ -65,7 +75,7 @@ public abstract class DictionaryEditTester {
 
     @Test(expected = JWNLException.class)
     public void testAddElementAlien() throws JWNLException {
-        dictionary.addElement(new Synset(null, POS.NOUN));
+        dictionary.addElement(new Synset(dictionary, POS.NOUN));
     }
 
     @Test
@@ -124,12 +134,12 @@ public abstract class DictionaryEditTester {
 
     @Test(expected = JWNLException.class)
     public void testAddExceptionAlien() throws JWNLException {
-        dictionary.addException(new Exc(null, POS.NOUN, "test", Arrays.asList("tests")));
+        dictionary.addException(new Exc(dictionary, POS.NOUN, "test", Arrays.asList("tests")));
     }
 
     @Test(expected = JWNLException.class)
     public void testRemoveExceptionReadOnly() throws JWNLException {
-        dictionary.removeException(new Exc(null, POS.NOUN, "test", Arrays.asList("tests")));
+        dictionary.removeException(new Exc(dictionary, POS.NOUN, "test", Arrays.asList("tests")));
     }
 
     @Test(expected = JWNLException.class)
@@ -163,12 +173,12 @@ public abstract class DictionaryEditTester {
     @Test(expected = JWNLException.class)
     public void testAddSynsetAlien() throws JWNLException {
         dictionary.edit();
-        dictionary.addSynset(new Synset(null, POS.NOUN));
+        dictionary.addSynset(new Synset(mapDictionary, POS.NOUN));
     }
 
     @Test(expected = JWNLException.class)
     public void testRemoveSynsetReadOnly() throws JWNLException {
-        dictionary.removeSynset(new Synset(null, POS.NOUN));
+        dictionary.removeSynset(new Synset(dictionary, POS.NOUN));
     }
 
     @Test(expected = JWNLException.class)
@@ -183,12 +193,12 @@ public abstract class DictionaryEditTester {
 
     @Test(expected = JWNLException.class)
     public void testAddIndexWordAlien() throws JWNLException {
-        dictionary.addIndexWord(new IndexWord(null, "test", POS.NOUN, new Synset(null, POS.NOUN)));
+        dictionary.addIndexWord(new IndexWord(mapDictionary, "test", POS.NOUN, new Synset(mapDictionary, POS.NOUN)));
     }
 
     @Test(expected = JWNLException.class)
     public void testRemoveIndexWordReadOnly() throws JWNLException {
-        dictionary.removeIndexWord(new IndexWord(null, "test", POS.NOUN, new Synset(null, POS.NOUN)));
+        dictionary.removeIndexWord(new IndexWord(dictionary, "test", POS.NOUN, new Synset(dictionary, POS.NOUN)));
     }
 
     @Test

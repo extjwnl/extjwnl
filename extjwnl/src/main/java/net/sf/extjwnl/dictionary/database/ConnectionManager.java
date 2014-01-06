@@ -1,6 +1,7 @@
 package net.sf.extjwnl.dictionary.database;
 
 import net.sf.extjwnl.JWNLException;
+import net.sf.extjwnl.dictionary.Dictionary;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -19,6 +20,7 @@ import java.sql.SQLException;
  */
 public class ConnectionManager {
 
+    private final Dictionary dictionary;
     private String driverClass;
     private String url;
     private String userName;
@@ -27,20 +29,22 @@ public class ConnectionManager {
     private Connection connection;
     private String jndi;
 
-    public ConnectionManager(String driverClass, String url, String userName, String password) {
+    public ConnectionManager(Dictionary dictionary, String driverClass, String url, String userName, String password) {
+        this.dictionary = dictionary;
         this.driverClass = driverClass;
         this.url = url;
         this.userName = userName;
         this.password = password;
     }
 
-    public ConnectionManager(String jndi) {
+    public ConnectionManager(Dictionary dictionary, String jndi) {
+        this.dictionary = dictionary;
         this.jndi = jndi;
     }
 
 
     public Query getQuery(String sql) throws SQLException, JWNLException {
-        return new Query(sql, getConnection());
+        return new Query(dictionary, sql, getConnection());
     }
 
     public Connection getConnection() throws SQLException, JWNLException {
@@ -58,7 +62,7 @@ public class ConnectionManager {
                     return connection;
                 }
             } catch (NamingException ne) {
-                throw new JWNLException("JNDI_NAMING_EXCEPTION", ne);
+                throw new JWNLException(dictionary.getMessages().resolveMessage("JNDI_NAMING_EXCEPTION", jndi));
             }
         }
         registerDriver();
@@ -80,7 +84,7 @@ public class ConnectionManager {
                 DriverManager.registerDriver(driver);
                 registered = true;
             } catch (Exception e) {
-                throw new JWNLException("DICTIONARY_EXCEPTION_024", e);
+                throw new JWNLException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_024"), e);
             }
         }
     }

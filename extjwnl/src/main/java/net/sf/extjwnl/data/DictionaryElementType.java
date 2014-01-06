@@ -1,6 +1,6 @@
 package net.sf.extjwnl.data;
 
-import net.sf.extjwnl.JWNL;
+import net.sf.extjwnl.util.ResourceBundleSet;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -15,9 +15,9 @@ import java.util.List;
  */
 public enum DictionaryElementType {
 
-    INDEX_WORD("INDEX_WORD"),
-    SYNSET("SYNSET"),
-    EXCEPTION("EXCEPTION");
+    INDEX_WORD("IndexWord"),
+    SYNSET("Synset"),
+    EXCEPTION("Exception");
 
     /**
      * The name of the dictionary element type.
@@ -47,12 +47,11 @@ public enum DictionaryElementType {
      * @param name name
      */
     private DictionaryElementType(String name) {
-        JWNL.initialize();
-        this.name = JWNL.resolveMessage(name);
+        this.name = name;
     }
 
     public String toString() {
-        return JWNL.resolveMessage("DATA_TOSTRING_016", getName());
+        return ResourceBundleSet.insertParams("[DictionaryElementType: {0}]", new String[]{getName()});
     }
 
     /**

@@ -1,6 +1,5 @@
 package net.sf.extjwnl.dictionary;
 
-import net.sf.extjwnl.JWNL;
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.data.*;
 import net.sf.extjwnl.dictionary.file.DictionaryCatalog;
@@ -38,7 +37,7 @@ public class MapBackedDictionary extends MapDictionary {
         try {
             return files.delete();
         } catch (IOException e) {
-            throw new JWNLException("EXCEPTION_001", e.getMessage(), e);
+            throw new JWNLException(getMessages().resolveMessage("EXCEPTION_001", e.getMessage()), e);
         }
     }
 
@@ -54,7 +53,7 @@ public class MapBackedDictionary extends MapDictionary {
                 super.edit();
                 files.edit();
             } catch (IOException e) {
-                throw new JWNLException("EXCEPTION_001", e.getMessage(), e);
+                throw new JWNLException(getMessages().resolveMessage("EXCEPTION_001", e.getMessage()), e);
             }
         }
     }
@@ -65,48 +64,8 @@ public class MapBackedDictionary extends MapDictionary {
             super.save();
             files.save();
         } catch (IOException e) {
-            throw new JWNLException("EXCEPTION_001", e.getMessage(), e);
+            throw new JWNLException(getMessages().resolveMessage("EXCEPTION_001", e.getMessage()), e);
         }
-    }
-
-    @Override
-    public void addSynset(Synset synset) throws JWNLException {
-        super.addSynset(synset);
-        getTable(synset.getPOS(), DictionaryFileType.DATA).put(synset.getKey(), synset);
-    }
-
-    @Override
-    public void removeSynset(Synset synset) throws JWNLException {
-        getTable(synset.getPOS(), DictionaryFileType.DATA).remove(synset.getKey());
-        super.removeSynset(synset);
-    }
-
-    @Override
-    public void addException(Exc exc) throws JWNLException {
-        super.addException(exc);
-        getTable(exc.getPOS(), DictionaryFileType.EXCEPTION).put(exc.getKey(), exc);
-    }
-
-    @Override
-    public void removeException(Exc exc) throws JWNLException {
-        getTable(exc.getPOS(), DictionaryFileType.EXCEPTION).remove(exc.getKey());
-        super.removeException(exc);
-    }
-
-    @Override
-    public void addIndexWord(IndexWord indexWord) throws JWNLException {
-        super.addIndexWord(indexWord);
-        getTable(indexWord.getPOS(), DictionaryFileType.INDEX).put(indexWord.getKey(), indexWord);
-    }
-
-    @Override
-    public void removeIndexWord(IndexWord indexWord) throws JWNLException {
-        getTable(indexWord.getPOS(), DictionaryFileType.INDEX).remove(indexWord.getKey());
-        super.removeIndexWord(indexWord);
-    }
-
-    public Map<Object, DictionaryElement> getTable(POS pos, DictionaryFileType fileType) {
-        return tableMap.get(pos).get(fileType);
     }
 
     private void load() throws JWNLException {
@@ -117,26 +76,26 @@ public class MapBackedDictionary extends MapDictionary {
                     try {
                         files.open();
                     } catch (Exception e) {
-                        throw new JWNLException("DICTIONARY_EXCEPTION_019", e);
+                        throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_019"), e);
                     }
                 }
                 // Load all the hash tables into memory
                 if (log.isDebugEnabled()) {
-                    log.debug(JWNL.resolveMessage("DICTIONARY_INFO_009"));
+                    log.debug(getMessages().resolveMessage("DICTIONARY_INFO_009"));
                 }
                 if (log.isTraceEnabled()) {
-                    log.trace(JWNL.resolveMessage("DICTIONARY_INFO_010", Runtime.getRuntime().freeMemory()));
+                    log.trace(getMessages().resolveMessage("DICTIONARY_INFO_010", Runtime.getRuntime().freeMemory()));
                 }
 
                 for (DictionaryFileType fileType : DictionaryFileType.getAllDictionaryFileTypes()) {
                     DictionaryCatalog<ObjectDictionaryFile> catalog = files.get(fileType);
                     for (POS pos : POS.getAllPOS()) {
                         if (log.isDebugEnabled()) {
-                            log.debug(JWNL.resolveMessage("DICTIONARY_INFO_011", new Object[]{pos.getLabel(), fileType.getName()}));
+                            log.debug(getMessages().resolveMessage("DICTIONARY_INFO_011", new Object[]{pos.getLabel(), fileType.getName()}));
                         }
                         putTable(pos, fileType, loadDictFile(catalog.get(pos)));
                         if (log.isTraceEnabled()) {
-                            log.trace(JWNL.resolveMessage("DICTIONARY_INFO_012", Runtime.getRuntime().freeMemory()));
+                            log.trace(getMessages().resolveMessage("DICTIONARY_INFO_012", Runtime.getRuntime().freeMemory()));
                         }
                     }
                 }
@@ -153,7 +112,7 @@ public class MapBackedDictionary extends MapDictionary {
             Map<Object, DictionaryElement> result = (Map<Object, DictionaryElement>) file.readObject();
             return result;
         } catch (Exception e) {
-            throw new JWNLException("DICTIONARY_EXCEPTION_020", file.getFile(), e);
+            throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_020", file.getFile().getName()), e);
         }
     }
 

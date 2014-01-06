@@ -37,40 +37,39 @@ public class DictionaryCatalog<E extends DictionaryFile> implements Owned {
     private final DictionaryFileType fileType;
     private final Dictionary dictionary;
 
+    @SuppressWarnings("unchecked")
     public DictionaryCatalog(Dictionary dictionary, DictionaryFileType fileType, Class desiredDictionaryFileType, Map<String, Param> params) throws JWNLException {
         this.files = new EnumMap<POS, E>(POS.class);
         this.dictionary = dictionary;
         this.fileType = fileType;
 
         if (!params.containsKey(DICTIONARY_PATH_KEY)) {
-            throw new JWNLException("DICTIONARY_EXCEPTION_052", DICTIONARY_PATH_KEY);
+            throw new JWNLException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_052", DICTIONARY_PATH_KEY));
         }
         String path = params.get(DICTIONARY_PATH_KEY).getValue();
 
         if (!params.containsKey(DICTIONARY_FILE_TYPE_KEY)) {
-            throw new JWNLException("DICTIONARY_EXCEPTION_052", DICTIONARY_FILE_TYPE_KEY);
+            throw new JWNLException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_052", DICTIONARY_FILE_TYPE_KEY));
         }
 
         try {
             Class fileClass;
             try {
                 fileClass = Class.forName(params.get(DICTIONARY_FILE_TYPE_KEY).getValue());
-                //noinspection unchecked
                 if (!desiredDictionaryFileType.isAssignableFrom(fileClass)) {
-                    throw new JWNLRuntimeException("DICTIONARY_EXCEPTION_003", fileClass);
+                    throw new JWNLRuntimeException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_003", fileClass));
                 }
             } catch (ClassNotFoundException ex) {
-                throw new JWNLRuntimeException("DICTIONARY_EXCEPTION_002", ex);
+                throw new JWNLRuntimeException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_002"), ex);
             }
 
-            @SuppressWarnings("unchecked")
             DictionaryFileFactory<E> factory = (DictionaryFileFactory<E>) params.get(DICTIONARY_FILE_TYPE_KEY).create();
             for (POS pos : POS.getAllPOS()) {
                 E file = factory.newInstance(dictionary, path, pos, fileType);
                 files.put(file.getPOS(), file);
             }
         } catch (Exception e) {
-            throw new JWNLRuntimeException("DICTIONARY_EXCEPTION_018", fileType, e);
+            throw new JWNLRuntimeException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_018", fileType), e);
         }
     }
 

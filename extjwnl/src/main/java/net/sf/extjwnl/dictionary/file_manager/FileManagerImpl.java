@@ -1,6 +1,5 @@
 package net.sf.extjwnl.dictionary.file_manager;
 
-import net.sf.extjwnl.JWNL;
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.JWNLRuntimeException;
 import net.sf.extjwnl.data.IndexWord;
@@ -65,7 +64,7 @@ public class FileManagerImpl implements FileManager {
     public FileManagerImpl(Dictionary dictionary, Map<String, Param> params) throws JWNLException {
         try {
             if (!params.containsKey(DictionaryCatalog.DICTIONARY_PATH_KEY)) {
-                throw new JWNLException("JWNL_EXCEPTION_004", DictionaryCatalog.DICTIONARY_PATH_KEY);
+                throw new JWNLException(dictionary.getMessages().resolveMessage("JWNL_EXCEPTION_004", DictionaryCatalog.DICTIONARY_PATH_KEY));
             }
 
             boolean checkPath = true;
@@ -78,7 +77,7 @@ public class FileManagerImpl implements FileManager {
             if (checkPath) {
                 File dictionaryPath = new File(path);
                 if (!dictionaryPath.exists()) {
-                    throw new JWNLException("JWNL_EXCEPTION_009", path);
+                    throw new JWNLException(dictionary.getMessages().resolveMessage("JWNL_EXCEPTION_009", path));
                 }
             }
 
@@ -90,10 +89,10 @@ public class FileManagerImpl implements FileManager {
                 try {
                     Class fileClass = Class.forName(params.get(DictionaryCatalog.DICTIONARY_FILE_TYPE_KEY).getValue());
                     if (!RandomAccessDictionaryFile.class.isAssignableFrom(fileClass)) {
-                        throw new JWNLRuntimeException("DICTIONARY_EXCEPTION_003", fileClass);
+                        throw new JWNLRuntimeException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_003", fileClass));
                     }
                 } catch (ClassNotFoundException ex) {
-                    throw new JWNLRuntimeException("DICTIONARY_EXCEPTION_002", ex);
+                    throw new JWNLRuntimeException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_002"), ex);
                 }
 
                 @SuppressWarnings("unchecked")
@@ -115,17 +114,17 @@ public class FileManagerImpl implements FileManager {
                 cntList.open();
                 senseIndex.open();
             } catch (Exception e) {
-                throw new JWNLRuntimeException("DICTIONARY_EXCEPTION_018", DictionaryFileType.REVCNTLIST, e);
+                throw new JWNLRuntimeException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_018", DictionaryFileType.REVCNTLIST), e);
             }
 
         } catch (IOException e) {
-            throw new JWNLException("DICTIONARY_EXCEPTION_016", e);
+            throw new JWNLException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_016"), e);
         }
     }
 
     private void cacheUseCounts() throws IOException {
         if (log.isDebugEnabled()) {
-            log.debug(JWNL.resolveMessage("PRINCETON_INFO_018"));
+            log.debug(dictionary.getMessages().resolveMessage("PRINCETON_INFO_018"));
         }
         String line = revCntList.readLine();
         while (null != line && !"".equals(line)) {
@@ -138,7 +137,7 @@ public class FileManagerImpl implements FileManager {
             line = revCntList.readLine();
         }
         if (log.isDebugEnabled()) {
-            log.debug(JWNL.resolveMessage("PRINCETON_INFO_019"));
+            log.debug(dictionary.getMessages().resolveMessage("PRINCETON_INFO_019"));
         }
     }
 
@@ -365,7 +364,7 @@ public class FileManagerImpl implements FileManager {
 
         {
             if (log.isDebugEnabled()) {
-                log.debug(JWNL.resolveMessage("PRINCETON_INFO_004", revCntList.getFile().getName()));
+                log.debug(dictionary.getMessages().resolveMessage("PRINCETON_INFO_004", revCntList.getFile().getName()));
             }
             //cntlist.rev
             ArrayList<Word> toRender = new ArrayList<Word>();
@@ -390,13 +389,17 @@ public class FileManagerImpl implements FileManager {
             Collections.sort(toRender, new Comparator<Word>() {
                 @Override
                 public int compare(Word o1, Word o2) {
-                    return o1.getSenseKeyWithAdjClass().compareTo(o2.getSenseKeyWithAdjClass());
+                    try {
+                        return o1.getSenseKeyWithAdjClass().compareTo(o2.getSenseKeyWithAdjClass());
+                    } catch (JWNLException e) {
+                        throw new JWNLRuntimeException(e);
+                    }
                 }
             });
 
             revCntList.seek(0);
             if (log.isDebugEnabled()) {
-                log.debug(JWNL.resolveMessage("PRINCETON_INFO_008", revCntList.getFile().getName()));
+                log.debug(dictionary.getMessages().resolveMessage("PRINCETON_INFO_008", revCntList.getFile().getName()));
             }
             long counter = 0;
             long total = toRender.size();
@@ -405,16 +408,16 @@ public class FileManagerImpl implements FileManager {
                 counter++;
                 if (0 == (counter % reportInt)) {
                     if (log.isDebugEnabled()) {
-                        log.debug(JWNL.resolveMessage("PRINCETON_INFO_014", 100 * counter / total));
+                        log.debug(dictionary.getMessages().resolveMessage("PRINCETON_INFO_014", 100 * counter / total));
                     }
                 }
                 revCntList.writeLine(word.getSenseKeyWithAdjClass() + " " + word.getIndex() + " " + word.getUseCount());
             }
             if (log.isDebugEnabled()) {
-                log.debug(JWNL.resolveMessage("PRINCETON_INFO_013", revCntList.getFile().getName()));
+                log.debug(dictionary.getMessages().resolveMessage("PRINCETON_INFO_013", revCntList.getFile().getName()));
             }
             if (log.isDebugEnabled()) {
-                log.debug(JWNL.resolveMessage("PRINCETON_INFO_012", revCntList.getFile().getName()));
+                log.debug(dictionary.getMessages().resolveMessage("PRINCETON_INFO_012", revCntList.getFile().getName()));
             }
 
 
@@ -428,7 +431,7 @@ public class FileManagerImpl implements FileManager {
 
             cntList.seek(0);
             if (log.isDebugEnabled()) {
-                log.debug(JWNL.resolveMessage("PRINCETON_INFO_008", cntList.getFile().getName()));
+                log.debug(dictionary.getMessages().resolveMessage("PRINCETON_INFO_008", cntList.getFile().getName()));
             }
             counter = 0;
             total = toRender.size();
@@ -437,16 +440,16 @@ public class FileManagerImpl implements FileManager {
                 counter++;
                 if (0 == (counter % reportInt)) {
                     if (log.isDebugEnabled()) {
-                        log.debug(JWNL.resolveMessage("PRINCETON_INFO_014", 100 * counter / total));
+                        log.debug(dictionary.getMessages().resolveMessage("PRINCETON_INFO_014", 100 * counter / total));
                     }
                 }
                 cntList.writeLine(word.getUseCount() + " " + word.getSenseKeyWithAdjClass() + " " + word.getIndex());
             }
             if (log.isDebugEnabled()) {
-                log.debug(JWNL.resolveMessage("PRINCETON_INFO_013", cntList.getFile().getName()));
+                log.debug(dictionary.getMessages().resolveMessage("PRINCETON_INFO_013", cntList.getFile().getName()));
             }
             if (log.isDebugEnabled()) {
-                log.debug(JWNL.resolveMessage("PRINCETON_INFO_012", cntList.getFile().getName()));
+                log.debug(dictionary.getMessages().resolveMessage("PRINCETON_INFO_012", cntList.getFile().getName()));
             }
 
         }
@@ -455,7 +458,7 @@ public class FileManagerImpl implements FileManager {
         {
             //sense index
             if (log.isDebugEnabled()) {
-                log.debug(JWNL.resolveMessage("PRINCETON_INFO_004", senseIndex.getFile().getName()));
+                log.debug(dictionary.getMessages().resolveMessage("PRINCETON_INFO_004", senseIndex.getFile().getName()));
             }
             Set<String> senseIndexContent = new TreeSet<String>();
             for (POS pos : POS.getAllPOS()) {
@@ -484,7 +487,7 @@ public class FileManagerImpl implements FileManager {
             senseIndex.seek(0);
             senseIndex.writeStrings(senseIndexContent);
             if (log.isDebugEnabled()) {
-                log.debug(JWNL.resolveMessage("PRINCETON_INFO_012", senseIndex.getFile().getName()));
+                log.debug(dictionary.getMessages().resolveMessage("PRINCETON_INFO_012", senseIndex.getFile().getName()));
             }
         }
     }

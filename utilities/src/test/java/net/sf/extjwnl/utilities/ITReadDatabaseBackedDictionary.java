@@ -18,7 +18,7 @@ public class ITReadDatabaseBackedDictionary extends DictionaryReadTester {
     @BeforeClass
     public static void initDictionary() throws IOException, JWNLException {
         dictionary = Dictionary.getInstance(
-                ITReadDatabaseBackedDictionary.class.getClassLoader().getResourceAsStream("test_h2_properties.xml"));
+                ITReadDatabaseBackedDictionary.class.getResourceAsStream("/test_h2_properties.xml"));
     }
 
     @AfterClass
