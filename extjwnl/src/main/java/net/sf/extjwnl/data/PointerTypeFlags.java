@@ -12,5 +12,4 @@ public interface PointerTypeFlags {
     int V = 2;
     int ADJ = 4;
     int ADV = 8;
-    int LEXICAL = 16;
 }

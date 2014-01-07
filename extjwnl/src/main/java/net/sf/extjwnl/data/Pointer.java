@@ -67,12 +67,21 @@ public class Pointer implements Serializable {
     }
 
     /**
-     * Returns whether this pointer's source is a Word.
+     * Returns whether this pointer is between two words.
      *
-     * @return true if this pointer's source is a Word
+     * @return true if this pointer is between two words.
      */
-    public boolean isLexical() {
-        return getSource() instanceof Word;
+    public boolean isLexical() throws JWNLException {
+        return (getSource() instanceof Word) && (getTarget() instanceof Word);
+    }
+
+    /**
+     * Returns whether this pointer is between two synsets.
+     *
+     * @return true if this pointer is between two synsets.
+     */
+    public boolean isSemantic() throws JWNLException {
+        return (getSource() instanceof Synset) && (getTarget() instanceof Synset);
     }
 
     /**

@@ -58,7 +58,7 @@ public enum PointerType {
 //    "@i", 			/* 38 INSTANCE (noun) */
 //    "~i",			/* 39 INSTANCES (noun) */
 
-    ANTONYM("!", "antonym", PointerTypeFlags.N | PointerTypeFlags.V | PointerTypeFlags.ADJ | PointerTypeFlags.ADV | PointerTypeFlags.LEXICAL),
+    ANTONYM("!", "antonym", PointerTypeFlags.N | PointerTypeFlags.V | PointerTypeFlags.ADJ | PointerTypeFlags.ADV),
     HYPERNYM("@", "hypernym", PointerTypeFlags.N | PointerTypeFlags.V),
     HYPONYM("~", "hyponym", PointerTypeFlags.N | PointerTypeFlags.V),
     ENTAILMENT("*", "entailment", PointerTypeFlags.V),
@@ -72,17 +72,17 @@ public enum PointerType {
     //    "#",			/* 12 MERONYM (noun) */
 //    "%",			/* 13 HOLONYM (noun) */
     CAUSE(">", "cause", PointerTypeFlags.V),
-    PARTICIPLE_OF("<", "participle of", PointerTypeFlags.ADJ | PointerTypeFlags.LEXICAL),
-    SEE_ALSO("^", "also see", PointerTypeFlags.N | PointerTypeFlags.V | PointerTypeFlags.ADJ | PointerTypeFlags.LEXICAL),
-    PERTAINYM("\\", "pertainym", PointerTypeFlags.ADJ | PointerTypeFlags.ADV | PointerTypeFlags.LEXICAL),
+    PARTICIPLE_OF("<", "participle of", PointerTypeFlags.ADJ),
+    SEE_ALSO("^", "also see", PointerTypeFlags.N | PointerTypeFlags.V | PointerTypeFlags.ADJ),
+    PERTAINYM("\\", "pertainym", PointerTypeFlags.ADJ | PointerTypeFlags.ADV),
     ATTRIBUTE("=", "attribute", PointerTypeFlags.N | PointerTypeFlags.ADJ),
     VERB_GROUP("$", "verb group", PointerTypeFlags.V),
     DERIVATION("+", "derivation", PointerTypeFlags.N | PointerTypeFlags.V | PointerTypeFlags.ADJ | PointerTypeFlags.ADV),
-    DOMAIN_ALL(";", "domain", PointerTypeFlags.N | PointerTypeFlags.V | PointerTypeFlags.ADJ | PointerTypeFlags.ADV | PointerTypeFlags.LEXICAL),
+    DOMAIN_ALL(";", "domain", PointerTypeFlags.N | PointerTypeFlags.V | PointerTypeFlags.ADJ | PointerTypeFlags.ADV),
     MEMBER_ALL("-", "member", PointerTypeFlags.N),
-    CATEGORY(";c", "category domain", PointerTypeFlags.N | PointerTypeFlags.V | PointerTypeFlags.ADJ | PointerTypeFlags.ADV | PointerTypeFlags.LEXICAL),
-    USAGE(";u", "usage domain", PointerTypeFlags.N | PointerTypeFlags.V | PointerTypeFlags.ADJ | PointerTypeFlags.ADV | PointerTypeFlags.LEXICAL),
-    REGION(";r", "region domain", PointerTypeFlags.N | PointerTypeFlags.V | PointerTypeFlags.ADJ | PointerTypeFlags.ADV | PointerTypeFlags.LEXICAL),
+    CATEGORY(";c", "category domain", PointerTypeFlags.N | PointerTypeFlags.V | PointerTypeFlags.ADJ | PointerTypeFlags.ADV),
+    USAGE(";u", "usage domain", PointerTypeFlags.N | PointerTypeFlags.V | PointerTypeFlags.ADJ | PointerTypeFlags.ADV),
+    REGION(";r", "region domain", PointerTypeFlags.N | PointerTypeFlags.V | PointerTypeFlags.ADJ | PointerTypeFlags.ADV),
     CATEGORY_MEMBER("-c", "member of category domain", PointerTypeFlags.N),
     USAGE_MEMBER("-u", "member of usage domain", PointerTypeFlags.N),
     REGION_MEMBER("-r", "member of region domain", PointerTypeFlags.N),
@@ -284,10 +284,6 @@ public enum PointerType {
         return symmetricTo(this);
     }
 
-    public boolean isLexical() {
-        return (flags & PointerTypeFlags.LEXICAL) != 0;
-    }
-
     /**
      * Returns true if <var>type</var> is symmetric to this pointer type.
      *
@@ -341,9 +337,6 @@ public enum PointerType {
             }
             if ((flags & PointerTypeFlags.ADV) != 0) {
                 str += "adverb" + ", ";
-            }
-            if ((flags & PointerTypeFlags.LEXICAL) != 0) {
-                str += "lexical" + ", ";
             }
             flagStringCache = str.substring(0, str.length() - 2);
         }

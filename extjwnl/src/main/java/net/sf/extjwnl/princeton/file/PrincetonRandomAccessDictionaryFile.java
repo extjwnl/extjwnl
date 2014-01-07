@@ -776,7 +776,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
         //find all the pointers that come from this word
         for (Synset synset : indexWord.getSenses()) {
             for (Pointer pointer : synset.getPointers()) {
-                if (pointer.isLexical() && !indexWord.getLemma().equals(((Word) pointer.getSource()).getLemma().toLowerCase())) {
+                if ((pointer.getSource() instanceof Word) && !indexWord.getLemma().equals(((Word) pointer.getSource()).getLemma().toLowerCase())) {
                     continue;
                 }
                 //WN TRICK

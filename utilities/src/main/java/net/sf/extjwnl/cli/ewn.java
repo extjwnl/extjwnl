@@ -64,7 +64,7 @@ public class ewn {
                     "usage edit: ewn sensekey -command [value] [-command value] ... [sensekey -command ...]\n" +
                     "            ewn pos#derivation -command value\n" +
                     "\n" +
-                    "command is one of the following:\n" +
+                    "command is one of the following (for sensekey syntax):\n" +
                     "        -add                           Add a new synset identified by this sensekey\n" +
                     "        -remove                        Remove the synset\n" +
                     "        -addword word                  Add the word to the synset\n" +
@@ -74,10 +74,14 @@ public class ewn {
                     "        -setverbframe [-]n             Set the verb frame flag n (minus removes the flag)\n" +
                     "        -setverbframeall [-]n          Set the verb frame flag n for all words (minus removes the flag)\n" +
                     "        -setlexfile num|name           Set the lex file number or name\n" +
-                    "        -addptr sensekey key           Add a pointer to sensekey with type defined by key\n" +
-                    "        -removeptr sensekey key        Remove the pointer to sensekey\n" +
+                    "        -addsemptr sensekey key        Add a semantic (synset-synset) pointer to sensekey with type defined by key\n" +
+                    "        -removesemptr sensekey key     Remove the semantic pointer to sensekey\n" +
+                    "        -addlexptr sensekey key        Add a lexical pointer to sensekey with type defined by key\n" +
+                    "        -removelexptr sensekey key     Remove the lexical pointer to sensekey\n" +
                     "        -setlexid lexid                Set the lex id\n" +
                     "        -setusecount count             Set the use count\n" +
+                    "\n" +
+                    "or one of the following (for pos#derivation syntax):\n" +
                     "        -addexc baseform               Add baseform to exceptional forms of derivation. pos is one of n,v,a,r\n" +
                     "        -removeexc [baseform]          Remove all [or only baseform] exceptional forms of derivation. pos is one of n,v,a,r\n" +
                     "\n" +
@@ -422,9 +426,9 @@ public class ewn {
                         argProcessed = true;
                     }
 
-                    if ("-addptr".equals(args[i])) {
+                    if ("-addsemptr".equals(args[i])) {
                         if (null == workWord) {
-                            log.error("Missing current word for -addptr. Perhaps, word not found in synset, or synset not found.");
+                            log.error("Missing current word for -addsemptr. Perhaps, word not found in synset, or synset not found.");
                             System.exit(1);
                         } else {
                             i++;
@@ -435,42 +439,37 @@ public class ewn {
                                     if (i < args.length) {
                                         PointerType pt = PointerType.getPointerTypeForKey(args[i]);
                                         if (null != pt) {
-                                            Pointer p;
-                                            if (pt.isLexical()) {
-                                                p = new Pointer(pt, workWord, targetWord);
-                                            } else {
-                                                p = new Pointer(pt, workWord.getSynset(), targetWord.getSynset());
-                                            }
+                                            Pointer p = new Pointer(pt, workWord.getSynset(), targetWord.getSynset());
                                             if (!workWord.getSynset().getPointers().contains(p)) {
                                                 workWord.getSynset().getPointers().add(p);
                                             } else {
-                                                log.error("Duplicate pointer of type " + pt + " to " + targetWord.getSenseKey() + " in addptr command for sensekey " + workWord.getSenseKey());
+                                                log.error("Duplicate pointer of type " + pt + " to " + targetWord.getSenseKey() + " in addsemptr command for sensekey " + workWord.getSenseKey());
                                                 System.exit(1);
                                             }
                                         } else {
-                                            log.error("Invalid pointer type at " + args[i] + " in addptr command for sensekey " + workWord.getSenseKey());
+                                            log.error("Invalid pointer type at " + args[i] + " in addsemptr command for sensekey " + workWord.getSenseKey());
                                             System.exit(1);
                                         }
                                     } else {
-                                        log.error("Missing pointer type at " + args[i] + " in addptr command for sensekey " + workWord.getSenseKey());
+                                        log.error("Missing pointer type at " + args[i] + " in addsemptr command for sensekey " + workWord.getSenseKey());
                                         System.exit(1);
                                     }
                                 } else {
-                                    log.error("Missing target at " + args[i] + " in addptr command for sensekey " + workWord.getSenseKey());
+                                    log.error("Missing target at " + args[i] + " in addsemptr command for sensekey " + workWord.getSenseKey());
                                     System.exit(1);
                                 }
                                 key = null;
                             } else {
-                                log.error("Missing sensekey for addptr command for sensekey " + workWord.getSenseKey());
+                                log.error("Missing sensekey for addsemptr command for sensekey " + workWord.getSenseKey());
                                 System.exit(1);
                             }
                         }
                         argProcessed = true;
                     }
 
-                    if ("-removeptr".equals(args[i])) {
+                    if ("-addlexptr".equals(args[i])) {
                         if (null == workWord) {
-                            log.error("Missing current word for -removeptr. Perhaps, word not found in synset, or synset not found.");
+                            log.error("Missing current word for -addlexptr. Perhaps, word not found in synset, or synset not found.");
                             System.exit(1);
                         } else {
                             i++;
@@ -481,33 +480,110 @@ public class ewn {
                                     if (i < args.length) {
                                         PointerType pt = PointerType.getPointerTypeForKey(args[i]);
                                         if (null != pt) {
-                                            Pointer p;
-                                            if (pt.isLexical()) {
-                                                p = new Pointer(pt, workWord, targetWord);
+                                            Pointer p = new Pointer(pt, workWord, targetWord);
+                                            if (!workWord.getSynset().getPointers().contains(p)) {
+                                                workWord.getSynset().getPointers().add(p);
                                             } else {
-                                                p = new Pointer(pt, workWord.getSynset(), targetWord.getSynset());
-                                            }
-                                            if (workWord.getSynset().getPointers().contains(p)) {
-                                                workWord.getSynset().getPointers().remove(p);
-                                            } else {
-                                                log.error("Missing pointer of type " + pt + " to " + targetWord.getSenseKey() + " in removeptr command for sensekey " + workWord.getSenseKey());
+                                                log.error("Duplicate pointer of type " + pt + " to " + targetWord.getSenseKey() + " in addlexptr command for sensekey " + workWord.getSenseKey());
                                                 System.exit(1);
                                             }
                                         } else {
-                                            log.error("Invalid pointer type at " + args[i] + " in removeptr command for sensekey " + workWord.getSenseKey());
+                                            log.error("Invalid pointer type at " + args[i] + " in addlexptr command for sensekey " + workWord.getSenseKey());
                                             System.exit(1);
                                         }
                                     } else {
-                                        log.error("Missing pointer type at " + args[i] + " in removeptr command for sensekey " + workWord.getSenseKey());
+                                        log.error("Missing pointer type at " + args[i] + " in addlexptr command for sensekey " + workWord.getSenseKey());
                                         System.exit(1);
                                     }
                                 } else {
-                                    log.error("Missing target at " + args[i] + " in removeptr command for sensekey " + workWord.getSenseKey());
+                                    log.error("Missing target at " + args[i] + " in addlexptr command for sensekey " + workWord.getSenseKey());
                                     System.exit(1);
                                 }
                                 key = null;
                             } else {
-                                log.error("Missing sensekey for removeptr command for sensekey " + workWord.getSenseKey());
+                                log.error("Missing sensekey for addlexptr command for sensekey " + workWord.getSenseKey());
+                                System.exit(1);
+                            }
+                        }
+                        argProcessed = true;
+                    }
+
+                    if ("-removesemptr".equals(args[i])) {
+                        if (null == workWord) {
+                            log.error("Missing current word for -removesemptr. Perhaps, word not found in synset, or synset not found.");
+                            System.exit(1);
+                        } else {
+                            i++;
+                            if (i < args.length) {
+                                Word targetWord = d.getWordBySenseKey(args[i]);
+                                if (null != targetWord) {
+                                    i++;
+                                    if (i < args.length) {
+                                        PointerType pt = PointerType.getPointerTypeForKey(args[i]);
+                                        if (null != pt) {
+                                            Pointer p = new Pointer(pt, workWord.getSynset(), targetWord.getSynset());
+                                            if (workWord.getSynset().getPointers().contains(p)) {
+                                                workWord.getSynset().getPointers().remove(p);
+                                            } else {
+                                                log.error("Missing pointer of type " + pt + " to " + targetWord.getSenseKey() + " in removesemptr command for sensekey " + workWord.getSenseKey());
+                                                System.exit(1);
+                                            }
+                                        } else {
+                                            log.error("Invalid pointer type at " + args[i] + " in removesemptr command for sensekey " + workWord.getSenseKey());
+                                            System.exit(1);
+                                        }
+                                    } else {
+                                        log.error("Missing pointer type at " + args[i] + " in removesemptr command for sensekey " + workWord.getSenseKey());
+                                        System.exit(1);
+                                    }
+                                } else {
+                                    log.error("Missing target at " + args[i] + " in removesemptr command for sensekey " + workWord.getSenseKey());
+                                    System.exit(1);
+                                }
+                                key = null;
+                            } else {
+                                log.error("Missing sensekey for removesemptr command for sensekey " + workWord.getSenseKey());
+                                System.exit(1);
+                            }
+                        }
+                        argProcessed = true;
+                    }
+
+                    if ("-removelexptr".equals(args[i])) {
+                        if (null == workWord) {
+                            log.error("Missing current word for -removelexptr. Perhaps, word not found in synset, or synset not found.");
+                            System.exit(1);
+                        } else {
+                            i++;
+                            if (i < args.length) {
+                                Word targetWord = d.getWordBySenseKey(args[i]);
+                                if (null != targetWord) {
+                                    i++;
+                                    if (i < args.length) {
+                                        PointerType pt = PointerType.getPointerTypeForKey(args[i]);
+                                        if (null != pt) {
+                                            Pointer p = new Pointer(pt, workWord, targetWord);
+                                            if (workWord.getSynset().getPointers().contains(p)) {
+                                                workWord.getSynset().getPointers().remove(p);
+                                            } else {
+                                                log.error("Missing pointer of type " + pt + " to " + targetWord.getSenseKey() + " in removelexptr command for sensekey " + workWord.getSenseKey());
+                                                System.exit(1);
+                                            }
+                                        } else {
+                                            log.error("Invalid pointer type at " + args[i] + " in removelexptr command for sensekey " + workWord.getSenseKey());
+                                            System.exit(1);
+                                        }
+                                    } else {
+                                        log.error("Missing pointer type at " + args[i] + " in removelexptr command for sensekey " + workWord.getSenseKey());
+                                        System.exit(1);
+                                    }
+                                } else {
+                                    log.error("Missing target at " + args[i] + " in removelexptr command for sensekey " + workWord.getSenseKey());
+                                    System.exit(1);
+                                }
+                                key = null;
+                            } else {
+                                log.error("Missing sensekey for removelexptr command for sensekey " + workWord.getSenseKey());
                                 System.exit(1);
                             }
                         }
