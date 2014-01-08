@@ -9,26 +9,9 @@ import java.util.StringTokenizer;
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class TokenizerParser extends StringTokenizer {
+
     public TokenizerParser(String string, String delimiters) {
         super(string, delimiters);
-    }
-
-    /**
-     * Converts the next token into a byte
-     *
-     * @return next byte
-     */
-    public int nextByte() {
-        return Byte.parseByte(nextToken());
-    }
-
-    /**
-     * Converts the next token into a short
-     *
-     * @return next short
-     */
-    public int nextShort() {
-        return Short.parseShort(nextToken());
     }
 
     /**
