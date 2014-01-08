@@ -62,4 +62,40 @@ public class TestExc extends BaseData {
     public void testConstructor3() throws JWNLException {
         new Exc(dictionary, POS.NOUN, lemma, null);
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructor4() throws JWNLException {
+        new Exc(null, null, null, null);
+    }
+
+    @Test
+    public void testEquals() throws JWNLException {
+        Assert.assertFalse(testObj.equals(dictionary));
+
+        Exc neq = new Exc(dictionary, pos, "al", Arrays.asList(exc1, exc2));
+        Assert.assertFalse(testObj.equals(neq));
+
+        Exc neq2 = new Exc(dictionary, POS.ADJECTIVE, lemma, Arrays.asList(exc1, exc2));
+        Assert.assertFalse(testObj.equals(neq2));
+
+        Exc eq = new Exc(dictionary, pos, lemma, Arrays.asList(exc1, exc2));
+        Assert.assertTrue(testObj.equals(eq));
+    }
+
+    @Test
+    public void testHashCode() throws JWNLException {
+        Exc neq = new Exc(dictionary, pos, "al", Arrays.asList(exc1, exc2));
+        Assert.assertTrue(neq.hashCode() != testObj.hashCode());
+    }
+
+    @Test
+    public void testSetDictionary() throws JWNLException {
+        dictionary.edit();
+        mapDictionary.edit();
+        testObj = dictionary.createException(pos, lemma, Arrays.asList(exc1, exc2));
+        testObj.setDictionary(mapDictionary);
+        Assert.assertEquals(mapDictionary, testObj.getDictionary());
+        Assert.assertNull(dictionary.getException(pos, lemma));
+        Assert.assertEquals(testObj, mapDictionary.getException(pos, lemma));
+    }
 }

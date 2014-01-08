@@ -122,7 +122,37 @@ public class Synset extends PointerTarget implements DictionaryElement {
             if (null == pointer) {
                 throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_043"));
             }
+
+            Pointer old = get(index);
+
             Pointer result = super.set(index, pointer);
+
+            // check symmetries and update if necessary
+            if (null != dictionary && dictionary.isEditable() && dictionary.getManageSymmetricPointers()) {
+
+                // remove old symmetric one
+                if (null != old.getType().getSymmetricType()) {
+                    try {
+                        Pointer symmetric = new Pointer(old.getType().getSymmetricType(), old.getTarget(), old.getSource());
+                        old.getTarget().getSynset().getPointers().remove(symmetric);
+                    } catch (JWNLException e) {
+                        throw new JWNLRuntimeException(e);
+                    }
+                }
+
+                // add new symmetric one
+                if (null != pointer.getType().getSymmetricType()) {
+                    try {
+                        Pointer symmetric = new Pointer(pointer.getType().getSymmetricType(), pointer.getTarget(), pointer.getSource());
+                        if (!pointer.getTarget().getSynset().getPointers().contains(symmetric)) {
+                            pointer.getTarget().getSynset().getPointers().add(symmetric);
+                        }
+                    } catch (JWNLException e) {
+                        throw new JWNLRuntimeException(e);
+                    }
+                }
+            }
+
             checkPointers();
             return result;
         }

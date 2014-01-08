@@ -107,7 +107,12 @@ public class IndexWordSet {
      * @return number of senses the word with part-of-speech <var>pos</var> has
      */
     public int getSenseCount(POS pos) {
-        return getIndexWord(pos).getSenses().size();
+        int result = 0;
+        IndexWord indexWord = getIndexWord(pos);
+        if (null != indexWord) {
+            result = indexWord.getSenses().size();
+        }
+        return result;
     }
 
     public String toString() {

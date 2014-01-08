@@ -6,6 +6,7 @@ import net.sf.extjwnl.data.relationship.RelationshipFinder;
 import net.sf.extjwnl.data.relationship.RelationshipList;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -20,6 +21,7 @@ import java.util.List;
  * @author Brett Walenz <bwalenz@users.sourceforge.net>
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
+@Ignore
 public class DictionaryReadTester {
 
     /**
@@ -52,13 +54,53 @@ public class DictionaryReadTester {
      */
     protected final long wn30VerbOffset = 484166;
 
+    /**
+     * Synset for "bright" (adj) for wn2.1
+     */
+    protected final long wn21BrightOffset = 301258;
+
+    /**
+     * Synset for "bright" (adj) for wn3.0
+     */
+    protected final long wn30BrightOffset = 278551;
+
+    /**
+     * Synset for "dissilient" (adj) for wn2.1
+     */
+    protected final long wn21DissilientOffset = 3681;
+
+    /**
+     * Synset for "dissilient" (adj) for wn3.0
+     */
+    protected final long wn30DissilientOffset = 3700;
+
+    /**
+     * Synset for "bright" (adv) for wn2.1
+     */
+    protected final long wn21BrightAdvOffset = 77569;
+
+    /**
+     * Synset for "bright" (adv) for wn3.0
+     */
+    protected final long wn30BrightAdvOffset = 77168;
+
     protected final List<Long> verbOffsets = Arrays.asList(wn20VerbOffset, wn21VerbOffset, wn30VerbOffset);
 
     protected final List<Long> nounOffsets = Arrays.asList(wn20TankOffset, wn21TankOffset, wn30TankOffset);
 
+    protected final List<Long> adjOffsets = Arrays.asList(wn21BrightOffset, wn30BrightOffset);
+
+    protected final List<Long> adjSOffsets = Arrays.asList(wn21DissilientOffset, wn30DissilientOffset);
+
+    protected final List<Long> advOffsets = Arrays.asList(wn21BrightAdvOffset, wn30BrightAdvOffset);
+
     final String glossDefinition = "an enclosed armored military vehicle; has a cannon and moves on caterpillar treads";
 
     protected final List<String> lemmas = Arrays.asList("tank", "army tank", "armored combat vehicle", "armoured combat vehicle");
+
+    protected final List<String> adjLemmas = Arrays.asList("bright");
+
+    protected final List<String> advLemmas = Arrays.asList("brilliantly", "brightly", "bright");
 
     protected final String[] exceptions = {"bicennaries", "bicentenary", "bicentennial"};
 
@@ -103,6 +145,60 @@ public class DictionaryReadTester {
     }
 
     @Test
+    public void testBrightAdj() throws JWNLException {
+        IndexWord iw = dictionary.getIndexWord(POS.ADJECTIVE, "bright");
+        Assert.assertNotNull("IndexWord loaded", iw);
+        Synset synset = null;
+        for (Synset s : iw.getSenses()) {
+            if (adjOffsets.contains(s.getOffset())) {
+                synset = s;
+                break;
+            }
+        }
+
+        Assert.assertNotNull("Synset search", synset);
+        Assert.assertEquals("Pointer testing", 22, synset.getPointers().size());
+        for (Word w : synset.getWords()) {
+            Assert.assertTrue("Synset word loading: " + w.getLemma(), adjLemmas.contains(w.getLemma()));
+        }
+    }
+
+    @Test
+    public void testDissilientAdjS() throws JWNLException {
+        IndexWord iw = dictionary.getIndexWord(POS.ADJECTIVE, "dissilient");
+        Assert.assertNotNull("IndexWord loaded", iw);
+        Synset synset = null;
+        for (Synset s : iw.getSenses()) {
+            if (adjSOffsets.contains(s.getOffset())) {
+                synset = s;
+                break;
+            }
+        }
+
+        Assert.assertNotNull("Synset search", synset);
+        Assert.assertEquals("Pointer testing", 2, synset.getPointers().size());
+    }
+
+    @Test
+    public void testBrightAdv() throws JWNLException {
+        IndexWord iw = dictionary.getIndexWord(POS.ADVERB, "bright");
+        Assert.assertNotNull("IndexWord loaded", iw);
+        Synset synset = null;
+        for (Synset s : iw.getSenses()) {
+            if (advOffsets.contains(s.getOffset())) {
+                synset = s;
+                break;
+            }
+        }
+
+        Assert.assertNotNull("Synset search", synset);
+        Assert.assertEquals("Pointer testing", 2, synset.getPointers().size());
+        for (Word w : synset.getWords()) {
+            Assert.assertTrue("Synset word loading: " + w.getLemma(), advLemmas.contains(w.getLemma()));
+        }
+    }
+
+    @Test
     public void testRandomIndexWord() throws JWNLException {
         Assert.assertNotNull(dictionary.getRandomIndexWord(POS.NOUN));
     }
@@ -127,6 +223,10 @@ public class DictionaryReadTester {
         Assert.assertEquals("Verb synset frame size test", 2, indices.length);
         Assert.assertEquals("Verb synset frame test", 2, indices[0]);
         Assert.assertEquals("Verb synset frame test", 33, indices[1]);
+        Assert.assertTrue(synset.getVerbFrameFlags().get(2));
+        Assert.assertTrue(synset.getVerbFrameFlags().get(33));
+        Assert.assertEquals(2, synset.getVerbFrames().length);
+
         Assert.assertTrue(word instanceof Verb);
         Verb v = (Verb) word;
         Assert.assertEquals(4, v.getVerbFrameIndices().length);
@@ -348,7 +448,6 @@ public class DictionaryReadTester {
         Assert.assertEquals(DictionaryElementType.EXCEPTION, e.getType());
     }
 
-
     @Test
     public void testSynsetIterator() throws JWNLException {
         Iterator<Synset> i = dictionary.getSynsetIterator(POS.NOUN);
@@ -386,8 +485,12 @@ public class DictionaryReadTester {
         Assert.assertEquals(DictionaryElementType.SYNSET, s.getType());
     }
 
-    public void runAllTests() throws JWNLException, CloneNotSupportedException {
+    protected void runAllTests() throws JWNLException, CloneNotSupportedException {
         testTank();
+        testBrightAdj();
+        testDissilientAdjS();
+        testBrightAdv();
+        testRandomIndexWord();
         testComplete();
         testCycles();
         testLexFileNumber();
@@ -401,6 +504,10 @@ public class DictionaryReadTester {
         testNonExistentIndexWordIterator();
         testIndexWordIterator();
         testSpacedIndexWordIterator();
+        testMorphoLookupBaseFormNull();
+        testMorphoLookupBaseForm();
+        testMorphoLookupAllBaseFormsNull();
+        testMorphoLookupAllBaseForms();
         testExceptionIterator();
         testSynsetIterator();
     }

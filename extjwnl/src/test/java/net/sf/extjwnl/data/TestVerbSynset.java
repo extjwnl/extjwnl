@@ -10,9 +10,16 @@ import org.junit.Test;
 public class TestVerbSynset extends BaseData {
 
     @Test
+    public void testConstructor() throws JWNLException {
+        VerbSynset verbSynset = new VerbSynset(dictionary);
+        Assert.assertNotNull(verbSynset.getVerbFrameFlags());
+    }
+
+    @Test
     public void testGetVerbFrames() throws JWNLException {
         VerbSynset verbSynset = new VerbSynset(dictionary, 0);
         Assert.assertNotNull(verbSynset.getVerbFrameFlags());
+        Assert.assertNotNull(verbSynset.getVerbFrames());
     }
 
     @Test(expected = IllegalArgumentException.class)

@@ -44,10 +44,6 @@ public abstract class PointerTarget implements Serializable, Owned {
 
     public abstract String toString();
 
-    public boolean equals(Object obj) {
-        return (obj instanceof PointerTarget) && ((PointerTarget) obj).getPOS().equals(getPOS());
-    }
-
     /**
      * Returns all pointers of type <var>type</var>.
      *

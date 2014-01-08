@@ -94,6 +94,28 @@ public class TestSynset extends BaseData {
         Assert.assertEquals(1, hyponym.getPointers().size());
         Assert.assertEquals(PointerType.HYPERNYM, hyponym.getPointers().get(0).getType());
         Assert.assertEquals(testObj, hyponym.getPointers().get(0).getTarget());
+
+        Assert.assertEquals(1, testObj.getTargets().size());
+        Assert.assertEquals(hyponym, testObj.getTargets().get(0));
+    }
+
+    @Test
+    public void testSetPointer() throws JWNLException {
+        Synset hyponym = new Synset(dictionary, POS.NOUN, 1);
+        hyponym.setGloss("hyponym");
+        Synset hypernym = new Synset(dictionary, POS.NOUN, 2);
+        hypernym.setGloss("hypernym");
+        dictionary.edit();
+        testObj.getPointers().add(new Pointer(PointerType.HYPERNYM, testObj, hypernym));
+        testObj.getPointers().set(0, new Pointer(PointerType.HYPONYM, testObj, hyponym));
+        Assert.assertEquals(1, testObj.getPointers().size());
+        Assert.assertEquals(1, hyponym.getPointers().size());
+        Assert.assertEquals(0, hypernym.getPointers().size());
+        Assert.assertEquals(PointerType.HYPERNYM, hyponym.getPointers().get(0).getType());
+        Assert.assertEquals(testObj, hyponym.getPointers().get(0).getTarget());
+
+        Assert.assertEquals(1, testObj.getTargets().size());
+        Assert.assertEquals(hyponym, testObj.getTargets().get(0));
     }
 
     @Test

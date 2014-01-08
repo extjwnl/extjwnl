@@ -5,6 +5,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -64,12 +65,12 @@ public class TestIndexWord extends BaseData {
 
     @Test(expected = IllegalArgumentException.class)
     public void testConstructorSynsetOffset0() throws JWNLException {
-        new IndexWord(dictionary, "test", POS.VERB, new long[] {});
+        new IndexWord(dictionary, "test", POS.VERB, new long[]{});
     }
 
     @Test
     public void testType() throws JWNLException {
-        IndexWord iw = new IndexWord(dictionary, "test", POS.NOUN, new long[] {1});
+        IndexWord iw = new IndexWord(dictionary, "test", POS.NOUN, new long[]{1});
         Assert.assertEquals(DictionaryElementType.INDEX_WORD, iw.getType());
     }
 
@@ -83,8 +84,8 @@ public class TestIndexWord extends BaseData {
     @Test(expected = IllegalArgumentException.class)
     public void testSynsetSetAlien() throws JWNLException {
         Synset s = new Synset(mapDictionary, POS.NOUN);
-        IndexWord iw = new IndexWord(dictionary, "test", POS.NOUN, s);
-        iw.getSenses().set(0, new Synset(dictionary, POS.NOUN));
+        IndexWord iw = new IndexWord(dictionary, "test", POS.NOUN, new Synset(dictionary, POS.NOUN));
+        iw.getSenses().set(0, s);
     }
 
     @Test
@@ -139,6 +140,36 @@ public class TestIndexWord extends BaseData {
         Assert.assertTrue(t.containsWord("test"));
     }
 
+    @Test
+    public void testSynsetAddAllIndexed() throws JWNLException {
+        dictionary.edit();
+        Synset s = new Synset(dictionary, POS.NOUN);
+        s.setGloss("test gloss");
+        Synset t = new Synset(dictionary, POS.NOUN);
+        t.setGloss("car gloss");
+        Synset tt = new Synset(dictionary, POS.NOUN);
+        tt.setGloss("another car gloss");
+        IndexWord iws = new IndexWord(dictionary, "test", POS.NOUN, s);
+
+        iws.getSenses().addAll(0, Arrays.asList(t, tt));
+        Assert.assertEquals(3, iws.getSenses().size());
+    }
+
+    @Test
+    public void testSynsetAddAll() throws JWNLException {
+        dictionary.edit();
+        Synset s = new Synset(dictionary, POS.NOUN);
+        s.setGloss("test gloss");
+        Synset t = new Synset(dictionary, POS.NOUN);
+        t.setGloss("car gloss");
+        Synset tt = new Synset(dictionary, POS.NOUN);
+        tt.setGloss("another car gloss");
+        IndexWord iws = new IndexWord(dictionary, "test", POS.NOUN, s);
+
+        iws.getSenses().addAll(Arrays.asList(t, tt));
+        Assert.assertEquals(3, iws.getSenses().size());
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void testSynsetAddAlien() throws JWNLException {
         Synset s = new Synset(mapDictionary, POS.NOUN);
@@ -150,6 +181,32 @@ public class TestIndexWord extends BaseData {
         Synset s = new Synset(dictionary, POS.NOUN);
         IndexWord iw = new IndexWord(dictionary, "test", POS.NOUN, s);
         iw.getSenses().add(null);
+    }
+
+    @Test
+    public void testSynsetListIterator() throws JWNLException {
+        Synset s = new Synset(dictionary, POS.NOUN);
+        IndexWord iw = new IndexWord(dictionary, "test", POS.NOUN, s);
+        Assert.assertNotNull(iw.getSenses().listIterator());
+        Assert.assertTrue(iw.getSenses().listIterator().hasNext());
+    }
+
+    @Test
+    public void testSynsetListIteratorIndexed() throws JWNLException {
+        Synset s = new Synset(dictionary, POS.NOUN);
+        IndexWord iw = new IndexWord(dictionary, "test", POS.NOUN, s);
+        Assert.assertNotNull(iw.getSenses().listIterator(0));
+        Assert.assertTrue(iw.getSenses().listIterator(0).hasNext());
+        Assert.assertEquals(s, iw.getSenses().listIterator(0).next());
+    }
+
+    @Test
+    public void testSynsetSubList() throws JWNLException {
+        Synset s = new Synset(dictionary, POS.NOUN);
+        IndexWord iw = new IndexWord(dictionary, "test", POS.NOUN, s);
+        iw.getSenses().add(new Synset(dictionary, POS.NOUN));
+        Assert.assertNotNull(iw.getSenses().subList(0, 1));
+        Assert.assertEquals(s, iw.getSenses().subList(0, 1).get(0));
     }
 
     @Test
@@ -169,6 +226,37 @@ public class TestIndexWord extends BaseData {
     }
 
     @Test
+    public void testSynsetRemoveAll() throws JWNLException {
+        Synset s = new Synset(dictionary, POS.NOUN);
+        IndexWord iw = new IndexWord(dictionary, "test", POS.NOUN, s);
+        iw.getSenses().add(new Synset(dictionary, POS.NOUN));
+        Assert.assertNotNull(iw.getSenses().removeAll(Arrays.asList(s)));
+        Assert.assertFalse(iw.getSenses().contains(s));
+    }
+
+    @Test
+    public void testSynsetRetainAll() throws JWNLException {
+        dictionary.edit();
+        Synset s = new Synset(dictionary, POS.NOUN, 1);
+        s.setGloss("synset 1");
+        IndexWord iw = new IndexWord(dictionary, "test", POS.NOUN, s);
+        Synset ss = new Synset(dictionary, POS.NOUN, 2);
+        ss.setGloss("synset 2");
+        iw.getSenses().add(ss);
+        Assert.assertTrue(iw.getSenses().retainAll(Arrays.asList(s)));
+        Assert.assertTrue(iw.getSenses().contains(s));
+        Assert.assertEquals(1, iw.getSenses().size());
+    }
+
+    @Test
+    public void testSynsetRetainAllRemove() throws JWNLException {
+        Synset s = new Synset(dictionary, POS.NOUN);
+        IndexWord iw = new IndexWord(dictionary, "test", POS.NOUN, s);
+        Assert.assertNotNull(iw.getSenses().retainAll(Arrays.asList()));
+        Assert.assertNull(dictionary.getIndexWord(POS.NOUN, "test"));
+    }
+
+    @Test
     public void testSynsetClear() throws JWNLException {
         dictionary.edit();
         Synset s = new Synset(dictionary, POS.NOUN);
@@ -182,5 +270,28 @@ public class TestIndexWord extends BaseData {
             indexWords.add(i.next());
         }
         Assert.assertEquals(0, indexWords.size());
+    }
+
+    @Test
+    public void testSynsetSortSenses() throws JWNLException {
+        AdjectiveSynset s = new AdjectiveSynset(dictionary);
+        Adjective w = new Adjective(dictionary, s, 1, "test", AdjectivePosition.NONE);
+        w.setUseCount(1);
+        s.getWords().add(w);
+
+        AdjectiveSynset ss = new AdjectiveSynset(dictionary);
+        Adjective ww = new Adjective(dictionary, ss, 1, "test", AdjectivePosition.ATTRIBUTIVE);
+        ww.setUseCount(10);
+        ss.getWords().add(ww);
+
+        AdjectiveSynset sss = new AdjectiveSynset(dictionary);
+        Adjective www = new Adjective(dictionary, sss, 1, "test", AdjectivePosition.NONE);
+        www.setUseCount(0);
+        sss.getWords().add(www);
+
+        IndexWord iw = new IndexWord(dictionary, "test", POS.ADJECTIVE, s);
+        iw.getSenses().add(ss);
+        iw.getSenses().add(sss);
+        Assert.assertEquals(2, iw.sortSenses());
     }
 }

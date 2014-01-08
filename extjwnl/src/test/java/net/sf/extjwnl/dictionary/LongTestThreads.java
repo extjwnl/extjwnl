@@ -3,6 +3,7 @@ package net.sf.extjwnl.dictionary;
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.data.IndexWord;
 import net.sf.extjwnl.data.POS;
+import org.junit.Ignore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.junit.Assert;
@@ -18,6 +19,7 @@ import java.util.List;
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  * @author wangyeee
  */
+@Ignore
 public class LongTestThreads extends MultiThreadedTestCase {
 
     private static final Logger log = LoggerFactory.getLogger(LongTestThreads.class);

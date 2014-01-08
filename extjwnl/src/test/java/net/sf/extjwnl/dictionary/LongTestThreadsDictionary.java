@@ -1,6 +1,7 @@
 package net.sf.extjwnl.dictionary;
 
 import net.sf.extjwnl.JWNLException;
+import org.junit.Ignore;
 
 import java.io.IOException;
 
@@ -10,6 +11,7 @@ import java.io.IOException;
  *
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
+@Ignore
 public class LongTestThreadsDictionary extends MultiThreadedTestCase {
 
     private static final int threadCount = 5;

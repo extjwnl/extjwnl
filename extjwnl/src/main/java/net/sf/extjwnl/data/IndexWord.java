@@ -343,18 +343,19 @@ public class IndexWord extends BaseDictionaryElement {
             if (null != dictionary && dictionary.isEditable()) {
                 List<Synset> copy = new ArrayList<Synset>(this);
                 boolean result = super.retainAll(c);
-                for (Synset synset : copy) {
-                    if (!c.contains(synset)) {
-                        removeWordsFromSynset(synset, lemma);
+                if (result) {
+                    for (Synset synset : copy) {
+                        if (!c.contains(synset)) {
+                            removeWordsFromSynset(synset, lemma);
+                        }
                     }
-                }
-
-                if (0 == size()) {
-                    try {
-                        dictionary.removeIndexWord(IndexWord.this);
-                    } catch (JWNLException e) {
-                        if (log.isErrorEnabled()) {
-                            log.error(dictionary.getMessages().resolveMessage("EXCEPTION_001", e.getMessage()), e);
+                    if (0 == size()) {
+                        try {
+                            dictionary.removeIndexWord(IndexWord.this);
+                        } catch (JWNLException e) {
+                            if (log.isErrorEnabled()) {
+                                log.error(dictionary.getMessages().resolveMessage("EXCEPTION_001", e.getMessage()), e);
+                            }
                         }
                     }
                 }

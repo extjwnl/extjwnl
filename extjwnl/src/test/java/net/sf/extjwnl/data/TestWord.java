@@ -76,5 +76,20 @@ public class TestWord extends BaseData {
     @Test
     public void testGetPointers() {
         Assert.assertEquals(0, word.getPointers().size());
+
+        Synset synset = word.getSynset();
+        synset.getPointers().add(new Pointer(PointerType.ANTONYM, synset, synset));
+        Assert.assertEquals(0, word.getPointers().size());
+        synset.getPointers().add(new Pointer(PointerType.ANTONYM, word, synset));
+        Assert.assertEquals(1, word.getPointers().size());
+    }
+
+    @Test
+    public void testHashCode() throws JWNLException {
+        Synset s = new Synset(dictionary, POS.NOUN);
+        Word w = new Word(dictionary, s, 1, "lemma");
+        Word ww = new Word(dictionary, s, 2, "gemma");
+
+        Assert.assertNotEquals(w.hashCode(), ww.hashCode());
     }
 }
