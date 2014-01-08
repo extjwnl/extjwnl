@@ -2,10 +2,7 @@ package net.sf.extjwnl.dictionary;
 
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.data.*;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -20,6 +17,7 @@ import java.util.List;
  *
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
+@Ignore
 public abstract class DictionaryEditTester {
 
     private final static String entityGloss = "that which is perceived or known or inferred to have its own distinct existence (living or nonliving)";
@@ -45,15 +43,7 @@ public abstract class DictionaryEditTester {
         dictionary.close();
         dictionary.delete();
 
-        // to decrease probability of "Access is denied" messages from file system on Windows
-        try {
-            Thread.sleep(1000L);
-        } catch (InterruptedException e) {
-            //
-        }
-
         dictionary = Dictionary.getInstance(getProperties());
-
         mapDictionary = Dictionary.getResourceInstance("/net/sf/extjwnl/dictionary/mem_properties.xml");
     }
 
