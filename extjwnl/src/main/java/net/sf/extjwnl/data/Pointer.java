@@ -40,16 +40,37 @@ public class Pointer implements Serializable {
 
     public Pointer(PointerTarget source, PointerType pointerType,
                    POS targetPOS, long targetOffset, int targetIndex) {
+        if (null == source) {
+            throw new IllegalArgumentException();
+        }
         this.source = source;
+        if (null == pointerType) {
+            throw new IllegalArgumentException();
+        }
         this.pointerType = pointerType;
+        if (null == targetPOS) {
+            throw new IllegalArgumentException();
+        }
         this.targetIndex = new TargetIndex(targetPOS, targetOffset, targetIndex);
         this.target = null;
     }
 
     public Pointer(PointerType pointerType, PointerTarget source, PointerTarget target) {
+        if (null == pointerType) {
+            throw new IllegalArgumentException();
+        }
         this.pointerType = pointerType;
+        if (null == source) {
+            throw new IllegalArgumentException();
+        }
         this.source = source;
+        if (null == target) {
+            throw new IllegalArgumentException();
+        }
         this.target = target;
+        if (source.getDictionary() != target.getDictionary()) {
+            throw new IllegalArgumentException(source.getDictionary().getMessages().resolveMessage("DICTIONARY_EXCEPTION_063"));
+        }
     }
 
     public String toString() {
@@ -82,6 +103,20 @@ public class Pointer implements Serializable {
      */
     public boolean isSemantic() throws JWNLException {
         return (getSource() instanceof Synset) && (getTarget() instanceof Synset);
+    }
+
+    /**
+     * Returns whether <var>that</var> is symmetric to this pointer.
+     * @param that pointer
+     * @return true, if <var>that</var> is symmetric to this pointer.
+     * @throws JWNLException
+     */
+    public boolean isSymmetricTo(Pointer that) throws JWNLException {
+        return
+                null != pointerType.getSymmetricType()
+                && that.getType().equals(pointerType.getSymmetricType())
+                && that.getTarget().equals(getSource())
+                && that.getSource().equals(getTarget());
     }
 
     /**
@@ -229,10 +264,6 @@ public class Pointer implements Serializable {
             this.pos = pos;
             this.offset = offset;
             this.index = index;
-        }
-
-        public String toString() {
-            return ResourceBundleSet.insertParams("[TargetIndex: {0} [Offset: {1}] [Index: {2}]]", new Object[]{pos, offset, index});
         }
 
         @Override

@@ -10,6 +10,7 @@ import java.util.List;
  * @author John Didion <jdidion@didion.net>
  */
 public class Util {
+
     public static String getLemma(String[] tokens, BitSet bits, String delimiter) {
         StringBuilder buf = new StringBuilder();
         for (int i = 0; i < tokens.length; i++) {
@@ -51,8 +52,5 @@ public class Util {
             tokens.add(buf.toString());
         }
         return tokens.toArray(new String[tokens.size()]);
-    }
-
-    private Util() {
     }
 }

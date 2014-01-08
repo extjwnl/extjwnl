@@ -6,9 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Tests Synset functionality by creating a mock synset.
@@ -32,6 +30,16 @@ public class TestSynset extends BaseData {
     @Test
     public void testConstructor() throws JWNLException {
         testObj = new Synset(dictionary, POS.NOUN, offset);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorNullDictionary() throws JWNLException {
+        testObj = new Synset(null, POS.NOUN, offset);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorNullPOS() throws JWNLException {
+        testObj = new Synset(dictionary, null, offset);
     }
 
     @Test
@@ -100,6 +108,15 @@ public class TestSynset extends BaseData {
     }
 
     @Test
+    public void testPointersLastIndexOf() throws JWNLException {
+        dictionary.edit();
+        Synset hyponym = new Synset(dictionary, POS.NOUN, 100);
+        Pointer hyponymPtr = new Pointer(PointerType.HYPONYM, testObj, hyponym);
+        testObj.getPointers().add(hyponymPtr);
+        Assert.assertEquals(0, testObj.getPointers().lastIndexOf(hyponymPtr));
+    }
+
+    @Test
     public void testSetPointer() throws JWNLException {
         Synset hyponym = new Synset(dictionary, POS.NOUN, 1);
         hyponym.setGloss("hyponym");
@@ -135,6 +152,150 @@ public class TestSynset extends BaseData {
         testObj.getPointers().add(0, new Pointer(PointerType.HYPONYM, testObj, hyponym));
         Assert.assertEquals(1, testObj.getPointers().size());
         Assert.assertEquals(0, hyponym.getPointers().size());
+    }
+
+    @Test
+    public void testPointerListIterator() throws JWNLException {
+        Synset hyponym = new Synset(dictionary, POS.NOUN, 100);
+        Pointer hyponymPtr = new Pointer(PointerType.HYPONYM, testObj, hyponym);
+        testObj.getPointers().add(0, hyponymPtr);
+        ListIterator<Pointer> i = testObj.getPointers().listIterator();
+        Assert.assertTrue(i.hasNext());
+        Assert.assertEquals(hyponymPtr, i.next());
+        Assert.assertFalse(i.hasNext());
+    }
+
+    @Test
+    public void testAddPointerAddAll() throws JWNLException {
+        Synset hyponym = new Synset(dictionary, POS.NOUN, 100);
+        Synset hypernym = new Synset(dictionary, POS.NOUN, 200);
+
+        Assert.assertTrue(
+                testObj.getPointers().addAll(Arrays.asList(
+                        new Pointer(PointerType.HYPONYM, testObj, hyponym),
+                        new Pointer(PointerType.HYPERNYM, testObj, hypernym)))
+        );
+
+        Assert.assertEquals(2, testObj.getPointers().size());
+        Assert.assertEquals(0, hyponym.getPointers().size());
+        Assert.assertEquals(0, hypernym.getPointers().size());
+    }
+
+    @Test
+    public void testPointerSubList() throws JWNLException {
+        Synset hyponym = new Synset(dictionary, POS.NOUN, 100);
+        Synset hypernym = new Synset(dictionary, POS.NOUN, 200);
+
+        Pointer hyponymPtr = new Pointer(PointerType.HYPONYM, testObj, hyponym);
+        Pointer hypernymPtr = new Pointer(PointerType.HYPERNYM, testObj, hypernym);
+        testObj.getPointers().addAll(Arrays.asList(hyponymPtr, hypernymPtr));
+
+        List<Pointer> subList =  testObj.getPointers().subList(0, 1);
+        Assert.assertEquals(1, subList.size());
+        Assert.assertEquals(hyponymPtr, subList.get(0));
+    }
+
+    @Test
+    public void testPointerContainsAll() throws JWNLException {
+        Synset hyponym = new Synset(dictionary, POS.NOUN, 100);
+        Synset hypernym = new Synset(dictionary, POS.NOUN, 200);
+
+        Pointer hyponymPtr = new Pointer(PointerType.HYPONYM, testObj, hyponym);
+        Pointer hypernymPtr = new Pointer(PointerType.HYPERNYM, testObj, hypernym);
+        testObj.getPointers().addAll(Arrays.asList(hyponymPtr, hypernymPtr));
+
+        Assert.assertTrue(testObj.getPointers().containsAll(Arrays.asList(hyponymPtr, hypernymPtr)));
+    }
+
+    @Test
+    public void testPointerRemoveAllEdit() throws JWNLException {
+        dictionary.edit();
+        Synset hyponym = new Synset(dictionary, POS.NOUN, 100);
+        Synset hypernym = new Synset(dictionary, POS.NOUN, 200);
+
+        Pointer hyponymPtr = new Pointer(PointerType.HYPONYM, testObj, hyponym);
+        Pointer hypernymPtr = new Pointer(PointerType.HYPERNYM, testObj, hypernym);
+        testObj.getPointers().addAll(Arrays.asList(hyponymPtr, hypernymPtr));
+
+        Assert.assertTrue(testObj.getPointers().removeAll(Arrays.asList(hyponymPtr, hypernymPtr)));
+        Assert.assertTrue(testObj.getPointers().isEmpty());
+        Assert.assertTrue(hyponym.getPointers().isEmpty());
+        Assert.assertTrue(hypernym.getPointers().isEmpty());
+    }
+
+    @Test
+    public void testPointerRemoveAll() throws JWNLException {
+        Synset hyponym = new Synset(dictionary, POS.NOUN, 100);
+        Synset hypernym = new Synset(dictionary, POS.NOUN, 200);
+
+        Pointer hyponymPtr = new Pointer(PointerType.HYPONYM, testObj, hyponym);
+        Pointer hypernymPtr = new Pointer(PointerType.HYPERNYM, testObj, hypernym);
+        testObj.getPointers().addAll(Arrays.asList(hyponymPtr, hypernymPtr));
+
+        Assert.assertTrue(hyponym.getPointers().isEmpty());
+        Assert.assertTrue(hypernym.getPointers().isEmpty());
+
+        Assert.assertTrue(testObj.getPointers().removeAll(Arrays.asList(hyponymPtr, hypernymPtr)));
+        Assert.assertTrue(testObj.getPointers().isEmpty());
+        Assert.assertTrue(hyponym.getPointers().isEmpty());
+        Assert.assertTrue(hypernym.getPointers().isEmpty());
+    }
+
+
+    @Test
+    public void testPointerRetainAllEdit() throws JWNLException {
+        dictionary.edit();
+        Synset hyponym = new Synset(dictionary, POS.NOUN, 100);
+        Synset hypernym = new Synset(dictionary, POS.NOUN, 200);
+
+        Pointer hyponymPtr = new Pointer(PointerType.HYPONYM, testObj, hyponym);
+        Pointer hypernymPtr = new Pointer(PointerType.HYPERNYM, testObj, hypernym);
+        testObj.getPointers().addAll(Arrays.asList(hyponymPtr, hypernymPtr));
+
+        Assert.assertTrue(testObj.getPointers().retainAll(Arrays.asList(hyponymPtr)));
+        Assert.assertEquals(1, testObj.getPointers().size());
+        Assert.assertEquals(1, hyponym.getPointers().size());
+        Assert.assertEquals(hyponymPtr, testObj.getPointers().get(0));
+        Assert.assertTrue(hypernym.getPointers().isEmpty());
+    }
+
+
+    @Test
+    public void testAddPointerAddAllEdit() throws JWNLException {
+        dictionary.edit();
+        Synset hyponym = new Synset(dictionary, POS.NOUN, 100);
+        Synset hypernym = new Synset(dictionary, POS.NOUN, 200);
+
+        Assert.assertTrue(
+                testObj.getPointers().addAll(Arrays.asList(
+                        new Pointer(PointerType.HYPONYM, testObj, hyponym),
+                        new Pointer(PointerType.HYPERNYM, testObj, hypernym)))
+        );
+
+        Assert.assertEquals(2, testObj.getPointers().size());
+        Assert.assertEquals(1, hyponym.getPointers().size());
+        Assert.assertEquals(1, hypernym.getPointers().size());
+    }
+
+    @Test
+    public void testAddPointerAddAllIndexedEdit() throws JWNLException {
+        dictionary.edit();
+        Synset hyponym = new Synset(dictionary, POS.NOUN, 100);
+        Synset hypernym = new Synset(dictionary, POS.NOUN, 200);
+
+        Pointer hyponymPtr = new Pointer(PointerType.HYPONYM, testObj, hyponym);
+        testObj.getPointers().add(hyponymPtr);
+
+        Pointer hypernymPtr = new Pointer(PointerType.HYPERNYM, testObj, hypernym);
+        Assert.assertTrue(
+                testObj.getPointers().addAll(0, Arrays.asList(
+                        hypernymPtr))
+        );
+
+        Assert.assertEquals(2, testObj.getPointers().size());
+        Assert.assertEquals(hypernymPtr, testObj.getPointers().get(0));
+        Assert.assertEquals(1, hyponym.getPointers().size());
+        Assert.assertEquals(1, hypernym.getPointers().size());
     }
 
     @Test
@@ -275,18 +436,29 @@ public class TestSynset extends BaseData {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void containsWord() throws JWNLException {
+    public void testContainsWord() throws JWNLException {
         testObj.containsWord(null);
     }
 
     @Test
-    public void containsWord2() throws JWNLException {
+    public void testContainsWord2() throws JWNLException {
         Assert.assertFalse(testObj.containsWord("test"));
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void indexOfWord() throws JWNLException {
+    public void testIndexOfWordNull() throws JWNLException {
         testObj.indexOfWord(null);
+    }
+
+    @Test
+    public void testIndexOfWordPositive() throws JWNLException {
+        testObj.getWords().add(new Word(dictionary, testObj, 1, "lemma"));
+        Assert.assertEquals(0, testObj.indexOfWord("lemma"));
+    }
+
+    @Test
+    public void testIndexOfWordNegative() throws JWNLException {
+        Assert.assertEquals(-1, testObj.indexOfWord("lemma"));
     }
 
     @Test
@@ -310,4 +482,44 @@ public class TestSynset extends BaseData {
         Assert.assertEquals(1, synsets.size());
         Assert.assertEquals(testObj, synsets.get(0));
     }
+
+    @Test
+    public void testWordListAddAlien() throws JWNLException {
+        testObj.getWords().add(new Word(mapDictionary, new Synset(mapDictionary, POS.NOUN), 1, "test"));
+    }
+
+    @Test
+    public void testWordListAddAll() throws JWNLException {
+        dictionary.edit();
+        Word w = new Word(dictionary, testObj, 1, "test");
+        Word ww = new Word(dictionary, testObj, 1, "rest");
+
+        Assert.assertTrue(testObj.getWords().addAll(Arrays.asList(w, ww)));
+        Assert.assertEquals(2, testObj.getWords().size());
+        Assert.assertTrue(testObj.getWords().contains(w));
+        Assert.assertTrue(testObj.getWords().contains(ww));
+    }
+
+    @Test
+    public void testWordListAddAllIndex() throws JWNLException {
+        dictionary.edit();
+        Word w = new Word(dictionary, testObj, 1, "test");
+        Word ww = new Word(dictionary, testObj, 1, "rest");
+        testObj.getWords().add(w);
+
+        Assert.assertTrue(testObj.getWords().addAll(0, Arrays.asList(ww)));
+        Assert.assertEquals(2, testObj.getWords().size());
+        Assert.assertEquals(ww, testObj.getWords().get(0));
+    }
+
+    @Test
+    public void testWordListClear() throws JWNLException {
+        dictionary.edit();
+        Word w = new Word(dictionary, testObj, 1, "test");
+        testObj.getWords().add(w);
+        testObj.getWords().clear();
+
+        Assert.assertTrue(testObj.getWords().isEmpty());
+    }
+
 }

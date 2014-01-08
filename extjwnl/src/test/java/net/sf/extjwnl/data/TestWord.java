@@ -56,6 +56,11 @@ public class TestWord extends BaseData {
         word = new Word(dictionary, new Synset(dictionary, POS.NOUN), 1, "a ");
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testCreate6() throws JWNLException {
+        word = new Word(dictionary, new Synset(mapDictionary, POS.NOUN), 1, "a ");
+    }
+
     @Test
     public void testGetIndex() {
         Assert.assertEquals(index, word.getIndex());

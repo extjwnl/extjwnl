@@ -99,7 +99,7 @@ public abstract class Dictionary {
     /**
      * Default name of the configuration file for resource instance creation.
      */
-    public static final String DEFAULT_RESOURCE_CONFIG_PATH = "extjwnl_resource_properties.xml";
+    public static final String DEFAULT_RESOURCE_CONFIG_PATH = "/extjwnl_resource_properties.xml";
 
     private static final Comparator<Word> wordLexIdComparator = new Comparator<Word>() {
         @Override

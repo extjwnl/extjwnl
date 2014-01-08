@@ -49,27 +49,6 @@ public class Word extends PointerTarget {
      */
     private int useCount;
 
-    private static final SenseWordCountComparator swcComp = new SenseWordCountComparator();
-    private static final StringLengthComparator slComp = new StringLengthComparator();
-
-    /**
-     * Comparator to sort synsets according to word count.
-     */
-    private static class SenseWordCountComparator implements Comparator<Synset> {
-        public int compare(Synset o1, Synset o2) {
-            return o1.getWords().size() - o2.getWords().size();
-        }
-    }
-
-    /**
-     * Comparator to sort strings by length.
-     */
-    private static class StringLengthComparator implements Comparator<String> {
-        public int compare(String o1, String o2) {
-            return o1.length() - o2.length();
-        }
-    }
-
     /**
      * Constructs a word tied to a synset, it's position within the synset, and the lemma.
      *
@@ -82,6 +61,9 @@ public class Word extends PointerTarget {
         super(dictionary);
         if (null == synset) {
             throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_042"));
+        }
+        if (synset.getDictionary() != dictionary) {
+            throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_040"));
         }
         this.synset = synset;
         if (index < 1) {

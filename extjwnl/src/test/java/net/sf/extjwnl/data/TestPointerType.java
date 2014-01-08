@@ -86,4 +86,10 @@ public class TestPointerType {
     public void testGetFlags() {
         Assert.assertEquals(PointerTypeFlags.N | PointerTypeFlags.V, PointerType.HYPERNYM.getFlags());
     }
+
+    @Test
+    public void testGetAllPointerTypes() {
+        Assert.assertNotNull(PointerType.getAllPointerTypes());
+        Assert.assertEquals(26, PointerType.getAllPointerTypes().size());
+    }
 }
