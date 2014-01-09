@@ -1,7 +1,6 @@
 package net.sf.extjwnl.data;
 
 import net.sf.extjwnl.JWNLException;
-import net.sf.extjwnl.util.factory.Owned;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -13,7 +12,7 @@ import java.sql.SQLException;
  * @author John Didion <jdidion@didion.net>
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
-public interface DatabaseDictionaryElementFactory extends Owned {
+public interface DatabaseDictionaryElementFactory extends DictionaryElementFactory {
 
     /**
      * Create an IndexWord from a row in the database.

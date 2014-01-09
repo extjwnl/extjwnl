@@ -59,7 +59,6 @@ public abstract class Dictionary {
     public static final String EDIT_CHECK_ALIEN_POINTERS = "edit_check_alien_pointers";
     private boolean editCheckAlienPointers = true;
 
-
     // tag names
     private static final String VERSION_TAG = "version";
     private static final String DICTIONARY_TAG = "dictionary";
@@ -108,10 +107,13 @@ public abstract class Dictionary {
         }
     };
 
-    // stores max offset for each POS
-    protected final Map<POS, Long> maxOffset = new EnumMap<POS, Long>(POS.class);
-
     private final String[] verbFrames;
+
+    /**
+     * The class of DictionaryElementFactory to use.
+     */
+    public static final String DICTIONARY_ELEMENT_FACTORY = "dictionary_element_factory";
+    protected final DictionaryElementFactory elementFactory;
 
     /**
      * Represents a version of WordNet.
@@ -345,6 +347,11 @@ public abstract class Dictionary {
             params.put(p.getName(), p);
         }
 
+        if (!params.containsKey(DICTIONARY_ELEMENT_FACTORY)) {
+            throw new IllegalArgumentException(messages.resolveMessage("DICTIONARY_EXCEPTION_001", DICTIONARY_ELEMENT_FACTORY));
+        }
+        elementFactory = (DictionaryElementFactory) (params.get(DICTIONARY_ELEMENT_FACTORY)).create();
+
         if (params.containsKey(CHECK_LEX_IDS_KEY)) {
             checkLexIds = Boolean.parseBoolean(params.get(CHECK_LEX_IDS_KEY).getValue());
         }
@@ -566,9 +573,7 @@ public abstract class Dictionary {
      * @throws JWNLException JWNLException
      */
     public synchronized void save() throws JWNLException {
-        if (!isEditable()) {
-            throw new JWNLException(messages.resolveMessage("DICTIONARY_EXCEPTION_029"));
-        }
+        checkEditable();
         if (log.isInfoEnabled()) {
             log.info(messages.resolveMessage("DICTIONARY_INFO_014"));
         }
@@ -638,12 +643,7 @@ public abstract class Dictionary {
      * @throws JWNLException JWNLException
      */
     public void addElement(DictionaryElement element) throws JWNLException {
-        if (!isEditable()) {
-            throw new JWNLException(messages.resolveMessage("DICTIONARY_EXCEPTION_029"));
-        }
-        if (this != element.getDictionary()) {
-            throw new JWNLException(messages.resolveMessage("DICTIONARY_EXCEPTION_040"));
-        }
+        checkEditable();
         if (element instanceof Exc) {
             addException((Exc) element);
         } else if (element instanceof IndexWord) {
@@ -660,9 +660,7 @@ public abstract class Dictionary {
      * @throws JWNLException JWNLException
      */
     public void removeElement(DictionaryElement element) throws JWNLException {
-        if (!isEditable()) {
-            throw new JWNLException(messages.resolveMessage("DICTIONARY_EXCEPTION_029"));
-        }
+        checkEditable();
         if (element instanceof Exc) {
             removeException((Exc) element);
         } else if (element instanceof IndexWord) {
@@ -682,10 +680,8 @@ public abstract class Dictionary {
      * @throws JWNLException JWNLException
      */
     public Exc createException(POS pos, String lemma, List<String> exceptions) throws JWNLException {
-        if (!isEditable()) {
-            throw new JWNLException(messages.resolveMessage("DICTIONARY_EXCEPTION_029"));
-        }
-        return new Exc(this, pos, lemma, exceptions);
+        checkEditable();
+        return elementFactory.createException(pos, lemma, exceptions);
     }
 
     /**
@@ -695,12 +691,7 @@ public abstract class Dictionary {
      * @throws JWNLException JWNLException
      */
     public void addException(Exc exc) throws JWNLException {
-        if (!isEditable()) {
-            throw new JWNLException(messages.resolveMessage("DICTIONARY_EXCEPTION_029"));
-        }
-        if (this != exc.getDictionary()) {
-            throw new JWNLException(messages.resolveMessage("DICTIONARY_EXCEPTION_040"));
-        }
+        checkEditable();
         exc.setDictionary(this);
     }
 
@@ -711,9 +702,7 @@ public abstract class Dictionary {
      * @throws JWNLException JWNLException
      */
     public void removeException(Exc exc) throws JWNLException {
-        if (!isEditable()) {
-            throw new JWNLException(messages.resolveMessage("DICTIONARY_EXCEPTION_029"));
-        }
+        checkEditable();
         exc.setDictionary(null);
     }
 
@@ -725,16 +714,8 @@ public abstract class Dictionary {
      * @throws JWNLException JWNLException
      */
     public Synset createSynset(POS pos) throws JWNLException {
-        if (!isEditable()) {
-            throw new JWNLException(messages.resolveMessage("DICTIONARY_EXCEPTION_029"));
-        }
-        if (POS.VERB == pos) {
-            return new VerbSynset(this, createNewOffset(pos));
-        } else if (POS.ADJECTIVE == pos) {
-            return new AdjectiveSynset(this, createNewOffset(pos));
-        } else {
-            return new Synset(this, pos, createNewOffset(pos));
-        }
+        checkEditable();
+        return elementFactory.createSynset(pos);
     }
 
     /**
@@ -744,12 +725,7 @@ public abstract class Dictionary {
      * @throws JWNLException JWNLException
      */
     public void addSynset(Synset synset) throws JWNLException {
-        if (!isEditable()) {
-            throw new JWNLException(messages.resolveMessage("DICTIONARY_EXCEPTION_029"));
-        }
-        if (this != synset.getDictionary()) {
-            throw new JWNLException(messages.resolveMessage("DICTIONARY_EXCEPTION_040"));
-        }
+        checkEditable();
         synset.setDictionary(this);
     }
 
@@ -760,17 +736,16 @@ public abstract class Dictionary {
      * @throws JWNLException JWNLException
      */
     public synchronized void removeSynset(Synset synset) throws JWNLException {
-        if (!isEditable()) {
-            throw new JWNLException(messages.resolveMessage("DICTIONARY_EXCEPTION_029"));
-        }
-        //take care of pointers
-        //this will delete symmetric ones
+        checkEditable();
+
+        // take care of pointers
+        // this will delete symmetric ones
+        // asymmetric ones will be checked by the synset on gets and removed
         synset.getPointers().clear();
-        //asymmetric ones will be checked by the synset on gets
 
         synset.setDictionary(null);
 
-        //take care of index words
+        // take care of index words
         List<Word> copy = new ArrayList<Word>(synset.getWords());
         for (Word word : copy) {
             IndexWord indexWord = getIndexWord(synset.getPOS(), word.getLemma());
@@ -790,10 +765,8 @@ public abstract class Dictionary {
      * @throws JWNLException JWNLException
      */
     public IndexWord createIndexWord(POS pos, String lemma, Synset synset) throws JWNLException {
-        if (!isEditable()) {
-            throw new JWNLException(messages.resolveMessage("DICTIONARY_EXCEPTION_029"));
-        }
-        return new IndexWord(this, lemma, pos, synset);
+        checkEditable();
+        return elementFactory.createIndexWord(pos, lemma, synset);
     }
 
     /**
@@ -803,12 +776,7 @@ public abstract class Dictionary {
      * @throws JWNLException JWNLException
      */
     public void addIndexWord(IndexWord indexWord) throws JWNLException {
-        if (!isEditable()) {
-            throw new JWNLException(messages.resolveMessage("DICTIONARY_EXCEPTION_029"));
-        }
-        if (this != indexWord.getDictionary()) {
-            throw new JWNLException(messages.resolveMessage("DICTIONARY_EXCEPTION_040"));
-        }
+        checkEditable();
         indexWord.setDictionary(this);
     }
 
@@ -819,13 +787,11 @@ public abstract class Dictionary {
      * @throws JWNLException JWNLException
      */
     public synchronized void removeIndexWord(IndexWord indexWord) throws JWNLException {
-        if (!isEditable()) {
-            throw new JWNLException(messages.resolveMessage("DICTIONARY_EXCEPTION_029"));
-        }
+        checkEditable();
 
         indexWord.setDictionary(null);
 
-        //take care of words in synsets
+        // take care of words in synsets
         List<Synset> copy = new ArrayList<Synset>(indexWord.getSenses());
         for (Synset synset : copy) {
             List<Word> wordsCopy = new ArrayList<Word>(synset.getWords());
@@ -846,7 +812,6 @@ public abstract class Dictionary {
         return editCheckAlienPointers;
     }
 
-
     /**
      * Returns the frames at the indexes encoded in <var>l</var>.
      * Verb Frames are encoded within <code>Word</code>s as a long. Each bit represents
@@ -857,6 +822,19 @@ public abstract class Dictionary {
      * @return the frames at the indexes encoded in <var>l</var>
      */
     public String[] getFrames(BitSet bits) {
+        return getFrames(bits, verbFrames);
+    }
+
+    /**
+     * Returns the frames at the indexes encoded in <var>l</var>.
+     * Verb Frames are encoded within <code>Word</code>s as a long. Each bit represents
+     * the frame at its corresponding index. If the bit is set, that verb
+     * frame is valid for the word.
+     *
+     * @param bits frame flags
+     * @return the frames at the indexes encoded in <var>l</var>
+     */
+    public static String[] getFrames(BitSet bits, String[] verbFrames) {
         int[] indices = getVerbFrameIndices(bits);
         String[] frames = new String[indices.length];
         for (int i = 0; i < indices.length; i++) {
@@ -874,7 +852,7 @@ public abstract class Dictionary {
      * @param bits the bit set
      * @return an integer collection
      */
-    public int[] getVerbFrameIndices(BitSet bits) {
+    public static int[] getVerbFrameIndices(BitSet bits) {
         int[] indices = new int[bits.cardinality()];
         int index = 0;
         for (int i = bits.nextSetBit(0); i >= 0; i = bits.nextSetBit(i + 1)) {
@@ -896,6 +874,22 @@ public abstract class Dictionary {
         return lemma.trim().toLowerCase();
     }
 
+    /**
+     * Checks whether dictionary is editable and throws if not;
+     *
+     * @throws JWNLException JWNLException
+     */
+    protected void checkEditable() throws JWNLException {
+        if (!isEditable()) {
+            throw new JWNLException(messages.resolveMessage("DICTIONARY_EXCEPTION_029"));
+        }
+    }
+
+    /**
+     * Loads all targets in load all pointers and all synsets in all index words.
+     *
+     * @throws JWNLException JWNLException
+     */
     protected void resolveAllPointers() throws JWNLException {
         for (POS pos : POS.getAllPOS()) {
             resolvePointers(pos);
@@ -912,7 +906,8 @@ public abstract class Dictionary {
             while (si.hasNext()) {
                 Synset s = si.next();
                 for (Pointer p : s.getPointers()) {
-                    p.getTarget();//resolve pointers
+                    // resolve pointers
+                    p.getTarget();
                 }
             }
         }
@@ -921,7 +916,8 @@ public abstract class Dictionary {
             Iterator<IndexWord> ii = getIndexWordIterator(pos);
             while (ii.hasNext()) {
                 IndexWord iw = ii.next();
-                iw.getSenses().iterator();//resolve pointers
+                // load synsets
+                iw.getSenses().iterator();
             }
         }
     }
@@ -970,12 +966,6 @@ public abstract class Dictionary {
         } else {
             return new Locale(language, country);
         }
-    }
-
-    private synchronized long createNewOffset(POS pos) {
-        long result = maxOffset.get(pos) + 1;
-        maxOffset.put(pos, result);
-        return result;
     }
 
     private static String getResourceProperties(String resourceName) throws IOException {

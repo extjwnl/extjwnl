@@ -23,6 +23,7 @@ public class MapDictionary extends Dictionary {
 
     public MapDictionary(Document doc) throws JWNLException {
         super(doc);
+
         tableMap = new EnumMap<POS, Map<DictionaryFileType, Map<Object, DictionaryElement>>>(POS.class);
         for (POS pos : POS.values()) {
             Map<DictionaryFileType, Map<Object, DictionaryElement>> files = new EnumMap<DictionaryFileType, Map<Object, DictionaryElement>>(DictionaryFileType.class);
@@ -49,10 +50,9 @@ public class MapDictionary extends Dictionary {
         return new AbstractCachingDictionary.IndexWordIterator(itr, substring, start);
     }
 
+    @SuppressWarnings({"unchecked"})
     public Iterator<IndexWord> getIndexWordIterator(POS pos) {
-        @SuppressWarnings({"unchecked", "UnnecessaryLocalVariable"})
-        Iterator<IndexWord> result = (Iterator<IndexWord>) getIterator(getTable(pos, DictionaryFileType.INDEX));
-        return result;
+        return (Iterator<IndexWord>) getIterator(getTable(pos, DictionaryFileType.INDEX));
     }
 
     public IndexWord getRandomIndexWord(POS pos) throws JWNLException {
@@ -67,16 +67,14 @@ public class MapDictionary extends Dictionary {
         return itr.hasNext() ? itr.next() : null;
     }
 
+    @SuppressWarnings({"unchecked"})
     public Iterator<Synset> getSynsetIterator(POS pos) {
-        @SuppressWarnings({"unchecked", "UnnecessaryLocalVariable"})
-        Iterator<Synset> result = (Iterator<Synset>) getIterator(getTable(pos, DictionaryFileType.DATA));
-        return result;
+        return (Iterator<Synset>) getIterator(getTable(pos, DictionaryFileType.DATA));
     }
 
+    @SuppressWarnings({"unchecked"})
     public Iterator<Exc> getExceptionIterator(POS pos) {
-        @SuppressWarnings({"unchecked", "UnnecessaryLocalVariable"})
-        Iterator<Exc> result = (Iterator<Exc>) getIterator(getTable(pos, DictionaryFileType.EXCEPTION));
-        return result;
+        return (Iterator<Exc>) getIterator(getTable(pos, DictionaryFileType.EXCEPTION));
     }
 
     private Iterator<? extends DictionaryElement> getIterator(Map<Object, ? extends DictionaryElement> map) {
@@ -100,20 +98,6 @@ public class MapDictionary extends Dictionary {
         if (!isEditable()) {
             super.edit();
             resolveAllPointers();
-
-            //update max offsets for new synset creation
-            //iteration might take time
-            for (POS pos : POS.getAllPOS()) {
-                Long maxOff = 0L;
-                Iterator<Synset> si = getSynsetIterator(pos);
-                while (si.hasNext()) {
-                    Synset s = si.next();
-                    if (maxOff < s.getOffset()) {
-                        maxOff = s.getOffset();
-                    }
-                }
-                maxOffset.put(pos, maxOff);
-            }
         }
     }
 

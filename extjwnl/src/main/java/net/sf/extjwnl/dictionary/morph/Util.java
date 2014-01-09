@@ -9,7 +9,7 @@ import java.util.List;
  *
  * @author John Didion <jdidion@didion.net>
  */
-public class Util {
+public abstract class Util {
 
     public static String getLemma(String[] tokens, BitSet bits, String delimiter) {
         StringBuilder buf = new StringBuilder();

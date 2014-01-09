@@ -70,7 +70,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
     protected static final String ALL_EXCEPTIONS_SQL =
             "SELECT derivation FROM exceptions WHERE pos = ?";
 
-    protected static final Random rand = new Random(new Date().getTime());
+    protected static final Random rand = new Random();
 
     protected final ConnectionManager connectionManager;
     protected final Map<POS, MinMax> minMaxIds;

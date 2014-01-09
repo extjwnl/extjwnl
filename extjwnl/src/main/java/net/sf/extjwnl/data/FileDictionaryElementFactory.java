@@ -11,7 +11,7 @@ import net.sf.extjwnl.util.factory.Owned;
  * @author John Didion <jdidion@didion.net>
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
-public interface FileDictionaryElementFactory extends Owned {
+public interface FileDictionaryElementFactory extends DictionaryElementFactory {
 
     /**
      * Create an Exc from a line in an exception file.
@@ -42,5 +42,4 @@ public interface FileDictionaryElementFactory extends Owned {
      * @throws JWNLException JWNLException
      */
     IndexWord createIndexWord(POS pos, String line) throws JWNLException;
-
 }

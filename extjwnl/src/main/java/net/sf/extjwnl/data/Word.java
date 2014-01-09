@@ -60,21 +60,41 @@ public class Word extends PointerTarget {
     public Word(Dictionary dictionary, Synset synset, int index, String lemma) {
         super(dictionary);
         if (null == synset) {
-            throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_042"));
+            if (null != dictionary) {
+                throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_042"));
+            } else {
+                throw new IllegalArgumentException("Synset must be not null");
+            }
         }
         if (synset.getDictionary() != dictionary) {
-            throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_040"));
+            if (null != dictionary) {
+                throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_040"));
+            } else {
+                throw new IllegalArgumentException("Dictionary element must belong to this dictionary");
+            }
         }
         this.synset = synset;
         if (index < 1) {
-            throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_045"));
+            if (null != dictionary) {
+                throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_045"));
+            } else {
+                throw new IllegalArgumentException("Word index must be greater or equal than 1");
+            }
         }
         this.index = index;
         if (null == lemma || "".equals(lemma)) {
-            throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_046"));
+            if (null != dictionary) {
+                throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_046"));
+            } else {
+                throw new IllegalArgumentException("Lemma must be not null and not empty");
+            }
         }
         if (' ' == lemma.charAt(0) || ' ' == lemma.charAt(lemma.length() - 1)) {
-            throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_055"));
+            if (null != dictionary) {
+                throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_055"));
+            } else {
+                throw new IllegalArgumentException("Lemma should not be surrounded by spaces");
+            }
         }
         this.lemma = lemma;
     }

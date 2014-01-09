@@ -45,21 +45,33 @@ public class Exc extends BaseDictionaryElement {
      * @throws JWNLException JWNLException
      */
     public Exc(Dictionary dictionary, POS pos, String lemma, List<String> exceptions) throws JWNLException {
-        super(dictionary);
+        this.dictionary = dictionary;
         if (null == pos) {
-            throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_041"));
-        }
-        if (null == lemma || "".equals(lemma)) {
-            throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_046"));
-        }
-        if (null == exceptions || 0 == exceptions.size()) {
-            throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_039"));
+            if (null != dictionary) {
+                throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_041"));
+            } else {
+                throw new IllegalArgumentException("Pos must be not null");
+            }
         }
         this.pos = pos;
+        if (null == lemma || "".equals(lemma)) {
+            if (null != dictionary) {
+                throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_046"));
+            } else {
+                throw new IllegalArgumentException("Lemma must be not null and not empty");
+            }
+        }
         this.lemma = lemma;
+        if (null == exceptions || 0 == exceptions.size()) {
+            if (null != dictionary) {
+                throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_039"));
+            } else {
+                throw new IllegalArgumentException("Exceptions must be not null and not empty");
+            }
+        }
         this.exceptions = exceptions;
         if (null != dictionary && dictionary.isEditable()) {
-            dictionary.addException(this);
+            dictionary.addElement(this);
         }
     }
 

@@ -244,35 +244,33 @@ public class TestIndexWord extends BaseData {
         Assert.assertTrue(iw.getSenses().containsAll(Arrays.asList(s, ss)));
     }
 
-    // TODO AA very strange dictionary = null after call to super.
-//    @Test
-//    public void testSynsetRemoveAllEditable() throws JWNLException {
-//        dictionary.edit();
-//        Synset s = new Synset(dictionary, POS.NOUN);
-//        IndexWord iw = new IndexWord(dictionary, "test", POS.NOUN, s);
-//        iw.getSenses().add(new Synset(dictionary, POS.NOUN));
-//        Assert.assertTrue(iw.getSenses().removeAll(Arrays.asList(s)));
-//        Assert.assertFalse(iw.getSenses().contains(s));
-//        Assert.assertNull(dictionary.getIndexWord(POS.NOUN, "test"));
-//    }
+    @Test
+    public void testSynsetRemoveAllEditable() throws JWNLException {
+        dictionary.edit();
+        Synset s = new Synset(dictionary, POS.NOUN);
+        IndexWord iw = new IndexWord(dictionary, "test", POS.NOUN, s);
+        iw.getSenses().add(new Synset(dictionary, POS.NOUN));
+        Assert.assertTrue(iw.getSenses().removeAll(Arrays.asList(s)));
+        Assert.assertFalse(iw.getSenses().contains(s));
+        Assert.assertNull(dictionary.getIndexWord(POS.NOUN, "test"));
+    }
 
-    // TODO AA very strange dictionary = null after call to super.
-//    @Test
-//    public void testSynsetRetainAll() throws JWNLException {
-//        dictionary.edit();
-//        Synset s = new Synset(dictionary, POS.NOUN, 1);
-//        s.setGloss("synset 1");
-//        IndexWord iw = new IndexWord(dictionary, "test", POS.NOUN, s);
-//        Synset ss = new Synset(dictionary, POS.NOUN, 2);
-//        ss.setGloss("synset 2");
-//        iw.getSenses().add(ss);
-//        Assert.assertTrue(iw.getSenses().retainAll(Arrays.asList(s)));
-//        Assert.assertTrue(iw.getSenses().contains(s));
-//        Assert.assertEquals(1, iw.getSenses().size());
-//
-//        Assert.assertTrue(iw.getSenses().retainAll(Arrays.asList()));
-//        Assert.assertNull(dictionary.getIndexWord(POS.NOUN, "test"));
-//    }
+    @Test
+    public void testSynsetRetainAll() throws JWNLException {
+        dictionary.edit();
+        Synset s = new Synset(dictionary, POS.NOUN, 1);
+        s.setGloss("synset 1");
+        IndexWord iw = new IndexWord(dictionary, "test", POS.NOUN, s);
+        Synset ss = new Synset(dictionary, POS.NOUN, 2);
+        ss.setGloss("synset 2");
+        iw.getSenses().add(ss);
+        Assert.assertTrue(iw.getSenses().retainAll(Arrays.asList(s)));
+        Assert.assertTrue(iw.getSenses().contains(s));
+        Assert.assertEquals(1, iw.getSenses().size());
+
+        Assert.assertTrue(iw.getSenses().retainAll(Arrays.asList()));
+        Assert.assertNull(dictionary.getIndexWord(POS.NOUN, "test"));
+    }
 
     @Test
     public void testSynsetRetainAllRemove() throws JWNLException {

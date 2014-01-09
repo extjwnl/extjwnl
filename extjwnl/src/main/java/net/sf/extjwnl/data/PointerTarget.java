@@ -23,9 +23,6 @@ public abstract class PointerTarget implements Serializable, Owned {
     protected transient Dictionary dictionary;
 
     protected PointerTarget(Dictionary dictionary) {
-        if (null == dictionary) {
-            throw new IllegalArgumentException();
-        }
         this.dictionary = dictionary;
     }
 

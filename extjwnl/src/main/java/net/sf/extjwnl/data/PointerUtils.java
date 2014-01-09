@@ -2,6 +2,9 @@ package net.sf.extjwnl.data;
 
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.data.list.*;
+import net.sf.extjwnl.util.ResourceBundleSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -14,16 +17,15 @@ import java.util.Set;
  *
  * @author John Didion <jdidion@didion.net>
  */
-public class PointerUtils {
+public abstract class PointerUtils {
+
+    private static final Logger log = LoggerFactory.getLogger(PointerUtils.class);
 
     /**
      * Representation of infinite depth. Used to tell the pointer operations to
      * return all links to an infinite depth.
      */
     public static final int INFINITY = Integer.MAX_VALUE;
-
-    private PointerUtils() {
-    }
 
     /**
      * Returns the immediate parents of <code>synset</code>.
@@ -772,7 +774,7 @@ public class PointerUtils {
                                     labelType == null ? type : labelType, parent);
                     if (allowRedundancies || !list.contains(node)) {
                         if (depth != 0) {
-                            //check cycles through parent
+                            // check cycles through parent
                             Set<PointerTargetTreeNode> parents = new HashSet<PointerTargetTreeNode>();
                             PointerTargetTreeNode currentParent = parent;
                             while (null != currentParent) {
@@ -780,7 +782,15 @@ public class PointerUtils {
                                     parents.add(currentParent);
                                     currentParent = currentParent.getParent();
                                 } else {
-                                    //cycle
+                                    // cycle
+                                    if (log.isWarnEnabled()) {
+                                        if (null != synset.getDictionary()) {
+                                            log.warn(synset.getDictionary().getMessages().resolveMessage("DICTIONARY_WARN_001", currentParent));
+                                        } else {
+                                            log.warn(ResourceBundleSet.insertParams("Cycle detected: {0}", new Object[]{currentParent}));
+                                        }
+                                    }
+
                                     break;
                                 }
                             }
@@ -929,7 +939,8 @@ public class PointerUtils {
                                                                   boolean allowRedundancies) throws JWNLException {
         ancestorDepth--;
         PointerTargetTreeNodeList inherited = new PointerTargetTreeNodeList();
-        if (null != list) {//AA: cycle with "period"...
+        // AA: cycle with "period"...
+        if (null != list) {
             for (PointerTargetTreeNode node : list) {
                 if (allowRedundancies || !inherited.contains(node)) {
                     if (ancestorDepth == 0) {

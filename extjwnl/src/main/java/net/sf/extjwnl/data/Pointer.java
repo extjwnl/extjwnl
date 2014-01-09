@@ -38,18 +38,17 @@ public class Pointer implements Serializable {
      */
     private transient PointerTarget target;
 
-    public Pointer(PointerTarget source, PointerType pointerType,
-                   POS targetPOS, long targetOffset, int targetIndex) {
+    public Pointer(PointerTarget source, PointerType pointerType, POS targetPOS, long targetOffset, int targetIndex) {
         if (null == source) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Source must be not null");
         }
         this.source = source;
         if (null == pointerType) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Pointer type must be not null");
         }
         this.pointerType = pointerType;
         if (null == targetPOS) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Target POS must be not null");
         }
         this.targetIndex = new TargetIndex(targetPOS, targetOffset, targetIndex);
         this.target = null;
@@ -57,19 +56,27 @@ public class Pointer implements Serializable {
 
     public Pointer(PointerType pointerType, PointerTarget source, PointerTarget target) {
         if (null == pointerType) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Pointer type must be not null");
         }
         this.pointerType = pointerType;
         if (null == source) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Source must be not null");
         }
         this.source = source;
         if (null == target) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Target must be not null");
         }
         this.target = target;
         if (source.getDictionary() != target.getDictionary()) {
-            throw new IllegalArgumentException(source.getDictionary().getMessages().resolveMessage("DICTIONARY_EXCEPTION_063"));
+            if (null != source.getDictionary()) {
+                throw new IllegalArgumentException(source.getDictionary().getMessages().resolveMessage("DICTIONARY_EXCEPTION_063"));
+            } else {
+                if (null != target.getDictionary()) {
+                    throw new IllegalArgumentException(target.getDictionary().getMessages().resolveMessage("DICTIONARY_EXCEPTION_063"));
+                } else {
+                    throw new IllegalArgumentException("Source and target must belong to the same dictionary");
+                }
+            }
         }
     }
 
@@ -218,10 +225,10 @@ public class Pointer implements Serializable {
 
         Pointer pointer = (Pointer) o;
 
-        if (pointerType != null ? !pointerType.equals(pointer.pointerType) : pointer.pointerType != null) {
+        if (!pointerType.equals(pointer.pointerType)) {
             return false;
         }
-        if (source != null ? !source.equals(pointer.source) : pointer.source != null) {
+        if (!source.equals(pointer.source)) {
             return false;
         }
         if (null == target) {
@@ -245,9 +252,9 @@ public class Pointer implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = pointerType != null ? pointerType.hashCode() : 0;
+        int result = pointerType.hashCode();
         result = 31 * result + (targetIndex != null ? targetIndex.hashCode() : 0);
-        result = 31 * result + (source != null ? source.hashCode() : 0);
+        result = 31 * result + source.hashCode();
         return result;
     }
 

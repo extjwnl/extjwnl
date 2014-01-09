@@ -42,7 +42,6 @@ public class ConnectionManager {
         this.jndi = jndi;
     }
 
-
     public Query getQuery(String sql) throws SQLException, JWNLException {
         return new Query(dictionary, sql, getConnection());
     }

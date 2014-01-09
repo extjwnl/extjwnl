@@ -69,7 +69,8 @@ public class MapBackedDictionary extends MapDictionary {
     }
 
     private void load() throws JWNLException {
-        synchronized (Dictionary.class) {//because restore variable is static
+        // because restore variable is static
+        synchronized (Dictionary.class) {
             Dictionary.setRestoreDictionary(this);
             try {
                 if (!files.isOpen()) {
@@ -79,7 +80,7 @@ public class MapBackedDictionary extends MapDictionary {
                         throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_019"), e);
                     }
                 }
-                // Load all the hash tables into memory
+                // load all the hash tables into memory
                 if (log.isDebugEnabled()) {
                     log.debug(getMessages().resolveMessage("DICTIONARY_INFO_009"));
                 }

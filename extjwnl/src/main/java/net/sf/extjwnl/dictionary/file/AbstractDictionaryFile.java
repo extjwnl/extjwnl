@@ -30,7 +30,6 @@ public abstract class AbstractDictionaryFile implements DictionaryFile {
      */
     private DictionaryFileType fileType;
 
-
     public AbstractDictionaryFile(Dictionary dictionary, Map<String, Param> params) {
         this.dictionary = dictionary;
         this.params = params;

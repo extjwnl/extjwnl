@@ -1,7 +1,6 @@
 package net.sf.extjwnl.dictionary;
 
 import net.sf.extjwnl.JWNLException;
-import net.sf.extjwnl.JWNLRuntimeException;
 import net.sf.extjwnl.data.*;
 import net.sf.extjwnl.util.cache.CacheSet;
 import net.sf.extjwnl.util.cache.LRUCacheSet;
@@ -117,12 +116,12 @@ public abstract class AbstractCachingDictionary extends Dictionary {
         return (IndexWord) getCached(DictionaryElementType.INDEX_WORD, pos, key);
     }
 
-    //public access to allow synset to update cache on offset change without extra hassle
+    // public access to allow synset to update cache on offset change without extra hassle
     public void cacheSynset(Synset synset) {
         cache(DictionaryElementType.SYNSET, synset);
     }
 
-    //public access to allow synset to update cache on offset change without extra hassle
+    // public access to allow synset to update cache on offset change without extra hassle
     public void clearSynset(POS pos, Object key) {
         clear(DictionaryElementType.SYNSET, pos, key);
     }
@@ -145,9 +144,9 @@ public abstract class AbstractCachingDictionary extends Dictionary {
 
     private CacheSet<DictionaryElementType, Object, DictionaryElement> getCaches() {
         if (!isCachingEnabled()) {
-            throw new JWNLRuntimeException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_022"));
+            throw new IllegalStateException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_022"));
         }
-        //fixed DCL idiom: http://en.wikipedia.org/wiki/Double-checked_locking
+        // fixed DCL idiom: http://en.wikipedia.org/wiki/Double-checked_locking
         CacheSet<DictionaryElementType, Object, DictionaryElement> result = caches;
         if (null == result) {
             synchronized (this) {
@@ -181,24 +180,21 @@ public abstract class AbstractCachingDictionary extends Dictionary {
     }
 
     @Override
+    @SuppressWarnings({"unchecked"})
     public Iterator<Exc> getExceptionIterator(POS pos) throws JWNLException {
-        @SuppressWarnings({"unchecked", "UnnecessaryLocalVariable"})
-        Iterator<Exc> result = (Iterator<Exc>) (Object) caches.getCache(DictionaryElementType.EXCEPTION).getCache(pos).values().iterator();
-        return result;
+        return (Iterator<Exc>) (Object) caches.getCache(DictionaryElementType.EXCEPTION).getCache(pos).values().iterator();
     }
 
     @Override
+    @SuppressWarnings({"unchecked"})
     public Iterator<Synset> getSynsetIterator(POS pos) throws JWNLException {
-        @SuppressWarnings({"unchecked", "UnnecessaryLocalVariable"})
-        Iterator<Synset> result = (Iterator<Synset>) (Object) caches.getCache(DictionaryElementType.SYNSET).getCache(pos).values().iterator();
-        return result;
+        return (Iterator<Synset>) (Object) caches.getCache(DictionaryElementType.SYNSET).getCache(pos).values().iterator();
     }
 
     @Override
+    @SuppressWarnings({"unchecked"})
     public Iterator<IndexWord> getIndexWordIterator(POS pos) throws JWNLException {
-        @SuppressWarnings({"unchecked", "UnnecessaryLocalVariable"})
-        Iterator<IndexWord> result = (Iterator<IndexWord>) (Object) caches.getCache(DictionaryElementType.INDEX_WORD).getCache(pos).values().iterator();
-        return result;
+        return (Iterator<IndexWord>) (Object) caches.getCache(DictionaryElementType.INDEX_WORD).getCache(pos).values().iterator();
     }
 
     @Override
@@ -222,7 +218,7 @@ public abstract class AbstractCachingDictionary extends Dictionary {
         if (!isEditable()) {
             cacheAll();
             super.edit();
-            //resolving pointers here to use faster iterators on hashes
+            // resolving pointers here to use faster iterators on hashes
             resolveAllPointers();
         }
     }
@@ -300,7 +296,6 @@ public abstract class AbstractCachingDictionary extends Dictionary {
                 log.debug(getMessages().resolveMessage("DICTIONARY_INFO_008"));
             }
             int count = 0;
-            maxOffset.put(pos, 0L);
             Iterator<Synset> si = getSynsetIterator(pos);
             while (si.hasNext()) {
                 if (count % 10000 == 0) {
@@ -309,10 +304,7 @@ public abstract class AbstractCachingDictionary extends Dictionary {
                     }
                 }
                 count++;
-                Synset s = si.next();
-                if (maxOffset.get(pos) < s.getOffset()) {
-                    maxOffset.put(pos, s.getOffset());
-                }
+                si.next();
             }
             if (log.isDebugEnabled()) {
                 log.debug(getMessages().resolveMessage("DICTIONARY_INFO_006", count));

@@ -23,5 +23,6 @@ public class MemoryDictionary extends MapDictionary {
                 files.put(type, file);
             }
         }
+        edit();
     }
 }

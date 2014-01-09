@@ -5,7 +5,7 @@ import net.sf.extjwnl.JWNLRuntimeException;
 import net.sf.extjwnl.data.*;
 import net.sf.extjwnl.dictionary.file.DictionaryFileType;
 import net.sf.extjwnl.dictionary.file_manager.FileManager;
-import net.sf.extjwnl.princeton.data.AbstractPrincetonDictionaryElementFactory;
+import net.sf.extjwnl.princeton.data.AbstractDictionaryElementFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -28,10 +28,7 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
      * File manager install parameter. The value should be the class of FileManager to use.
      */
     public static final String FILE_MANAGER = "file_manager";
-    /**
-     * The class of FileDictionaryElementFactory to use.
-     */
-    public static final String DICTIONARY_ELEMENT_FACTORY = "dictionary_element_factory";
+
     /**
      * The value should be "true" or "false". The default is "true".
      */
@@ -60,15 +57,14 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
         super(doc);
 
         FileManager manager = (FileManager) (params.get(FILE_MANAGER)).create();
+
         // caching is enabled by default
-        FileDictionaryElementFactory factory =
-                (FileDictionaryElementFactory) (params.get(DICTIONARY_ELEMENT_FACTORY)).create();
         boolean enableCaching =
                 !params.containsKey(ENABLE_CACHING) || !params.get(ENABLE_CACHING).getValue().equalsIgnoreCase("false");
 
         this.setCachingEnabled(enableCaching);
         this.fileManager = manager;
-        this.factory = factory;
+        this.factory = (FileDictionaryElementFactory) elementFactory;
 
         if (params.containsKey(CACHE_SIZE)) {
             this.setCacheCapacity(Integer.parseInt((params.get(CACHE_SIZE)).getValue()));
@@ -448,12 +444,12 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
 
     @Override
     public synchronized void cacheAll() throws JWNLException {
-        if (factory instanceof AbstractPrincetonDictionaryElementFactory) {
-            ((AbstractPrincetonDictionaryElementFactory) factory).startCaching();
+        if (factory instanceof AbstractDictionaryElementFactory) {
+            ((AbstractDictionaryElementFactory) factory).startCaching();
         }
         super.cacheAll();
-        if (factory instanceof AbstractPrincetonDictionaryElementFactory) {
-            ((AbstractPrincetonDictionaryElementFactory) factory).stopCaching();
+        if (factory instanceof AbstractDictionaryElementFactory) {
+            ((AbstractDictionaryElementFactory) factory).stopCaching();
         }
     }
 }

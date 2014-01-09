@@ -143,7 +143,6 @@ public class TestPointer extends BaseData {
 
     @Test
     public void testGetTarget() throws JWNLException {
-        dictionary.edit();
         Synset s = dictionary.createSynset(POS.NOUN);
         Synset t = dictionary.createSynset(POS.NOUN);
         Pointer p = new Pointer(s, PointerType.ANTONYM, POS.NOUN, t.getOffset(), 0);
@@ -166,7 +165,7 @@ public class TestPointer extends BaseData {
 
     @Test
     public void testGetTargetOffset() throws JWNLException {
-        Synset s = new Synset(dictionary, POS.NOUN, 1);
+        Synset s = new Synset(null, POS.NOUN, 1);
         Pointer p = new Pointer(s, PointerType.ANTONYM, POS.NOUN, 2, 0);
 
         Assert.assertEquals(2, p.getTargetOffset());
@@ -195,7 +194,7 @@ public class TestPointer extends BaseData {
 
     @Test
     public void testGetTargetIndex() throws JWNLException {
-        Synset s = new Synset(dictionary, POS.NOUN, 1);
+        Synset s = new Synset(null, POS.NOUN, 1);
         Pointer p = new Pointer(s, PointerType.ANTONYM, POS.NOUN, 2, 0);
 
         Assert.assertEquals(0, p.getTargetIndex());
@@ -213,7 +212,7 @@ public class TestPointer extends BaseData {
 
     @Test
     public void testGetTargetPOS() throws JWNLException {
-        Synset s = new Synset(dictionary, POS.NOUN, 1);
+        Synset s = new Synset(null, POS.NOUN, 1);
         Pointer p = new Pointer(s, PointerType.ANTONYM, POS.NOUN, 2, 0);
 
         Assert.assertEquals(POS.NOUN, p.getTargetPOS());
@@ -221,7 +220,6 @@ public class TestPointer extends BaseData {
 
     @Test
     public void testGetTargetPOSEdit() throws JWNLException {
-        dictionary.edit();
         Synset s = new Synset(dictionary, POS.NOUN, 1);
         Synset t = new Synset(dictionary, POS.NOUN, 2);
         Pointer p = new Pointer(s, PointerType.ANTONYM, POS.NOUN, 2, 0);

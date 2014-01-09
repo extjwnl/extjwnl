@@ -4,7 +4,7 @@ import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.data.*;
 import net.sf.extjwnl.dictionary.database.DatabaseManager;
 import net.sf.extjwnl.dictionary.database.Query;
-import net.sf.extjwnl.princeton.data.AbstractPrincetonDictionaryElementFactory;
+import net.sf.extjwnl.princeton.data.AbstractDictionaryElementFactory;
 import net.sf.extjwnl.util.factory.Param;
 import org.w3c.dom.Document;
 
@@ -20,10 +20,7 @@ import java.util.NoSuchElementException;
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class DatabaseBackedDictionary extends AbstractCachingDictionary {
-    /**
-     * The class of DatabaseDictionaryElementFactory to use.
-     */
-    public static final String DICTIONARY_ELEMENT_FACTORY = "dictionary_element_factory";
+
     /**
      * Database manager install parameter. The value should be the class of DatabaseManager to use.
      */
@@ -35,15 +32,10 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
     public DatabaseBackedDictionary(Document doc) throws JWNLException {
         super(doc);
 
-        Param param = params.get(DICTIONARY_ELEMENT_FACTORY);
-        DatabaseDictionaryElementFactory factory =
-                (param == null) ? null : (DatabaseDictionaryElementFactory) param.create();
+        this.factory = (DatabaseDictionaryElementFactory) elementFactory;
 
-        param = params.get(DATABASE_MANAGER);
-        DatabaseManager manager = (param == null) ? null : (DatabaseManager) param.create();
-
-        this.factory = factory;
-        dbManager = manager;
+        Param param = params.get(DATABASE_MANAGER);
+        this.dbManager = (param == null) ? null : (DatabaseManager) param.create();
     }
 
     public IndexWord getIndexWord(POS pos, String lemma) throws JWNLException {
@@ -179,6 +171,22 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
         dbManager.close();
     }
 
+    @Override
+    public synchronized void cacheAll() throws JWNLException {
+        if (factory instanceof AbstractDictionaryElementFactory) {
+            ((AbstractDictionaryElementFactory) factory).startCaching();
+        }
+        super.cacheAll();
+        if (factory instanceof AbstractDictionaryElementFactory) {
+            ((AbstractDictionaryElementFactory) factory).stopCaching();
+        }
+    }
+
+    @Override
+    public synchronized void edit() throws JWNLException {
+        throw new UnsupportedOperationException();
+    }
+
     private abstract class DatabaseElementIterator<E extends DictionaryElement> implements Iterator<E> {
         private final POS pos;
         private final Query lemmas;
@@ -270,17 +278,6 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
         protected Exc createElement() throws Exception {
             String derivation = getResults().getString(1);
             return getException(getPOS(), derivation);
-        }
-    }
-
-    @Override
-    public synchronized void cacheAll() throws JWNLException {
-        if (factory instanceof AbstractPrincetonDictionaryElementFactory) {
-            ((AbstractPrincetonDictionaryElementFactory) factory).startCaching();
-        }
-        super.cacheAll();
-        if (factory instanceof AbstractPrincetonDictionaryElementFactory) {
-            ((AbstractPrincetonDictionaryElementFactory) factory).stopCaching();
         }
     }
 }

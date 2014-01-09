@@ -17,7 +17,7 @@ import java.util.*;
  * @author John Didion <jdidion@didion.net>
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
-public abstract class AbstractPrincetonFileDictionaryElementFactory extends AbstractPrincetonDictionaryElementFactory implements FileDictionaryElementFactory {
+public abstract class AbstractPrincetonFileDictionaryElementFactory extends AbstractDictionaryElementFactory implements FileDictionaryElementFactory {
 
     private static final Logger log = LoggerFactory.getLogger(AbstractPrincetonFileDictionaryElementFactory.class);
 
@@ -80,7 +80,7 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory extends Abst
 
             int lexId = tokenizer.nextHexInt(); // lex id
 
-            //NB index: Word numbers are assigned to the word fields in a synset, from left to right, beginning with 1
+            // NB index: Word numbers are assigned to the word fields in a synset, from left to right, beginning with 1
             Word w = createWord(synset, i + 1, lemma);
             w.setLexId(lexId);
             synset.getWords().add(w);
@@ -134,6 +134,15 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory extends Abst
             gloss = line.substring(index + 2, line.length() - 2);
         }
         synset.setGloss(gloss);
+
+        Long mOffset = maxOffset.get(synset.getPOS());
+        if (null == maxOffset) {
+            maxOffset.put(synset.getPOS(), synset.getOffset());
+        } else {
+            if (mOffset < synset.getOffset()) {
+                maxOffset.put(synset.getPOS(), synset.getOffset());
+            }
+        }
 
         if (log.isTraceEnabled()) {
             log.trace(dictionary.getMessages().resolveMessage("PRINCETON_INFO_002", new Object[]{pos, offset}));

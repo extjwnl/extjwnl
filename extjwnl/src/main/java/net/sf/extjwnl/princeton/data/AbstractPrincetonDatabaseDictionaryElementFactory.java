@@ -15,7 +15,7 @@ import java.util.*;
  * @author John Didion <jdidion@didion.net>
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
-public abstract class AbstractPrincetonDatabaseDictionaryElementFactory extends AbstractPrincetonDictionaryElementFactory implements DatabaseDictionaryElementFactory {
+public abstract class AbstractPrincetonDatabaseDictionaryElementFactory extends AbstractDictionaryElementFactory implements DatabaseDictionaryElementFactory {
 
     public AbstractPrincetonDatabaseDictionaryElementFactory(Dictionary dictionary, Map<String, Param> params) {
         super(dictionary, params);

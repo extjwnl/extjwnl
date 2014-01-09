@@ -32,6 +32,9 @@ public class VerbSynset extends Synset {
      * @return all Verb Frames that are valid for all the words in this synset
      */
     public String[] getVerbFrames() {
+        if (null == dictionary) {
+            return Dictionary.getFrames(verbFrameFlags, Verb.frames);
+        }
         return dictionary.getFrames(verbFrameFlags);
     }
 
@@ -41,12 +44,16 @@ public class VerbSynset extends Synset {
 
     public void setVerbFrameFlags(BitSet verbFrameFlags) {
         if (null == verbFrameFlags) {
-            throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_050"));
+            if (null != dictionary) {
+                throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_050"));
+            } else {
+                throw new IllegalArgumentException("Verb frame flags must be not null");
+            }
         }
         this.verbFrameFlags = verbFrameFlags;
     }
 
     public int[] getVerbFrameIndices() {
-        return dictionary.getVerbFrameIndices(verbFrameFlags);
+        return Dictionary.getVerbFrameIndices(verbFrameFlags);
     }
 }
