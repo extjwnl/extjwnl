@@ -21,7 +21,7 @@ import java.util.List;
  */
 public class Exc extends BaseDictionaryElement {
 
-    private static final long serialVersionUID = 4L;
+    private static final long serialVersionUID = 5L;
 
     private POS pos;
 

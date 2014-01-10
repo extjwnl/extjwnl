@@ -49,23 +49,33 @@ public class TestExc extends BaseData {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testConstructor() throws JWNLException {
+    public void testConstructorNullPOS() throws JWNLException {
         new Exc(dictionary, null, null, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testConstructor2() throws JWNLException {
+    public void testConstructorNullLemma() throws JWNLException {
         new Exc(dictionary, POS.NOUN, null, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testConstructor3() throws JWNLException {
+    public void testConstructorNullExceptions() throws JWNLException {
         new Exc(dictionary, POS.NOUN, lemma, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testConstructor4() throws JWNLException {
+    public void testConstructor2NullPOS() throws JWNLException {
         new Exc(null, null, null, null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructor2NullLemma() throws JWNLException {
+        new Exc(null, POS.NOUN, null, null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructor2NullExceptions() throws JWNLException {
+        new Exc(null, POS.NOUN, lemma, null);
     }
 
     @Test

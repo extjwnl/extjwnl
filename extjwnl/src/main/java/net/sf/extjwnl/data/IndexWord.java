@@ -19,7 +19,7 @@ import java.util.*;
  */
 public class IndexWord extends BaseDictionaryElement {
 
-    private static final long serialVersionUID = 4L;
+    private static final long serialVersionUID = 5L;
 
     private static final Logger log = LoggerFactory.getLogger(IndexWord.class);
 
@@ -198,9 +198,7 @@ public class IndexWord extends BaseDictionaryElement {
                 List<Synset> copy = new ArrayList<Synset>(this);
                 super.clear();
                 for (Synset synset : copy) {
-                    if (null != synset) {
-                        removeWordsFromSynset(synset, lemma);
-                    }
+                    removeWordsFromSynset(synset, lemma);
                 }
                 checkIfWeReEmptyAndRemoveIndexWord(d);
             } else {
@@ -220,6 +218,9 @@ public class IndexWord extends BaseDictionaryElement {
                 }
                 return result;
             } else {
+                for (Synset synset : c) {
+                    checkSynsetIsNotNull(synset);
+                }
                 return super.addAll(c);
             }
         }
@@ -234,6 +235,9 @@ public class IndexWord extends BaseDictionaryElement {
                 }
                 return true;
             } else {
+                for (Synset synset : c) {
+                    checkSynsetIsNotNull(synset);
+                }
                 return super.addAll(index, c);
             }
         }

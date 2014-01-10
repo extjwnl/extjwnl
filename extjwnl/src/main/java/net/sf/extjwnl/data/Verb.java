@@ -13,7 +13,7 @@ import java.util.BitSet;
  */
 public class Verb extends Word {
 
-    private static final long serialVersionUID = 4L;
+    private static final long serialVersionUID = 5L;
 
     final static String[] frames = {
             "Something ----s",

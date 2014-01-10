@@ -12,7 +12,7 @@ import net.sf.extjwnl.dictionary.Dictionary;
  */
 public class Adjective extends Word {
 
-    private static final long serialVersionUID = 4L;
+    private static final long serialVersionUID = 5L;
 
     private final AdjectivePosition adjectivePosition;
 

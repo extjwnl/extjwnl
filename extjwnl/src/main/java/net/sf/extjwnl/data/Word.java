@@ -18,7 +18,7 @@ import java.util.*;
  */
 public class Word extends PointerTarget {
 
-    private static final long serialVersionUID = 4L;
+    private static final long serialVersionUID = 5L;
 
     /**
      * The Synset to which this word belongs.

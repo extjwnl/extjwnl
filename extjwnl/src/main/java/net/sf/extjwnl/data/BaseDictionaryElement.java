@@ -12,7 +12,7 @@ import java.io.IOException;
  */
 public abstract class BaseDictionaryElement implements DictionaryElement {
 
-    private static final long serialVersionUID = 4L;
+    private static final long serialVersionUID = 5L;
 
     protected transient Dictionary dictionary;
 

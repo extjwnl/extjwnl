@@ -10,7 +10,7 @@ import net.sf.extjwnl.dictionary.Dictionary;
  */
 public class AdjectiveSynset extends Synset {
 
-    private static final long serialVersionUID = 4L;
+    private static final long serialVersionUID = 5L;
 
     /**
      * for use only with WordNet 1.6 and earlier

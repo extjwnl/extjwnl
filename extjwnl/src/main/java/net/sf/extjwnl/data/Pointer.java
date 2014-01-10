@@ -19,7 +19,7 @@ import java.io.Serializable;
  */
 public class Pointer implements Serializable {
 
-    private static final long serialVersionUID = 4L;
+    private static final long serialVersionUID = 5L;
 
     private final PointerType pointerType;
 
@@ -73,9 +73,11 @@ public class Pointer implements Serializable {
             } else {
                 if (null != target.getDictionary()) {
                     throw new IllegalArgumentException(target.getDictionary().getMessages().resolveMessage("DICTIONARY_EXCEPTION_063"));
-                } else {
-                    throw new IllegalArgumentException("Source and target must belong to the same dictionary");
                 }
+                //else {
+                    // should never get there because of null == null above
+                    //throw new IllegalArgumentException("Source and target must belong to the same dictionary");
+                //}
             }
         }
     }

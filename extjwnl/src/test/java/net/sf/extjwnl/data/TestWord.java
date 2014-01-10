@@ -27,38 +27,73 @@ public class TestWord extends BaseData {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testCreate() {
+    public void testCreateNullSynset() {
         word = new Word(dictionary, null, -1, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testCreate2() throws JWNLException {
+    public void testCreateIndex() throws JWNLException {
         word = new Word(dictionary, new Synset(dictionary, POS.NOUN), -1, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testCreate3() throws JWNLException {
+    public void testCreateNullLemma() throws JWNLException {
         word = new Word(dictionary, new Synset(dictionary, POS.NOUN), 1, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testCreate35() throws JWNLException {
+    public void testCreateEmptyLemma() throws JWNLException {
         word = new Word(dictionary, new Synset(dictionary, POS.NOUN), 1, "");
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testCreate4() throws JWNLException {
+    public void testCreateLemmaPrefix() throws JWNLException {
         word = new Word(dictionary, new Synset(null, POS.NOUN), 1, " a");
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testCreate5() throws JWNLException {
+    public void testCreateLemmaSuffix() throws JWNLException {
         word = new Word(dictionary, new Synset(dictionary, POS.NOUN), 1, "a ");
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testCreate6() throws JWNLException {
+    public void testCreateAlienSynset() throws JWNLException {
         word = new Word(dictionary, new Synset(mapDictionary, POS.NOUN), 1, "a ");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCreate2NullSynset() {
+        word = new Word(null, null, -1, null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCreate2Index() throws JWNLException {
+        word = new Word(null, new Synset(null, POS.NOUN), -1, null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCreate2NullLemma() throws JWNLException {
+        word = new Word(null, new Synset(null, POS.NOUN), 1, null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCreate2EmptyLemma() throws JWNLException {
+        word = new Word(null, new Synset(null, POS.NOUN), 1, "");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCreate2LemmaPrefix() throws JWNLException {
+        word = new Word(null, new Synset(null, POS.NOUN), 1, " a");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCreate2LemmaSuffix() throws JWNLException {
+        word = new Word(null, new Synset(null, POS.NOUN), 1, "a ");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCreate2AlienSynset() throws JWNLException {
+        word = new Word(null, new Synset(mapDictionary, POS.NOUN), 1, "a ");
     }
 
     @Test

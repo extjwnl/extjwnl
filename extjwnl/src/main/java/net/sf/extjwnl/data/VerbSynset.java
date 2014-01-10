@@ -12,7 +12,7 @@ import java.util.BitSet;
  */
 public class VerbSynset extends Synset {
 
-    private static final long serialVersionUID = 4L;
+    private static final long serialVersionUID = 5L;
 
     private BitSet verbFrameFlags;
 

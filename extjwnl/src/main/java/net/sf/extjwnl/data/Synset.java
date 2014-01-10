@@ -28,7 +28,7 @@ import java.util.*;
  */
 public class Synset extends PointerTarget implements DictionaryElement {
 
-    private static final long serialVersionUID = 4L;
+    private static final long serialVersionUID = 5L;
 
     private static final Logger log = LoggerFactory.getLogger(Synset.class);
 
@@ -57,6 +57,8 @@ public class Synset extends PointerTarget implements DictionaryElement {
 
     //for access control and updates
     private class PointerList extends ArrayList<Pointer> {
+
+        private static final long serialVersionUID = 5L;
 
         private volatile boolean checkingPointers = false;
 
@@ -381,6 +383,8 @@ public class Synset extends PointerTarget implements DictionaryElement {
 
     private class WordList extends ArrayList<Word> {
 
+        private static final long serialVersionUID = 5L;
+
         private WordList() {
         }
 
@@ -406,6 +410,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
                 add(size(), word);
                 return true;
             } else {
+                checkWordIsNotNull(word);
                 return super.add(word);
             }
         }
@@ -434,6 +439,9 @@ public class Synset extends PointerTarget implements DictionaryElement {
                 }
                 return result;
             } else {
+                for (Word word : c) {
+                    checkWordIsNotNull(word);
+                }
                 return super.addAll(c);
             }
         }
@@ -448,6 +456,9 @@ public class Synset extends PointerTarget implements DictionaryElement {
                 }
                 return true;
             } else {
+                for (Word word : c) {
+                    checkWordIsNotNull(word);
+                }
                 return super.addAll(index, c);
             }
         }

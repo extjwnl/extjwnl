@@ -56,6 +56,13 @@ public class TestPointer extends BaseData {
         new Pointer(PointerType.ANTONYM, s, t);
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructor2Alien2() throws JWNLException {
+        Synset s = new Synset(null, POS.NOUN);
+        Synset t = new Synset(mapDictionary, POS.NOUN);
+        new Pointer(PointerType.ANTONYM, s, t);
+    }
+
     @Test
     public void testConstructor2Semantic() throws JWNLException {
         dictionary.edit();

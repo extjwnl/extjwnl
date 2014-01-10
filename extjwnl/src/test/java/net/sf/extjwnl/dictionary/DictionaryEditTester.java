@@ -306,9 +306,11 @@ public abstract class DictionaryEditTester {
     }
 
     private void saveAndReloadDictionary() throws JWNLException, FileNotFoundException {
-        dictionary.save();
-        dictionary.close();
-        dictionary = Dictionary.getInstance(getProperties());
+        if (!(dictionary instanceof MemoryDictionary)) {
+            dictionary.save();
+            dictionary.close();
+            dictionary = Dictionary.getInstance(getProperties());
+        }
     }
 
     private void createExceptions(Dictionary dictionary) throws JWNLException {
@@ -852,5 +854,25 @@ public abstract class DictionaryEditTester {
         Assert.assertNotNull(iwAbstractEntity);
         Assert.assertEquals(1, iwAbstractEntity.getSenses().size());
         Assert.assertTrue(iwAbstractEntity.getSenses().contains(synAbstraction));
+    }
+
+    @Test
+    public void testSynsetOffsetsIncrease() throws JWNLException, FileNotFoundException {
+        dictionary.edit();
+
+        Synset s1 = dictionary.createSynset(POS.NOUN);
+        s1.setGloss("first gloss");
+        s1.getWords().add(new Word(dictionary, s1, 1, "first"));
+        long o1 = s1.getOffset();
+
+        saveAndReloadDictionary();
+        dictionary.edit();
+
+        Synset s2 = dictionary.createSynset(POS.NOUN);
+        s2.getWords().add(new Word(dictionary, s2, 1, "second"));
+        s2.setGloss("second gloss");
+        long o2 = s2.getOffset();
+
+        Assert.assertTrue(o1 < o2);
     }
 }
