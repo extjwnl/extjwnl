@@ -23,10 +23,8 @@ This release contains several features:
 
 3. Getting started
 
-extJWNL is contains Examples.java with examples of API use.
-
-Run:
-bin\examples.bat src\extjwnl\src\main\resources\net\sf\extjwnl\file_properties.xml
+extJWNL contains Examples.java with examples of API use.
+Run: bin\examples.bat
 
 4. Maven Support
 
