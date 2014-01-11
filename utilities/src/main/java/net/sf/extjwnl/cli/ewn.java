@@ -110,6 +110,8 @@ public class ewn {
                 } else {
                     log.error("Cannot find dictionary. Make sure " + defaultConfig + " is available or WNHOME variable is set.");
                 }
+            } else {
+                d = Dictionary.getDefaultResourceInstance();
             }
         } else {
             d = Dictionary.getInstance(new FileInputStream(config));

@@ -58,9 +58,9 @@
         </dependency>
 
         <dependency>
-            <scope>test</scope>
+            <scope>runtime</scope>
             <groupId>net.sf.extjwnl</groupId>
-            <artifactId>extjwnl-data-wn30</artifactId>
+            <artifactId>extjwnl-data-wn31</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
