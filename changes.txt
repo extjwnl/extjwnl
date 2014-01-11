@@ -1,3 +1,14 @@
+1.7.0
+
+- memory and resource dictionaries added
+- support for windows wordnets < 2.1 dropped
+- support for static instances dropped
+- commons-logging replaced with slf4j
+- several bugs fixed
+- test coverage improved
+- exception handling improved
+- jndi support dropped
+
 1.6.10
 
 - PointerType.NOMINALIZATION renamed to PointerType.DERIVATION, scope extended to all parts of speech
