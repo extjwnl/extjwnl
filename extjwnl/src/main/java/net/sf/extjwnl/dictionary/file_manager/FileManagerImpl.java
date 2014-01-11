@@ -86,37 +86,47 @@ public class FileManagerImpl implements FileManager {
             files.open();
 
             try {
-                try {
-                    Class fileClass = Class.forName(params.get(DictionaryCatalog.DICTIONARY_FILE_TYPE_KEY).getValue());
-                    if (!RandomAccessDictionaryFile.class.isAssignableFrom(fileClass)) {
-                        throw new JWNLRuntimeException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_003", fileClass));
-                    }
-                } catch (ClassNotFoundException ex) {
-                    throw new JWNLRuntimeException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_002"), ex);
+                Class fileClass = Class.forName(params.get(DictionaryCatalog.DICTIONARY_FILE_TYPE_KEY).getValue());
+                if (!RandomAccessDictionaryFile.class.isAssignableFrom(fileClass)) {
+                    throw new JWNLException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_003",
+                            new Object[]{fileClass, RandomAccessDictionaryFile.class.getCanonicalName()}));
                 }
-
-                @SuppressWarnings("unchecked")
-                DictionaryFileFactory<RandomAccessDictionaryFile> factory = (DictionaryFileFactory<RandomAccessDictionaryFile>) params.get(DictionaryCatalog.DICTIONARY_FILE_TYPE_KEY).create();
-                revCntList = factory.newInstance(dictionary, path, null, DictionaryFileType.REVCNTLIST);
-                cntList = factory.newInstance(dictionary, path, null, DictionaryFileType.CNTLIST);
-                senseIndex = factory.newInstance(dictionary, path, null, DictionaryFileType.INDEX);
-
-                revCntList.open();
-
-                if (params.containsKey(CACHE_USE_COUNT_KEY)) {
-                    cacheUseCount = Boolean.parseBoolean(params.get(CACHE_USE_COUNT_KEY).getValue());
-                }
-
-                if (cacheUseCount) {
-                    cacheUseCounts();
-                }
-
-                cntList.open();
-                senseIndex.open();
-            } catch (Exception e) {
-                throw new JWNLRuntimeException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_018", DictionaryFileType.REVCNTLIST), e);
+            } catch (ClassNotFoundException e) {
+                throw new JWNLException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_002"), e);
             }
 
+            @SuppressWarnings("unchecked")
+            DictionaryFileFactory<RandomAccessDictionaryFile> factory =
+                    (DictionaryFileFactory<RandomAccessDictionaryFile>) params.get(DictionaryCatalog.DICTIONARY_FILE_TYPE_KEY).create();
+
+            try {
+                revCntList = factory.newInstance(dictionary, path, null, DictionaryFileType.REVCNTLIST);
+                revCntList.open();
+            } catch (IOException e) {
+                throw new JWNLException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_018", DictionaryFileType.REVCNTLIST), e);
+            }
+
+            try {
+                cntList = factory.newInstance(dictionary, path, null, DictionaryFileType.CNTLIST);
+                cntList.open();
+            } catch (IOException e) {
+                throw new JWNLException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_018", DictionaryFileType.CNTLIST), e);
+            }
+
+            try {
+                senseIndex = factory.newInstance(dictionary, path, null, DictionaryFileType.INDEX);
+                senseIndex.open();
+            } catch (IOException e) {
+                throw new JWNLException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_018", DictionaryFileType.INDEX), e);
+            }
+
+            if (params.containsKey(CACHE_USE_COUNT_KEY)) {
+                cacheUseCount = Boolean.parseBoolean(params.get(CACHE_USE_COUNT_KEY).getValue());
+            }
+
+            if (cacheUseCount) {
+                cacheUseCounts();
+            }
         } catch (IOException e) {
             throw new JWNLException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_016"), e);
         }

@@ -1,6 +1,7 @@
 package net.sf.extjwnl.dictionary;
 
 import net.sf.extjwnl.JWNLException;
+import net.sf.extjwnl.JWNLRuntimeException;
 import net.sf.extjwnl.data.*;
 import net.sf.extjwnl.dictionary.database.DatabaseManager;
 import net.sf.extjwnl.dictionary.database.Query;
@@ -34,6 +35,9 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
 
         this.factory = (DatabaseDictionaryElementFactory) elementFactory;
 
+        if (!params.containsKey(DATABASE_MANAGER)) {
+            throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_001", DATABASE_MANAGER));
+        }
         Param param = params.get(DATABASE_MANAGER);
         this.dbManager = (param == null) ? null : (DatabaseManager) param.create();
     }
@@ -54,7 +58,7 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
                         cacheIndexWord(word);
                     }
                 } catch (SQLException e) {
-                    throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_023"), e);
+                    throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_004", new Object[]{pos.getLabel(), lemma}), e);
                 } finally {
                     if (query != null) {
                         query.close();
@@ -66,27 +70,40 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
     }
 
     public Iterator<IndexWord> getIndexWordIterator(POS pos) throws JWNLException {
-        Query query = dbManager.getIndexWordLemmasQuery(pos);
+        Query query;
+        try {
+            query = dbManager.getIndexWordLemmasQuery(pos);
+        } catch (SQLException e) {
+            throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_064", pos.getLabel()), e);
+        }
         return new IndexWordIterator(pos, query);
     }
 
     public Iterator<IndexWord> getIndexWordIterator(POS pos, String substring) throws JWNLException {
-        Query query = dbManager.getIndexWordLemmasQuery(pos, substring);
+        Query query;
+        try {
+            query = dbManager.getIndexWordLemmasQuery(pos, substring);
+        } catch (SQLException e) {
+            throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_065", new Object[]{pos.getLabel(), substring}), e);
+        }
         return new IndexWordIterator(pos, query);
     }
 
     public IndexWord getRandomIndexWord(POS pos) throws JWNLException {
-        Query query = dbManager.getRandomIndexWordQuery(pos);
-        String lemma = null;
+        Query query = null;
+        String lemma;
 
         try {
+            query = dbManager.getRandomIndexWordQuery(pos);
             query.execute();
             query.getResults().next();
             lemma = query.getResults().getString(1);
         } catch (SQLException e) {
-            throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_023"), e);
+            throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_004", new Object[]{pos.getLabel(), "random"}), e);
         } finally {
-            query.close();
+            if (null != query) {
+                query.close();
+            }
         }
 
         return getIndexWord(pos, lemma);
@@ -113,7 +130,7 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
                     cacheSynset(synset);
                 }
             } catch (SQLException e) {
-                throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_023"), e);
+                throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_005", new Object[]{pos.getLabel(), offset}), e);
             } finally {
                 if (query != null) {
                     query.close();
@@ -133,7 +150,12 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
     }
 
     public Iterator<Synset> getSynsetIterator(POS pos) throws JWNLException {
-        Query query = dbManager.getSynsetsQuery(pos);
+        Query query;
+        try {
+            query = dbManager.getSynsetsQuery(pos);
+        } catch (SQLException e) {
+            throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_066", pos.getLabel()), e);
+        }
         return new SynsetIterator(pos, query);
     }
 
@@ -152,7 +174,7 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
                     cacheException(exc);
                 }
             } catch (SQLException e) {
-                throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_023"), e);
+                throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_006", new Object[]{pos.getLabel(), derivation}), e);
             } finally {
                 if (query != null) {
                     query.close();
@@ -163,7 +185,12 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
     }
 
     public Iterator<Exc> getExceptionIterator(POS pos) throws JWNLException {
-        Query query = dbManager.getExceptionsQuery(pos);
+        Query query;
+        try {
+            query = dbManager.getExceptionsQuery(pos);
+        } catch (SQLException e) {
+            throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_067", pos.getLabel()), e);
+        }
         return new ExceptionIterator(pos, query);
     }
 
@@ -204,7 +231,7 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
                 try {
                     hasNext = getResults().next();
                 } catch (SQLException e) {
-                    hasNext = false;
+                    throw new JWNLRuntimeException(e);
                 }
             }
             if (!hasNext) {
@@ -218,8 +245,10 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
                 advanced = false;
                 try {
                     return createElement();
-                } catch (Exception e) {
-                    return null;
+                } catch (JWNLException e) {
+                    throw new JWNLRuntimeException(e);
+                } catch (SQLException e) {
+                    throw new JWNLRuntimeException(e);
                 }
             }
             throw new NoSuchElementException();
@@ -229,7 +258,7 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
             throw new UnsupportedOperationException();
         }
 
-        protected abstract E createElement() throws Exception;
+        protected abstract E createElement() throws JWNLException, SQLException;
 
         protected POS getPOS() {
             return pos;
@@ -253,7 +282,7 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
             super(pos, query);
         }
 
-        protected IndexWord createElement() throws Exception {
+        protected IndexWord createElement() throws JWNLException, SQLException {
             String lemma = getResults().getString(1);
             return getIndexWord(getPOS(), lemma);
         }
@@ -264,7 +293,7 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
             super(pos, query);
         }
 
-        protected Synset createElement() throws Exception {
+        protected Synset createElement() throws JWNLException, SQLException {
             long offset = getResults().getLong(1);
             return getSynsetAt(getPOS(), offset);
         }
@@ -275,7 +304,7 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
             super(pos, query);
         }
 
-        protected Exc createElement() throws Exception {
+        protected Exc createElement() throws JWNLException, SQLException {
             String derivation = getResults().getString(1);
             return getException(getPOS(), derivation);
         }

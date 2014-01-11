@@ -1,7 +1,6 @@
 package net.sf.extjwnl.dictionary.file;
 
 import net.sf.extjwnl.JWNLException;
-import net.sf.extjwnl.JWNLRuntimeException;
 import net.sf.extjwnl.data.POS;
 import net.sf.extjwnl.dictionary.Dictionary;
 import net.sf.extjwnl.util.factory.Owned;
@@ -57,10 +56,10 @@ public class DictionaryCatalog<E extends DictionaryFile> implements Owned {
             try {
                 fileClass = Class.forName(params.get(DICTIONARY_FILE_TYPE_KEY).getValue());
                 if (!desiredDictionaryFileType.isAssignableFrom(fileClass)) {
-                    throw new JWNLRuntimeException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_003", fileClass));
+                    throw new JWNLException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_003", new Object[]{fileClass, desiredDictionaryFileType.getCanonicalName()}));
                 }
-            } catch (ClassNotFoundException ex) {
-                throw new JWNLRuntimeException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_002"), ex);
+            } catch (ClassNotFoundException e) {
+                throw new JWNLException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_002"), e);
             }
 
             DictionaryFileFactory<E> factory = (DictionaryFileFactory<E>) params.get(DICTIONARY_FILE_TYPE_KEY).create();
@@ -68,8 +67,8 @@ public class DictionaryCatalog<E extends DictionaryFile> implements Owned {
                 E file = factory.newInstance(dictionary, path, pos, fileType);
                 files.put(file.getPOS(), file);
             }
-        } catch (Exception e) {
-            throw new JWNLRuntimeException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_018", fileType), e);
+        } catch (JWNLException e) {
+            throw new JWNLException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_018", fileType), e);
         }
     }
 
@@ -79,7 +78,7 @@ public class DictionaryCatalog<E extends DictionaryFile> implements Owned {
 
     public void open() throws IOException {
         if (!isOpen()) {
-            for (Iterator<E> itr = getFileIterator(); itr.hasNext();) {
+            for (Iterator<E> itr = getFileIterator(); itr.hasNext(); ) {
                 itr.next().open();
             }
         }
@@ -87,14 +86,14 @@ public class DictionaryCatalog<E extends DictionaryFile> implements Owned {
 
     public boolean delete() throws IOException {
         boolean result = true;
-        for (Iterator<E> itr = getFileIterator(); itr.hasNext();) {
+        for (Iterator<E> itr = getFileIterator(); itr.hasNext(); ) {
             result = result && itr.next().delete();
         }
         return result;
     }
 
     public boolean isOpen() {
-        for (Iterator<E> itr = getFileIterator(); itr.hasNext();) {
+        for (Iterator<E> itr = getFileIterator(); itr.hasNext(); ) {
             if (!itr.next().isOpen()) {
                 return false;
             }
@@ -103,7 +102,7 @@ public class DictionaryCatalog<E extends DictionaryFile> implements Owned {
     }
 
     public void close() {
-        for (Iterator<E> itr = getFileIterator(); itr.hasNext();) {
+        for (Iterator<E> itr = getFileIterator(); itr.hasNext(); ) {
             itr.next().close();
         }
     }
@@ -133,13 +132,13 @@ public class DictionaryCatalog<E extends DictionaryFile> implements Owned {
     }
 
     public void save() throws IOException, JWNLException {
-        for (Iterator<E> itr = getFileIterator(); itr.hasNext();) {
+        for (Iterator<E> itr = getFileIterator(); itr.hasNext(); ) {
             itr.next().save();
         }
     }
 
     public void edit() throws IOException {
-        for (Iterator<E> itr = getFileIterator(); itr.hasNext();) {
+        for (Iterator<E> itr = getFileIterator(); itr.hasNext(); ) {
             itr.next().edit();
         }
     }

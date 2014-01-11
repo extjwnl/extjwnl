@@ -76,7 +76,7 @@ public class MapBackedDictionary extends MapDictionary {
                 if (!files.isOpen()) {
                     try {
                         files.open();
-                    } catch (Exception e) {
+                    } catch (IOException e) {
                         throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_019"), e);
                     }
                 }

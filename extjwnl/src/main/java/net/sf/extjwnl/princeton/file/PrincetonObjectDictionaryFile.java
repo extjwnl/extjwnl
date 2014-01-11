@@ -77,7 +77,7 @@ public class PrincetonObjectDictionaryFile extends AbstractPrincetonDictionaryFi
                 fout.close();
             }
             super.close();
-        } catch (Exception e) {
+        } catch (IOException e) {
             if (log.isErrorEnabled()) {
                 log.error(dictionary.getMessages().resolveMessage("EXCEPTION_001", e.getMessage()), e);
             }

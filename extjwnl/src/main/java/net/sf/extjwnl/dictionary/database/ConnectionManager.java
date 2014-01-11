@@ -1,12 +1,8 @@
 package net.sf.extjwnl.dictionary.database;
 
-import net.sf.extjwnl.JWNLException;
+import net.sf.extjwnl.JWNLRuntimeException;
 import net.sf.extjwnl.dictionary.Dictionary;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
@@ -25,9 +21,7 @@ public class ConnectionManager {
     private String url;
     private String userName;
     private String password;
-    private boolean registered;
     private Connection connection;
-    private String jndi;
 
     public ConnectionManager(Dictionary dictionary, String driverClass, String url, String userName, String password) {
         this.dictionary = dictionary;
@@ -35,36 +29,17 @@ public class ConnectionManager {
         this.url = url;
         this.userName = userName;
         this.password = password;
+        registerDriver();
     }
 
-    public ConnectionManager(Dictionary dictionary, String jndi) {
-        this.dictionary = dictionary;
-        this.jndi = jndi;
-    }
-
-    public Query getQuery(String sql) throws SQLException, JWNLException {
+    public Query getQuery(String sql) throws SQLException {
         return new Query(dictionary, sql, getConnection());
     }
 
-    public Connection getConnection() throws SQLException, JWNLException {
+    public Connection getConnection() throws SQLException {
         if (null != connection) {
             return connection;
         }
-        if (jndi != null) {
-            try {
-                Context initContext = new InitialContext();
-                Context envContext = (Context) initContext.lookup("java:/comp/env");
-                DataSource ds = (DataSource) envContext.lookup(jndi);
-                if (ds != null) {
-                    connection = ds.getConnection();
-                    connection.setReadOnly(true);
-                    return connection;
-                }
-            } catch (NamingException ne) {
-                throw new JWNLException(dictionary.getMessages().resolveMessage("JNDI_NAMING_EXCEPTION", jndi));
-            }
-        }
-        registerDriver();
         if (userName == null) {
             connection = DriverManager.getConnection(url);
             connection.setReadOnly(true);
@@ -76,15 +51,18 @@ public class ConnectionManager {
         }
     }
 
-    private void registerDriver() throws JWNLException {
-        if (!registered) {
-            try {
-                Driver driver = (Driver) Class.forName(driverClass).newInstance();
-                DriverManager.registerDriver(driver);
-                registered = true;
-            } catch (Exception e) {
-                throw new JWNLException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_024"), e);
-            }
+    private void registerDriver() {
+        try {
+            Driver driver = (Driver) Class.forName(driverClass).newInstance();
+            DriverManager.registerDriver(driver);
+        } catch (SQLException e) {
+            throw new JWNLRuntimeException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_024", driverClass), e);
+        } catch (ClassNotFoundException e) {
+            throw new JWNLRuntimeException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_024", driverClass), e);
+        } catch (InstantiationException e) {
+            throw new JWNLRuntimeException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_024", driverClass), e);
+        } catch (IllegalAccessException e) {
+            throw new JWNLRuntimeException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_024", driverClass), e);
         }
     }
 

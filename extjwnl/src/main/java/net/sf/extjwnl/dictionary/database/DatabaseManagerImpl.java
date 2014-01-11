@@ -1,12 +1,13 @@
 package net.sf.extjwnl.dictionary.database;
 
-import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.data.POS;
 import net.sf.extjwnl.dictionary.Dictionary;
 import net.sf.extjwnl.util.factory.Param;
 
 import java.sql.SQLException;
-import java.util.*;
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.Random;
 
 /**
  * Database manager.
@@ -19,7 +20,6 @@ public class DatabaseManagerImpl implements DatabaseManager {
     public static final String URL = "url";
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
-    public static final String JNDI = "jndi";
 
     protected static final String LEMMA_FOR_INDEX_WORD_ID_SQL =
             "SELECT iw.lemma " +
@@ -76,35 +76,30 @@ public class DatabaseManagerImpl implements DatabaseManager {
     protected final Map<POS, MinMax> minMaxIds;
     protected final Dictionary dictionary;
 
-    public DatabaseManagerImpl(Dictionary dictionary, Map<String, Param> params) throws JWNLException {
+    public DatabaseManagerImpl(Dictionary dictionary, Map<String, Param> params) throws SQLException {
         String driverClassName = params.containsKey(DRIVER) ? params.get(DRIVER).getValue() : null;
         String url = params.containsKey(URL) ? params.get(URL).getValue() : null;
         String userName = params.containsKey(USERNAME) ? params.get(USERNAME).getValue() : null;
         String password = params.containsKey(PASSWORD) ? params.get(PASSWORD).getValue() : null;
-        String jndi = params.containsKey(JNDI) ? params.get(JNDI).getValue() : null;
-        if (null != jndi && jndi.trim().length() > 0) {
-            connectionManager = new ConnectionManager(dictionary, jndi.trim());
-        } else {
-            connectionManager = new ConnectionManager(dictionary, driverClassName, url, userName, password);
-        }
+        connectionManager = new ConnectionManager(dictionary, driverClassName, url, userName, password);
 
         this.dictionary = dictionary;
         this.minMaxIds = new EnumMap<POS, MinMax>(POS.class);
     }
 
-    public Query getIndexWordSynsetsQuery(POS pos, String lemma) throws JWNLException {
+    public Query getIndexWordSynsetsQuery(POS pos, String lemma) throws SQLException {
         return createPOSStringQuery(pos, lemma, SYNSET_IDS_FOR_INDEX_WORD_SQL);
     }
 
-    public Query getIndexWordLemmasQuery(POS pos) throws JWNLException {
+    public Query getIndexWordLemmasQuery(POS pos) throws SQLException {
         return createPOSQuery(pos, ALL_LEMMAS_SQL);
     }
 
-    public Query getIndexWordLemmasQuery(POS pos, String substring) throws JWNLException {
+    public Query getIndexWordLemmasQuery(POS pos, String substring) throws SQLException {
         return createPOSStringQuery(pos, "%" + substring + "%", ALL_LEMMAS_LIKE_SQL);
     }
 
-    public synchronized Query getRandomIndexWordQuery(POS pos) throws JWNLException {
+    public synchronized Query getRandomIndexWordQuery(POS pos) throws SQLException {
         MinMax minMax = minMaxIds.get(pos);
         if (minMax == null) {
             Query query = createPOSQuery(pos, COUNT_INDEX_WORDS_SQL);
@@ -113,8 +108,6 @@ public class DatabaseManagerImpl implements DatabaseManager {
                 query.getResults().next();
                 minMax = new MinMax(query.getResults().getInt(1), query.getResults().getInt(2));
                 minMaxIds.put(pos, minMax);
-            } catch (SQLException ex) {
-                throw new JWNLException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_023"), ex);
             } finally {
                 if (query != null) {
                     query.close();
@@ -143,31 +136,31 @@ public class DatabaseManagerImpl implements DatabaseManager {
         }
     }
 
-    public Query getSynsetQuery(POS pos, long offset) throws JWNLException {
+    public Query getSynsetQuery(POS pos, long offset) throws SQLException {
         return createPOSOffsetQuery(pos, offset, SYNSET_SQL);
     }
 
-    public Query getSynsetWordQuery(POS pos, long offset) throws JWNLException {
+    public Query getSynsetWordQuery(POS pos, long offset) throws SQLException {
         return createPOSOffsetQuery(pos, offset, SYNSET_WORD_SQL);
     }
 
-    public Query getPointerQuery(POS pos, long offset) throws JWNLException {
+    public Query getPointerQuery(POS pos, long offset) throws SQLException {
         return createPOSOffsetQuery(pos, offset, SYNSET_POINTER_SQL);
     }
 
-    public Query getVerbFrameQuery(POS pos, long offset) throws JWNLException {
+    public Query getVerbFrameQuery(POS pos, long offset) throws SQLException {
         return createPOSOffsetQuery(pos, offset, SYNSET_VERB_FRAME_SQL);
     }
 
-    public Query getSynsetsQuery(POS pos) throws JWNLException {
+    public Query getSynsetsQuery(POS pos) throws SQLException {
         return createPOSQuery(pos, ALL_SYNSETS_SQL);
     }
 
-    public Query getExceptionQuery(POS pos, String derivation) throws JWNLException {
+    public Query getExceptionQuery(POS pos, String derivation) throws SQLException {
         return createPOSStringQuery(pos, derivation, EXCEPTION_SQL);
     }
 
-    public Query getExceptionsQuery(POS pos) throws JWNLException {
+    public Query getExceptionsQuery(POS pos) throws SQLException {
         return createPOSQuery(pos, ALL_EXCEPTIONS_SQL);
     }
 
@@ -177,63 +170,59 @@ public class DatabaseManagerImpl implements DatabaseManager {
         connectionManager.close();
     }
 
-    protected Query createPOSQuery(POS pos, String sql) throws JWNLException {
+    protected Query createPOSQuery(POS pos, String sql) throws SQLException {
         Query query = null;
         try {
             query = connectionManager.getQuery(sql);
             query.getStatement().setString(1, pos.getKey());
-            return query;
-        } catch (SQLException ex) {
+        } finally {
             if (query != null) {
                 query.close();
             }
-            throw new JWNLException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_023"), ex);
         }
+        return query;
     }
 
-    protected Query createPOSStringQuery(POS pos, String str, String sql) throws JWNLException {
+    protected Query createPOSStringQuery(POS pos, String str, String sql) throws SQLException {
         Query query = null;
         try {
             query = connectionManager.getQuery(sql);
             query.getStatement().setString(1, pos.getKey());
             query.getStatement().setString(2, str);
-            return query;
-        } catch (SQLException ex) {
+        } finally {
             if (query != null) {
                 query.close();
             }
-            throw new JWNLException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_023"), ex);
         }
+        return query;
     }
 
-    protected Query createPOSOffsetQuery(POS pos, long offset, String sql) throws JWNLException {
+    protected Query createPOSOffsetQuery(POS pos, long offset, String sql) throws SQLException {
         Query query = null;
         try {
             query = connectionManager.getQuery(sql);
             query.getStatement().setString(1, pos.getKey());
             query.getStatement().setLong(2, offset);
-            return query;
-        } catch (SQLException ex) {
+        } finally {
             if (query != null) {
                 query.close();
             }
-            throw new JWNLException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_023"), ex);
         }
+        return query;
     }
 
-    protected Query createPOSIdQuery(POS pos, int id, String sql) throws JWNLException {
+    protected Query createPOSIdQuery(POS pos, int id, String sql) throws SQLException {
         Query query = null;
         try {
             query = connectionManager.getQuery(sql);
             query.getStatement().setString(1, pos.getKey());
             query.getStatement().setInt(2, id);
-            return query;
-        } catch (SQLException ex) {
+        } finally {
             if (query != null) {
                 query.close();
             }
-            throw new JWNLException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_023"), ex);
         }
+        return query;
     }
 
     public Dictionary getDictionary() {

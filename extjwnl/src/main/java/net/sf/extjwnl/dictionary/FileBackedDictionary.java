@@ -140,7 +140,7 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
                         word = parseAndCacheIndexWordLine(pos, getFileManager().readLineAt(pos, DictionaryFileType.INDEX, offset));
                     }
                 } catch (IOException e) {
-                    throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_004", lemma), e);
+                    throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_004", new Object[]{pos.getLabel(), lemma}), e);
                 }
             }
         }
@@ -152,7 +152,7 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
             long offset = getFileManager().getRandomLinePointer(pos, DictionaryFileType.INDEX);
             return parseAndCacheIndexWordLine(pos, getFileManager().readLineAt(pos, DictionaryFileType.INDEX, offset));
         } catch (IOException e) {
-            throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_004", "random"), e);
+            throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_004", new Object[]{pos.getLabel(), "?random?"}), e);
         }
     }
 
@@ -200,7 +200,7 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
                     cacheSynset(synset);
                 }
             } catch (IOException e) {
-                throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_005", offset), e);
+                throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_005", new Object[]{pos.getLabel(), offset}), e);
             }
         }
         return synset;
@@ -242,8 +242,8 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
                     if (offset >= 0) {
                         exc = parseAndCacheExceptionLine(pos, getFileManager().readLineAt(pos, DictionaryFileType.EXCEPTION, offset));
                     }
-                } catch (IOException ex) {
-                    throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_006", ex.getMessage()), ex);
+                } catch (IOException e) {
+                    throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_006", new Object[]{pos.getLabel(), derivation}), e);
                 }
             }
         }

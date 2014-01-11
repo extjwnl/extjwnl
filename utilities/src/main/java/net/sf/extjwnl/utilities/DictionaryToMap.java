@@ -112,13 +112,9 @@ public class DictionaryToMap {
         System.out.println("Successfully serialized " + count + " elements...");
     }
 
-    public static void main(String args[]) {
+    public static void main(String args[]) throws IOException, JWNLException {
         if (args.length == 2) {
-            try {
-                (new DictionaryToMap(args[0], args[1])).convert();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            new DictionaryToMap(args[0], args[1]).convert();
         } else {
             System.out.println("Usage: DictionaryToMap <properties file> <destination directory>");
         }

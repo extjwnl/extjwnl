@@ -81,8 +81,6 @@ public class DictionaryToDatabase {
             DictionaryToDatabase d2d = new DictionaryToDatabase(dictionary, conn);
             d2d.createTables(tablesScript);
             d2d.insertData();
-        } catch (Exception e) {
-            e.printStackTrace();
         } finally {
             if (null != conn) {
                 conn.close();

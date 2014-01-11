@@ -26,7 +26,7 @@ import java.io.IOException;
 public class Examples {
     private static final String USAGE = "Usage: Examples <properties file>";
 
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) throws FileNotFoundException, JWNLException, CloneNotSupportedException {
         if (args.length != 1) {
             System.out.println(USAGE);
         } else {
@@ -34,8 +34,6 @@ public class Examples {
             try {
                 Dictionary dictionary = Dictionary.getInstance(inputStream);
                 new Examples(dictionary).go();
-            } catch (Exception e) {
-                e.printStackTrace();
             } finally {
                 try {
                     inputStream.close();
