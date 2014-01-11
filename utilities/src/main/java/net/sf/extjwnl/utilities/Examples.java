@@ -15,7 +15,10 @@ import net.sf.extjwnl.dictionary.Dictionary;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A class to demonstrate the functionality of the library.
@@ -24,23 +27,27 @@ import java.io.IOException;
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class Examples {
-    private static final String USAGE = "Usage: Examples <properties file>";
+
+    private static final String USAGE = "Usage: Examples [properties file]";
+    private static final Set<String> HELP_KEYS = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
+            "--help", "-help", "/help", "--?", "-?", "?", "/?"
+    )));
 
     public static void main(String[] args) throws FileNotFoundException, JWNLException, CloneNotSupportedException {
+        Dictionary dictionary = null;
         if (args.length != 1) {
-            System.out.println(USAGE);
+            dictionary = Dictionary.getDefaultResourceInstance();
         } else {
-            FileInputStream inputStream = new FileInputStream(args[0]);
-            try {
-                Dictionary dictionary = Dictionary.getInstance(inputStream);
-                new Examples(dictionary).go();
-            } finally {
-                try {
-                    inputStream.close();
-                } catch (IOException e) {
-                    // nop
-                }
+            if (HELP_KEYS.contains(args[0])) {
+                System.out.println(USAGE);
+            } else {
+                FileInputStream inputStream = new FileInputStream(args[0]);
+                dictionary = Dictionary.getInstance(inputStream);
             }
+        }
+
+        if (null != dictionary) {
+            new Examples(dictionary).go();
         }
     }
 
