@@ -61,11 +61,7 @@ public class PointerTargetNode implements Node {
      * @return If the target is a synset, return it, otherwise it's a word so return the word's parent synset
      */
     public Synset getSynset() {
-        if (isLexical()) {
-            return target.getSynset();
-        } else {
-            return (Synset) target;
-        }
+        return target.getSynset();
     }
 
     /**

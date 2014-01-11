@@ -15,13 +15,10 @@ import java.util.List;
  * @author John Didion <jdidion@didion.net>
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
-public class RelationshipFinder {
+public abstract class RelationshipFinder {
 
     private static final int DEFAULT_ASYMMETRIC_SEARCH_DEPTH = Integer.MAX_VALUE;
     private static final int DEFAULT_SYMMETRIC_SEARCH_DEPTH = 2;
-
-    private RelationshipFinder() {
-    }
 
     /**
      * Looks whether the target word is one of the words in one of the synsets

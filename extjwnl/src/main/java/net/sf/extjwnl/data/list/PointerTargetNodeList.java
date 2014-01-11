@@ -71,21 +71,6 @@ public class PointerTargetNodeList extends LinkedList<PointerTargetNode> impleme
     }
 
     /**
-     * Converts this list to a PointerTargetTreeNodeList.
-     *
-     * @return PointerTargetTreeNodeList
-     */
-    public PointerTargetTreeNodeList toTreeList() {
-        ListIterator<PointerTargetNode> itr = listIterator();
-        PointerTargetTreeNodeList list = new PointerTargetTreeNodeList();
-        while (itr.hasNext()) {
-            PointerTargetNode node = itr.next();
-            list.add(new PointerTargetTreeNode(node.getPointerTarget(), node.getType()));
-        }
-        return list;
-    }
-
-    /**
      * Reverses the contents of this list. This function creates a copy of
      * this list and reverses it, so there are no changes made to this list
      * itself.

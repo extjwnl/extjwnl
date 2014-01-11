@@ -16,6 +16,7 @@ import net.sf.extjwnl.data.list.PointerTargetNodeList;
  * @author John Didion <jdidion@didion.net>
  */
 public class SymmetricRelationship extends Relationship {
+
     public SymmetricRelationship(
             PointerType type, PointerTargetNodeList nodes, Synset sourceSynset, Synset targetSynset) {
 

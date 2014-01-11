@@ -416,7 +416,7 @@ public class ewn {
                             i++;
                             if (i < args.length && '-' != args[i].charAt(0)) {
                                 if (-1 < args[i].indexOf('.')) {
-                                    workWord.getSynset().setLexFileNum(LexFileNameLexFileIdMap.getMap().get(args[i]));
+                                    workWord.getSynset().setLexFileNum(LexFileNameFileIdMap.getMap().get(args[i]));
                                 } else {
                                     workWord.getSynset().setLexFileNum(Integer.parseInt(args[i]));
                                 }

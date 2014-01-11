@@ -27,6 +27,8 @@ public class AsymmetricRelationship extends Relationship {
             PointerType type, PointerTargetNodeList nodes, int commonParentIndex, Synset sourceSynset, Synset targetSynset) {
 
         super(type, nodes, sourceSynset, targetSynset);
+        // fail fast
+        nodes.get(commonParentIndex);
         this.commonParentIndex = commonParentIndex;
     }
 

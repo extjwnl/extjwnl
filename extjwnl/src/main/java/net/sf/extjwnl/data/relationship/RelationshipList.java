@@ -31,9 +31,9 @@ public class RelationshipList extends ArrayList<Relationship> {
             shallowestIndex = 0;
             deepestIndex = 0;
         } else {
-            Relationship shallowest = get(shallowestIndex);
-            Relationship deepest = get(deepestIndex);
             if (success) {
+                Relationship shallowest = get(shallowestIndex);
+                Relationship deepest = get(deepestIndex);
                 if (relationship.getDepth() < shallowest.getDepth()) {
                     shallowestIndex = curSize;
                 }
