@@ -90,6 +90,7 @@ public class TestSynset extends BaseData {
 
     @Test(expected = IllegalArgumentException.class)
     public void testAddNullPointer2() throws JWNLException {
+        dictionary.edit();
         testObj.setDictionary(null);
         testObj.getPointers().add(null);
     }
@@ -159,6 +160,7 @@ public class TestSynset extends BaseData {
 
     @Test
     public void testAddPointer3() throws JWNLException {
+        dictionary.edit();
         Synset hyponym = new Synset(dictionary, POS.NOUN, 100);
         testObj.getPointers().add(0, new Pointer(PointerType.HYPONYM, testObj, hyponym));
         Assert.assertEquals(1, testObj.getPointers().size());
@@ -178,6 +180,7 @@ public class TestSynset extends BaseData {
 
     @Test
     public void testAddPointerAddAll() throws JWNLException {
+        dictionary.edit();
         Synset hyponym = new Synset(dictionary, POS.NOUN, 100);
         Synset hypernym = new Synset(dictionary, POS.NOUN, 200);
 
@@ -194,6 +197,7 @@ public class TestSynset extends BaseData {
 
     @Test
     public void testAddPointerAddAllNull() throws JWNLException {
+        dictionary.edit();
         testObj.setDictionary(null);
         Synset hyponym = new Synset(null, POS.NOUN, 100);
         Synset hypernym = new Synset(null, POS.NOUN, 200);
@@ -253,6 +257,7 @@ public class TestSynset extends BaseData {
 
     @Test
     public void testPointerRemoveAll() throws JWNLException {
+        dictionary.edit();
         Synset hyponym = new Synset(dictionary, POS.NOUN, 100);
         Synset hypernym = new Synset(dictionary, POS.NOUN, 200);
 
@@ -271,6 +276,7 @@ public class TestSynset extends BaseData {
 
     @Test
     public void testPointerRemoveAllNull() throws JWNLException {
+        dictionary.edit();
         testObj.setDictionary(null);
         Synset hyponym = new Synset(null, POS.NOUN, 100);
         Synset hypernym = new Synset(null, POS.NOUN, 200);
@@ -291,6 +297,7 @@ public class TestSynset extends BaseData {
 
     @Test
     public void testPointerRetainAllEdit() throws JWNLException {
+        dictionary.edit();
         Synset hyponym = new Synset(dictionary, POS.NOUN, 100);
         Synset hypernym = new Synset(dictionary, POS.NOUN, 200);
 
@@ -307,6 +314,7 @@ public class TestSynset extends BaseData {
 
     @Test
     public void testPointerRetainAllNull() throws JWNLException {
+        dictionary.edit();
         testObj.setDictionary(null);
         Synset hyponym = new Synset(null, POS.NOUN, 100);
         Synset hypernym = new Synset(null, POS.NOUN, 200);
@@ -322,6 +330,7 @@ public class TestSynset extends BaseData {
 
     @Test
     public void testAddPointerAddAllEdit() throws JWNLException {
+        dictionary.edit();
         Synset hyponym = new Synset(dictionary, POS.NOUN, 100);
         Synset hypernym = new Synset(dictionary, POS.NOUN, 200);
 
@@ -338,6 +347,7 @@ public class TestSynset extends BaseData {
 
     @Test
     public void testAddPointerAddAllIndexedEdit() throws JWNLException {
+        dictionary.edit();
         Synset hyponym = new Synset(dictionary, POS.NOUN, 100);
         Synset hypernym = new Synset(dictionary, POS.NOUN, 200);
 
@@ -358,6 +368,7 @@ public class TestSynset extends BaseData {
 
     @Test
     public void testRemovePointer() throws JWNLException {
+        dictionary.edit();
         Synset hyponym = new Synset(dictionary, POS.NOUN, 100);
         testObj.getPointers().add(new Pointer(PointerType.HYPONYM, testObj, hyponym));
         hyponym.getPointers().remove(0);
@@ -368,6 +379,7 @@ public class TestSynset extends BaseData {
 
     @Test
     public void testRemovePointer2() throws JWNLException {
+        dictionary.edit();
         Synset hyponym = new Synset(dictionary, POS.NOUN, 100);
         testObj.getPointers().add(new Pointer(PointerType.HYPONYM, testObj, hyponym));
         hyponym.getPointers().remove(hyponym.getPointers().get(0));
@@ -388,6 +400,7 @@ public class TestSynset extends BaseData {
 
     @Test
     public void testSetWord3() throws JWNLException {
+        dictionary.edit();
         testObj.getWords().add(new Word(dictionary, testObj, 1, "test2"));
         testObj.getWords().set(0, new Word(dictionary, testObj, 1, "test"));
 
@@ -412,6 +425,7 @@ public class TestSynset extends BaseData {
 
     @Test(expected = IllegalArgumentException.class)
     public void testAddWordNull() throws JWNLException {
+        dictionary.edit();
         testObj.setDictionary(null);
         testObj.getWords().add(null);
     }
@@ -423,6 +437,7 @@ public class TestSynset extends BaseData {
 
     @Test
     public void testAddWord3() throws JWNLException {
+        dictionary.edit();
         testObj.getWords().add(new Word(dictionary, testObj, 1, "test"));
         Assert.assertEquals(1, testObj.getWords().size());
         Assert.assertEquals("test", testObj.getWords().get(0).getLemma());
@@ -440,6 +455,7 @@ public class TestSynset extends BaseData {
 
     @Test
     public void testAddWordNullD() throws JWNLException {
+        dictionary.edit();
         testObj.setDictionary(null);
         testObj.getWords().add(new Word(null, testObj, 1, "test"));
         Assert.assertEquals(1, testObj.getWords().size());
@@ -447,7 +463,17 @@ public class TestSynset extends BaseData {
     }
 
     @Test
+    public void testAddWordIndexedNullD() throws JWNLException {
+        dictionary.edit();
+        testObj.setDictionary(null);
+        testObj.getWords().add(0, new Word(null, testObj, 1, "test"));
+        Assert.assertEquals(1, testObj.getWords().size());
+        Assert.assertEquals("test", testObj.getWords().get(0).getLemma());
+    }
+
+    @Test
     public void testAddWord4() throws JWNLException {
+        dictionary.edit();
         testObj.getWords().add(new Word(dictionary, testObj, 1, "test"));
         IndexWord iw = dictionary.getIndexWord(testObj.getPOS(), "test");
         Assert.assertNotNull(iw);
@@ -470,6 +496,7 @@ public class TestSynset extends BaseData {
 
     @Test
     public void testRemoveWord() throws JWNLException {
+        dictionary.edit();
         testObj.getWords().add(new Word(dictionary, testObj, 1, "test"));
         testObj.getWords().remove(0);
 
@@ -485,6 +512,7 @@ public class TestSynset extends BaseData {
 
     @Test
     public void testRemoveWordNull() throws JWNLException {
+        dictionary.edit();
         testObj.setDictionary(null);
         testObj.getWords().add(new Word(null, testObj, 1, "test"));
         testObj.getWords().remove(0);
@@ -509,6 +537,7 @@ public class TestSynset extends BaseData {
 
     @Test(expected = IllegalArgumentException.class)
     public void testSetGlossNullD() throws JWNLException {
+        dictionary.edit();
         testObj.setDictionary(null);
         testObj.setGloss(null);
     }
@@ -545,11 +574,13 @@ public class TestSynset extends BaseData {
 
     @Test
     public void testContainsWord2() throws JWNLException {
+        dictionary.edit();
         Assert.assertFalse(testObj.containsWord("test"));
     }
 
     @Test
     public void testContainsWord2NullD() throws JWNLException {
+        dictionary.edit();
         testObj.setDictionary(null);
         Assert.assertFalse(testObj.containsWord("test"));
     }
@@ -572,6 +603,8 @@ public class TestSynset extends BaseData {
 
     @Test
     public void testSetDictionary() throws JWNLException {
+        dictionary.edit();
+        mapDictionary.edit();
         testObj.setDictionary(mapDictionary);
 
         List<Synset> synsets = new ArrayList<Synset>(0);
@@ -592,11 +625,13 @@ public class TestSynset extends BaseData {
 
     @Test(expected = IllegalArgumentException.class)
     public void testWordListAddAlien() throws JWNLException {
+        dictionary.edit();
         testObj.getWords().add(new Word(mapDictionary, new Synset(mapDictionary, POS.NOUN), 1, "test"));
     }
 
     @Test
     public void testWordListAddAll() throws JWNLException {
+        dictionary.edit();
         Word w = new Word(dictionary, testObj, 1, "test");
         Word ww = new Word(dictionary, testObj, 1, "rest");
 
@@ -608,6 +643,7 @@ public class TestSynset extends BaseData {
 
     @Test
     public void testWordListAddAllNull() throws JWNLException {
+        dictionary.edit();
         testObj.setDictionary(null);
         Word w = new Word(null, testObj, 1, "test");
         Word ww = new Word(null, testObj, 1, "rest");
@@ -620,6 +656,7 @@ public class TestSynset extends BaseData {
 
     @Test
     public void testWordListAddAllIndex() throws JWNLException {
+        dictionary.edit();
         Word w = new Word(dictionary, testObj, 1, "test");
         Word ww = new Word(dictionary, testObj, 1, "rest");
         testObj.getWords().add(w);
@@ -631,6 +668,7 @@ public class TestSynset extends BaseData {
 
     @Test
     public void testWordListAddAllIndexNull() throws JWNLException {
+        dictionary.edit();
         testObj.setDictionary(null);
         Word w = new Word(null, testObj, 1, "test");
         Word ww = new Word(null, testObj, 1, "rest");
@@ -643,6 +681,7 @@ public class TestSynset extends BaseData {
 
     @Test
     public void testWordListClear() throws JWNLException {
+        dictionary.edit();
         Word w = new Word(dictionary, testObj, 1, "test");
         testObj.getWords().add(w);
         testObj.getWords().clear();
@@ -652,6 +691,7 @@ public class TestSynset extends BaseData {
 
     @Test
     public void testWordListClearNull() throws JWNLException {
+        dictionary.edit();
         testObj.setDictionary(null);
         Word w = new Word(null, testObj, 1, "test");
         testObj.getWords().add(w);

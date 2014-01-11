@@ -163,6 +163,7 @@ public abstract class DictionaryEditTester {
     @Test
     public void testAddSynsetAlien() throws JWNLException {
         dictionary.edit();
+        mapDictionary.edit();
         Synset synset = new Synset(mapDictionary, POS.NOUN, 100);
         dictionary.addSynset(synset);
         Assert.assertEquals(dictionary, synset.getDictionary());

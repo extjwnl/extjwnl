@@ -36,6 +36,7 @@ public class TestIndexWord extends BaseData {
 
     @Test
     public void testConstructor() throws JWNLException {
+        dictionary.edit();
         IndexWord iw = new IndexWord(dictionary, "test", POS.NOUN);
 
         List<IndexWord> indexWords = new ArrayList<IndexWord>(1);
@@ -120,6 +121,7 @@ public class TestIndexWord extends BaseData {
 
     @Test
     public void testSynsetSet() throws JWNLException {
+        dictionary.edit();
         Synset s = new Synset(dictionary, POS.NOUN, 1);
         s.setGloss("test gloss");
         Synset t = new Synset(dictionary, POS.NOUN, 2);
@@ -164,6 +166,7 @@ public class TestIndexWord extends BaseData {
 
     @Test
     public void testSynsetAdd() throws JWNLException {
+        dictionary.edit();
         Synset s = new Synset(dictionary, POS.NOUN, 1);
         s.setGloss("test gloss");
         Synset t = new Synset(dictionary, POS.NOUN, 2);
@@ -187,6 +190,7 @@ public class TestIndexWord extends BaseData {
 
     @Test
     public void testSynsetAddAllIndexed() throws JWNLException {
+        dictionary.edit();
         Synset s = new Synset(dictionary, POS.NOUN);
         s.setGloss("test gloss");
         Synset t = new Synset(dictionary, POS.NOUN);
@@ -201,6 +205,7 @@ public class TestIndexWord extends BaseData {
 
     @Test
     public void testSynsetAddAll() throws JWNLException {
+        dictionary.edit();
         Synset s = new Synset(dictionary, POS.NOUN);
         s.setGloss("test gloss");
         Synset t = new Synset(dictionary, POS.NOUN);
@@ -282,6 +287,7 @@ public class TestIndexWord extends BaseData {
 
     @Test
     public void testSynsetRemove() throws JWNLException {
+        dictionary.edit();
         Synset s = new Synset(dictionary, POS.NOUN);
         IndexWord iw = new IndexWord(dictionary, "test", POS.NOUN, s);
         iw.getSenses().remove(0);
@@ -313,6 +319,7 @@ public class TestIndexWord extends BaseData {
 
     @Test
     public void testSynsetRemoveAll() throws JWNLException {
+        dictionary.edit();
         Synset s = new Synset(dictionary, POS.NOUN);
         IndexWord iw = new IndexWord(dictionary, "test", POS.NOUN, s);
         iw.getSenses().add(new Synset(dictionary, POS.NOUN));
@@ -331,6 +338,7 @@ public class TestIndexWord extends BaseData {
 
     @Test
     public void testSynsetContainsAll() throws JWNLException {
+        dictionary.edit();
         Synset s = new Synset(dictionary, POS.NOUN);
         IndexWord iw = new IndexWord(dictionary, "test", POS.NOUN, s);
         Synset ss = new Synset(dictionary, POS.NOUN);
@@ -359,6 +367,7 @@ public class TestIndexWord extends BaseData {
 
     @Test
     public void testSynsetRetainAll() throws JWNLException {
+        dictionary.edit();
         Synset s = new Synset(dictionary, POS.NOUN, 1);
         s.setGloss("synset 1");
         IndexWord iw = new IndexWord(dictionary, "test", POS.NOUN, s);
@@ -396,6 +405,7 @@ public class TestIndexWord extends BaseData {
 
     @Test
     public void testSynsetClear() throws JWNLException {
+        dictionary.edit();
         Synset s = new Synset(dictionary, POS.NOUN);
         IndexWord iw = new IndexWord(dictionary, "test", POS.NOUN, s);
         iw.getSenses().clear();

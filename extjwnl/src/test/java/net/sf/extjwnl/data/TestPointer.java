@@ -150,6 +150,7 @@ public class TestPointer extends BaseData {
 
     @Test
     public void testGetTarget() throws JWNLException {
+        dictionary.edit();
         Synset s = dictionary.createSynset(POS.NOUN);
         Synset t = dictionary.createSynset(POS.NOUN);
         Pointer p = new Pointer(s, PointerType.ANTONYM, POS.NOUN, t.getOffset(), 0);
