@@ -37,3 +37,12 @@ Dictionary d = Dictionary.getDefaultResourceInstance();
 ```
 
 extJWNL contains Examples.java with examples of API use.
+
+# Resources
+
+(Homepage)[http://extjwnl.sourceforge.net]
+(Download)[http://sourceforge.net/projects/extjwnl/files]
+(Documentation Wiki)[http://sourceforge.net/apps/trac/extjwnl/]
+(Mailing Lists)[http://lists.sourceforge.net/lists/listinfo/extjwnl-announce]
+(Forums)[http://sourceforge.net/projects/extjwnl/forums/]
+(RSS News Feed)[http://sourceforge.net/export/rss2_projnews.php?group_id=386458]

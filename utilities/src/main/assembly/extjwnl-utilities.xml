@@ -24,7 +24,7 @@
         <fileSet>
             <directory>${project.build.directory}/../..</directory>
             <includes>
-                <include>readme.txt</include>
+                <include>README.md</include>
                 <include>license.txt</include>
                 <include>changes.txt</include>
             </includes>
