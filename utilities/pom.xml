@@ -4,12 +4,12 @@
     <parent>
         <groupId>net.sf.extjwnl</groupId>
         <artifactId>extjwnl-parent</artifactId>
-        <version>1.7.1-SNAPSHOT</version>
+        <version>1.7.1</version>
     </parent>
 
     <artifactId>extjwnl-utilities</artifactId>
     <packaging>jar</packaging>
-    <version>1.7.1-SNAPSHOT</version>
+    <version>1.7.1</version>
     <name>extJWNL Utilities</name>
     <description>Utilities for extJWNL library</description>
 
@@ -33,7 +33,7 @@
         <dependency>
             <groupId>net.sf.extjwnl</groupId>
             <artifactId>extjwnl</artifactId>
-            <version>1.7.1-SNAPSHOT</version>
+            <version>1.7.1</version>
         </dependency>
 
         <dependency>
@@ -80,7 +80,7 @@
         <resources>
             <resource>
                 <directory>src/resources/log4j</directory>
-                <includes/>
+                <includes />
                 <targetPath>${project.build.directory}/dist/etc</targetPath>
             </resource>
         </resources>
