@@ -1,16 +1,15 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>net.sf.extjwnl</groupId>
         <artifactId>extjwnl-parent</artifactId>
-        <version>1.6.11-SNAPSHOT</version>
+        <version>1.7.0</version>
     </parent>
 
     <artifactId>extjwnl-utilities</artifactId>
     <packaging>jar</packaging>
-    <version>1.6.11-SNAPSHOT</version>
+    <version>1.7.0</version>
     <name>extJWNL Utilities</name>
     <description>Utilities for extJWNL library</description>
 
@@ -34,7 +33,7 @@
         <dependency>
             <groupId>net.sf.extjwnl</groupId>
             <artifactId>extjwnl</artifactId>
-            <version>1.6.11-SNAPSHOT</version>
+            <version>1.7.0</version>
         </dependency>
 
         <dependency>
@@ -131,11 +130,11 @@
                                 </goals>
                                 <configuration>
                                     <target>
-                                        <echo message="Creating data folders..."/>
-                                        <mkdir dir="${project.build.directory}/data"/>
-                                        <mkdir dir="${project.build.directory}/data/db"/>
-                                        <mkdir dir="${project.build.directory}/data/map"/>
-                                        <mkdir dir="${project.build.directory}/data/wn30"/>
+                                        <echo message="Creating data folders..." />
+                                        <mkdir dir="${project.build.directory}/data" />
+                                        <mkdir dir="${project.build.directory}/data/db" />
+                                        <mkdir dir="${project.build.directory}/data/map" />
+                                        <mkdir dir="${project.build.directory}/data/wn30" />
                                     </target>
                                 </configuration>
                             </execution>
@@ -144,12 +143,12 @@
                                 <phase>pre-integration-test</phase>
                                 <configuration>
                                     <target>
-                                        <property name="test_classpath" refid="maven.test.classpath"/>
+                                        <property name="test_classpath" refid="maven.test.classpath" />
 
-                                        <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
+                                        <taskdef resource="net/sf/antcontrib/antcontrib.properties" />
 
                                         <if>
-                                            <available file="${project.build.directory}/data/db/wordnet.h2.db"/>
+                                            <available file="${project.build.directory}/data/db/wordnet.h2.db" />
                                             <then>
                                                 <echo>Using existing database</echo>
                                             </then>
@@ -157,19 +156,17 @@
                                             <else>
                                                 <echo>The database does not exist, converting</echo>
 
-                                                <java classname="net.sf.extjwnl.utilities.DictionaryToDatabase"
-                                                      fork="false"
-                                                      failonerror="true">
+                                                <java classname="net.sf.extjwnl.utilities.DictionaryToDatabase" fork="false" failonerror="true">
 
-                                                    <arg value="${project.build.testOutputDirectory}/test_file_properties.xml"/>
-                                                    <arg value="./src/main/sql/create.sql"/>
-                                                    <arg value="org.h2.Driver"/>
-                                                    <arg value="jdbc:h2:${project.build.directory}/data/db/wordnet"/>
-                                                    <arg value=""/>
-                                                    <arg value=""/>
+                                                    <arg value="${project.build.testOutputDirectory}/test_file_properties.xml" />
+                                                    <arg value="./src/main/sql/create.sql" />
+                                                    <arg value="org.h2.Driver" />
+                                                    <arg value="jdbc:h2:${project.build.directory}/data/db/wordnet" />
+                                                    <arg value="" />
+                                                    <arg value="" />
 
                                                     <classpath>
-                                                        <pathelement path="${test_classpath}"/>
+                                                        <pathelement path="${test_classpath}" />
                                                     </classpath>
                                                 </java>
                                                 <echo>The database converted</echo>
@@ -177,7 +174,7 @@
                                         </if>
 
                                         <if>
-                                            <available file="${project.build.directory}/data/map/data.noun"/>
+                                            <available file="${project.build.directory}/data/map/data.noun" />
                                             <then>
                                                 <echo>Using existing map</echo>
                                             </then>
@@ -185,15 +182,13 @@
                                             <else>
                                                 <echo>The map does not exist, converting</echo>
 
-                                                <java classname="net.sf.extjwnl.utilities.DictionaryToMap"
-                                                      fork="false"
-                                                      failonerror="true">
+                                                <java classname="net.sf.extjwnl.utilities.DictionaryToMap" fork="false" failonerror="true">
 
-                                                    <arg value="${project.build.testOutputDirectory}/test_file_properties.xml"/>
-                                                    <arg value="${project.build.directory}/data/map"/>
+                                                    <arg value="${project.build.testOutputDirectory}/test_file_properties.xml" />
+                                                    <arg value="${project.build.directory}/data/map" />
 
                                                     <classpath>
-                                                        <pathelement path="${test_classpath}"/>
+                                                        <pathelement path="${test_classpath}" />
                                                     </classpath>
                                                 </java>
                                                 <echo>The database converted</echo>
