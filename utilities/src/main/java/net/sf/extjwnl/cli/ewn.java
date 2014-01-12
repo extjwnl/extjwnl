@@ -23,7 +23,7 @@ public class ewn {
     private static final Logger log = LoggerFactory.getLogger(ewn.class);
 
     public static final String USAGE =
-            "usage browse: ewn word [-hgla] [-n#] -searchtype [-searchtype...]\n" +
+            "usage browse: ewn word [-hglaosk] [-n#] -searchtype [-searchtype...]\n" +
                     "\n" +
                     "        -h              Display help text before search output\n" +
                     "        -g              Display gloss\n" +

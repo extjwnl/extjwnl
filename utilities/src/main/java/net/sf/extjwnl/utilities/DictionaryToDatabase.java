@@ -356,7 +356,7 @@ public class DictionaryToDatabase {
         int count = 0;
         int batch = 0;
         for (Map.Entry<Integer, long[]> entry : idToSynsetOffset.entrySet()) {
-            if (count % 1000 == 0) {
+            if (count % 10000 == 0) {
                 batch = count;
                 iwsStmt.executeBatch();
                 log.info("index word synset: " + count);

@@ -48,8 +48,8 @@
         <dependency>
             <scope>test</scope>
             <groupId>net.sf.extjwnl</groupId>
-            <artifactId>extjwnl-data-wn30</artifactId>
-            <version>1.0</version>
+            <artifactId>extjwnl-data-wn31</artifactId>
+            <version>1.1</version>
         </dependency>
     </dependencies>
 
@@ -119,12 +119,11 @@
                                     <artifactItems>
                                         <artifactItem>
                                             <groupId>net.sf.extjwnl</groupId>
-                                            <artifactId>extjwnl-data-wn30</artifactId>
-                                            <version>1.0-SNAPSHOT</version>
+                                            <artifactId>extjwnl-data-wn31</artifactId>
                                             <type>jar</type>
                                             <overWrite>true</overWrite>
-                                            <includes>net/sf/extjwnl/data/wordnet/wn30/*.*</includes>
-                                            <outputDirectory>${project.build.directory}/data/wn30</outputDirectory>
+                                            <includes>net/sf/extjwnl/data/wordnet/wn31/*.*</includes>
+                                            <outputDirectory>${project.build.directory}/data/</outputDirectory>
                                         </artifactItem>
                                     </artifactItems>
                                 </configuration>
@@ -138,7 +137,7 @@
                             <systemProperties>
                                 <property>
                                     <name>extjwnl.testDataFolder</name>
-                                    <value>${project.build.directory}/data/wn30</value>
+                                    <value>${project.build.directory}/data</value>
                                 </property>
                             </systemProperties>
                         </configuration>

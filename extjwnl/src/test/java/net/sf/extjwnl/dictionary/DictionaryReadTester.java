@@ -25,24 +25,19 @@ import java.util.List;
 public class DictionaryReadTester {
 
     /**
-     * The offset for wn30.
-     */
-    protected final long wn30TankOffset = 4389033;
-
-    /**
      * The offset for wn2.1.
      */
     protected final long wn21TankOffset = 4337089;
 
     /**
-     * The offset for wn 2.0.
+     * The offset for wn30.
      */
-    protected final long wn20TankOffset = 4219085;
+    protected final long wn30TankOffset = 4389033;
 
     /**
-     * Synset for "complete/finish" for wn2.0
+     * The offset for wn31.
      */
-    protected final long wn20VerbOffset = 470712;
+    protected final long wn31TankOffset = 4396120;
 
     /**
      * Synset for "complete/finish" for wn2.1
@@ -55,6 +50,11 @@ public class DictionaryReadTester {
     protected final long wn30VerbOffset = 484166;
 
     /**
+     * Synset for "complete/finish" for wn3.1
+     */
+    protected final long wn31VerbOffset = 485097;
+
+    /**
      * Synset for "bright" (adj) for wn2.1
      */
     protected final long wn21BrightOffset = 301258;
@@ -63,6 +63,11 @@ public class DictionaryReadTester {
      * Synset for "bright" (adj) for wn3.0
      */
     protected final long wn30BrightOffset = 278551;
+
+    /**
+     * Synset for "bright" (adj) for wn3.1
+     */
+    protected final long wn31BrightOffset = 279417;
 
     /**
      * Synset for "dissilient" (adj) for wn2.1
@@ -75,6 +80,11 @@ public class DictionaryReadTester {
     protected final long wn30DissilientOffset = 3700;
 
     /**
+     * Synset for "dissilient" (adj) for wn3.1
+     */
+    protected final long wn31DissilientOffset = 3699;
+
+    /**
      * Synset for "bright" (adv) for wn2.1
      */
     protected final long wn21BrightAdvOffset = 77569;
@@ -84,15 +94,20 @@ public class DictionaryReadTester {
      */
     protected final long wn30BrightAdvOffset = 77168;
 
-    protected final List<Long> verbOffsets = Arrays.asList(wn20VerbOffset, wn21VerbOffset, wn30VerbOffset);
+    /**
+     * Synset for "bright" (adv) for wn3.1
+     */
+    protected final long wn31BrightAdvOffset = 77434;
 
-    protected final List<Long> nounOffsets = Arrays.asList(wn20TankOffset, wn21TankOffset, wn30TankOffset);
+    protected final List<Long> verbOffsets = Arrays.asList(wn21VerbOffset, wn30VerbOffset, wn31VerbOffset);
 
-    protected final List<Long> adjOffsets = Arrays.asList(wn21BrightOffset, wn30BrightOffset);
+    protected final List<Long> nounOffsets = Arrays.asList(wn21TankOffset, wn30TankOffset, wn31TankOffset);
 
-    protected final List<Long> adjSOffsets = Arrays.asList(wn21DissilientOffset, wn30DissilientOffset);
+    protected final List<Long> adjOffsets = Arrays.asList(wn21BrightOffset, wn30BrightOffset, wn31BrightOffset);
 
-    protected final List<Long> advOffsets = Arrays.asList(wn21BrightAdvOffset, wn30BrightAdvOffset);
+    protected final List<Long> adjSOffsets = Arrays.asList(wn21DissilientOffset, wn30DissilientOffset, wn31DissilientOffset);
+
+    protected final List<Long> advOffsets = Arrays.asList(wn21BrightAdvOffset, wn30BrightAdvOffset, wn31BrightAdvOffset);
 
     final String glossDefinition = "an enclosed armored military vehicle; has a cannon and moves on caterpillar treads";
 

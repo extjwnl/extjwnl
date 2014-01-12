@@ -16,7 +16,7 @@ public class TestGetFileBackedInstance extends DictionaryReadTester {
     /**
      * Data files location.
      */
-    private static final String location = System.getProperty("extjwnl.testDataFolder") + "/net/sf/extjwnl/data/wordnet/wn30";
+    private static final String location = System.getProperty("extjwnl.testDataFolder") + "/net/sf/extjwnl/data/wordnet/wn31";
 
     @BeforeClass
     public static void initDictionary() throws IOException, JWNLException {

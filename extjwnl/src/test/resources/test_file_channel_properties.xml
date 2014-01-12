@@ -43,7 +43,7 @@
                 <!--<param name="encoding" value="UTF-8"/>-->
             </param>
             <!--<param name="cache_use_count" value="true"/>-->
-            <param name="dictionary_path" value="${project.build.directory}/data/wn30/net/sf/extjwnl/data/wordnet/wn30"/>
+            <param name="dictionary_path" value="${project.build.directory}/data/net/sf/extjwnl/data/wordnet/wn31"/>
         </param>
     </dictionary>
     <resource class="PrincetonResource"/>

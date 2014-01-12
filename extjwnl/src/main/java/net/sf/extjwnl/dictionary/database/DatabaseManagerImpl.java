@@ -49,7 +49,8 @@ public class DatabaseManagerImpl implements DatabaseManager {
     protected static final String SYNSET_WORD_SQL =
             "SELECT sw.word, sw.word_index, sw.usage_cnt, sw.lex_id " +
                     "FROM synset s, synsetword sw " +
-                    "WHERE s.synset_id = sw.synset_id AND s.pos = ? AND s.file_offset = ?";
+                    "WHERE s.synset_id = sw.synset_id AND s.pos = ? AND s.file_offset = ?" +
+                    "ORDER BY sw.word_index";
 
     protected static final String SYNSET_POINTER_SQL =
             "SELECT sp.pointer_type, sp.target_offset, sp.target_pos, sp.source_index, sp.target_index " +
@@ -175,12 +176,13 @@ public class DatabaseManagerImpl implements DatabaseManager {
         try {
             query = connectionManager.getQuery(sql);
             query.getStatement().setString(1, pos.getKey());
-        } finally {
+            return query;
+        } catch (SQLException e) {
             if (query != null) {
                 query.close();
             }
+            throw e;
         }
-        return query;
     }
 
     protected Query createPOSStringQuery(POS pos, String str, String sql) throws SQLException {
@@ -189,12 +191,13 @@ public class DatabaseManagerImpl implements DatabaseManager {
             query = connectionManager.getQuery(sql);
             query.getStatement().setString(1, pos.getKey());
             query.getStatement().setString(2, str);
-        } finally {
+            return query;
+        } catch (SQLException e) {
             if (query != null) {
                 query.close();
             }
+            throw e;
         }
-        return query;
     }
 
     protected Query createPOSOffsetQuery(POS pos, long offset, String sql) throws SQLException {
@@ -203,12 +206,13 @@ public class DatabaseManagerImpl implements DatabaseManager {
             query = connectionManager.getQuery(sql);
             query.getStatement().setString(1, pos.getKey());
             query.getStatement().setLong(2, offset);
-        } finally {
+            return query;
+        } catch (SQLException e) {
             if (query != null) {
                 query.close();
             }
+            throw e;
         }
-        return query;
     }
 
     protected Query createPOSIdQuery(POS pos, int id, String sql) throws SQLException {
@@ -217,12 +221,13 @@ public class DatabaseManagerImpl implements DatabaseManager {
             query = connectionManager.getQuery(sql);
             query.getStatement().setString(1, pos.getKey());
             query.getStatement().setInt(2, id);
-        } finally {
+            return query;
+        } catch (SQLException e) {
             if (query != null) {
                 query.close();
             }
+            throw e;
         }
-        return query;
     }
 
     public Dictionary getDictionary() {

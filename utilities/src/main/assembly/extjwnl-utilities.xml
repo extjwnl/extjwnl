@@ -22,6 +22,12 @@
             <outputDirectory>/lib</outputDirectory>
         </fileSet>
         <fileSet>
+            <directory>${project.build.directory}/dist/etc</directory>
+            <includes/>
+            <fileMode>755</fileMode>
+            <outputDirectory>/etc</outputDirectory>
+        </fileSet>
+        <fileSet>
             <directory>${project.build.directory}/../..</directory>
             <includes>
                 <include>README.md</include>

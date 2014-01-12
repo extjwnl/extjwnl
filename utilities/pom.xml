@@ -61,8 +61,15 @@
             <scope>runtime</scope>
             <groupId>net.sf.extjwnl</groupId>
             <artifactId>extjwnl-data-wn31</artifactId>
-            <version>1.0</version>
+            <version>1.1</version>
         </dependency>
+
+        <dependency>
+            <groupId>postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>8.4-702.jdbc4</version>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -70,6 +77,13 @@
         <outputDirectory>target/classes</outputDirectory>
         <directory>target</directory>
         <finalName>${project.artifactId}-${project.version}</finalName>
+        <resources>
+            <resource>
+                <directory>src/resources/log4j</directory>
+                <includes/>
+                <targetPath>${project.build.directory}/dist/etc</targetPath>
+            </resource>
+        </resources>
     </build>
 
     <profiles>
@@ -112,12 +126,11 @@
                                     <artifactItems>
                                         <artifactItem>
                                             <groupId>net.sf.extjwnl</groupId>
-                                            <artifactId>extjwnl-data-wn30</artifactId>
-                                            <version>1.0-SNAPSHOT</version>
+                                            <artifactId>extjwnl-data-wn31</artifactId>
                                             <type>jar</type>
                                             <overWrite>true</overWrite>
-                                            <includes>net/sf/extjwnl/data/wordnet/wn30/*.*</includes>
-                                            <outputDirectory>${project.build.directory}/data/wn30</outputDirectory>
+                                            <includes>net/sf/extjwnl/data/wordnet/wn31/*.*</includes>
+                                            <outputDirectory>${project.build.directory}/data</outputDirectory>
                                         </artifactItem>
                                     </artifactItems>
                                 </configuration>
@@ -198,7 +211,7 @@
                                                         <pathelement path="${test_classpath}" />
                                                     </classpath>
                                                 </java>
-                                                <echo>The database converted</echo>
+                                                <echo>The map converted</echo>
                                             </else>
                                         </if>
                                     </target>
@@ -246,8 +259,7 @@
                                     <assembleDirectory>${project.build.directory}/dist</assembleDirectory>
                                     <!-- Extra JVM arguments that will be included in the bin scripts -->
                                     <extraJvmArguments>-Xmx512M</extraJvmArguments>
-                                    <includeConfigurationDirectoryInClasspath>false
-                                    </includeConfigurationDirectoryInClasspath>
+                                    <includeConfigurationDirectoryInClasspath>true</includeConfigurationDirectoryInClasspath>
                                     <repositoryLayout>flat</repositoryLayout>
                                     <repositoryName>lib</repositoryName>
                                     <programs>
