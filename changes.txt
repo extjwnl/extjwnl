@@ -1,3 +1,8 @@
+1.7.1 
+
+- test data added back
+- database synset loading fixed
+
 1.7.0
 
 - memory and resource dictionaries added

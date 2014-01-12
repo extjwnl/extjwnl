@@ -21,12 +21,12 @@ In the pom.xml:
 <dependency>
     <groupId>net.sf.extjwnl</groupId>
     <artifactId>extjwnl</artifactId>
-    <version>1.7.0</version>
+    <version>1.7.1</version>
 </dependency>
 <dependency>
     <groupId>net.sf.extjwnl</groupId>
     <artifactId>extjwnl-data-wn31</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
 </dependency>
 ```
 
@@ -42,7 +42,8 @@ extJWNL contains [Examples.java](utilities/src/main/java/net/sf/extjwnl/utilitie
 
 * [Homepage](http://extjwnl.sourceforge.net)
 * [Download](http://sourceforge.net/projects/extjwnl/files)
-* [Documentation Wiki](http://sourceforge.net/apps/trac/extjwnl/)
+* [Documentation Wiki](https://github.com/extjwnl/extjwnl/wiki)
 * [Mailing Lists](http://lists.sourceforge.net/lists/listinfo/extjwnl-announce)
 * [Forums](http://sourceforge.net/projects/extjwnl/forums/)
 * [RSS News Feed](http://sourceforge.net/export/rss2_projnews.php?group_id=386458)
+* [Issues](https://github.com/extjwnl/extjwnl/issues)
