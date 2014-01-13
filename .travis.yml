@@ -3,5 +3,5 @@ jdk:
   - oraclejdk7
   - openjdk7
   - openjdk6
-install: mvn install -DskipTests=true -Psonatype-oss-release
+install: mvn install -DskipTests=true
 script: mvn verify -Ptests -Pintegration-tests
