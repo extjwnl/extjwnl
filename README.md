@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/extjwnl/extjwnl.png?branch=master)](https://travis-ci.org/extjwnl/extjwnl)
+
 # About
 
 extJWNL (Extended Java WordNet Library) is a Java API for creating, reading and updating dictionaries in WordNet format. extJWNL supports:
