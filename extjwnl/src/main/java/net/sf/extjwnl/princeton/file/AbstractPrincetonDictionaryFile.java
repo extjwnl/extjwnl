@@ -58,7 +58,7 @@ public abstract class AbstractPrincetonDictionaryFile extends AbstractDictionary
             if (DictionaryFileType.REVCNTLIST.equals(getFileType())) {
                 return "cntlist.rev";
             } else if (DictionaryFileType.CNTLIST.equals(getFileType())) {
-                return "cntlist.";
+                return "cntlist";
             } else if (DictionaryFileType.INDEX.equals(getFileType())) {
                 return fileTypeToFileNameMap.get(getFileType()) + ".sense";
             } else {

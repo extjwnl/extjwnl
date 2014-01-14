@@ -110,19 +110,6 @@ public class FileManagerImpl implements FileManager {
                 cntList = factory.newInstance(dictionary, path, null, DictionaryFileType.CNTLIST);
                 cntList.open();
             } catch (IOException e) {
-                File f = new File("/home/travis/build/autayeu/extjwnl/extjwnl/target/data/net/sf/extjwnl/data/wordnet/wn31/");
-                System.out.println(Arrays.toString(f.list()));
-                // TODO AA: remove after debugging
-                System.out.println(e);
-                e.printStackTrace();
-                Throwable c = e;
-                while (null != e.getCause()) {
-                    c = c.getCause();
-                }
-                if (null != c) {
-                    System.out.println(e);
-                    c.printStackTrace();
-                }
                 throw new JWNLException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_018", DictionaryFileType.CNTLIST), e);
             }
 

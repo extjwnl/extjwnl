@@ -154,7 +154,6 @@
                                         <mkdir dir="${project.build.directory}/data" />
                                         <mkdir dir="${project.build.directory}/data/db" />
                                         <mkdir dir="${project.build.directory}/data/map" />
-                                        <mkdir dir="${project.build.directory}/data/wn30" />
                                     </target>
                                 </configuration>
                             </execution>

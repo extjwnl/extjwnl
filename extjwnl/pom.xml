@@ -99,7 +99,6 @@
                                         <mkdir dir="${project.build.directory}/data" />
                                         <mkdir dir="${project.build.directory}/data/clean-file" />
                                         <mkdir dir="${project.build.directory}/data/clean-map" />
-                                        <mkdir dir="${project.build.directory}/data/wn30" />
                                     </target>
                                 </configuration>
                             </execution>
@@ -122,7 +121,7 @@
                                             <artifactId>extjwnl-data-wn31</artifactId>
                                             <type>jar</type>
                                             <overWrite>true</overWrite>
-                                            <includes>net/sf/extjwnl/data/wordnet/wn31/*.*</includes>
+                                            <includes>net/sf/extjwnl/data/wordnet/wn31/*</includes>
                                             <outputDirectory>${project.build.directory}/data/</outputDirectory>
                                         </artifactItem>
                                     </artifactItems>
