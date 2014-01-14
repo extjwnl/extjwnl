@@ -298,12 +298,14 @@ public class TestSynset extends BaseData {
     @Test
     public void testPointerRetainAllEdit() throws JWNLException {
         dictionary.edit();
-        Synset hyponym = new Synset(dictionary, POS.NOUN, 100);
-        Synset hypernym = new Synset(dictionary, POS.NOUN, 200);
+        Synset hyponym = dictionary.createSynset(POS.NOUN);
+        Synset hypernym = dictionary.createSynset(POS.NOUN);
 
         Pointer hyponymPtr = new Pointer(PointerType.HYPONYM, testObj, hyponym);
         Pointer hypernymPtr = new Pointer(PointerType.HYPERNYM, testObj, hypernym);
+        Assert.assertEquals(0, testObj.getPointers().size());
         testObj.getPointers().addAll(Arrays.asList(hyponymPtr, hypernymPtr));
+        Assert.assertEquals(2, testObj.getPointers().size());
 
         Assert.assertTrue(testObj.getPointers().retainAll(Arrays.asList(hyponymPtr)));
         Assert.assertEquals(1, testObj.getPointers().size());
