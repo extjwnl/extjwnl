@@ -215,15 +215,15 @@ public abstract class Dictionary {
             Constructor c = clazz.getConstructor(Document.class);
             dictionary = (Dictionary) c.newInstance(doc);
         } catch (ClassNotFoundException e) {
-            throw new JWNLException(staticMessages.resolveMessage("DICTIONARY_UNABLE_TO_CREATE_INSTANCE", dictionaryClassName), e);
+            throw new JWNLException(staticMessages.resolveMessage("DICTIONARY_UNABLE_TO_CREATE_INSTANCE", new String[]{dictionaryClassName, e.getMessage()}), e);
         } catch (NoSuchMethodException e) {
-            throw new JWNLException(staticMessages.resolveMessage("DICTIONARY_UNABLE_TO_CREATE_INSTANCE", dictionaryClassName), e);
+            throw new JWNLException(staticMessages.resolveMessage("DICTIONARY_UNABLE_TO_CREATE_INSTANCE", new String[]{dictionaryClassName, e.getMessage()}), e);
         } catch (InstantiationException e) {
-            throw new JWNLException(staticMessages.resolveMessage("DICTIONARY_UNABLE_TO_CREATE_INSTANCE", dictionaryClassName), e);
+            throw new JWNLException(staticMessages.resolveMessage("DICTIONARY_UNABLE_TO_CREATE_INSTANCE", new String[]{dictionaryClassName, e.getMessage()}), e);
         } catch (IllegalAccessException e) {
-            throw new JWNLException(staticMessages.resolveMessage("DICTIONARY_UNABLE_TO_CREATE_INSTANCE", dictionaryClassName), e);
+            throw new JWNLException(staticMessages.resolveMessage("DICTIONARY_UNABLE_TO_CREATE_INSTANCE", new String[]{dictionaryClassName, e.getMessage()}), e);
         } catch (InvocationTargetException e) {
-            throw new JWNLException(staticMessages.resolveMessage("DICTIONARY_UNABLE_TO_CREATE_INSTANCE", dictionaryClassName), e);
+            throw new JWNLException(staticMessages.resolveMessage("DICTIONARY_UNABLE_TO_CREATE_INSTANCE", new String[]{dictionaryClassName, e.getMessage()}), e);
         }
 
         return dictionary;

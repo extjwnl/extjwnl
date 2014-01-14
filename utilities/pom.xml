@@ -179,7 +179,7 @@
                                                 <java classname="net.sf.extjwnl.utilities.DictionaryToDatabase" fork="false" failonerror="true">
 
                                                     <arg value="${project.build.testOutputDirectory}/test_file_properties.xml" />
-                                                    <arg value="./src/main/sql/create.sql" />
+                                                    <arg value="${project.basedir}/src/main/sql/create.sql" />
                                                     <arg value="org.h2.Driver" />
                                                     <arg value="jdbc:h2:${project.build.directory}/data/db/wordnet" />
                                                     <arg value="" />

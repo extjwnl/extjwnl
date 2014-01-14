@@ -46,15 +46,15 @@ public abstract class AbstractValueParam implements Param {
             Constructor c = clazz.getConstructor(Dictionary.class, Map.class);
             return c.newInstance(dictionary, paramMap);
         } catch (ClassNotFoundException e) {
-            throw new JWNLException(dictionary.getMessages().resolveMessage("DICTIONARY_UNABLE_TO_CREATE_INSTANCE", getValue()), e);
+            throw new JWNLException(dictionary.getMessages().resolveMessage("DICTIONARY_UNABLE_TO_CREATE_INSTANCE", new String[]{getValue(), e.getMessage()}), e);
         } catch (NoSuchMethodException e) {
-            throw new JWNLException(dictionary.getMessages().resolveMessage("DICTIONARY_UNABLE_TO_CREATE_INSTANCE", getValue()), e);
+            throw new JWNLException(dictionary.getMessages().resolveMessage("DICTIONARY_UNABLE_TO_CREATE_INSTANCE", new String[]{getValue(), e.getMessage()}), e);
         } catch (InstantiationException e) {
-            throw new JWNLException(dictionary.getMessages().resolveMessage("DICTIONARY_UNABLE_TO_CREATE_INSTANCE", getValue()), e);
+            throw new JWNLException(dictionary.getMessages().resolveMessage("DICTIONARY_UNABLE_TO_CREATE_INSTANCE", new String[]{getValue(), e.getMessage()}), e);
         } catch (IllegalAccessException e) {
-            throw new JWNLException(dictionary.getMessages().resolveMessage("DICTIONARY_UNABLE_TO_CREATE_INSTANCE", getValue()), e);
+            throw new JWNLException(dictionary.getMessages().resolveMessage("DICTIONARY_UNABLE_TO_CREATE_INSTANCE", new String[]{getValue(), e.getMessage()}), e);
         } catch (InvocationTargetException e) {
-            throw new JWNLException(dictionary.getMessages().resolveMessage("DICTIONARY_UNABLE_TO_CREATE_INSTANCE", getValue()), e);
+            throw new JWNLException(dictionary.getMessages().resolveMessage("DICTIONARY_UNABLE_TO_CREATE_INSTANCE", new String[]{getValue(), e.getMessage()}), e);
         }
     }
 }
