@@ -60,6 +60,15 @@ public class PrincetonResourceDictionaryFile extends PrincetonCharBufferFile imp
         }
     }
 
+    @Override
+    protected String getFilename() {
+        if (DictionaryFileType.CNTLIST.equals(getFileType())) {
+            return "cntlist";
+        } else {
+            return super.getFilename();
+        }
+    }
+
     public long length() throws IOException {
         return size;
     }
