@@ -53,4 +53,12 @@ public abstract class Util {
         }
         return tokens.toArray(new String[tokens.size()]);
     }
+
+    public static Throwable getRootCause(Throwable e) {
+        Throwable result = e.getCause();
+        while (null != result && null != result.getCause()) {
+            result = result.getCause();
+        }
+        return result;
+    }
 }

@@ -2,6 +2,7 @@ package net.sf.extjwnl.dictionary;
 
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.data.*;
+import net.sf.extjwnl.dictionary.morph.Util;
 import net.sf.extjwnl.util.ResourceBundleSet;
 import net.sf.extjwnl.util.factory.NameValueParam;
 import net.sf.extjwnl.util.factory.Param;
@@ -215,15 +216,15 @@ public abstract class Dictionary {
             Constructor c = clazz.getConstructor(Document.class);
             dictionary = (Dictionary) c.newInstance(doc);
         } catch (ClassNotFoundException e) {
-            throw new JWNLException(staticMessages.resolveMessage("DICTIONARY_UNABLE_TO_CREATE_INSTANCE", new String[]{dictionaryClassName, e.getMessage()}), e);
+            throw new JWNLException(staticMessages.resolveMessage("DICTIONARY_UNABLE_TO_CREATE_INSTANCE", new Object[]{dictionaryClassName, Util.getRootCause(e)}), e);
         } catch (NoSuchMethodException e) {
-            throw new JWNLException(staticMessages.resolveMessage("DICTIONARY_UNABLE_TO_CREATE_INSTANCE", new String[]{dictionaryClassName, e.getMessage()}), e);
+            throw new JWNLException(staticMessages.resolveMessage("DICTIONARY_UNABLE_TO_CREATE_INSTANCE", new Object[]{dictionaryClassName, Util.getRootCause(e)}), e);
         } catch (InstantiationException e) {
-            throw new JWNLException(staticMessages.resolveMessage("DICTIONARY_UNABLE_TO_CREATE_INSTANCE", new String[]{dictionaryClassName, e.getMessage()}), e);
+            throw new JWNLException(staticMessages.resolveMessage("DICTIONARY_UNABLE_TO_CREATE_INSTANCE", new Object[]{dictionaryClassName, Util.getRootCause(e)}), e);
         } catch (IllegalAccessException e) {
-            throw new JWNLException(staticMessages.resolveMessage("DICTIONARY_UNABLE_TO_CREATE_INSTANCE", new String[]{dictionaryClassName, e.getMessage()}), e);
+            throw new JWNLException(staticMessages.resolveMessage("DICTIONARY_UNABLE_TO_CREATE_INSTANCE", new Object[]{dictionaryClassName, Util.getRootCause(e)}), e);
         } catch (InvocationTargetException e) {
-            throw new JWNLException(staticMessages.resolveMessage("DICTIONARY_UNABLE_TO_CREATE_INSTANCE", new String[]{dictionaryClassName, e.getMessage()}), e);
+            throw new JWNLException(staticMessages.resolveMessage("DICTIONARY_UNABLE_TO_CREATE_INSTANCE", new Object[]{dictionaryClassName, Util.getRootCause(e)}), e);
         }
 
         return dictionary;
