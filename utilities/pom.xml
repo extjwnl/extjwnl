@@ -25,6 +25,7 @@
         </dependency>
 
         <dependency>
+            <scope>runtime</scope>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
             <version>${slf4j.version}</version>
@@ -65,6 +66,7 @@
         </dependency>
 
         <dependency>
+            <scope>runtime</scope>
             <groupId>postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>8.4-702.jdbc4</version>
