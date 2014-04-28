@@ -48,14 +48,14 @@
             <scope>test</scope>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <version>1.3.174</version>
+            <version>1.4.177</version>
         </dependency>
 
         <dependency>
             <scope>runtime</scope>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.22</version>
+            <version>5.1.30</version>
         </dependency>
 
         <dependency>
