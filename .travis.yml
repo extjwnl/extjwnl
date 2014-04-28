@@ -4,4 +4,4 @@ jdk:
   - openjdk7
   - openjdk6
 install: mvn -B install -DskipTests=true
-script: mvn -B verify -Ptests -Pintegration-tests
+script: mvn -B verify -Pintegration-tests
