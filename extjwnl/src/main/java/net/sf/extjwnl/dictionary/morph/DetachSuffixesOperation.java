@@ -11,14 +11,14 @@ import java.util.*;
  * Remove all applicable suffixes from the word(s) and do a look-up.
  * This class accepts parameters in the form of:
  * <pre>
- *
+ * {@code
  *  <param name="{part-of-speech}" value="|{suffix}={stemmed suffix}|..."/>
- *
+ * }
  * </pre>
  * where suffix is the {suffix} to convert from, and {stemmed suffix} is
  * the suffix to convert to.
  *
- * @author John Didion <jdidion@didion.net>
+ * @author John Didion (jdidion@didion.net)
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class DetachSuffixesOperation extends AbstractDelegatingOperation {

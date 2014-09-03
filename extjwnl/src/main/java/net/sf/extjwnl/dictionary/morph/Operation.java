@@ -7,7 +7,7 @@ import net.sf.extjwnl.util.factory.Owned;
 /**
  * Base class for morphological operations.
  *
- * @author John Didion <jdidion@didion.net>
+ * @author John Didion (jdidion@didion.net)
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public interface Operation extends Owned {

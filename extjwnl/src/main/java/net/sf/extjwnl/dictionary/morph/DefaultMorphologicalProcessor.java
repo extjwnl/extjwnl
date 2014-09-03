@@ -23,7 +23,7 @@ import java.util.Map;
  * of complex stemming rules. It also tries to be intelligent by removing delimiters and
  * doing concatenation.
  *
- * @author John Didion <jdidion@didion.net>
+ * @author John Didion (jdidion@didion.net)
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class DefaultMorphologicalProcessor implements MorphologicalProcessor {

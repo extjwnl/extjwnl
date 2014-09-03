@@ -11,7 +11,7 @@ import java.util.List;
  * the form that can be found in WordNet. For example, if one calls
  * lookupBaseForm(POS.VERB, "running"), the index word for "run" should be returned.
  *
- * @author John Didion <jdidion@didion.net>
+ * @author John Didion (jdidion@didion.net)
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public interface MorphologicalProcessor {

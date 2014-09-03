@@ -10,7 +10,7 @@ import java.util.*;
 /**
  * A list of <code>PointerTargetTreeNode</code>s.
  *
- * @author John Didion <jdidion@didion.net>
+ * @author John Didion (jdidion@didion.net)
  */
 public class PointerTargetTreeNodeList extends LinkedList<PointerTargetTreeNode> implements DeepCloneable {
 

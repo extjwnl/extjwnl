@@ -14,7 +14,7 @@ import java.util.*;
  * <code>FileDictionaryElementFactory</code> that parses lines from the dictionary files distributed by the
  * WordNet team at Princeton's Cognitive Science department.
  *
- * @author John Didion <jdidion@didion.net>
+ * @author John Didion (jdidion@didion.net)
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public abstract class AbstractPrincetonFileDictionaryElementFactory extends AbstractDictionaryElementFactory implements FileDictionaryElementFactory {

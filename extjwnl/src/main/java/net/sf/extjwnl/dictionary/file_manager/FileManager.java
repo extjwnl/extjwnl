@@ -11,7 +11,7 @@ import java.io.IOException;
  * <code>FileManager</code> defines the interface between the <code>FileBackedDictionary</code> and the file system.
  * Methods in this interface operate on and return offsets, which are indices into a dictionary file.
  *
- * @author John Didion <jdidion@didion.net>
+ * @author John Didion (jdidion@didion.net)
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public interface FileManager extends Owned {
@@ -108,6 +108,7 @@ public interface FileManager extends Owned {
     /**
      * Deletes the dictionary.
      *
+	 * @return true if successfully deleted
      * @throws IOException IOException
      */
     boolean delete() throws IOException;

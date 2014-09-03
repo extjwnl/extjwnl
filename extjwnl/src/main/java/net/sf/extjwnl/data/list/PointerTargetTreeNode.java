@@ -15,7 +15,7 @@ import java.util.ListIterator;
  * may have a ancestry tree, and each node, besides having links to its children, has links to the
  * synonyms of its target.
  *
- * @author John Didion <jdidion@didion.net>
+ * @author John Didion (jdidion@didion.net)
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class PointerTargetTreeNode extends PointerTargetNode {

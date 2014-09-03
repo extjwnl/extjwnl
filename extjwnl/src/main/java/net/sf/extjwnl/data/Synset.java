@@ -13,17 +13,18 @@ import java.util.*;
 
 /**
  * A <code>Synset</code>, or <b>syn</b>onym <b>set</b>, represents a
- * line of a WordNet <var>pos</var><code>.data</code> file. A <code>Synset</code>
+ * line of a WordNet <b>pos</b><code>.data</code> file. A <code>Synset</code>
  * represents a concept, and contains a set of <code>Word</code>s, each of
  * which has a sense that names that concept (and each of which is therefore
  * synonymous with the other words in the <code>Synset</code>).
- * <p/>
+ * <p>
  * <code>Synset</code>'s are linked by {@link Pointer}s into a network of related
- * concepts; this is the <it>Net</it> in WordNet. {@link #getTargets getTargets}
+ * concepts; this is the <i>Net</i> in WordNet. {@link #getTargets getTargets}
  * retrieves the targets of these links, and {@link #getPointers getPointers}
  * retrieves the pointers themselves.
+ * </p>
  *
- * @author John Didion <jdidion@didion.net>
+ * @author John Didion (jdidion@didion.net)
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class Synset extends PointerTarget implements DictionaryElement {

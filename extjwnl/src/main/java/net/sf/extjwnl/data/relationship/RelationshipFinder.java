@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Helper class to find relations.
  *
- * @author John Didion <jdidion@didion.net>
+ * @author John Didion (jdidion@didion.net)
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public abstract class RelationshipFinder {
@@ -48,7 +48,8 @@ public abstract class RelationshipFinder {
      * @param type         pointer type
      * @return all relationships of type <var>type</var> between <var>sourceSynset</var> and <var>targetSynset</var>
      * @throws CloneNotSupportedException CloneNotSupportedException
-     */
+	 * @throws JWNLException JWNLException
+	 */
     public static RelationshipList findRelationships(
             Synset sourceSynset, Synset targetSynset, PointerType type) throws CloneNotSupportedException, JWNLException {
 
@@ -68,6 +69,7 @@ public abstract class RelationshipFinder {
      * @param depth        depth
      * @return all relationships of type <var>type</var> between <var>sourceSynset</var> and <var>targetSynset</var>
      * @throws CloneNotSupportedException CloneNotSupportedException
+	 * @throws JWNLException JWNLException
      */
     public static RelationshipList findRelationships(
             Synset sourceSynset, Synset targetSynset, PointerType type, int depth) throws CloneNotSupportedException, JWNLException {

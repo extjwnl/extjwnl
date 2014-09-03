@@ -10,11 +10,11 @@ import java.io.Serializable;
 /**
  * A <code>Pointer</code> encodes a lexical or semantic relationship between WordNet entities.  A lexical
  * relationship holds between Words; a semantic relationship holds between Synsets.  Relationships
- * are <it>directional</it>:  the two roles of a relationship are the <it>source</it> and <it>target</it>.
- * Relationships are <it>typed</it>: the type of a relationship is a {@link PointerType}, and can
+ * are <i>directional</i>:  the two roles of a relationship are the <i>source</i> and <i>target</i>.
+ * Relationships are <i>typed</i>: the type of a relationship is a {@link PointerType}, and can
  * be retrieved via {@link Pointer#getType getType}.
  *
- * @author John Didion <jdidion@didion.net>
+ * @author John Didion (jdidion@didion.net)
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class Pointer implements Serializable {
@@ -100,6 +100,7 @@ public class Pointer implements Serializable {
      * Returns whether this pointer is between two words.
      *
      * @return true if this pointer is between two words.
+	 * @throws JWNLException JWNLException
      */
     public boolean isLexical() throws JWNLException {
         return (getSource() instanceof Word) && (getTarget() instanceof Word);
@@ -109,6 +110,7 @@ public class Pointer implements Serializable {
      * Returns whether this pointer is between two synsets.
      *
      * @return true if this pointer is between two synsets.
+	 * @throws JWNLException JWNLException
      */
     public boolean isSemantic() throws JWNLException {
         return (getSource() instanceof Synset) && (getTarget() instanceof Synset);
@@ -118,7 +120,7 @@ public class Pointer implements Serializable {
      * Returns whether <var>that</var> is symmetric to this pointer.
      * @param that pointer
      * @return true, if <var>that</var> is symmetric to this pointer.
-     * @throws JWNLException
+	 * @throws JWNLException JWNLException
      */
     public boolean isSymmetricTo(Pointer that) throws JWNLException {
         return
@@ -141,6 +143,7 @@ public class Pointer implements Serializable {
      * Returns the actual target of this pointer.
      *
      * @return actual target of this pointer
+	 * @throws JWNLException JWNLException
      */
     public PointerTarget getTarget() throws JWNLException {
         if (null == target && null != source.getDictionary()) {
@@ -167,6 +170,7 @@ public class Pointer implements Serializable {
      * Returns the synset that is a) the target of this pointer, or b) the synset that contains the target of this pointer.
      *
      * @return the synset that is a) the target of this pointer, or b) the synset that contains the target of this pointer.
+	 * @throws JWNLException JWNLException
      */
     public Synset getTargetSynset() throws JWNLException {
         if (null == getTarget()) {
@@ -179,6 +183,7 @@ public class Pointer implements Serializable {
      * Returns the offset of the target synset.
      *
      * @return offset of the target synset
+	 * @throws JWNLException JWNLException
      */
     public long getTargetOffset() throws JWNLException {
         if (null == target) {

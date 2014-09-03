@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * A set of </code>Caches</code>, indexed by <code>CacheKey</code>.
+ * A set of <code>Caches</code>, indexed by <code>CacheKey</code>.
  *
- * @author John Didion <jdidion@didion.net>
+ * @author John Didion (jdidion@didion.net)
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public abstract class CacheSet<K, A, B> {

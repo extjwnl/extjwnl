@@ -14,7 +14,7 @@ import java.util.Map;
  * file will be associated with both a POS and a file type (e.g. in the windows
  * naming scheme, the verb index file is called "verb.idx").
  *
- * @author John Didion <jdidion@didion.net>
+ * @author John Didion (jdidion@didion.net)
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public abstract class AbstractDictionaryFile implements DictionaryFile {

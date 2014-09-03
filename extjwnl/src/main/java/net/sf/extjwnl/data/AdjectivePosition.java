@@ -7,7 +7,7 @@ import net.sf.extjwnl.util.ResourceBundleSet;
  * adjective may have in relation to noun that it modifies. Adjective positions are
  * only used through WordNet version 1.6.
  *
- * @author John Didion <jdidion@didion.net>
+ * @author John Didion (jdidion@didion.net)
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public enum AdjectivePosition {

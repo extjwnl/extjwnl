@@ -13,7 +13,7 @@ import java.util.*;
  * {@link #getTargets getTargets} retrieves the targets of these links, and
  * {@link Word#getPointers getPointers} retrieves the pointers themselves.
  *
- * @author John Didion <jdidion@didion.net>
+ * @author John Didion (jdidion@didion.net)
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class Word extends PointerTarget {
@@ -216,6 +216,7 @@ public class Word extends PointerTarget {
      * Returns the sense key of a lemma.
      *
      * @return sense key
+	 * @throws JWNLException JWNLException
      */
     public String getSenseKey() throws JWNLException {
         int ss_type = getPOS().getId();
@@ -259,6 +260,7 @@ public class Word extends PointerTarget {
      * Returns the sense key of a lemma, taking into account adjective class (position).
      *
      * @return sense key
+	 * @throws JWNLException JWNLException
      */
     public String getSenseKeyWithAdjClass() throws JWNLException {
         int ss_type = getPOS().getId();

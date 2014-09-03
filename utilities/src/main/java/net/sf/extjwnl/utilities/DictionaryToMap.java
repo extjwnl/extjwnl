@@ -25,7 +25,7 @@ import java.util.Map;
  * using a high quantity of API calls to the extJWNL library
  * (such as word sense disambiguation algorithms or dictionary services).
  *
- * @author Brett Walenz <bwalenz@users.sourceforge.net>
+ * @author Brett Walenz (bwalenz@users.sourceforge.net)
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class DictionaryToMap {

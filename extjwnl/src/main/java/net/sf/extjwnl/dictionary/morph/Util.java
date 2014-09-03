@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Utility class.
  *
- * @author John Didion <jdidion@didion.net>
+ * @author John Didion (jdidion@didion.net)
  */
 public abstract class Util {
 

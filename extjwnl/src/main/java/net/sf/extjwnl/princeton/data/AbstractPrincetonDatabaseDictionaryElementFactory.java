@@ -12,7 +12,7 @@ import java.util.*;
 /**
  * Base class for database element factories.
  *
- * @author John Didion <jdidion@didion.net>
+ * @author John Didion (jdidion@didion.net)
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public abstract class AbstractPrincetonDatabaseDictionaryElementFactory extends AbstractDictionaryElementFactory implements DatabaseDictionaryElementFactory {

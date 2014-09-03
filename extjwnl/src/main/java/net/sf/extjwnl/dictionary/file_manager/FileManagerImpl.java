@@ -24,7 +24,7 @@ import java.util.*;
  * in order to eliminate the redundant IO activity that a naive implementation of these methods
  * would necessitate.
  *
- * @author John Didion <jdidion@didion.net>
+ * @author John Didion (jdidion@didion.net)
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class FileManagerImpl implements FileManager {
@@ -43,7 +43,7 @@ public class FileManagerImpl implements FileManager {
     public static final String CHECK_PATH_KEY = "check_path";
 
     /**
-     * Whether to cache use counts, default false. Setting this parameter to <code>true</true> speeds up elements
+     * Whether to cache use counts, default false. Setting this parameter to <code>true</code> speeds up elements
      * loading from files considerably, at the expense of some amount of memory.
      */
     public static final String CACHE_USE_COUNT_KEY = "cache_use_count";

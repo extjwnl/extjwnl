@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * Looks up the word in the exceptions file of the given part-of-speech.
  *
- * @author John Didion <jdidion@didion.net>
+ * @author John Didion (jdidion@didion.net)
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class LookupExceptionsOperation extends AbstractOperation {

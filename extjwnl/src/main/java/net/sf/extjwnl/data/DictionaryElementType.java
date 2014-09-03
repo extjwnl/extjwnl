@@ -9,8 +9,8 @@ import java.util.List;
 /**
  * Enumerates different dictionary file types present in WordNet: index, synset data, and exception files.
  *
- * @author Brett Walenz <bwalenz@users.sourceforge.net>
- * @author John Didion <jdidion@didion.net>
+ * @author Brett Walenz (bwalenz@users.sourceforge.net)
+ * @author John Didion (jdidion@didion.net)
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public enum DictionaryElementType {

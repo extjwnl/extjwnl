@@ -5,7 +5,7 @@ import net.sf.extjwnl.JWNLException;
 /**
  * Represents a parameter in a properties file. Parameters can be nested.
  *
- * @author John Didion <jdidion@didion.net>
+ * @author John Didion (jdidion@didion.net)
  */
 public interface Param {
 

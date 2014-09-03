@@ -21,7 +21,7 @@ import java.util.*;
 /**
  * DictionaryToDatabase is used to transfer a WordNet file database into an actual database structure.
  *
- * @author Brett Walenz <bwalenz@users.sourceforge.net>
+ * @author Brett Walenz (bwalenz@users.sourceforge.net)
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class DictionaryToDatabase {
@@ -61,6 +61,9 @@ public class DictionaryToDatabase {
      * Run the program, requires 4 arguments. See DictionaryToDatabase.txt for more documentation.
      *
      * @param args args
+	 * @throws JWNLException JWNLException
+	 * @throws SQLException SQLException
+	 * @throws IOException IOException
      */
     public static void main(String args[]) throws JWNLException, SQLException, IOException {
         if (args.length < 4) {
@@ -256,6 +259,7 @@ public class DictionaryToDatabase {
      *
      * @param itr itr
      * @throws SQLException SQLException
+	 * @throws JWNLException JWNLException
      */
     protected void storeSynsets(Iterator<Synset> itr) throws SQLException, JWNLException {
         PreparedStatement synsetStmt = connection.prepareStatement("INSERT INTO synset VALUES(?,?,?,?,?,?)");

@@ -10,7 +10,7 @@ import java.util.Set;
  * A fixed-capacity <code>Cache</code> that stores the most recently used elements. Once the cache reaches
  * capacity, the least recently used elements will be removed.
  *
- * @author John Didion <jdidion@didion.net>
+ * @author John Didion (jdidion@didion.net)
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class LRUCache<K, V> implements Cache<K, V> {

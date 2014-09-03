@@ -17,7 +17,7 @@ import java.util.*;
  * A <code>Dictionary</code> backed by <code>Map</code>s. Warning: this has huge memory requirements.
  * Make sure to start JVM with a large enough free memory pool to accommodate this.
  *
- * @author John Didion <jdidion@didion.net>
+ * @author John Didion (jdidion@didion.net)
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class MapBackedDictionary extends MapDictionary {

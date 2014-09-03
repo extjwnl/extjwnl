@@ -14,11 +14,12 @@ import java.io.StringWriter;
  * A <code>Relationship</code> encapsulates the relationship between two synsets. Basically, it is a list of
  * synsets/words that one must traverse to get from the source synset to the target synset of the
  * relationship, for some relationship type.
- * <p/>
+ * <p>
  * There are two types of relationships - {@link net.sf.extjwnl.data.relationship.SymmetricRelationship Symmetric}
  * and {@link net.sf.extjwnl.data.relationship.AsymmetricRelationship Asymmetric}.
+ * </p>
  *
- * @author John Didion <jdidion@didion.net>
+ * @author John Didion (jdidion@didion.net)
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public abstract class Relationship {

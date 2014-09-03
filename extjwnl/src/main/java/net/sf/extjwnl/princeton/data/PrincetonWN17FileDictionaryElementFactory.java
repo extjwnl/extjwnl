@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * <code>FileDictionaryElementFactory</code> that produces elements for the Princeton release of WordNet v 1.7
  *
- * @author John Didion <jdidion@didion.net>
+ * @author John Didion (jdidion@didion.net)
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class PrincetonWN17FileDictionaryElementFactory extends AbstractPrincetonFileDictionaryElementFactory {

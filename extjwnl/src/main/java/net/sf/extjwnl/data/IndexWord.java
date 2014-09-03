@@ -11,10 +11,10 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- * An <code>IndexWord</code> represents a line of the <var>pos</var><code>.index</code> file.
+ * An <code>IndexWord</code> represents a line of the <b>pos</b><code>.index</code> file.
  * An <code>IndexWord</code> is created or retrieved via {@link Dictionary#lookupIndexWord lookupIndexWord}.
  *
- * @author John Didion <jdidion@didion.net>
+ * @author John Didion (jdidion@didion.net)
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class IndexWord extends BaseDictionaryElement {
@@ -508,8 +508,8 @@ public class IndexWord extends BaseDictionaryElement {
     }
 
     /**
-     * Return the word's <it>lemma</it>.  Its lemma is its orthographic representation, for
-     * example <code>"dog"</code> or <code>"get up"</code>.
+     * Return the word's lemma.  Its lemma is its orthographic representation, for
+     * example {@code "dog"} or {@code "get up"}.
      *
      * @return the word's lemma
      */

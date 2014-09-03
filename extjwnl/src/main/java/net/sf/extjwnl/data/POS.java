@@ -10,7 +10,7 @@ import java.util.List;
  * Enumeration of major syntactic categories, or <b>P</b>art's <b>O</b>f <b>S</b>peech.
  * Each <code>POS</code> has a human-readable label that can be used to print it, and a key by which it can be looked up.
  *
- * @author John Didion <jdidion@didion.net>
+ * @author John Didion (jdidion@didion.net)
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public enum POS {

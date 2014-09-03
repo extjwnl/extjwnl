@@ -11,9 +11,9 @@ import java.util.Map;
 
 /**
  * <code>AbstractDictionaryFile</code> that uses file names compatible with Princeton's distribution of WordNet.
- * The filenames associated are: <index, data>.<noun, verb, adj, adv>, <noun, verb, adj, adv>.exc
+ * The associated filenames are: &lt;index, data&gt;.&lt;noun, verb, adj, adv&gt;, &lt;noun, verb, adj, adv&gt;.exc
  *
- * @author John Didion <jdidion@didion.net>
+ * @author John Didion (jdidion@didion.net)
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public abstract class AbstractPrincetonDictionaryFile extends AbstractDictionaryFile {

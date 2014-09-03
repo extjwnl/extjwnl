@@ -18,7 +18,7 @@ import java.util.List;
  * but requires an implementation of a specific dictionary to
  * function.
  *
- * @author Brett Walenz <bwalenz@users.sourceforge.net>
+ * @author Brett Walenz (bwalenz@users.sourceforge.net)
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 @Ignore

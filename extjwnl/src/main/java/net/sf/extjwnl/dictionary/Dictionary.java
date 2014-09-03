@@ -28,7 +28,7 @@ import java.util.*;
 /**
  * Abstract representation of a WordNet dictionary.
  *
- * @author John Didion <jdidion@didion.net>
+ * @author John Didion (jdidion@didion.net)
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public abstract class Dictionary {
@@ -833,6 +833,7 @@ public abstract class Dictionary {
      * frame is valid for the word.
      *
      * @param bits frame flags
+	 * @param verbFrames frames
      * @return the frames at the indexes encoded in <var>l</var>
      */
     public static String[] getFrames(BitSet bits, String[] verbFrames) {

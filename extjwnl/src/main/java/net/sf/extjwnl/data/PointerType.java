@@ -12,7 +12,7 @@ import java.util.*;
  * parts-of-speech that it applies to, and a short string that represents it in
  * the dictionary files.
  *
- * @author John Didion <jdidion@didion.net>
+ * @author John Didion (jdidion@didion.net)
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public enum PointerType {

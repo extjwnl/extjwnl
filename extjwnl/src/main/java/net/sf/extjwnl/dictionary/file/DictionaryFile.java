@@ -11,7 +11,7 @@ import java.io.IOException;
  * Represents a single dictionary file. Extensions or implementations of this interface should provide
  * the appropriate methods to read from the file.
  *
- * @author John Didion <jdidion@didion.net>
+ * @author John Didion (jdidion@didion.net)
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public interface DictionaryFile extends Owned {

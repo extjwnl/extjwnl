@@ -12,7 +12,7 @@ import java.util.Random;
 /**
  * Database manager.
  *
- * @author John Didion <jdidion@didion.net>
+ * @author John Didion (jdidion@didion.net)
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class DatabaseManagerImpl implements DatabaseManager {

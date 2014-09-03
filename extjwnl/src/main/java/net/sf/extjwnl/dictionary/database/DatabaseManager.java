@@ -8,7 +8,7 @@ import java.sql.SQLException;
 /**
  * Interface for database managers.
  *
- * @author John Didion <jdidion@didion.net>
+ * @author John Didion (jdidion@didion.net)
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public interface DatabaseManager extends Owned {

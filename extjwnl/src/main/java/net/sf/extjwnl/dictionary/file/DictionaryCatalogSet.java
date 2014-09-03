@@ -16,7 +16,7 @@ import java.util.Map;
  * a <code>DictionaryFile</code> to be retrieved by its <code>POS</code>
  * and <code>DictionaryFileType</code>.
  *
- * @author John Didion <jdidion@didion.net>
+ * @author John Didion (jdidion@didion.net)
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class DictionaryCatalogSet<E extends DictionaryFile> implements Owned {

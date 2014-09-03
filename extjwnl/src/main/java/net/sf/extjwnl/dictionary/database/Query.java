@@ -11,7 +11,7 @@ import java.sql.SQLException;
 /**
  * Helper class to manage queries.
  *
- * @author John Didion <jdidion@didion.net>
+ * @author John Didion (jdidion@didion.net)
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class Query {

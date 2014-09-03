@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * Base class for operations.
  *
- * @author John Didion <jdidion@didion.net>
+ * @author John Didion (jdidion@didion.net)
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public abstract class AbstractDelegatingOperation extends AbstractOperation {
