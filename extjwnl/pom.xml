@@ -50,7 +50,7 @@
             <scope>test</scope>
             <groupId>net.sf.extjwnl</groupId>
             <artifactId>extjwnl-data-wn31</artifactId>
-            <version>1.2-SNAPSHOT</version>
+            <version>1.2</version>
         </dependency>
     </dependencies>
 
