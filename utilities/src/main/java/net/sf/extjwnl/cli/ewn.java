@@ -227,19 +227,19 @@ public class ewn {
 //                                                }
 //                                            }
                                         } else {
-                                            log.error("Malformed sensekey " + key);
+                                            log.error("Malformed sensekey. Lexical id not found: " + key);
                                             System.exit(1);
                                         }
                                     } else {
-                                        log.error("Malformed sensekey " + key);
+                                        log.error("Malformed sensekey. Lexical id marker not found: " + key);
                                         System.exit(1);
                                     }
                                 } else {
-                                    log.error("Malformed sensekey " + key);
+                                    log.error("Malformed sensekey. Lexical file number not found: " + key);
                                     System.exit(1);
                                 }
                             } else {
-                                log.error("Malformed sensekey " + key);
+                                log.error("Malformed sensekey. POS is not recognized: " + key);
                                 System.exit(1);
                             }
                         }
