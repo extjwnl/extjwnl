@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jwnl_properties language="en">
-    <version publisher="Princeton" number="3.0" language="en"/>
+    <version publisher="Princeton" number="3.1" language="en"/>
     <dictionary class="net.sf.extjwnl.dictionary.FileBackedDictionary">
         <param name="morphological_processor" value="net.sf.extjwnl.dictionary.morph.DefaultMorphologicalProcessor">
             <param name="operations">
