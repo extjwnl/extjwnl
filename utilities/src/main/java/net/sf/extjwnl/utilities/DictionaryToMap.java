@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * DictionaryToMap allows you to populate and create an in-memory map of the WordNet
@@ -97,7 +98,7 @@ public class DictionaryToMap {
             }
         }
 
-        Map<Object, DictionaryElement> map = new HashMap<Object, DictionaryElement>((int) Math.ceil((float) count / 0.9F) + 1, 0.9F);
+        Map<Object, DictionaryElement> map = new ConcurrentHashMap<Object, DictionaryElement>();
         Iterator<? extends DictionaryElement> listItr = getIterator(pos, fileType);
         while (listItr.hasNext()) {
             DictionaryElement elt = listItr.next();
