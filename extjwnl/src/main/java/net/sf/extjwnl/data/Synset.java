@@ -344,32 +344,30 @@ public class Synset extends PointerTarget implements DictionaryElement {
         }
 
         private void checkPointers() {
-            if (null != dictionary && dictionary.getCheckAlienPointers() && !checkingPointers) {
+            if (null != dictionary && dictionary.isEditable() && dictionary.getCheckAlienPointers() && !checkingPointers) {
                 synchronized (this) {
                     if (!checkingPointers) {
                         checkingPointers = true;
-                        if (null != dictionary && dictionary.isEditable()) {
-                            List<Pointer> toDelete = null;
-                            for (int i = 0; i < super.size(); i++) {
-                                Pointer pointer = super.get(i);
-                                try {
-                                    if (dictionary != pointer.getSource().getDictionary() || null == pointer.getTarget() || dictionary != pointer.getTarget().getDictionary()) {
-                                        if (null == toDelete) {
-                                            toDelete = new ArrayList<Pointer>();
-                                        }
-                                        toDelete.add(pointer);
+                        List<Pointer> toDelete = null;
+                        for (int i = 0; i < super.size(); i++) {
+                            Pointer pointer = super.get(i);
+                            try {
+                                if (dictionary != pointer.getSource().getDictionary() || null == pointer.getTarget() || dictionary != pointer.getTarget().getDictionary()) {
+                                    if (null == toDelete) {
+                                        toDelete = new ArrayList<Pointer>();
                                     }
-                                } catch (JWNLException e) {
-                                    throw new JWNLRuntimeException(e);
+                                    toDelete.add(pointer);
                                 }
+                            } catch (JWNLException e) {
+                                throw new JWNLRuntimeException(e);
                             }
-                            if (null != toDelete) {
-                                if (log.isWarnEnabled() && 0 < toDelete.size()) {
-                                    log.warn(dictionary.getMessages().resolveMessage("DICTIONARY_WARN_002", Synset.this.getOffset()));
-                                }
-                                for (Pointer pointer : toDelete) {
-                                    remove(pointer);
-                                }
+                        }
+                        if (null != toDelete) {
+                            if (log.isWarnEnabled() && 0 < toDelete.size()) {
+                                log.warn(dictionary.getMessages().resolveMessage("DICTIONARY_WARN_002", Synset.this.getOffset()));
+                            }
+                            for (Pointer pointer : toDelete) {
+                                remove(pointer);
                             }
                         }
                         checkingPointers = false;
