@@ -10,7 +10,7 @@
             <directory>${project.build.directory}/dist/bin</directory>
             <includes/>
             <fileMode>755</fileMode>
-            <outputDirectory>/bin</outputDirectory>
+            <outputDirectory>bin</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>${project.build.directory}/dist/lib</directory>
@@ -19,13 +19,13 @@
                 <exclude>**/maven-metadata-appassembler.xml</exclude>
             </excludes>
             <fileMode>755</fileMode>
-            <outputDirectory>/lib</outputDirectory>
+            <outputDirectory>lib</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>${project.build.directory}/dist/etc</directory>
             <includes/>
             <fileMode>755</fileMode>
-            <outputDirectory>/etc</outputDirectory>
+            <outputDirectory>etc</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>${project.build.directory}/../..</directory>
@@ -34,70 +34,70 @@
                 <include>license.txt</include>
                 <include>changes.txt</include>
             </includes>
-            <outputDirectory>/</outputDirectory>
+            <outputDirectory/>
         </fileSet>
         <fileSet>
             <directory>${project.build.directory}/../src/</directory>
             <includes>
                 <include>**</include>
             </includes>
-            <outputDirectory>/src/utilities/src</outputDirectory>
+            <outputDirectory>src/utilities/src</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>${project.build.directory}/../../extjwnl/src/</directory>
             <includes>
                 <include>**</include>
             </includes>
-            <outputDirectory>/src/extjwnl/src</outputDirectory>
+            <outputDirectory>src/extjwnl/src</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>${project.build.directory}/../doc/</directory>
             <includes>
                 <include>**</include>
             </includes>
-            <outputDirectory>/doc</outputDirectory>
+            <outputDirectory>doc</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>${project.build.directory}/../../extjwnl/doc/</directory>
             <includes>
                 <include>**</include>
             </includes>
-            <outputDirectory>/doc</outputDirectory>
+            <outputDirectory>doc</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>${project.build.directory}/../</directory>
             <includes>
                 <include>pom.xml</include>
             </includes>
-            <outputDirectory>/src/utilities</outputDirectory>
+            <outputDirectory>src/utilities</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>${project.build.directory}/../../extjwnl/</directory>
             <includes>
                 <include>pom.xml</include>
             </includes>
-            <outputDirectory>/src/extjwnl</outputDirectory>
+            <outputDirectory>src/extjwnl</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>${project.build.directory}/../../</directory>
             <includes>
                 <include>pom.xml</include>
             </includes>
-            <outputDirectory>/src/</outputDirectory>
+            <outputDirectory>src/</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>${project.build.directory}/../../extjwnl/target/apidocs</directory>
             <includes>
                 <include>**</include>
             </includes>
-            <outputDirectory>/doc/apidocs/extjwnl</outputDirectory>
+            <outputDirectory>doc/apidocs/extjwnl</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>${project.build.directory}/apidocs</directory>
             <includes>
                 <include>**</include>
             </includes>
-            <outputDirectory>/doc/apidocs/utilities</outputDirectory>
+            <outputDirectory>doc/apidocs/utilities</outputDirectory>
         </fileSet>
     </fileSets>
 </assembly>
