@@ -1,133 +1,155 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" dir="ltr">
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="extJWNL (Extended Java WordNet Library) is a Java API for creating, reading and updating dictionaries in WordNet format.">
+    <meta name="author" content="Aliaksandr Autayeu">
+    <link rel="icon" href="favicon.ico">
+    <meta name="keywords" content="extJWNL, Extended Java WordNet Library, JWNL, Java, Java API, API, create, read, update, edit, command-line, dictionary, WordNet, open source">
 
-<head>
-	<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
-	<meta name="description" content="extJWNL (Extended Java WordNet Library) is a Java API for creating, reading and updating dictionaries in WordNet format."/>
-	<meta name="keywords" content="extJWNL, Extended Java WordNet Library, JWNL, Java, Java API, API, create, read, update, edit, command-line, dictionary, WordNet, open source" />
-	<meta name="author" content="Aliaksandr Autayeu" />
-	<link rel="stylesheet" type="text/css" href="style.css" media="screen" />
-	<link rel="alternate" type="application/rss+xml" title="extJWNL - News" href="http://sourceforge.net/export/rss2_projnews.php?group_id=386458" />
-	<link rel="alternate" type="application/rss+xml" title="extJWNL - Recent Activity" href="http://sourceforge.net/export/rss2_keepsake.php?group_id=386458" />
-	<link rel="alternate" type="application/rss+xml" title="extJWNL - File Releases" href="http://sourceforge.net/api/file/index/project-id/386458/mtime/desc/rss" />
-	<title>extJWNL (Extended Java WordNet Library)</title>
-<script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    <link rel="stylesheet" type="text/css" href="style.css" media="screen">
+    <link rel="alternate" type="application/rss+xml" title="extJWNL - News" href="http://sourceforge.net/export/rss2_projnews.php?group_id=386458">
+    <link rel="alternate" type="application/rss+xml" title="extJWNL - Recent Activity" href="http://sourceforge.net/export/rss2_keepsake.php?group_id=386458">
+    <link rel="alternate" type="application/rss+xml" title="extJWNL - File Releases" href="http://sourceforge.net/api/file/index/project-id/386458/mtime/desc/rss">
 
-  ga('create', 'UA-21951609-1', 'auto');
-  ga('send', 'pageview');
+    <title>extJWNL (Extended Java WordNet Library)</title>
 
-</script>
+    <!-- Bootstrap core CSS -->
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
+    <!-- customizations -->
+    <link href="style.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="//oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="//oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-21951609-1', 'auto');
+      ga('send', 'pageview');
+    </script>
 </head>
+
 <body>
 
-<div id="site-wrapper">
-	<div id="header">
-		<div id="top">
-			<div class="left" id="logo">
-				<a href="index.html"><img src="img/extjwnl-logo.png" alt="extJWNL" /></a>
-			</div>
+<div class="container">
+    <nav class="navbar navbar-default navbar-static-top">
+        <div class="header">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand"><img src="img/extjwnl-logo-web.svg" width="107" height="37" alt="extJWNL logo"></a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="current-tab"><a href="#">About</a></li>
+                    <li><a href="#license">License</a></li>
+                    <li><a href="#download">Download</a></li>
+                    <li><a href="#documentation">Documentation</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
-			<div class="left navigation" id="main-nav">
-				<ul class="tabbed">
-					<li class="current-tab"><a href="#about">About</a></li>
-					<li><a href="#license">License</a></li>
-					<li><a href="#download">Download</a></li>
-					<li><a href="#documentation">Documentation</a></li>
-				</ul>
-				<div class="clearer">&nbsp;</div>
-			</div>
-			<div class="clearer">&nbsp;</div>
-		</div>
-	</div>
+    <div class="main">
+        <div class="section">
+            <div class="section-content">
+                <div class="post">
+                    <div class="post-title"><h2>About</h2></div>
+                    <div class="post-body">
+                        <p class="large"><strong>extJWNL</strong> (Extended Java WordNet Library) is a Java API for
+                            creating, reading and updating dictionaries in WordNet format.
+                            <strong>extJWNL</strong> started from <a href="http://jwordnet.sourceforge.net">JWNL</a>,
+                            improved it and now features support for: </p>
+                        <ul>
+                            <li>creating, editing and writing dictionaries</li>
+                            <li>encodings, including UTF-8</li>
+                            <li>Java generics</li>
+                            <li>huge dictionaries</li>
+                            <li>instance dictionaries and static singletone dictionary</li>
+                            <li>Maven</li>
+                            <li>ewn: command-line tool to browse, create and edit dictionaries in WordNet format</li>
+                            <li>and more</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="content-separator"></div>
+                <div class="post">
+                    <div class="post-title" id="license"><h2>License</h2></div>
+                    <div class="post-body">
+                        <p class="large"><strong>extJWNL</strong> is an open source library written in Java and licensed
+                            under BSD license (see <a href="license.txt">license.txt</a>).</p>
+                    </div>
+                </div>
+                <div class="content-separator"></div>
+                <div class="post">
+                    <div class="post-title" id="download"><h2>Download</h2></div>
+                    <div class="post-body">
+                        <p class="large"><a href="http://sourceforge.net/projects/extjwnl/files">Download extJWNL binary
+                            release</a></p>
 
-	<div class="main">
-		<div class="section">
-			<div class="section-content">
-				<div class="post">
-					<div class="post-title"><h2>About</h2></div>
-					<div class="post-body">
-						<p class="large">extJWNL (Extended Java WordNet Library) is a Java API for creating, reading and updating dictionaries in WordNet format. extJWNL is an upgraded version of <a href="http://jwordnet.sourceforge.net">JWNL</a>. The library was improved and now features support for: </p>
-                                                <ul>
-                                                  <li>creating, editing and writing dictionaries</li>
-                                                  <li>encodings, including UTF-8</li>
-                                                  <li>Java generics</li>
-                                                  <li>huge dictionaries</li>
-                                                  <li>instance dictionaries and static singletone dictionary</li>
-                                                  <li>Maven</li>
-                                                  <li>ewn: command-line tool to browse, create and edit dictionaries in WordNet format</li>
-                                                  <li>and more</li>
-                                                </ul>
-					</div>
-				</div>
-				<div class="content-separator"></div>
-				<div class="post">
-					<div class="post-title"><h2>License</h2></div>
-					<div class="post-body">
-						<p class="large">extJWNL is an open source library written in Java and licensed under BSD license (see <a href="license.txt">license.txt</a>).</p>
-					</div>
-				</div>
-				<div class="content-separator"></div>
-				<div class="post">
-					<div class="post-title"><h2>Download</h2></div>
-					<div class="post-body">
-						<p class="large"><a href="http://sourceforge.net/projects/extjwnl/files">Download extJWNL binary release</a></p>
-						<p class="large"><a href="https://github.com/extjwnl/extjwnl">Clone extJWNL source code</a></p>
-						<p class="large">Maven dependency:</p>
-<pre>
-&lt;dependency&gt;
-    &lt;groupId&gt;net.sf.extjwnl&lt;/groupId&gt;
-    &lt;artifactId&gt;extjwnl&lt;/artifactId&gt;
-    &lt;version&gt;1.8.0&lt;/version&gt;
-&lt;/dependency&gt;
-&lt;dependency&gt;
-    &lt;groupId&gt;net.sf.extjwnl&lt;/groupId&gt;
-    &lt;artifactId&gt;extjwnl-data-wn31&lt;/artifactId&gt;
-    &lt;version&gt;1.2&lt;/version&gt;
-&lt;/dependency&gt;
-</pre>
-					</div>
-				</div>
-				<div class="content-separator"></div>
-				<div class="post">
-					<div class="post-title"><h2>Documentation</h2></div>
-					<div class="post-body">
-						<p class="large">extJWNL is accompanied with <a href="javadocs/index.html">JavaDocs</a>, <a href="https://github.com/extjwnl/extjwnl/wiki">extJWNL Wiki</a>, <a href="http://sourceforge.net/projects/extjwnl/forums">extJWNL forums</a> where you can ask questions and <a href="https://github.com/extjwnl/extjwnl/issues">Issues</a> where you can submit bugs.</p>
-					</div>
-				</div>
-				<div class="content-separator"></div>
-				<div class="post">
-					<div class="post-title"><h2>Acknowledgements</h2></div>
-					<div class="post-body">
-						<p class="large">This refactoring was done by <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a> as a part of work on <a href="http://geowordnet.semanticmatching.org/">GeoWordNet</a> in <a href="http://disi.unitn.it/~knowdive/">KnowDive</a> group.</p>
-					</div>
-				</div>
-				<div class="clearer">&nbsp;</div>
-			</div>
-		</div>
-	</div>
+                        <p class="large"><a href="https://github.com/extjwnl/extjwnl">Clone extJWNL source code</a></p>
 
-	<div id="footer">
-		<div class="left" id="footer-left">
-			<img src="img/extjwnl-logo-small.png" alt="extJWNL" class="left" />
-			<p>&copy; 2011-2015 <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>. All rights reserved.</p>
-			<p class="quiet"><a href="http://templates.arcsin.se/">Website template</a> by <a href="http://arcsin.se/">Arcsin</a></p>
-			<div class="clearer">&nbsp;</div>
-		</div>
+                        <p class="large">Maven dependency:</p>
+                        <div class="highlight">
+<pre><code class="language-html" data-lang="html"><span class="cp">&lt;dependency&gt;</span>
+<span class="cp">  &lt;groupId&gt;</span>net.sf.extjwnl<span class="cp">&lt;/groupId&gt;</span>
+<span class="cp">  &lt;artifactId&gt;</span>extjwnl<span class="cp">&lt;/artifactId&gt;</span>
+<span class="cp">  &lt;version&gt;</span>1.8.1<span class="cp">&lt;/version&gt;</span>
+<span class="cp">&lt;/dependency&gt;</span>
+<span class="cp">&lt;dependency&gt;</span>
+<span class="cp">  &lt;groupId&gt;</span>net.sf.extjwnl<span class="cp">&lt;/groupId&gt;</span>
+<span class="cp">  &lt;artifactId&gt;</span>extjwnl-data-wn31<span class="cp">&lt;/artifactId&gt;</span>
+<span class="cp">  &lt;version&gt;</span>1.2<span class="cp">&lt;/version&gt;</span>
+<span class="cp">&lt;/dependency&gt;</span>
+</code></pre>
+                        </div>
+                    </div>
+                </div>
+                <div class="content-separator"></div>
+                <div class="post">
+                    <div class="post-title" id="documentation"><h2>Documentation</h2></div>
+                    <div class="post-body">
+                        <p class="large"><strong>extJWNL</strong> is accompanied with <a href="javadocs/index.html">JavaDocs</a>,
+                            <a href="https://github.com/extjwnl/extjwnl/wiki">extJWNL Wiki</a>,
+                            <a href="http://sourceforge.net/projects/extjwnl/forums">extJWNL forums</a> where you can ask questions
+                            and <a href="https://github.com/extjwnl/extjwnl/issues">Issues</a> where you can submit bugs.</p>
+                    </div>
+                </div>
+                <div class="content-separator"></div>
+                <div class="post">
+                    <div class="post-title"><h2>Acknowledgements</h2></div>
+                    <div class="post-body">
+                        <p class="large">This refactoring was done by <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
+                            as a part of work on <a href="http://geowordnet.semanticmatching.org/">GeoWordNet</a>
+                            in <a href="http://disi.unitn.it/~knowdive/">KnowDive</a> group.</p>
+                    </div>
+                </div>
+                <div class="clearer">&nbsp;</div>
+            </div>
+        </div>
+    </div>
 
-		<div class="right" id="footer-right">
-			<p class="large">
-				<a href="#about">About</a> <span class="text-separator">|</span> 
-				<a href="#license">License</a> <span class="text-separator">|</span> 
-				<a href="#download">Download</a> <span class="text-separator">|</span> 
-				<a href="#documentation">Documentation</a>
-			</p>
-		</div>
-		<div class="clearer">&nbsp;</div>
-	</div>
+    <footer class="footer">
+        <p>&copy; 2011-2015 <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a></p>
+        <!-- Responsive design by Olga Fedoseeva (http://fedoseeva.net) -->
+    </footer>
+
 </div>
 </body>
 </html>
