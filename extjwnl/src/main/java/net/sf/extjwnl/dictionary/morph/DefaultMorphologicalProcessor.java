@@ -100,7 +100,8 @@ public class DefaultMorphologicalProcessor implements MorphologicalProcessor {
 
         final LookupInfo info = getCachedLookupInfo(pos, derivation);
         synchronized (info) {
-            while (info.isNextOperationAvailable() && !info.executeNextOperation()) {
+            while (info.isNextOperationAvailable()) {
+                info.executeNextOperation();
             }
         }
         return info.getBaseForms().getForms();
