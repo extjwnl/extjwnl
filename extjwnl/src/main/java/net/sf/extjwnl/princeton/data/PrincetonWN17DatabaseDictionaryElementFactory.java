@@ -9,7 +9,7 @@ import java.util.Map;
  * Element factory for WN1.7.
  *
  * @author John Didion (jdidion@didion.net)
- * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
+ * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class PrincetonWN17DatabaseDictionaryElementFactory extends AbstractPrincetonDatabaseDictionaryElementFactory {
 

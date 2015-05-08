@@ -3,6 +3,6 @@
  * dictionary files using the naming convention used in Princeton's release of WordNet.
  *
  * @author John Didion (jdidion@didion.net)
- * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
+ * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 package net.sf.extjwnl.princeton.file;

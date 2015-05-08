@@ -5,7 +5,7 @@ import java.io.InputStream;
 /**
  * Tests FileBackedDictionary editing.
  *
- * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
+ * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class TestEditFileBackedDictionary extends DictionaryEditTester {
 

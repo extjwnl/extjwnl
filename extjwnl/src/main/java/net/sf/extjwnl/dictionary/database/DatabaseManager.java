@@ -9,7 +9,7 @@ import java.sql.SQLException;
  * Interface for database managers.
  *
  * @author John Didion (jdidion@didion.net)
- * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
+ * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public interface DatabaseManager extends Owned {
     Query getIndexWordSynsetsQuery(POS pos, String lemma) throws SQLException;

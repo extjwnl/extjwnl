@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * Tests dictionary editing.
  *
- * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
+ * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 @Ignore
 public abstract class DictionaryEditTester {

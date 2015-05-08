@@ -10,7 +10,7 @@ import java.util.List;
  * and <code>IndexWord</code>s). Using a factory class rather than individual parsing methods in each class
  * facilitates using multiple versions of WordNet, or using a proprietary data format.
  *
- * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
+ * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public interface DictionaryElementFactory extends Owned {
 

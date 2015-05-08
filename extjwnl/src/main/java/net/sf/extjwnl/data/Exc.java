@@ -18,7 +18,7 @@ import java.util.List;
  * </p>
  *
  * @author John Didion (jdidion@didion.net)
- * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
+ * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class Exc extends BaseDictionaryElement {
 

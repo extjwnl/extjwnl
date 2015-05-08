@@ -8,7 +8,7 @@ import net.sf.extjwnl.util.ResourceBundleSet;
  * only used through WordNet version 1.6.
  *
  * @author John Didion (jdidion@didion.net)
- * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
+ * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public enum AdjectivePosition {
     NONE("none", "none"),

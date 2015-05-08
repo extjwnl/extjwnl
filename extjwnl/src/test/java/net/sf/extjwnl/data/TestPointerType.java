@@ -6,7 +6,7 @@ import org.junit.Test;
 import java.util.List;
 
 /**
- * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
+ * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class TestPointerType {
 

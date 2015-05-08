@@ -7,7 +7,7 @@ import org.junit.BeforeClass;
 import java.io.IOException;
 
 /**
- * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
+ * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class TestReadFileChannelBackedDictionary extends DictionaryReadTester {
 

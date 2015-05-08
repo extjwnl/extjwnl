@@ -6,6 +6,6 @@
  * - which looks up information in in-memory tables (or Maps).
  *
  * @author John Didion (jdidion@didion.net)
- * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
+ * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 package net.sf.extjwnl.dictionary;

@@ -11,7 +11,7 @@ import java.io.IOException;
 /**
  * Creates a DatabaseBackedDictionary and runs all the test cases.
  *
- * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
+ * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class ITReadDatabaseBackedDictionary extends DictionaryReadTester {
 

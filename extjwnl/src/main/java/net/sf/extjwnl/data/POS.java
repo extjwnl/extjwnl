@@ -11,7 +11,7 @@ import java.util.List;
  * Each <code>POS</code> has a human-readable label that can be used to print it, and a key by which it can be looked up.
  *
  * @author John Didion (jdidion@didion.net)
- * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
+ * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public enum POS {
 

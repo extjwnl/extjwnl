@@ -16,7 +16,7 @@ import java.util.*;
  * A command-line (CLI) interface to WordNets via extJWNL. It follows the syntax of the wn shipped with the original
  * WordNet, extending it with WordNet editing commands.
  *
- * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
+ * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class ewn {
 

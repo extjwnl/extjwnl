@@ -9,7 +9,7 @@ import java.io.IOException;
  * Tests thread locking for this case:
  * https://sourceforge.net/projects/extjwnl/forums/forum/1333399/topic/4772095/index/page/1
  *
- * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
+ * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 @Ignore
 public class LongTestThreadsDictionary extends MultiThreadedTestCase {

@@ -18,7 +18,7 @@ import java.util.*;
  * Make sure to start JVM with a large enough free memory pool to accommodate this.
  *
  * @author John Didion (jdidion@didion.net)
- * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
+ * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class MapBackedDictionary extends MapDictionary {
 

@@ -11,7 +11,7 @@ import java.io.IOException;
  * Tests the word functionality.
  *
  * @author Brett Walenz (bwalenz@users.sourceforge.net)
- * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
+ * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class TestWord extends BaseData {
 

@@ -7,7 +7,7 @@ import java.util.Map;
  * unspecified amount of time (which the implementor of <code>Cache</code> may further specify).
  *
  * @author John Didion (jdidion@didion.net)
- * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
+ * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public interface Cache<K, V> extends Map<K, V> {
 

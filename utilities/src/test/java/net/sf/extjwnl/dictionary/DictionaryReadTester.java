@@ -18,7 +18,7 @@ import java.util.List;
  * function.
  *
  * @author Brett Walenz (bwalenz@users.sourceforge.net)
- * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
+ * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 @Ignore
 public class DictionaryReadTester {

@@ -10,7 +10,7 @@ import java.util.List;
  * A group of possible base forms for a particular lemma.
  *
  * @author John Didion (jdidion@didion.net)
- * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
+ * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class BaseFormSet {
 

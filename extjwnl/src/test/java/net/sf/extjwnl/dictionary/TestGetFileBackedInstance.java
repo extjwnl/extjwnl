@@ -9,7 +9,7 @@ import java.io.IOException;
 /**
  * Creates a FileBackedDictionary via .getFileBackedInstance and tests it.
  *
- * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
+ * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class TestGetFileBackedInstance extends DictionaryReadTester {
 

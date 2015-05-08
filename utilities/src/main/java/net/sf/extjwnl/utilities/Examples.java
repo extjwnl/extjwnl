@@ -24,7 +24,7 @@ import java.util.Set;
  * A class to demonstrate the functionality of the library.
  *
  * @author John Didion (jdidion@didion.net)
- * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
+ * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class Examples {
 

@@ -29,7 +29,7 @@ import java.util.*;
  * Abstract representation of a WordNet dictionary.
  *
  * @author John Didion (jdidion@didion.net)
- * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
+ * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public abstract class Dictionary {
 

@@ -10,7 +10,7 @@ import java.util.*;
 /**
  * A in-memory <code>Dictionary</code> backed by <code>HashMap</code>s.
  *
- * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
+ * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class MemoryDictionary extends MapDictionary {
 

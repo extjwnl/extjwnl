@@ -10,7 +10,7 @@ import net.sf.extjwnl.util.ResourceBundleSet;
  * A node in a <code>PointerTargetNodeList</code>.
  *
  * @author John Didion (jdidion@didion.net)
- * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
+ * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class PointerTargetNode implements Node {
     /**

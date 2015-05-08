@@ -10,7 +10,7 @@ import java.util.*;
 /**
  * Base class for map-based dictionaries.
  *
- * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
+ * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class MapDictionary extends Dictionary {
 

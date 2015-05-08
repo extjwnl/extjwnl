@@ -16,7 +16,7 @@ import java.util.ListIterator;
  * synonyms of its target.
  *
  * @author John Didion (jdidion@didion.net)
- * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
+ * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class PointerTargetTreeNode extends PointerTargetNode {
     /**

@@ -17,7 +17,7 @@ import java.util.Map;
  * Uses java.nio.channels.FileChannel for file access.
  *
  * @author John Didion (jdidion@didion.net)
- * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
+ * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class PrincetonChannelDictionaryFile extends PrincetonCharBufferFile implements DictionaryFileFactory<PrincetonChannelDictionaryFile> {
 

@@ -5,7 +5,7 @@ import java.util.HashMap;
 /**
  * Pools objects through a HashSet.
  *
- * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
+ * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class HashPool<T> implements Pool<T> {
 

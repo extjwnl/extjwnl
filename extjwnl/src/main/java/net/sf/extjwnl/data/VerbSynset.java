@@ -8,7 +8,7 @@ import java.util.BitSet;
 /**
  * A <code>Synset</code> for verbs.
  *
- * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
+ * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class VerbSynset extends Synset {
 

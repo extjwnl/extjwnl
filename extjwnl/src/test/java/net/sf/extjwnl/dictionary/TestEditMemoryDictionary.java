@@ -3,7 +3,7 @@ package net.sf.extjwnl.dictionary;
 import java.io.InputStream;
 
 /**
- * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
+ * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class TestEditMemoryDictionary extends DictionaryEditTester {
 

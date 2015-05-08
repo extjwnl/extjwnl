@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * A <code>RandomAccessDictionaryFile</code> that accesses files named with Princeton's dictionary file naming convention.
  *
- * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
+ * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public abstract class PrincetonCharBufferFile extends AbstractPrincetonRandomAccessDictionaryFile {
 

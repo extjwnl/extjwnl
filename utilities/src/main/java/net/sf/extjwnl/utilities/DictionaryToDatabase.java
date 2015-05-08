@@ -22,7 +22,7 @@ import java.util.*;
  * DictionaryToDatabase is used to transfer a WordNet file database into an actual database structure.
  *
  * @author Brett Walenz (bwalenz@users.sourceforge.net)
- * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
+ * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class DictionaryToDatabase {
 

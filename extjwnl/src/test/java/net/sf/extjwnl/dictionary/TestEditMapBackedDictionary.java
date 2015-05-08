@@ -5,7 +5,7 @@ import java.io.InputStream;
 /**
  * Tests MapBackedDictionary editing.
  *
- * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
+ * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class TestEditMapBackedDictionary extends DictionaryEditTester {
 

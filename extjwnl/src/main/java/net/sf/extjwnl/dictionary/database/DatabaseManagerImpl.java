@@ -13,7 +13,7 @@ import java.util.Random;
  * Database manager.
  *
  * @author John Didion (jdidion@didion.net)
- * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
+ * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class DatabaseManagerImpl implements DatabaseManager {
     public static final String DRIVER = "driver";

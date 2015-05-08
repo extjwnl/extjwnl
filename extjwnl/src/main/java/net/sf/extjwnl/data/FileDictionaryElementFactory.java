@@ -9,7 +9,7 @@ import net.sf.extjwnl.util.factory.Owned;
  * facilitates using multiple versions of WordNet, or using a proprietary data format.
  *
  * @author John Didion (jdidion@didion.net)
- * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
+ * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public interface FileDictionaryElementFactory extends DictionaryElementFactory {
 

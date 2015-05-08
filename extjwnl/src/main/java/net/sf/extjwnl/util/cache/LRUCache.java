@@ -11,7 +11,7 @@ import java.util.Set;
  * capacity, the least recently used elements will be removed.
  *
  * @author John Didion (jdidion@didion.net)
- * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
+ * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class LRUCache<K, V> implements Cache<K, V> {
 

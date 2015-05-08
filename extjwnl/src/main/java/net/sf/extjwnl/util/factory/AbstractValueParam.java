@@ -14,7 +14,7 @@ import java.util.Map;
  * Base class for configuration parameters.
  *
  * @author John Didion (jdidion@didion.net)
- * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
+ * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public abstract class AbstractValueParam implements Param {
 

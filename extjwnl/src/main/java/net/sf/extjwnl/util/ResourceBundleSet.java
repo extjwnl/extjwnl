@@ -6,7 +6,7 @@ import java.util.*;
  * A ResourceBundle that is a proxy to multiple ResourceBundles.
  *
  * @author John Didion (jdidion@didion.net)
- * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
+ * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class ResourceBundleSet extends ResourceBundle {
 

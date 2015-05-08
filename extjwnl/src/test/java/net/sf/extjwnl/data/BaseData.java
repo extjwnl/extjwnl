@@ -10,7 +10,7 @@ import java.io.InputStream;
 /**
  * Base class for tests.
  *
- * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
+ * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public abstract class BaseData {
 

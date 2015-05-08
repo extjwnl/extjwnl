@@ -12,7 +12,7 @@ import java.util.*;
  * Tests Synset functionality by creating a mock synset.
  *
  * @author Brett Walenz (bwalenz@users.sourceforge.net)
- * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
+ * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class TestSynset extends BaseData {
 

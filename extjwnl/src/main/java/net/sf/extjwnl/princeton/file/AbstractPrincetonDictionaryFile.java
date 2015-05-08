@@ -14,7 +14,7 @@ import java.util.Map;
  * The associated filenames are: &lt;index, data&gt;.&lt;noun, verb, adj, adv&gt;, &lt;noun, verb, adj, adv&gt;.exc
  *
  * @author John Didion (jdidion@didion.net)
- * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
+ * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public abstract class AbstractPrincetonDictionaryFile extends AbstractDictionaryFile {
     private static final String NOUN_EXT = "noun";

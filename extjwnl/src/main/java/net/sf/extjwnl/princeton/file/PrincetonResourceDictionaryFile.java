@@ -21,7 +21,7 @@ import java.util.Map;
  * A <code>RandomAccessDictionaryFile</code> that accesses files named with Princeton's dictionary file naming convention.
  * The file is loaded from classpath and stored in CharBuffer.
  *
- * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
+ * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public class PrincetonResourceDictionaryFile extends PrincetonCharBufferFile implements DictionaryFileFactory<PrincetonResourceDictionaryFile> {
 

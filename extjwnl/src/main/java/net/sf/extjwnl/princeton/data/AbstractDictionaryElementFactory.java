@@ -16,7 +16,7 @@ import java.util.Map;
 /**
  * Base class for element factories. Holds some common code.
  *
- * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
+ * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public abstract class AbstractDictionaryElementFactory implements DictionaryElementFactory {
 
