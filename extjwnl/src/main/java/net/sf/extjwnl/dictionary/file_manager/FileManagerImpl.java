@@ -278,7 +278,7 @@ public class FileManagerImpl implements FileManager {
             int compare;
             String word; //current word at a line
             while (true) {
-                midpoint = (start + stop) / 2;
+                midpoint = start + (stop - start) / 2;
                 file.seek(midpoint);
                 file.readLine();//without synchronization inside PRADF, this sometimes returned garbage.
                 offset = file.getFilePointer();//and the pointer was moved by another thread
