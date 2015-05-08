@@ -23,7 +23,7 @@ In the pom.xml:
 <dependency>
     <groupId>net.sf.extjwnl</groupId>
     <artifactId>extjwnl</artifactId>
-    <version>1.8.0</version>
+    <version>1.8.1</version>
 </dependency>
 <dependency>
     <groupId>net.sf.extjwnl</groupId>
