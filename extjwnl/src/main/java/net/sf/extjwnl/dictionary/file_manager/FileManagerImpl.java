@@ -385,10 +385,12 @@ public class FileManagerImpl implements FileManager {
                     IndexWord iw = ii.next();
                     for (int i = 0; i < iw.getSenses().size(); i++) {
                         for (Word w : iw.getSenses().get(i).getWords()) {
-                            String key = w.getSenseKeyWithAdjClass();
-                            if (0 < w.getUseCount() && !renderedKeys.contains(key)) {
-                                toRender.add(w);
-                                renderedKeys.add(key);
+                            if (0 < w.getUseCount()) {
+                                String key = w.getSenseKeyWithAdjClass();
+                                if (!renderedKeys.contains(key)) {
+                                    toRender.add(w);
+                                    renderedKeys.add(key);
+                                }
                             }
                         }
                     }
@@ -491,6 +493,7 @@ public class FileManagerImpl implements FileManager {
                 // and
                 // 5 small%5:00:00:little:03 13
                 // are discrepancies in adjective satellite clusters
+                // e.g. (a) is missing from the key
             }
             if (log.isDebugEnabled()) {
                 log.debug(dictionary.getMessages().resolveMessage("PRINCETON_INFO_013", cntList.getFile().getName()));
