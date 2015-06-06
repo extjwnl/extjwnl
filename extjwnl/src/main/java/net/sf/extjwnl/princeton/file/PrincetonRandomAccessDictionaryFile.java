@@ -82,7 +82,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
 
     protected RandomAccessFile raFile = null;
 
-    private static final String PRINCETON_HEADER = "  1 This software and database is being provided to you, the LICENSEE, by  \n" +
+    private static final String PRINCETON_HEADER_HEAD = "  1 This software and database is being provided to you, the LICENSEE, by  \n" +
             "  2 Princeton University under the following license.  By obtaining, using  \n" +
             "  3 and/or copying this software and database, you agree that you have  \n" +
             "  4 read, understood, and will comply with these terms and conditions.:  \n" +
@@ -94,8 +94,16 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
             "  10 and that the same appear on ALL copies of the software, database and  \n" +
             "  11 documentation, including modifications that you make for internal  \n" +
             "  12 use or for distribution.  \n" +
-            "  13   \n" +
-            "  14 WordNet 3.0 Copyright 2006 by Princeton University.  All rights reserved.  \n" +
+            "  13   \n";
+
+    private static final String PRINCETON_HEADER_21 =
+            "  14 WordNet 2.1 Copyright 2005 by Princeton University.  All rights reserved.  \n";
+    private static final String PRINCETON_HEADER_30 =
+            "  14 WordNet 3.0 Copyright 2006 by Princeton University.  All rights reserved.  \n";
+    private static final String PRINCETON_HEADER_31 =
+            "  14 WordNet 3.1 Copyright 2011 by Princeton University.  All rights reserved.  \n";
+
+    private static final String PRINCETON_HEADER_TAIL =
             "  15   \n" +
             "  16 THIS SOFTWARE AND DATABASE IS PROVIDED \"AS IS\" AND PRINCETON  \n" +
             "  17 UNIVERSITY MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR  \n" +
@@ -111,6 +119,9 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
             "  27 and/or database.  Title to copyright in this software, database and  \n" +
             "  28 any associated documentation shall at all times remain with  \n" +
             "  29 Princeton University and LICENSEE agrees to preserve same.  \n";
+
+    private static final long PRINCETON_HEADER_LENGTH =
+            PRINCETON_HEADER_HEAD.length() + PRINCETON_HEADER_21.length() + PRINCETON_HEADER_TAIL.length();
 
     /**
      * Read-only file permission.
@@ -466,7 +477,15 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                     if (log.isDebugEnabled()) {
                         log.debug(dictionary.getMessages().resolveMessage("PRINCETON_INFO_020", getFilename()));
                     }
-                    raFile.writeBytes(PRINCETON_HEADER);
+                    raFile.writeBytes(PRINCETON_HEADER_HEAD);
+                    if (dictionary.getVersion().getNumber() > 3.05) {
+                        raFile.writeBytes(PRINCETON_HEADER_31);
+                    } else if (dictionary.getVersion().getNumber() > 2.9) {
+                        raFile.writeBytes(PRINCETON_HEADER_30);
+                    } else {
+                        raFile.writeBytes(PRINCETON_HEADER_21);
+                    }
+                    raFile.writeBytes(PRINCETON_HEADER_TAIL);
                 }
                 if (log.isDebugEnabled()) {
                     log.debug(dictionary.getMessages().resolveMessage("PRINCETON_INFO_021", getFilename()));
@@ -509,7 +528,18 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
 
                 seek(0);
                 if (writePrincetonHeader) {
-                    raFile.writeBytes(PRINCETON_HEADER);
+                    if (log.isDebugEnabled()) {
+                        log.debug(dictionary.getMessages().resolveMessage("PRINCETON_INFO_020", getFilename()));
+                    }
+                    raFile.writeBytes(PRINCETON_HEADER_HEAD);
+                    if (dictionary.getVersion().getNumber() > 3.05) {
+                        raFile.writeBytes(PRINCETON_HEADER_31);
+                    } else if (dictionary.getVersion().getNumber() > 2.9) {
+                        raFile.writeBytes(PRINCETON_HEADER_30);
+                    } else {
+                        raFile.writeBytes(PRINCETON_HEADER_21);
+                    }
+                    raFile.writeBytes(PRINCETON_HEADER_TAIL);
                 }
                 writeIndexStrings(indexes);
             }
@@ -864,7 +894,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                 }
                 long offset = 0;
                 if (writePrincetonHeader) {
-                    offset = offset + PRINCETON_HEADER.length();
+                    offset = offset + PRINCETON_HEADER_LENGTH;
                 }
                 long safeOffset = Integer.MAX_VALUE - 1;
                 for (Synset s : synsets) {
@@ -923,7 +953,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                 }
                 long offset = 0;
                 if (writePrincetonHeader) {
-                    offset = offset + PRINCETON_HEADER.length();
+                    offset = offset + PRINCETON_HEADER_LENGTH;
                 }
                 long safeOffset = Integer.MAX_VALUE - 1;
                 for (Synset s : synsets) {
