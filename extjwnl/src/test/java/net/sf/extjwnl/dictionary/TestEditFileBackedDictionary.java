@@ -41,24 +41,24 @@ public class TestEditFileBackedDictionary extends DictionaryEditTester {
 
         Synset s0 = dictionary.createSynset(POS.NOUN);
         s0.setGloss("zero gloss");
-        final Word w0 = new Word(dictionary, s0, 1, zero);
+        final Word w0 = new Word(dictionary, s0, zero);
         s0.getWords().add(w0);
 
         Synset s1 = dictionary.createSynset(POS.NOUN);
         s1.setGloss("first gloss");
-        final Word w1 = new Word(dictionary, s1, 1, first);
+        final Word w1 = new Word(dictionary, s1, first);
         w1.setUseCount(1);
         s1.getWords().add(w1);
 
         Synset s2 = dictionary.createSynset(POS.NOUN);
         s2.setGloss("second gloss");
-        final Word w2 = new Word(dictionary, s2, 1, second);
+        final Word w2 = new Word(dictionary, s2, second);
         w2.setUseCount(2);
         s2.getWords().add(w2);
 
         Synset s3 = dictionary.createSynset(POS.NOUN);
         s3.setGloss("third gloss");
-        final Word w3 = new Word(dictionary, s3, 1, third);
+        final Word w3 = new Word(dictionary, s3, third);
         w3.setUseCount(3);
         s3.getWords().add(w3);
 

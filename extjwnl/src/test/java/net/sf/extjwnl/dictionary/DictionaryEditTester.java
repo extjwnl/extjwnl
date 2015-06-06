@@ -447,7 +447,7 @@ public abstract class DictionaryEditTester {
     private void createEntityWord(Dictionary dictionary) throws JWNLException {
         Synset synEntity = dictionary.createSynset(POS.NOUN);
         synEntity.setGloss(entityGloss);
-        synEntity.getWords().add(new Word(dictionary, synEntity, 1, entityLemma));
+        synEntity.getWords().add(new Word(dictionary, synEntity, entityLemma));
     }
 
     private void checkEntityWord(Dictionary dictionary) throws JWNLException {
@@ -479,7 +479,7 @@ public abstract class DictionaryEditTester {
     private void createPEntityWord(Dictionary dictionary) throws JWNLException {
         Synset synPEntity = dictionary.createSynset(POS.NOUN);
         synPEntity.setGloss(physical_entityGloss);
-        synPEntity.getWords().add(new Word(dictionary, synPEntity, 1, physical_entityLemma));
+        synPEntity.getWords().add(new Word(dictionary, synPEntity, physical_entityLemma));
     }
 
     private void checkPEntityWord(Dictionary dictionary) throws JWNLException {
@@ -678,7 +678,7 @@ public abstract class DictionaryEditTester {
         synAbstraction.getPointers().add(new Pointer(PointerType.HYPERNYM, synAbstraction, synEntity));
 
         for (int i = 0; i < abstractionWords.length; i++) {
-            Word word = new Word(dictionary, synAbstraction, i + 1, abstractionWords[i]);
+            Word word = new Word(dictionary, synAbstraction, abstractionWords[i]);
             word.setUseCount(i + 1);
             synAbstraction.getWords().add(word);
         }
@@ -863,14 +863,14 @@ public abstract class DictionaryEditTester {
 
         Synset s1 = dictionary.createSynset(POS.NOUN);
         s1.setGloss("first gloss");
-        s1.getWords().add(new Word(dictionary, s1, 1, "first"));
+        s1.getWords().add(new Word(dictionary, s1, "first"));
         long o1 = s1.getOffset();
 
         saveAndReloadDictionary();
         dictionary.edit();
 
         Synset s2 = dictionary.createSynset(POS.NOUN);
-        s2.getWords().add(new Word(dictionary, s2, 1, "second"));
+        s2.getWords().add(new Word(dictionary, s2, "second"));
         s2.setGloss("second gloss");
         long o2 = s2.getOffset();
 
@@ -886,13 +886,13 @@ public abstract class DictionaryEditTester {
 
         Synset s1 = dictionary.createSynset(POS.NOUN);
         s1.setGloss("first gloss");
-        final Word w1 = new Word(dictionary, s1, 1, first);
+        final Word w1 = new Word(dictionary, s1, first);
         w1.setUseCount(1);
         s1.getWords().add(w1);
 
         Synset s2 = dictionary.createSynset(POS.NOUN);
         s2.setGloss("second gloss");
-        final Word w2 = new Word(dictionary, s2, 1, second);
+        final Word w2 = new Word(dictionary, s2, second);
         w2.setUseCount(2);
         s2.getWords().add(w2);
 

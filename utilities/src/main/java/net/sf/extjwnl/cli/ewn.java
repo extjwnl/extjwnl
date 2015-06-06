@@ -272,7 +272,7 @@ public class ewn {
                         log.info("Creating " + pos.getLabel() + " synset...");
                         Synset tempSynset = d.createSynset(pos);
                         log.info("Creating word " + lemma + "...");
-                        workWord = new Word(d, tempSynset, 1, lemma);
+                        workWord = new Word(d, tempSynset, lemma);
                         workWord.setLexId(lexId);
                         tempSynset.getWords().add(workWord);
                         tempSynset.setLexFileNum(lexFileNum);
@@ -299,7 +299,7 @@ public class ewn {
                         } else {
                             i++;
                             if (i < args.length && '-' != args[i].charAt(0)) {
-                                Word tempWord = new Word(d, workWord.getSynset(), workWord.getSynset().getWords().size() + 1, args[i].replace('_', ' '));
+                                Word tempWord = new Word(d, workWord.getSynset(), args[i].replace('_', ' '));
                                 workWord.getSynset().getWords().add(tempWord);
                                 key = null;
                             } else {

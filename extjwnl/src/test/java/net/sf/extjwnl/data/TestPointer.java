@@ -84,11 +84,11 @@ public class TestPointer extends BaseData {
     public void testConstructor2Lexical() throws JWNLException {
         dictionary.edit();
         Synset s = new Synset(dictionary, POS.NOUN, 1);
-        Word sw = new Word(dictionary, s, 1, "test");
+        Word sw = new Word(dictionary, s, "test");
         s.getWords().add(sw);
 
         Synset t = new Synset(dictionary, POS.ADJECTIVE, 2);
-        Word tw = new Word(dictionary, t, 1, "rest");
+        Word tw = new Word(dictionary, t, "rest");
         t.getWords().add(tw);
 
         Pointer p = new Pointer(PointerType.ANTONYM, sw, tw);
@@ -116,11 +116,11 @@ public class TestPointer extends BaseData {
     public void testSetTarget() throws JWNLException {
         dictionary.edit();
         Synset s = new Synset(dictionary, POS.NOUN, 1);
-        Word sw = new Word(dictionary, s, 1, "test");
+        Word sw = new Word(dictionary, s, "test");
         s.getWords().add(sw);
 
         Synset t = new Synset(dictionary, POS.ADJECTIVE, 2);
-        Word tw = new Word(dictionary, t, 1, "rest");
+        Word tw = new Word(dictionary, t, "rest");
         t.getWords().add(tw);
 
         Pointer p = new Pointer(PointerType.ANTONYM, sw, tw);
@@ -163,7 +163,7 @@ public class TestPointer extends BaseData {
         dictionary.edit();
         Synset s = dictionary.createSynset(POS.NOUN);
         Synset t = dictionary.createSynset(POS.NOUN);
-        Word tw = new Word(dictionary, t, 1, "test");
+        Word tw = new Word(dictionary, t, "test");
         t.getWords().add(tw);
         Pointer p = new Pointer(s, PointerType.ANTONYM, POS.NOUN, t.getOffset(), 1);
 
@@ -193,7 +193,7 @@ public class TestPointer extends BaseData {
     public void testGetTargetIndexWord() throws JWNLException {
         Synset s = new Synset(dictionary, POS.NOUN, 1);
         Synset t = new Synset(dictionary, POS.NOUN, 2);
-        Word tw = new Word(dictionary, t, 1, "test");
+        Word tw = new Word(dictionary, t, "test");
         t.getWords().add(tw);
         Pointer p = new Pointer(s, PointerType.ANTONYM, POS.NOUN, 2, 1);
 

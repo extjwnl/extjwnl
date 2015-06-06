@@ -395,16 +395,11 @@ public class TestSynset extends BaseData {
         testObj.getWords().set(0, null);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testSetWord2() throws JWNLException {
-        testObj.getWords().set(0, new Word(dictionary, new Synset(dictionary, POS.NOUN), 0, "test"));
-    }
-
     @Test
     public void testSetWord3() throws JWNLException {
         dictionary.edit();
-        testObj.getWords().add(new Word(dictionary, testObj, 1, "test2"));
-        testObj.getWords().set(0, new Word(dictionary, testObj, 1, "test"));
+        testObj.getWords().add(new Word(dictionary, testObj, "test2"));
+        testObj.getWords().set(0, new Word(dictionary, testObj, "test"));
 
         Assert.assertEquals(1, testObj.getWords().size());
         Assert.assertEquals("test", testObj.getWords().get(0).getLemma());
@@ -434,13 +429,13 @@ public class TestSynset extends BaseData {
 
     @Test(expected = IllegalArgumentException.class)
     public void testAddWord2() throws JWNLException {
-        testObj.getWords().add(new Word(null, new Synset(dictionary, POS.NOUN), 0, "test"));
+        testObj.getWords().add(new Word(null, new Synset(dictionary, POS.NOUN), "test"));
     }
 
     @Test
     public void testAddWord3() throws JWNLException {
         dictionary.edit();
-        testObj.getWords().add(new Word(dictionary, testObj, 1, "test"));
+        testObj.getWords().add(new Word(dictionary, testObj, "test"));
         Assert.assertEquals(1, testObj.getWords().size());
         Assert.assertEquals("test", testObj.getWords().get(0).getLemma());
 
@@ -459,7 +454,7 @@ public class TestSynset extends BaseData {
     public void testAddWordNullD() throws JWNLException {
         dictionary.edit();
         testObj.setDictionary(null);
-        testObj.getWords().add(new Word(null, testObj, 1, "test"));
+        testObj.getWords().add(new Word(null, testObj, "test"));
         Assert.assertEquals(1, testObj.getWords().size());
         Assert.assertEquals("test", testObj.getWords().get(0).getLemma());
     }
@@ -468,7 +463,7 @@ public class TestSynset extends BaseData {
     public void testAddWordIndexedNullD() throws JWNLException {
         dictionary.edit();
         testObj.setDictionary(null);
-        testObj.getWords().add(0, new Word(null, testObj, 1, "test"));
+        testObj.getWords().add(0, new Word(null, testObj, "test"));
         Assert.assertEquals(1, testObj.getWords().size());
         Assert.assertEquals("test", testObj.getWords().get(0).getLemma());
     }
@@ -476,12 +471,12 @@ public class TestSynset extends BaseData {
     @Test
     public void testAddWord4() throws JWNLException {
         dictionary.edit();
-        testObj.getWords().add(new Word(dictionary, testObj, 1, "test"));
+        testObj.getWords().add(new Word(dictionary, testObj, "test"));
         IndexWord iw = dictionary.getIndexWord(testObj.getPOS(), "test");
         Assert.assertNotNull(iw);
         iw.getSenses().add(new Synset(dictionary, testObj.getPOS()));
         iw.getSenses().remove(testObj);
-        testObj.getWords().add(new Word(dictionary, testObj, 1, "test"));
+        testObj.getWords().add(new Word(dictionary, testObj, "test"));
         Assert.assertEquals(1, testObj.getWords().size());
         Assert.assertEquals("test", testObj.getWords().get(0).getLemma());
 
@@ -499,7 +494,7 @@ public class TestSynset extends BaseData {
     @Test
     public void testRemoveWord() throws JWNLException {
         dictionary.edit();
-        testObj.getWords().add(new Word(dictionary, testObj, 1, "test"));
+        testObj.getWords().add(new Word(dictionary, testObj, "test"));
         testObj.getWords().remove(0);
 
         Assert.assertEquals(0, testObj.getWords().size());
@@ -516,7 +511,7 @@ public class TestSynset extends BaseData {
     public void testRemoveWordNull() throws JWNLException {
         dictionary.edit();
         testObj.setDictionary(null);
-        testObj.getWords().add(new Word(null, testObj, 1, "test"));
+        testObj.getWords().add(new Word(null, testObj, "test"));
         testObj.getWords().remove(0);
 
         Assert.assertEquals(0, testObj.getWords().size());
@@ -594,7 +589,7 @@ public class TestSynset extends BaseData {
 
     @Test
     public void testIndexOfWordPositive() throws JWNLException {
-        testObj.getWords().add(new Word(dictionary, testObj, 1, "lemma"));
+        testObj.getWords().add(new Word(dictionary, testObj, "lemma"));
         Assert.assertEquals(0, testObj.indexOfWord("lemma"));
     }
 
@@ -628,14 +623,14 @@ public class TestSynset extends BaseData {
     @Test(expected = IllegalArgumentException.class)
     public void testWordListAddAlien() throws JWNLException {
         dictionary.edit();
-        testObj.getWords().add(new Word(mapDictionary, new Synset(mapDictionary, POS.NOUN), 1, "test"));
+        testObj.getWords().add(new Word(mapDictionary, new Synset(mapDictionary, POS.NOUN), "test"));
     }
 
     @Test
     public void testWordListAddAll() throws JWNLException {
         dictionary.edit();
-        Word w = new Word(dictionary, testObj, 1, "test");
-        Word ww = new Word(dictionary, testObj, 1, "rest");
+        Word w = new Word(dictionary, testObj, "test");
+        Word ww = new Word(dictionary, testObj, "rest");
 
         Assert.assertTrue(testObj.getWords().addAll(Arrays.asList(w, ww)));
         Assert.assertEquals(2, testObj.getWords().size());
@@ -647,8 +642,8 @@ public class TestSynset extends BaseData {
     public void testWordListAddAllNull() throws JWNLException {
         dictionary.edit();
         testObj.setDictionary(null);
-        Word w = new Word(null, testObj, 1, "test");
-        Word ww = new Word(null, testObj, 1, "rest");
+        Word w = new Word(null, testObj, "test");
+        Word ww = new Word(null, testObj, "rest");
 
         Assert.assertTrue(testObj.getWords().addAll(Arrays.asList(w, ww)));
         Assert.assertEquals(2, testObj.getWords().size());
@@ -659,8 +654,8 @@ public class TestSynset extends BaseData {
     @Test
     public void testWordListAddAllIndex() throws JWNLException {
         dictionary.edit();
-        Word w = new Word(dictionary, testObj, 1, "test");
-        Word ww = new Word(dictionary, testObj, 1, "rest");
+        Word w = new Word(dictionary, testObj, "test");
+        Word ww = new Word(dictionary, testObj, "rest");
         testObj.getWords().add(w);
 
         Assert.assertTrue(testObj.getWords().addAll(0, Arrays.asList(ww)));
@@ -672,8 +667,8 @@ public class TestSynset extends BaseData {
     public void testWordListAddAllIndexNull() throws JWNLException {
         dictionary.edit();
         testObj.setDictionary(null);
-        Word w = new Word(null, testObj, 1, "test");
-        Word ww = new Word(null, testObj, 1, "rest");
+        Word w = new Word(null, testObj, "test");
+        Word ww = new Word(null, testObj, "rest");
         testObj.getWords().add(w);
 
         Assert.assertTrue(testObj.getWords().addAll(0, Arrays.asList(ww)));
@@ -684,7 +679,7 @@ public class TestSynset extends BaseData {
     @Test
     public void testWordListClear() throws JWNLException {
         dictionary.edit();
-        Word w = new Word(dictionary, testObj, 1, "test");
+        Word w = new Word(dictionary, testObj, "test");
         testObj.getWords().add(w);
         testObj.getWords().clear();
 
@@ -695,7 +690,7 @@ public class TestSynset extends BaseData {
     public void testWordListClearNull() throws JWNLException {
         dictionary.edit();
         testObj.setDictionary(null);
-        Word w = new Word(null, testObj, 1, "test");
+        Word w = new Word(null, testObj, "test");
         testObj.getWords().add(w);
         testObj.getWords().clear();
 

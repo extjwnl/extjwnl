@@ -82,7 +82,7 @@ public abstract class AbstractDictionaryElementFactory implements DictionaryElem
             }
             return new Adjective(dictionary, synset, index, stringCache.replace(lemma), adjectivePosition);
         } else {
-            return new Word(dictionary, synset, index, stringCache.replace(lemma));
+            return new Word(dictionary, synset, stringCache.replace(lemma));
         }
     }
 

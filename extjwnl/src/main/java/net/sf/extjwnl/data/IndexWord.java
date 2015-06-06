@@ -364,7 +364,7 @@ public class IndexWord extends BaseDictionaryElement {
         private void addWord(Synset synset, String lemma) {
             if (null != synset.getDictionary() && synset.getDictionary().isEditable()) {
                 if (!synset.containsWord(lemma)) {
-                    synset.getWords().add(new Word(synset.getDictionary(), synset, synset.getWords().size() + 1, lemma));
+                    synset.getWords().add(new Word(synset.getDictionary(), synset, lemma));
                 }
             }
         }
