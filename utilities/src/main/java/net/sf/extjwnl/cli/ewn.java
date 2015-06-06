@@ -192,7 +192,7 @@ public class ewn {
                 POS pos = null;
                 String derivation = null;
 
-                for (int i = 0; i < args.length; i++) {
+                for (int i = 0; i < args.length && null != args[i]; i++) {
                     boolean argProcessed = false;
                     if (null == key && '-' != args[i].charAt(0) && ((-1 < args[i].indexOf('%') && -1 < args[i].indexOf(':')))) {
                         key = args[i];
