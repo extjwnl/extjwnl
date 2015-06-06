@@ -141,7 +141,7 @@ public class FileManagerImpl implements FileManager {
             //sense_key  sense_number  tag_cnt
             TokenizerParser tokenizer = new TokenizerParser(line, " ");
             String senseKey = tokenizer.nextToken();//sense_key
-            tokenizer.nextToken();//sense_number
+            tokenizer.nextToken();// skip sense_number
             Integer useCnt = tokenizer.nextInt();//tag_cnt
             useCountCache.put(senseKey, useCnt);
             line = revCntList.readLine();
@@ -407,6 +407,7 @@ public class FileManagerImpl implements FileManager {
                 }
             });
 
+            revCntList.truncate();
             revCntList.seek(0);
             if (log.isDebugEnabled()) {
                 log.debug(dictionary.getMessages().resolveMessage("PRINCETON_INFO_008", revCntList.getFile().getName()));
@@ -421,7 +422,8 @@ public class FileManagerImpl implements FileManager {
                         log.debug(dictionary.getMessages().resolveMessage("PRINCETON_INFO_014", 100 * counter / total));
                     }
                 }
-                revCntList.writeLine(word.getSenseKeyWithAdjClass() + " " + word.getIndex() + " " + word.getUseCount());
+                // sense_key  sense_number  tag_cnt
+                revCntList.writeLine(word.getSenseKeyWithAdjClass() + " " + word.getSenseNumber() + " " + word.getUseCount());
             }
             if (log.isDebugEnabled()) {
                 log.debug(dictionary.getMessages().resolveMessage("PRINCETON_INFO_013", revCntList.getFile().getName()));
@@ -431,14 +433,23 @@ public class FileManagerImpl implements FileManager {
             }
 
 
-            //sort by count
+            // sort by count in descending order
             Collections.sort(toRender, new Comparator<Word>() {
                 @Override
                 public int compare(Word o1, Word o2) {
-                    return o1.getUseCount() - o2.getUseCount();
+                    int result = o2.getUseCount() - o1.getUseCount();
+                    if (0 == result) {
+                        try {
+                            result = o2.getSenseKeyWithAdjClass().compareTo(o1.getSenseKeyWithAdjClass());
+                        } catch (JWNLException e) {
+                            throw new JWNLRuntimeException(e);
+                        }
+                    }
+                    return result;
                 }
             });
 
+            cntList.truncate();
             cntList.seek(0);
             if (log.isDebugEnabled()) {
                 log.debug(dictionary.getMessages().resolveMessage("PRINCETON_INFO_008", cntList.getFile().getName()));
@@ -453,7 +464,33 @@ public class FileManagerImpl implements FileManager {
                         log.debug(dictionary.getMessages().resolveMessage("PRINCETON_INFO_014", 100 * counter / total));
                     }
                 }
-                cntList.writeLine(word.getUseCount() + " " + word.getSenseKeyWithAdjClass() + " " + word.getIndex());
+                // tag_cnt  sense_key  sense_number
+                cntList.writeLine(word.getUseCount() + " " + word.getSenseKeyWithAdjClass() + " " + word.getSenseNumber());
+
+                // WN TRICK
+                // differences in re-rendering of cntlist are due to discrepancies(?) in wordnet files
+                // below from 2.1 (more in 3.0 and 3.1)
+                // e.g. 232 world%1:17:01:: 2 VS 232 world%1:17:01:: 1
+                //      original                 re-render
+                // however,
+                // world n 8 6 @ ~ #m %m %p + 8 7 09330440 05738136 07857779 09138104 05600868 09344389 08066556 02450463
+                // world%1:17:01:: corresponds to
+                // 09330440 17 n 06 universe 0 existence 0 creation 0 world 1 cosmos 0 macrocosm 0 011 @ 00018635 n 0000 + 02987805 a 0601 + 01437993 a 0501 + 02789059 a 0501 + 00553777 a 0105 %m 08157282 n 0000 %p 09107111 n 0000 ~ 09114410 n 0000 %p 09144850 n 0000 ~ 09232164 n 0000 ~ 09232329 n 0000 | everything that exists anywhere; "they study the evolution of the universe"; "the biggest tree in existence"
+                //          ^^                                        ^^^^^^^
+                // which is sense number 1, not 2.
+                // sense number 2 is
+                // 05738136 09 n 02 world 0 reality 0 002 @ 05908392 n 0000 ~ 05738508 n 0000 | all of your experiences that determine how things appear to you; "his world was shattered"; "we live in different worlds"; "for them demons were as much a part of reality as trees were"
+                //          ^^      ^^^^^^^
+                // that is "156 world%1:09:00:: 2" (2 and not 3: "156 world%1:09:00:: 3")
+                // most differing indices are off-by-one
+                // some are off-by-two or more
+
+                // ussr%1:15:00:: is duplicated in original wordnet 2.1  files
+
+                // 7 old%5:00:00:preceding:00 9
+                // and
+                // 5 small%5:00:00:little:03 13
+                // are discrepancies in adjective satellite clusters
             }
             if (log.isDebugEnabled()) {
                 log.debug(dictionary.getMessages().resolveMessage("PRINCETON_INFO_013", cntList.getFile().getName()));
@@ -494,6 +531,7 @@ public class FileManagerImpl implements FileManager {
                 }
             }
 
+            senseIndex.truncate();
             senseIndex.seek(0);
             senseIndex.writeStrings(senseIndexContent);
             if (log.isDebugEnabled()) {

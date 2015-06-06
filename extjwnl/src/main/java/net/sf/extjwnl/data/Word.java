@@ -294,6 +294,24 @@ public class Word extends PointerTarget {
         return senseKey.toString();
     }
 
+    /**
+     * Returns sense number of this word (1-based) or 0 if not found.
+     * sense_number is a decimal integer indicating the sense number of the word,
+     * within the part of speech encoded in sense_key, in the WordNet database.
+     * @return sense number or 0 if not found
+     * @throws JWNLException JWNLException
+     */
+    public int getSenseNumber() throws JWNLException {
+        int result = 0;
+        if (null != dictionary) {
+            IndexWord indexWord = dictionary.getIndexWord(getPOS(), lemma);
+            if (null != indexWord) {
+                result = indexWord.getSenses().indexOf(synset) + 1;
+            }
+        }
+        return result;
+    }
+
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
         dictionary = Dictionary.getRestoreDictionary();

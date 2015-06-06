@@ -117,4 +117,9 @@ public interface RandomAccessDictionaryFile extends DictionaryFile {
      * @throws net.sf.extjwnl.JWNLException IOException
      */
     void setOffsetLength(int length) throws JWNLException, IOException;
+
+    /**
+     * Prepares the file for rewriting by truncating it.
+     */
+    void truncate() throws IOException;
 }

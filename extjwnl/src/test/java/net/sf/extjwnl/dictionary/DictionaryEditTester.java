@@ -31,7 +31,7 @@ public abstract class DictionaryEditTester {
     private final static String[] exception2 = {"aìdes-de-camp", "aìde-de-camp"};//ì to test encoding
     private final static String[] exception3 = {"altocumuli", "altocumulus"};//to test sorting
 
-    private Dictionary dictionary;
+    protected Dictionary dictionary;
     private Dictionary mapDictionary;
 
     protected abstract InputStream getProperties();
@@ -875,5 +875,43 @@ public abstract class DictionaryEditTester {
         long o2 = s2.getOffset();
 
         Assert.assertTrue(o1 < o2);
+    }
+
+    @Test
+    public void testCounts() throws JWNLException, FileNotFoundException {
+        final String first = "first";
+        final String second = "second";
+
+        dictionary.edit();
+
+        Synset s1 = dictionary.createSynset(POS.NOUN);
+        s1.setGloss("first gloss");
+        final Word w1 = new Word(dictionary, s1, 1, first);
+        w1.setUseCount(1);
+        s1.getWords().add(w1);
+
+        Synset s2 = dictionary.createSynset(POS.NOUN);
+        s2.setGloss("second gloss");
+        final Word w2 = new Word(dictionary, s2, 1, second);
+        w2.setUseCount(2);
+        s2.getWords().add(w2);
+
+        saveAndReloadDictionary();
+
+        IndexWord f = dictionary.getIndexWord(POS.NOUN, first);
+        Assert.assertNotNull(f);
+        Assert.assertEquals(1, f.getSenses().size());
+        s1 = f.getSenses().get(0);
+        Assert.assertNotNull(s1);
+        Assert.assertEquals(1, s1.getWords().size());
+        Assert.assertEquals(1, s1.getWords().get(0).getUseCount());
+
+        IndexWord s = dictionary.getIndexWord(POS.NOUN, second);
+        Assert.assertNotNull(s);
+        Assert.assertEquals(1, s.getSenses().size());
+        s2 = s.getSenses().get(0);
+        Assert.assertNotNull(s2);
+        Assert.assertEquals(1, s2.getWords().size());
+        Assert.assertEquals(2, s2.getWords().get(0).getUseCount());
     }
 }

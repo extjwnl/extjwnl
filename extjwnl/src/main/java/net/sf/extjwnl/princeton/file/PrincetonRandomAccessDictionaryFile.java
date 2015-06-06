@@ -447,6 +447,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
             Collections.sort(exceptions);
 
             synchronized (file) {
+                truncate();
                 seek(0);
                 writeStrings(exceptions);
             }
@@ -472,6 +473,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
             long total = synsets.size();
             long reportInt = (total / 20) + 1;//i.e. report every 5%
             synchronized (file) {
+                truncate();
                 seek(0);
                 if (writePrincetonHeader) {
                     if (log.isDebugEnabled()) {
@@ -525,7 +527,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
             }
             Collections.sort(indexes);
             synchronized (file) {
-
+                truncate();
                 seek(0);
                 if (writePrincetonHeader) {
                     if (log.isDebugEnabled()) {
@@ -762,6 +764,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                 result.append("0");
             }
             result.append(Integer.toString(verbFramesCount)).append(" ");
+            // render frames applicable to all words
             for (int i = verbFrames.nextSetBit(0); i >= 0; i = verbFrames.nextSetBit(i + 1)) {
                 if (checkVerbFrameLimit && log.isWarnEnabled() && (99 < i)) {
                     log.warn(dictionary.getMessages().resolveMessage("PRINCETON_WARN_008", new Object[]{synset.getOffset(), i}));
@@ -773,7 +776,9 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                 result.append(Integer.toString(i));
                 result.append(" 00 ");
             }
-            for (Word word : synset.getWords()) {
+            // render word-specific frames
+            for (int idx = synset.getWords().size() - 1; idx >= 0; idx--) {
+                Word word = synset.getWords().get(idx);
                 if (word instanceof Verb) {
                     BitSet bits = ((Verb) word).getVerbFrameFlags();
                     for (int i = bits.nextSetBit(0); i >= 0; i = bits.nextSetBit(i + 1)) {

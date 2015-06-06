@@ -6,7 +6,9 @@ import net.sf.extjwnl.dictionary.file.DictionaryFileType;
 import net.sf.extjwnl.dictionary.file.RandomAccessDictionaryFile;
 import net.sf.extjwnl.util.factory.Param;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.channels.FileChannel;
 import java.util.Collection;
 import java.util.Map;
 
@@ -74,5 +76,12 @@ public abstract class AbstractPrincetonRandomAccessDictionaryFile extends Abstra
     @Override
     public void writeLine(String line) throws IOException {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void truncate() throws IOException {
+        FileChannel outChan = new FileOutputStream(file, true).getChannel();
+        outChan.truncate(0);
+        outChan.close();
     }
 }
