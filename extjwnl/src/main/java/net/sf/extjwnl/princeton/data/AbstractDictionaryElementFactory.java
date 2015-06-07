@@ -65,13 +65,12 @@ public abstract class AbstractDictionaryElementFactory implements DictionaryElem
      * Creates a word.
      *
      * @param synset synset
-     * @param index  index
      * @param lemma  lemma
      * @return word
      */
-    protected Word createWord(Synset synset, int index, String lemma) {
+    protected Word createWord(Synset synset, String lemma) {
         if (POS.VERB == synset.getPOS()) {
-            return new Verb(dictionary, synset, index, stringCache.replace(lemma), new BitSet());
+            return new Verb(dictionary, synset, stringCache.replace(lemma), new BitSet());
         } else if (POS.ADJECTIVE == synset.getPOS()) {
             AdjectivePosition adjectivePosition = AdjectivePosition.NONE;
             if (lemma.charAt(lemma.length() - 1) == ')' && lemma.indexOf('(') > 0) {
@@ -80,7 +79,7 @@ public abstract class AbstractDictionaryElementFactory implements DictionaryElem
                 adjectivePosition = AdjectivePosition.getAdjectivePositionForKey(marker);
                 lemma = lemma.substring(0, left);
             }
-            return new Adjective(dictionary, synset, index, stringCache.replace(lemma), adjectivePosition);
+            return new Adjective(dictionary, synset, stringCache.replace(lemma), adjectivePosition);
         } else {
             return new Word(dictionary, synset, stringCache.replace(lemma));
         }

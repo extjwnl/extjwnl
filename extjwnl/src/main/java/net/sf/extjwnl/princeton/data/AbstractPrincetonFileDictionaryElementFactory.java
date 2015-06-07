@@ -81,7 +81,7 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory extends Abst
             int lexId = tokenizer.nextHexInt(); // lex id
 
             // NB index: Word numbers are assigned to the word fields in a synset, from left to right, beginning with 1
-            Word w = createWord(synset, i + 1, lemma);
+            Word w = createWord(synset, lemma);
             w.setLexId(lexId);
             synset.getWords().add(w);
         }
@@ -136,7 +136,7 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory extends Abst
         synset.setGloss(gloss);
 
         Long mOffset = maxOffset.get(synset.getPOS());
-        if (null == maxOffset) {
+        if (null == mOffset) {
             maxOffset.put(synset.getPOS(), synset.getOffset());
         } else {
             if (mOffset < synset.getOffset()) {

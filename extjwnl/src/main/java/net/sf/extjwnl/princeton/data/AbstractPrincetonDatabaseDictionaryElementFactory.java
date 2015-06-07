@@ -63,8 +63,7 @@ public abstract class AbstractPrincetonDatabaseDictionaryElementFactory extends 
 
             while (words.next()) {
                 String lemma = stringCache.replace(words.getString(1));
-                int index = words.getInt(2);
-                Word word = createWord(synset, index, lemma);
+                Word word = createWord(synset, lemma);
                 word.setUseCount(words.getInt(3));
                 word.setLexId(words.getInt(4));
                 synset.getWords().add(word);
