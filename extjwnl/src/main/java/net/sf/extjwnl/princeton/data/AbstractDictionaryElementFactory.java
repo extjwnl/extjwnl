@@ -73,11 +73,15 @@ public abstract class AbstractDictionaryElementFactory implements DictionaryElem
             return new Verb(dictionary, synset, stringCache.replace(lemma), new BitSet());
         } else if (POS.ADJECTIVE == synset.getPOS()) {
             AdjectivePosition adjectivePosition = AdjectivePosition.NONE;
-            if (lemma.charAt(lemma.length() - 1) == ')' && lemma.indexOf('(') > 0) {
+            if (lemma.charAt(lemma.length() - 1) == ')') {
                 int left = lemma.indexOf('(');
-                String marker = lemma.substring(left + 1, lemma.length() - 1);
-                adjectivePosition = AdjectivePosition.getAdjectivePositionForKey(marker);
-                lemma = lemma.substring(0, left);
+                if  (left > 0) {
+                    String marker = lemma
+                        .substring(left + 1, lemma.length() - 1);
+                    adjectivePosition = AdjectivePosition
+                        .getAdjectivePositionForKey(marker);
+                    lemma = lemma.substring(0, left);
+                }
             }
             return new Adjective(dictionary, synset, stringCache.replace(lemma), adjectivePosition);
         } else {
