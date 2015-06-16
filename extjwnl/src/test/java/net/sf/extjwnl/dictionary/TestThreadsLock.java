@@ -19,8 +19,6 @@ import java.util.List;
  */
 public class TestThreadsLock extends MultiThreadedTestCase {
 
-    private static final Logger log = LoggerFactory.getLogger(TestThreadsLock.class);
-
     private static final int threadCount = 5;
 
     /**
@@ -34,13 +32,11 @@ public class TestThreadsLock extends MultiThreadedTestCase {
 
     protected class LookupThread extends TestCaseRunnable {
 
-        private String name;
         private List<String> list;
         private Dictionary d;
 
-        public LookupThread(Dictionary d, String name, List<String> list) {
+        public LookupThread(Dictionary d, List<String> list) {
             this.d = d;
-            this.name = name;
             this.list = list;
         }
 
@@ -48,9 +44,7 @@ public class TestThreadsLock extends MultiThreadedTestCase {
         public void runTestCase() throws JWNLException {
             for (String word : list) {
                 if (!isInterrupted()) {
-                    log.info(name + " querying for " + word);
                     d.getMorphologicalProcessor().lookupBaseForm(POS.NOUN, word);
-                    log.info(name + " finished querying for " + word);
                 } else {
                     break;
                 }
@@ -70,7 +64,7 @@ public class TestThreadsLock extends MultiThreadedTestCase {
 
         TestCaseRunnable[] runnables = new TestCaseRunnable[threadCount];
         for (int i = 0; i < threadCount; i++) {
-            runnables[i] = new LookupThread(d, "t" + (i + 1), list);
+            runnables[i] = new LookupThread(d, list);
         }
 
         runTestCaseRunnables(runnables);
@@ -87,7 +81,7 @@ public class TestThreadsLock extends MultiThreadedTestCase {
 
         TestCaseRunnable[] runnables = new TestCaseRunnable[threadCount];
         for (int i = 0; i < threadCount; i++) {
-            runnables[i] = new LookupThread(d, "t" + (i + 1), list);
+            runnables[i] = new LookupThread(d, list);
         }
 
         runTestCaseRunnables(runnables);
