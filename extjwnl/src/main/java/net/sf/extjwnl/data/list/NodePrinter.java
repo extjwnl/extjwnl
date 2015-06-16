@@ -106,7 +106,7 @@ public abstract class NodePrinter<E extends Node> {
      * @param itr             iterator with nodes to print
      */
     public void print(ListIterator<E> itr, PrintStream stream, int indent, int indentIncrement) {
-        NodeListIteratorWrapper<E> pItr = new NodeListIteratorWrapper<E>(itr);
+        NodeListIteratorWrapper<E> pItr = new NodeListIteratorWrapper<>(itr);
         // Find out where we currently are in the iterator
         int curNode = pItr.currentIndex();
         // Move to the first node in the iterator

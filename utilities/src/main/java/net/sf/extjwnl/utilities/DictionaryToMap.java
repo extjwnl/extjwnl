@@ -44,10 +44,10 @@ public class DictionaryToMap {
      */
     public DictionaryToMap(String propFile, String destinationDirectory) throws JWNLException, IOException {
         dictionary = Dictionary.getInstance(new FileInputStream(propFile));
-        HashMap<String, Param> params = new HashMap<String, Param>();
+        HashMap<String, Param> params = new HashMap<>();
         params.put(DictionaryCatalog.DICTIONARY_PATH_KEY, new NameValueParam(dictionary, DictionaryCatalog.DICTIONARY_PATH_KEY, destinationDirectory));
         params.put(DictionaryCatalog.DICTIONARY_FILE_TYPE_KEY, new NameValueParam(dictionary, DictionaryCatalog.DICTIONARY_FILE_TYPE_KEY, PrincetonObjectDictionaryFile.class.getCanonicalName()));
-        destinationFiles = new DictionaryCatalogSet<ObjectDictionaryFile>(dictionary, params, ObjectDictionaryFile.class);
+        destinationFiles = new DictionaryCatalogSet<>(dictionary, params, ObjectDictionaryFile.class);
     }
 
     /**
@@ -88,8 +88,7 @@ public class DictionaryToMap {
         }
     }
 
-    private void serialize(POS pos, DictionaryFileType fileType)
-            throws JWNLException, IOException {
+    private void serialize(POS pos, DictionaryFileType fileType) throws JWNLException {
         ObjectDictionaryFile file = destinationFiles.getDictionaryFile(pos, fileType);
         int count = 0;
         for (Iterator<? extends DictionaryElement> itr = getIterator(pos, fileType); itr.hasNext(); itr.next()) {
@@ -98,7 +97,7 @@ public class DictionaryToMap {
             }
         }
 
-        Map<Object, DictionaryElement> map = new ConcurrentHashMap<Object, DictionaryElement>();
+        Map<Object, DictionaryElement> map = new ConcurrentHashMap<>();
         Iterator<? extends DictionaryElement> listItr = getIterator(pos, fileType);
         while (listItr.hasNext()) {
             DictionaryElement elt = listItr.next();

@@ -29,7 +29,7 @@ import java.util.Set;
 public class Examples {
 
     private static final String USAGE = "Usage: Examples [properties file]";
-    private static final Set<String> HELP_KEYS = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
+    private static final Set<String> HELP_KEYS = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
             "--help", "-help", "/help", "--?", "-?", "?", "/?"
     )));
 

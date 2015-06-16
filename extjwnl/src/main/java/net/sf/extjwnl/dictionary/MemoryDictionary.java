@@ -19,7 +19,7 @@ public class MemoryDictionary extends MapDictionary {
         for (POS pos : POS.values()) {
             Map<DictionaryFileType, Map<Object, DictionaryElement>> files = tableMap.get(pos);
             for (DictionaryFileType type : DictionaryFileType.getAllDictionaryFileTypes()) {
-                Map<Object, DictionaryElement> file = new HashMap<Object, DictionaryElement>();
+                Map<Object, DictionaryElement> file = new HashMap<>();
                 files.put(type, file);
             }
         }

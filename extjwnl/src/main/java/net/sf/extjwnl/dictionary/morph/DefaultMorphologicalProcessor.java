@@ -56,7 +56,7 @@ public class DefaultMorphologicalProcessor implements MorphologicalProcessor {
 
         Param param = params.get(CACHE_CAPACITY);
         int capacity = (param == null) ? CacheSet.DEFAULT_CACHE_CAPACITY : Integer.parseInt(param.getValue());
-        lookupCache = new LRUPOSCache<String, LookupInfo>(capacity);
+        lookupCache = new LRUPOSCache<>(capacity);
     }
 
     /**

@@ -17,10 +17,10 @@ import java.sql.SQLException;
 public class ConnectionManager {
 
     private final Dictionary dictionary;
-    private String driverClass;
-    private String url;
-    private String userName;
-    private String password;
+    private final String driverClass;
+    private final String url;
+    private final String userName;
+    private final String password;
     private Connection connection;
 
     public ConnectionManager(Dictionary dictionary, String driverClass, String url, String userName, String password) {
@@ -55,13 +55,7 @@ public class ConnectionManager {
         try {
             Driver driver = (Driver) Class.forName(driverClass).newInstance();
             DriverManager.registerDriver(driver);
-        } catch (SQLException e) {
-            throw new JWNLRuntimeException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_024", driverClass), e);
-        } catch (ClassNotFoundException e) {
-            throw new JWNLRuntimeException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_024", driverClass), e);
-        } catch (InstantiationException e) {
-            throw new JWNLRuntimeException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_024", driverClass), e);
-        } catch (IllegalAccessException e) {
+        } catch (SQLException | ClassNotFoundException | IllegalAccessException | InstantiationException e) {
             throw new JWNLRuntimeException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_024", driverClass), e);
         }
     }

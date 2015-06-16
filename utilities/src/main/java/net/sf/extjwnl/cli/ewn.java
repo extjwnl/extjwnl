@@ -130,7 +130,7 @@ public class ewn {
                         File script = new File(args[1]);
                         if (script.exists()) {
                             //load into args
-                            ArrayList<String> newArgs = new ArrayList<String>();
+                            ArrayList<String> newArgs = new ArrayList<>();
                             BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(script), "UTF-8"));
                             try {
                                 String str;
@@ -626,7 +626,7 @@ public class ewn {
                                             }
                                         }
                                     } else {
-                                        ArrayList<String> list = new ArrayList<String>(1);
+                                        ArrayList<String> list = new ArrayList<>(1);
                                         list.add(baseform);
                                         d.createException(pos, derivation, list);
                                     }
@@ -1340,7 +1340,7 @@ public class ewn {
     }
 
     private static void tracePointers(IndexWord iw, PointerType pt, int depth, int needSense, boolean needGloss, boolean needLex, boolean needOffset, boolean needSenseNum, boolean needSenseKeys) throws JWNLException {
-        Map<Synset, PointerTargetTreeNodeList> ptrs = new HashMap<Synset, PointerTargetTreeNodeList>();
+        Map<Synset, PointerTargetTreeNodeList> ptrs = new HashMap<>();
         for (Synset synset : iw.getSenses()) {
             PointerTargetTreeNodeList list = PointerUtils.makePointerTargetTreeList(synset, pt, depth);
             if (null != list && 0 < list.size()) {

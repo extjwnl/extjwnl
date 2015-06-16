@@ -29,7 +29,7 @@ public class DetachSuffixesOperation extends AbstractDelegatingOperation {
 
     public DetachSuffixesOperation(Dictionary dictionary, Map<String, Param> params) throws JWNLException {
         super(dictionary, params);
-        suffixMap = new EnumMap<POS, String[][]>(POS.class);
+        suffixMap = new EnumMap<>(POS.class);
         for (Param p : params.values()) {
             POS pos = POS.getPOSForLabel(p.getName());
             if (pos != null) {
@@ -43,7 +43,7 @@ public class DetachSuffixesOperation extends AbstractDelegatingOperation {
         if (!"|".equals(tokenizer.nextToken())) {
             throw new JWNLException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_028"));
         }
-        List<String[]> suffixList = new ArrayList<String[]>();
+        List<String[]> suffixList = new ArrayList<>();
         while (tokenizer.hasMoreTokens()) {
             String next = tokenizer.nextToken();
             String first = "";

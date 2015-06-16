@@ -152,8 +152,7 @@ public abstract class AbstractCachingDictionary extends Dictionary {
             synchronized (this) {
                 result = caches;
                 if (null == result) {
-                    caches = result = new LRUCacheSet<DictionaryElementType, Object, DictionaryElement>
-                            (DictionaryElementType.getAllDictionaryElementTypes());
+                    caches = result = new LRUCacheSet<>(DictionaryElementType.getAllDictionaryElementTypes());
                 }
             }
         }

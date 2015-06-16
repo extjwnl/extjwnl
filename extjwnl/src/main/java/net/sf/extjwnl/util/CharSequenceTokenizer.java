@@ -83,6 +83,11 @@ public class CharSequenceTokenizer implements Iterator<CharSequence> {
         return nextToken();
     }
 
+    @Override
+    public void remove() {
+        throw new UnsupportedOperationException();
+    }
+
     /**
      * Skips to the next token and returns previous position.
      *

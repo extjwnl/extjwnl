@@ -47,7 +47,7 @@ public class FileManagerImpl implements FileManager {
     public static final String CACHE_USE_COUNT_KEY = "cache_use_count";
     private boolean cacheUseCount = false;
 
-    private final Map<String, Integer> useCountCache = new HashMap<String, Integer>();
+    private final Map<String, Integer> useCountCache = new HashMap<>();
 
     private RandomAccessDictionaryFile revCntList;
     private RandomAccessDictionaryFile cntList;
@@ -74,7 +74,7 @@ public class FileManagerImpl implements FileManager {
             }
 
             this.dictionary = dictionary;
-            files = new DictionaryCatalogSet<RandomAccessDictionaryFile>(dictionary, params, RandomAccessDictionaryFile.class);
+            files = new DictionaryCatalogSet<>(dictionary, params, RandomAccessDictionaryFile.class);
             files.open();
 
             try {

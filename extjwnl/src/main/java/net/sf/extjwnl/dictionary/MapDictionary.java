@@ -24,9 +24,9 @@ public class MapDictionary extends Dictionary {
     public MapDictionary(Document doc) throws JWNLException {
         super(doc);
 
-        tableMap = new EnumMap<POS, Map<DictionaryFileType, Map<Object, DictionaryElement>>>(POS.class);
+        tableMap = new EnumMap<>(POS.class);
         for (POS pos : POS.values()) {
-            Map<DictionaryFileType, Map<Object, DictionaryElement>> files = new EnumMap<DictionaryFileType, Map<Object, DictionaryElement>>(DictionaryFileType.class);
+            Map<DictionaryFileType, Map<Object, DictionaryElement>> files = new EnumMap<>(DictionaryFileType.class);
             tableMap.put(pos, files);
         }
     }

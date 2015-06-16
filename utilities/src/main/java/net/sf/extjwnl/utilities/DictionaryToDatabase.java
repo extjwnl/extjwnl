@@ -111,8 +111,8 @@ public class DictionaryToDatabase {
      */
     public DictionaryToDatabase(Dictionary dictionary, Connection conn) {
         this.dictionary = dictionary;
-        idToSynsetOffset = new HashMap<Integer, long[]>();
-        synsetOffsetToId = new HashMap<Long, Integer>();
+        idToSynsetOffset = new HashMap<>();
+        synsetOffsetToId = new HashMap<>();
         connection = conn;
         if (dictionary instanceof AbstractCachingDictionary) {
             ((AbstractCachingDictionary) dictionary).setCachingEnabled(false);
@@ -156,8 +156,7 @@ public class DictionaryToDatabase {
      * @throws SQLException  SQLException
      */
     public void insertData() throws JWNLException, SQLException {
-        Statement s = connection.createStatement();
-        try {
+        try (Statement s = connection.createStatement()) {
             log.info("disabling autocommit...");
             connection.setAutoCommit(false);
 
@@ -216,8 +215,6 @@ public class DictionaryToDatabase {
             }
             log.info("committing...");
             connection.commit();
-        } finally {
-            s.close();
         }
     }
 

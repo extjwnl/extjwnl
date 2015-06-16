@@ -28,7 +28,7 @@ public class MapBackedDictionary extends MapDictionary {
 
     public MapBackedDictionary(Document doc) throws JWNLException {
         super(doc);
-        files = new DictionaryCatalogSet<ObjectDictionaryFile>(this, params, ObjectDictionaryFile.class);
+        files = new DictionaryCatalogSet<>(this, params, ObjectDictionaryFile.class);
         this.load();
     }
 
