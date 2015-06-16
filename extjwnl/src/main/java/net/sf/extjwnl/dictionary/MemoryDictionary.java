@@ -18,7 +18,7 @@ public class MemoryDictionary extends MapDictionary {
         super(doc);
         for (POS pos : POS.values()) {
             Map<DictionaryFileType, Map<Object, DictionaryElement>> files = tableMap.get(pos);
-            for (DictionaryFileType type : DictionaryFileType.values()) {
+            for (DictionaryFileType type : DictionaryFileType.getAllDictionaryFileTypes()) {
                 Map<Object, DictionaryElement> file = new HashMap<Object, DictionaryElement>();
                 files.put(type, file);
             }

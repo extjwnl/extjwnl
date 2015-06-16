@@ -104,8 +104,8 @@ public abstract class AbstractCachingDictionary extends Dictionary {
         }
     }
 
-    protected void cacheIndexWord(IndexWord word) {
-        cache(DictionaryElementType.INDEX_WORD, word);
+    protected IndexWord cacheIndexWord(IndexWord word) {
+        return (IndexWord) cache(DictionaryElementType.INDEX_WORD, word);
     }
 
     protected void clearIndexWord(POS pos, Object key) {
@@ -130,8 +130,8 @@ public abstract class AbstractCachingDictionary extends Dictionary {
         return (Synset) getCached(DictionaryElementType.SYNSET, pos, key);
     }
 
-    protected void cacheException(Exc exception) {
-        cache(DictionaryElementType.EXCEPTION, exception);
+    protected Exc cacheException(Exc exception) {
+        return (Exc) cache(DictionaryElementType.EXCEPTION, exception);
     }
 
     protected void clearException(POS pos, Object key) {
@@ -160,10 +160,11 @@ public abstract class AbstractCachingDictionary extends Dictionary {
         return result;
     }
 
-    private void cache(DictionaryElementType fileType, DictionaryElement obj) {
-        if (isCachingEnabled()) {
+    private DictionaryElement cache(DictionaryElementType fileType, DictionaryElement obj) {
+        if (isCachingEnabled() && null != obj) {
             getCaches().cacheObject(fileType, obj.getPOS(), obj.getKey(), obj);
         }
+        return obj;
     }
 
     private void clear(DictionaryElementType fileType, POS pos, Object key) {

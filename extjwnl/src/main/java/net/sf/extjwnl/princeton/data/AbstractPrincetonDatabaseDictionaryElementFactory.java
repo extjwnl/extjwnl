@@ -31,9 +31,8 @@ public abstract class AbstractPrincetonDatabaseDictionaryElementFactory extends 
         }
 
         long[] offsetArray = new long[offsets.size()];
-        Iterator<Long> itr = offsets.iterator();
-        for (int i = 0; itr.hasNext(); i++) {
-            offsetArray[i] = itr.next();
+        for (int i = 0; i < offsets.size(); i++) {
+            offsetArray[i] = offsets.get(i);
         }
 
         return new IndexWord(dictionary, stringCache.replace(lemma), pos, offsetArray);

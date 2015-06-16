@@ -194,7 +194,7 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
         return new ExceptionIterator(pos, query);
     }
 
-    public void close() {
+    public synchronized void close() {
         dbManager.close();
     }
 

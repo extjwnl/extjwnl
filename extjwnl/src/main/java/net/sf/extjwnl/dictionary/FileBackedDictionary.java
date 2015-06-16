@@ -1,16 +1,15 @@
 package net.sf.extjwnl.dictionary;
 
 import net.sf.extjwnl.JWNLException;
+import net.sf.extjwnl.JWNLIOException;
 import net.sf.extjwnl.JWNLRuntimeException;
 import net.sf.extjwnl.data.*;
 import net.sf.extjwnl.dictionary.file.DictionaryFileType;
 import net.sf.extjwnl.dictionary.file_manager.FileManager;
 import net.sf.extjwnl.princeton.data.AbstractDictionaryElementFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.sf.extjwnl.util.PointedCharSequence;
 import org.w3c.dom.Document;
 
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -23,7 +22,6 @@ import java.util.NoSuchElementException;
  */
 public class FileBackedDictionary extends AbstractCachingDictionary {
 
-    private static final Logger log = LoggerFactory.getLogger(FileBackedDictionary.class);
     /**
      * File manager install parameter. The value should be the class of FileManager to use.
      */
@@ -33,18 +31,22 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
      * The value should be "true" or "false". The default is "true".
      */
     public static final String ENABLE_CACHING = "enable_caching";
+
     /**
      * The default cache size.
      */
     public static final String CACHE_SIZE = "cache_size";
+
     /**
      * Size of the index word cache. Overrides the default cache size
      */
     public static final String INDEX_WORD_CACHE_SIZE = "index_word_cache_size";
+
     /**
      * Size of the synset cache. Overrides the default cache size
      */
     public static final String SYNSET_WORD_CACHE_SIZE = "synset_word_cache_size";
+
     /**
      * Size of the exception cache. Overrides the default cache size
      */
@@ -85,28 +87,16 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
     }
 
     @Override
-    public void close() {
+    public synchronized void close() throws JWNLException {
         fileManager.close();
     }
 
     @Override
     public synchronized boolean delete() throws JWNLException {
-        try {
-            return fileManager.delete();
-        } catch (IOException e) {
-            throw new JWNLException(getMessages().resolveMessage("EXCEPTION_001", e.getMessage()), e);
-        }
+        return fileManager.delete();
     }
 
-    /**
-     * Returns the file manager that backs this database.
-     *
-     * @return the file manager that backs this database
-     */
-    protected FileManager getFileManager() {
-        return fileManager;
-    }
-
+    @Override
     public Iterator<IndexWord> getIndexWordIterator(final POS pos) throws JWNLException {
         if (!isEditable()) {
             return new IndexFileLookaheadIterator(pos);
@@ -115,14 +105,17 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
         }
     }
 
+    @Override
     public Iterator<IndexWord> getIndexWordIterator(final POS pos, final String substring) throws JWNLException {
         if (!isEditable()) {
+            // replace here kind of "leaks out" file format
             return new SubstringIndexFileLookaheadIterator(pos, prepareQueryString(substring.replace(' ', '_')));
         } else {
             return super.getIndexWordIterator(pos, substring);
         }
     }
 
+    @Override
     public IndexWord getIndexWord(POS pos, String lemma) throws JWNLException {
         lemma = prepareQueryString(lemma);
 
@@ -131,15 +124,14 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
             if (isCachingEnabled()) {
                 word = getCachedIndexWord(pos, lemma);
             }
-            if (!isEditable() && word == null) {
+            if (!isEditable() && null == word) {
                 try {
-                    /** determines the offset within the index file */
-                    long offset = getFileManager().getIndexedLinePointer(
-                            pos, DictionaryFileType.INDEX, lemma.replace(' ', '_'));
-                    if (offset >= 0) {
-                        word = parseAndCacheIndexWordLine(pos, getFileManager().readLineAt(pos, DictionaryFileType.INDEX, offset));
+                    // replace here kind of "leaks out" file format
+                    CharSequence line = fileManager.getIndexedLine(pos, DictionaryFileType.INDEX, lemma.replace(' ', '_'));
+                    if (null != line) {
+                        word = parseAndCacheIndexWord(pos, line);
                     }
-                } catch (IOException e) {
+                } catch (JWNLIOException e) {
                     throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_004", new Object[]{pos.getLabel(), lemma}), e);
                 }
             }
@@ -147,31 +139,27 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
         return word;
     }
 
+    @Override
     public IndexWord getRandomIndexWord(POS pos) throws JWNLException {
-        try {
-            long offset = getFileManager().getRandomLinePointer(pos, DictionaryFileType.INDEX);
-            return parseAndCacheIndexWordLine(pos, getFileManager().readLineAt(pos, DictionaryFileType.INDEX, offset));
-        } catch (IOException e) {
-            throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_004", new Object[]{pos.getLabel(), "?random?"}), e);
+        if (!isEditable()) {
+            CharSequence line = fileManager.getRandomLine(pos, DictionaryFileType.INDEX);
+            return parseAndCacheIndexWord(pos, line);
+        } else {
+            throw new UnsupportedOperationException();
         }
     }
 
-    private IndexWord parseAndCacheIndexWordLine(POS pos, String line) throws JWNLException {
-        IndexWord word = factory.createIndexWord(pos, line);
-        if (isCachingEnabled() && word != null) {
-            cacheIndexWord(word);
-        }
-        return word;
-    }
-
+    @Override
     public Iterator<Synset> getSynsetIterator(POS pos) throws JWNLException {
         if (!isEditable()) {
             return new FileLookaheadIterator<Synset>(pos, DictionaryFileType.DATA) {
-                protected Synset parseLine(POS pos, long offset, String line) {
+                @Override
+                protected Synset parseLine(POS pos, PointedCharSequence line) {
                     try {
-                        return getSynset(pos, offset, line);
+                        return parseAndCacheSynset(pos, line);
                     } catch (JWNLException e) {
-                        throw new RuntimeException(e);
+                        throw new JWNLRuntimeException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_005",
+                                new Object[]{pos.getLabel(), "?"}), e);
                     }
                 }
             };
@@ -180,45 +168,23 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
         }
     }
 
+    @Override
     public Synset getSynsetAt(POS pos, long offset) throws JWNLException {
-        return getSynset(pos, offset, null);
-    }
-
-    private Synset getSynset(POS pos, long offset, String line) throws JWNLException {
         Synset synset = getCachedSynset(pos, offset);
-        if (!isEditable() && synset == null) {
-            try {
-                if (line == null) {
-                    line = getFileManager().readLineAt(pos, DictionaryFileType.DATA, offset);
-                }
-                if (null != line) {
-                    synset = factory.createSynset(pos, line);
-                    for (Word w : synset.getWords()) {
-                        w.setUseCount(fileManager.getUseCount(w.getSenseKeyWithAdjClass()));
-                    }
-
-                    cacheSynset(synset);
-                }
-            } catch (IOException e) {
-                throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_005", new Object[]{pos.getLabel(), offset}), e);
-            }
+        if (!isEditable() && null == synset) {
+            PointedCharSequence line = fileManager.readLineAt(pos, DictionaryFileType.DATA, offset);
+            synset = parseAndCacheSynset(pos, line);
         }
         return synset;
     }
 
+    @Override
     public Iterator<Exc> getExceptionIterator(POS pos) throws JWNLException {
         if (!isEditable()) {
             return new FileLookaheadIterator<Exc>(pos, DictionaryFileType.EXCEPTION) {
-                protected Exc parseLine(POS pos, long offset, String line) throws JWNLException {
-                    Exc exc = null;
-                    if (isCachingEnabled()) {
-                        String lemma = line.substring(0, line.indexOf(' '));
-                        exc = getCachedException(pos, lemma);
-                    }
-                    if (exc == null) {
-                        exc = parseAndCacheExceptionLine(pos, line);
-                    }
-                    return exc;
+                @Override
+                protected Exc parseLine(POS pos, PointedCharSequence line) throws JWNLException {
+                    return parseAndCacheExceptionLine(pos, line);
                 }
             };
         } else {
@@ -227,194 +193,29 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
     }
 
     public Exc getException(POS pos, String derivation) throws JWNLException {
-        derivation = prepareQueryString(derivation);
-
         Exc exc = null;
-        if (derivation != null) {
-            if (isCachingEnabled()) {
-                exc = getCachedException(pos, derivation);
-            }
-            if (!isEditable() && exc == null) {
-                long offset;
-                try {
-                    offset = getFileManager().getIndexedLinePointer(
-                            pos, DictionaryFileType.EXCEPTION, derivation.replace(' ', '_'));
-                    if (offset >= 0) {
-                        exc = parseAndCacheExceptionLine(pos, getFileManager().readLineAt(pos, DictionaryFileType.EXCEPTION, offset));
+        if (null != derivation) {
+            derivation = prepareQueryString(derivation);
+            if (derivation.length() > 0) {
+                if (isCachingEnabled()) {
+                    exc = getCachedException(pos, derivation);
+                }
+                if (!isEditable() && null == exc) {
+                    try {
+                        CharSequence line = fileManager.getIndexedLine(
+                                // replace here kind of "leaks out" file format
+                                pos, DictionaryFileType.EXCEPTION, derivation.replace(' ', '_'));
+                        if (null != line) {
+                            exc = parseAndCacheExceptionLine(pos, line);
+                        }
+                    } catch (JWNLIOException e) {
+                        throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_006",
+                                new Object[]{pos.getLabel(), derivation}), e);
                     }
-                } catch (IOException e) {
-                    throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_006", new Object[]{pos.getLabel(), derivation}), e);
                 }
             }
         }
         return exc;
-    }
-
-    private Exc parseAndCacheExceptionLine(POS pos, String line) throws JWNLException {
-        Exc exc = factory.createExc(pos, line);
-        if (isCachingEnabled() && exc != null) {
-            cacheException(exc);
-        }
-        return exc;
-    }
-
-    /**
-     * A lookahead iterator over a dictionary file. Each element in the enumeration
-     * is a line in the enumerated file.
-     */
-    private abstract class FileLookaheadIterator<E extends DictionaryElement> implements Iterator<E> {
-        protected String currentLine = null;
-        protected long currentOffset = -1;
-        protected long nextOffset = 0;
-
-        protected boolean more = true;
-
-        protected final POS pos;
-        protected final DictionaryFileType fileType;
-
-        public FileLookaheadIterator(POS pos, DictionaryFileType fileType) {
-            this.pos = pos;
-            this.fileType = fileType;
-            try {
-                nextOffset = fileManager.getFirstLinePointer(pos, fileType);
-                nextLine();
-            } catch (IOException ex) {
-                if (log.isWarnEnabled()) {
-                    log.warn(getMessages().resolveMessage("DICTIONARY_EXCEPTION_007", new Object[]{this.pos, this.fileType}));
-                }
-            } catch (JWNLException ex) {
-                if (log.isWarnEnabled()) {
-                    log.warn(getMessages().resolveMessage("DICTIONARY_EXCEPTION_007", new Object[]{this.pos, this.fileType}));
-                }
-            }
-        }
-
-        protected abstract E parseLine(POS pos, long offset, String line) throws JWNLException;
-
-        public final E next() {
-            if (hasNext()) {
-                E returnVal;
-                try {
-                    returnVal = parseLine(pos, currentOffset, currentLine);
-                    nextLine();
-                } catch (JWNLException e) {
-                    throw new JWNLRuntimeException(e.getMessage(), e.getCause());
-                }
-                return returnVal;
-            } else {
-                throw new NoSuchElementException();
-            }
-        }
-
-        public final boolean hasNext() {
-            return more;
-        }
-
-        public void remove() {
-            throw new UnsupportedOperationException();
-        }
-
-        /**
-         * Read the next line in the iterated file.
-         */
-        protected void nextLine() throws JWNLException {
-            try {
-                currentLine = fileManager.readLineAt(pos, fileType, nextOffset);
-                if (currentLine != null) {
-                    nextOffset();
-                    return;
-                }
-            } catch (Exception e) {
-                if (log.isErrorEnabled()) {
-                    log.error(getMessages().resolveMessage("EXCEPTION_001", e.getMessage()), e);
-                }
-            }
-            more = false;
-        }
-
-        protected void nextOffset() throws JWNLException {
-            currentOffset = nextOffset;
-            nextOffset = getNextOffset(currentOffset);
-        }
-
-        protected long getNextOffset(long currentOffset) throws JWNLException {
-            try {
-                return fileManager.getNextLinePointer(pos, fileType, currentOffset);
-            } catch (IOException ex) {
-                throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_008", new Object[]{pos, fileType}), ex);
-            }
-        }
-    }
-
-    private class IndexFileLookaheadIterator extends FileLookaheadIterator<IndexWord> {
-        public IndexFileLookaheadIterator(POS pos) {
-            super(pos, DictionaryFileType.INDEX);
-        }
-
-        protected IndexWord parseLine(POS pos, long offset, String line) throws JWNLException {
-            IndexWord word = null;
-            if (isCachingEnabled()) {
-                String lemma = line.substring(0, line.indexOf(' '));
-                word = getCachedIndexWord(this.pos, lemma);
-            }
-            if (word == null) {
-                word = parseAndCacheIndexWordLine(this.pos, line);
-            }
-            return word;
-        }
-    }
-
-    private class SubstringIndexFileLookaheadIterator extends IndexFileLookaheadIterator {
-        private final String substring;
-
-        public SubstringIndexFileLookaheadIterator(POS pos, String substring) throws JWNLException {
-            super(pos);
-
-            //reinitialize
-            this.substring = substring;
-            currentLine = null;
-            currentOffset = -1;
-            try {
-                nextOffset = getNextOffset(fileManager.getFirstLinePointer(pos, fileType));
-            } catch (IOException ex) {
-                throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_008", new Object[]{pos, fileType}), ex);
-            }
-            nextLine();
-        }
-
-        protected void nextLine() throws JWNLException {
-            try {
-                if (-1 == nextOffset) {
-                    currentLine = null;
-                } else {
-                    currentLine = fileManager.readLineAt(pos, fileType, nextOffset);
-                }
-                if (currentLine != null) {
-                    nextOffset();
-                    return;
-                }
-            } catch (IOException ex) {
-                throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_008", new Object[]{pos, fileType}), ex);
-            }
-            more = false;
-        }
-
-        protected final void nextOffset() throws JWNLException {
-            currentOffset = nextOffset;
-            nextOffset = getNextOffset(super.getNextOffset(currentOffset));//search next offset from next line
-        }
-
-        protected long getNextOffset(long currentOffset) throws JWNLException {
-            if (null != substring) {//null == substring in the init of a super, should be skipped
-                try {
-                    return getFileManager().getMatchingLinePointer(pos, DictionaryFileType.INDEX, currentOffset, substring);
-                } catch (IOException ex) {
-                    throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_008", new Object[]{pos, fileType}), ex);
-                }
-            } else {
-                return super.getNextOffset(currentOffset);
-            }
-        }
     }
 
     @Override
@@ -424,22 +225,14 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
                 throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_030"));
             }
             super.edit();
-            try {
-                fileManager.edit();
-            } catch (IOException e) {
-                throw new JWNLException(getMessages().resolveMessage("EXCEPTION_001", e.getMessage()), e);
-            }
+            fileManager.edit();
         }
     }
 
     @Override
     public synchronized void save() throws JWNLException {
-        try {
-            super.save();
-            fileManager.save();
-        } catch (IOException e) {
-            throw new JWNLException(getMessages().resolveMessage("EXCEPTION_001", e.getMessage()), e);
-        }
+        super.save();
+        fileManager.save();
     }
 
     @Override
@@ -451,5 +244,122 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
         if (factory instanceof AbstractDictionaryElementFactory) {
             ((AbstractDictionaryElementFactory) factory).stopCaching();
         }
+    }
+
+    /**
+     * A lookahead iterator over a dictionary file.
+     * Each element in the enumeration is a line in the enumerated file.
+     */
+    private abstract class FileLookaheadIterator<E extends DictionaryElement> implements Iterator<E> {
+
+        protected PointedCharSequence next;
+        protected final POS pos;
+        protected final DictionaryFileType fileType;
+
+        public FileLookaheadIterator(POS pos, DictionaryFileType fileType, boolean skipLookup) throws JWNLException {
+            this.pos = pos;
+            this.fileType = fileType;
+        }
+
+        public FileLookaheadIterator(POS pos, DictionaryFileType fileType) throws JWNLException {
+            this.pos = pos;
+            this.fileType = fileType;
+            next = fileManager.readLineAt(pos, fileType, fileManager.getFirstLineOffset(pos, fileType));
+        }
+
+        @Override
+        public E next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+
+            E result;
+            try {
+                result = parseLine(pos, next);
+                next = fileManager.readLineAt(pos, fileType, next.getLastBytePosition() + 1);
+            } catch (JWNLException e) {
+                throw new JWNLRuntimeException(e);
+            }
+            return result;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return null != next;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+
+        protected abstract E parseLine(POS pos, PointedCharSequence line) throws JWNLException;
+    }
+
+    private class IndexFileLookaheadIterator extends FileLookaheadIterator<IndexWord> {
+        public IndexFileLookaheadIterator(POS pos) throws JWNLException {
+            super(pos, DictionaryFileType.INDEX);
+        }
+
+        public IndexFileLookaheadIterator(POS pos, boolean skipLookup) throws JWNLException {
+            super(pos, DictionaryFileType.INDEX, true);
+        }
+
+        @Override
+        protected IndexWord parseLine(POS pos, PointedCharSequence line) throws JWNLException {
+            return parseAndCacheIndexWord(pos, line);
+        }
+    }
+
+    private class SubstringIndexFileLookaheadIterator extends IndexFileLookaheadIterator {
+        private final String substring;
+
+        public SubstringIndexFileLookaheadIterator(POS pos, String substring) throws JWNLException {
+            super(pos, true);
+            this.substring = substring;
+            next = fileManager.getMatchingLine(pos, fileType, fileManager.getFirstLineOffset(pos, fileType), substring);
+        }
+
+        @Override
+        public IndexWord next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+
+            IndexWord result;
+            try {
+                result = parseLine(pos, next);
+                next = fileManager.getMatchingLine(pos, fileType, next.getLastBytePosition() + 1, substring);
+            } catch (JWNLException e) {
+                throw new JWNLRuntimeException(e);
+            }
+            return result;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return null != next;
+        }
+    }
+
+    private IndexWord parseAndCacheIndexWord(POS pos, CharSequence line) throws JWNLException {
+        return cacheIndexWord(factory.createIndexWord(pos, line));
+    }
+
+    private Exc parseAndCacheExceptionLine(POS pos, CharSequence line) throws JWNLException {
+        return cacheException(factory.createExc(pos, line));
+    }
+
+    private Synset parseAndCacheSynset(POS pos, PointedCharSequence line) throws JWNLException {
+        Synset result = null;
+        if (null != line) {
+            result = factory.createSynset(pos, line);
+            for (Word w : result.getWords()) {
+                w.setUseCount(fileManager.getUseCount(w.getSenseKeyWithAdjClass()));
+            }
+
+            cacheSynset(result);
+        }
+        return result;
     }
 }

@@ -229,6 +229,133 @@ public enum PointerType {
         return null;
     }
 
+    /**
+     * Return the <code>PointerType</code> whose key matches <var>key</var> and applies to <var>pos</var>.
+     *
+     * @param key pointer type key
+     * @return the <code>PointerType</code> whose key matches <var>key</var>
+     */
+    public static PointerType getPointerTypeForKey(CharSequence key) {
+        if (0 == key.length()) {
+            return null;
+        } else {
+            if (key.charAt(0) == ANTONYM.getKey().charAt(0)) {
+                return ANTONYM;
+            }
+            if (key.charAt(0) == HYPERNYM.getKey().charAt(0)) {
+                if (1 == key.length()) {
+                    return HYPERNYM;
+                } else if (2 == key.length() && key.charAt(1) == INSTANCE_HYPERNYM.getKey().charAt(1)) {
+                    return INSTANCE_HYPERNYM;
+                } else {
+                    return null;
+                }
+            }
+            if (key.charAt(0) == HYPONYM.getKey().charAt(0)) {
+                if (1 == key.length()) {
+                    return HYPONYM;
+                } else if (2 == key.length() && key.charAt(1) == INSTANCES_HYPONYM.getKey().charAt(1)) {
+                    return INSTANCES_HYPONYM;
+                } else {
+                    return null;
+                }
+            }
+            if (key.charAt(0) == ENTAILMENT.getKey().charAt(0)) {
+                return ENTAILMENT;
+            }
+            if (key.charAt(0) == SIMILAR_TO.getKey().charAt(0)) {
+                return SIMILAR_TO;
+            }
+            if (key.charAt(0) == CAUSE.getKey().charAt(0)) {
+                return CAUSE;
+            }
+            if (key.charAt(0) == PARTICIPLE_OF.getKey().charAt(0)) {
+                return PARTICIPLE_OF;
+            }
+            if (key.charAt(0) == SEE_ALSO.getKey().charAt(0)) {
+                return SEE_ALSO;
+            }
+            if (key.charAt(0) == PERTAINYM.getKey().charAt(0)) {
+                return PERTAINYM;
+            }
+            if (key.charAt(0) == ATTRIBUTE.getKey().charAt(0)) {
+                return ATTRIBUTE;
+            }
+            if (key.charAt(0) == VERB_GROUP.getKey().charAt(0)) {
+                return VERB_GROUP;
+            }
+            if (key.charAt(0) == DERIVATION.getKey().charAt(0)) {
+                return DERIVATION;
+            }
+            if (key.charAt(0) == DOMAIN_ALL.getKey().charAt(0)) {
+                if (1 == key.length()) {
+                    return DOMAIN_ALL;
+                } else if (2 == key.length()) {
+                    if (key.charAt(1) == CATEGORY.getKey().charAt(1)) {
+                        return CATEGORY;
+                    }
+                    if (key.charAt(1) == USAGE.getKey().charAt(1)) {
+                        return USAGE;
+                    }
+                    if (key.charAt(1) == REGION.getKey().charAt(1)) {
+                        return REGION;
+                    }
+                } else {
+                    return null;
+                }
+
+            }
+            if (key.charAt(0) == MEMBER_ALL.getKey().charAt(0)) {
+                if (1 == key.length()) {
+                    return MEMBER_ALL;
+                } else if (2 == key.length()) {
+                    if (key.charAt(1) == CATEGORY_MEMBER.getKey().charAt(1)) {
+                        return CATEGORY_MEMBER;
+                    }
+                    if (key.charAt(1) == USAGE_MEMBER.getKey().charAt(1)) {
+                        return USAGE_MEMBER;
+                    }
+                    if (key.charAt(1) == REGION_MEMBER.getKey().charAt(1)) {
+                        return REGION_MEMBER;
+                    }
+                } else {
+                    return null;
+                }
+            }
+            if (key.charAt(0) == MEMBER_HOLONYM.getKey().charAt(0)) {
+                if (2 == key.length()) {
+                    if (key.charAt(1) == MEMBER_HOLONYM.getKey().charAt(1)) {
+                        return MEMBER_HOLONYM;
+                    }
+                    if (key.charAt(1) == SUBSTANCE_HOLONYM.getKey().charAt(1)) {
+                        return SUBSTANCE_HOLONYM;
+                    }
+                    if (key.charAt(1) == PART_HOLONYM.getKey().charAt(1)) {
+                        return PART_HOLONYM;
+                    }
+                } else {
+                    return null;
+                }
+            }
+            if (key.charAt(0) == MEMBER_MERONYM.getKey().charAt(0)) {
+                if (2 == key.length()) {
+                    if (key.charAt(1) == MEMBER_MERONYM.getKey().charAt(1)) {
+                        return MEMBER_MERONYM;
+                    }
+                    if (key.charAt(1) == SUBSTANCE_MERONYM.getKey().charAt(1)) {
+                        return SUBSTANCE_MERONYM;
+                    }
+                    if (key.charAt(1) == PART_MERONYM.getKey().charAt(1)) {
+                        return PART_MERONYM;
+                    }
+                } else {
+                    return null;
+                }
+            }
+            return null;
+        }
+    }
+
     public static List<PointerType> getAllPointerTypes() {
         return ALL_TYPES;
     }

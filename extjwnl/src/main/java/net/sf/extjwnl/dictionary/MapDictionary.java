@@ -89,7 +89,7 @@ public class MapDictionary extends Dictionary {
         return (Exc) getTable(pos, DictionaryFileType.EXCEPTION).get(prepareQueryString(derivation));
     }
 
-    public void close() {
+    public synchronized void close() throws JWNLException {
         tableMap.clear();
     }
 

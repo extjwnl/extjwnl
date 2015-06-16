@@ -39,11 +39,9 @@
                value="net.sf.extjwnl.princeton.data.PrincetonWN17FileDictionaryElementFactory"/>
         <param name="file_manager" value="net.sf.extjwnl.dictionary.file_manager.FileManagerImpl">
             <param name="file_type" value="net.sf.extjwnl.princeton.file.PrincetonRandomAccessDictionaryFile">
-                <!--<param name="write_princeton_header" value="true"/>-->
-                <!--<param name="encoding" value="UTF-8"/>-->
+                <param name="write_princeton_header" value="true"/>
             </param>
-            <!--<param name="cache_use_count" value="true"/>-->
-            <param name="dictionary_path" value="./data/wn30"/>
+            <param name="dictionary_path" value="${project.build.directory}/data/clean-file"/>
         </param>
     </dictionary>
     <resource class="net.sf.extjwnl.princeton.PrincetonResource"/>

@@ -72,6 +72,32 @@ public enum POS {
     }
 
     /**
+     * Return the <code>POS</code> whose key matches <var>key</var>,
+     * or null if the key does not match any POS.
+     *
+     * @param key POS key
+     * @return POS
+     */
+    public static POS getPOSForKey(char key) {
+        if (key == NOUN.getKey().charAt(0)) {
+            return POS.NOUN;
+        }
+        if (key == VERB.getKey().charAt(0)) {
+            return POS.VERB;
+        }
+        if (key == ADJECTIVE.getKey().charAt(0)) {
+            return POS.ADJECTIVE;
+        }
+        if (key == ADVERB.getKey().charAt(0)) {
+            return POS.ADVERB;
+        }
+        if (key == ADJECTIVE_SATELLITE_KEY.charAt(0)) {
+            return POS.ADJECTIVE;
+        }
+        return null;
+    }
+
+    /**
      * Return the <code>POS</code> whose id matches <var>id</var>,
      * or null if the id does not match any POS.
      *

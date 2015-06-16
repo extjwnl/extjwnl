@@ -7,10 +7,7 @@ import org.junit.*;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Tests dictionary editing.
@@ -20,16 +17,20 @@ import java.util.List;
 @Ignore
 public abstract class DictionaryEditTester {
 
-    private final static String entityGloss = "that which is perceived or known or inferred to have its own distinct existence (living or nonliving)";
-    private final static String entityLemma = "entity";
-    private final static String physical_entityGloss = "an entity that has physical existence";
-    private final static String physical_entityLemma = "physìcal entìty";//ì to test encoding
-    private final static String abstractionGloss = "a general concept formed by extracting common features from specific examples";
-    private final static String[] abstractionWords = {"abstraction", "abstract entity"};
+    protected String entityGloss = "that which is perceived or known or inferred to have its own distinct existence (living or nonliving)";
+    protected String entityLemma = "entity";
+    protected String physical_entityGloss = "an entity that has physical existence";
+    protected String physical_entityLemma = "physìcal entìty"; // ì to test encoding
+    protected String abstractionGloss = "a general concept formed by extracting common features from specific examples";
+    protected String[] abstractionWords = {"abstraction", "abstract entity"};
 
-    private final static String[] exception1 = {"alto-relievos", "alto-relievo", "alto-rilievo"};
-    private final static String[] exception2 = {"aìdes-de-camp", "aìde-de-camp"};//ì to test encoding
-    private final static String[] exception3 = {"altocumuli", "altocumulus"};//to test sorting
+    protected String[] exception1 = {"alto-relievos", "alto-relievo", "alto-rilievo"};
+    protected String[] exception2 = {"aìdes-de-camp", "aìde-de-camp"}; // ì to test encoding
+    protected String[] exception3 = {"altocumuli", "altocumulus"}; // to test sorting
+
+    protected String first = "first";
+    protected String second = "second";
+
 
     protected Dictionary dictionary;
     private Dictionary mapDictionary;
@@ -71,7 +72,7 @@ public abstract class DictionaryEditTester {
     @Test
     public void testAddElementExc() throws JWNLException {
         dictionary.edit();
-        final Exc exc = new Exc(dictionary, POS.NOUN, "test", Arrays.asList("tests"));
+        final Exc exc = new Exc(dictionary, POS.NOUN, "test", Collections.singletonList("tests"));
         dictionary.addElement(exc);
 
         List<Exc> excs = new ArrayList<Exc>(1);
@@ -124,12 +125,12 @@ public abstract class DictionaryEditTester {
 
     @Test(expected = JWNLException.class)
     public void testAddExceptionAlien() throws JWNLException {
-        dictionary.addException(new Exc(dictionary, POS.NOUN, "test", Arrays.asList("tests")));
+        dictionary.addException(new Exc(dictionary, POS.NOUN, "test", Collections.singletonList("tests")));
     }
 
     @Test(expected = JWNLException.class)
     public void testRemoveExceptionReadOnly() throws JWNLException {
-        dictionary.removeException(new Exc(dictionary, POS.NOUN, "test", Arrays.asList("tests")));
+        dictionary.removeException(new Exc(dictionary, POS.NOUN, "test", Collections.singletonList("tests")));
     }
 
     @Test(expected = JWNLException.class)
@@ -199,26 +200,10 @@ public abstract class DictionaryEditTester {
     @Test
     public void testEmptyDictionary() throws IOException, JWNLException {
         for (POS pos : POS.getAllPOS()) {
-            int synsetCount = 0;
-            Iterator<Synset> si = dictionary.getSynsetIterator(pos);
-            while (si.hasNext()) {
-                synsetCount++;
-            }
-            Assert.assertEquals(0, synsetCount);
-
-            int iwCount = 0;
-            Iterator<IndexWord> ii = dictionary.getIndexWordIterator(pos);
-            while (ii.hasNext()) {
-                iwCount++;
-            }
-            Assert.assertEquals(0, iwCount);
-
-            int excCount = 0;
-            Iterator<Exc> ei = dictionary.getExceptionIterator(pos);
-            while (ei.hasNext()) {
-                excCount++;
-            }
-            Assert.assertEquals(0, excCount);
+            Assert.assertFalse(dictionary.getSynsetIterator(pos).hasNext());
+            Assert.assertFalse(dictionary.getIndexWordIterator(pos).hasNext());
+            Assert.assertFalse(dictionary.getIndexWordIterator(pos, "car").hasNext());
+            Assert.assertFalse(dictionary.getExceptionIterator(pos).hasNext());
         }
     }
 
@@ -316,8 +301,8 @@ public abstract class DictionaryEditTester {
 
     private void createExceptions(Dictionary dictionary) throws JWNLException {
         dictionary.createException(POS.NOUN, exception1[0], Arrays.asList(exception1[1], exception1[2]));
-        dictionary.createException(POS.NOUN, exception2[0], Arrays.asList(exception2[1]));
-        dictionary.createException(POS.NOUN, exception3[0], Arrays.asList(exception3[1]));
+        dictionary.createException(POS.NOUN, exception2[0], Collections.singletonList(exception2[1]));
+        dictionary.createException(POS.NOUN, exception3[0], Collections.singletonList(exception3[1]));
     }
 
     private void checkThreeExceptions(Dictionary dictionary) throws JWNLException {
@@ -879,19 +864,16 @@ public abstract class DictionaryEditTester {
 
     @Test
     public void testCounts() throws JWNLException, FileNotFoundException {
-        final String first = "first";
-        final String second = "second";
-
         dictionary.edit();
 
         Synset s1 = dictionary.createSynset(POS.NOUN);
-        s1.setGloss("first gloss");
+        s1.setGloss(first + " gloss");
         final Word w1 = new Word(dictionary, s1, first);
         w1.setUseCount(1);
         s1.getWords().add(w1);
 
         Synset s2 = dictionary.createSynset(POS.NOUN);
-        s2.setGloss("second gloss");
+        s2.setGloss(second + " gloss");
         final Word w2 = new Word(dictionary, s2, second);
         w2.setUseCount(2);
         s2.getWords().add(w2);

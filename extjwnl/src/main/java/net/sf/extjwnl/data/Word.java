@@ -215,7 +215,7 @@ public class Word extends PointerTarget {
         }
         senseKey.append(lexId).append(":");
 
-        if (5 == ss_type) {
+        if (POS.ADJECTIVE_SATELLITE_ID == ss_type) {
             List<Pointer> p = synset.getPointers(PointerType.SIMILAR_TO);
             if (0 < p.size()) {
                 Pointer headWord = p.get(0);
@@ -248,7 +248,16 @@ public class Word extends PointerTarget {
             ss_type = POS.ADJECTIVE_SATELLITE_ID;
         }
 
-        StringBuilder senseKey = new StringBuilder(String.format("%s%%%d:%02d:%02d:", lemma.toLowerCase().replace(' ', '_'), ss_type, synset.getLexFileNum(), lexId));
+        StringBuilder senseKey = new StringBuilder(lemma.toLowerCase().replace(' ', '_'));
+        senseKey.append("%").append(ss_type).append(":");
+        if (synset.getLexFileNum() < 10) {
+            senseKey.append("0");
+        }
+        senseKey.append(synset.getLexFileNum()).append(":");
+        if (lexId < 10) {
+            senseKey.append("0");
+        }
+        senseKey.append(lexId).append(":");
 
         if (POS.ADJECTIVE_SATELLITE_ID == ss_type) {
             List<Pointer> p = synset.getPointers(PointerType.SIMILAR_TO);
@@ -264,7 +273,11 @@ public class Word extends PointerTarget {
                             lemma = lemma + "(" + a.getAdjectivePosition().getKey() + ")";
                         }
                     }
-                    senseKey.append(String.format("%s:%02d", lemma, word.getLexId()));
+                    senseKey.append(lemma);
+                    if (word.getLexId() < 10) {
+                        senseKey.append("0");
+                    }
+                    senseKey.append(word.getLexId());
                 }
             }
         } else {

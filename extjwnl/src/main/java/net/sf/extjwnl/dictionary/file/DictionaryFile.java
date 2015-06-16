@@ -4,29 +4,14 @@ import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.data.POS;
 import net.sf.extjwnl.util.factory.Owned;
 
-import java.io.File;
-import java.io.IOException;
-
 /**
- * Represents a single dictionary file. Extensions or implementations of this interface should provide
- * the appropriate methods to read from the file.
+ * Represents a single dictionary file.
+ * The "file" can represent something not necessary on the disk: stream, resource.
  *
  * @author John Didion (jdidion@didion.net)
  * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
 public interface DictionaryFile extends Owned {
-
-    /**
-     * Closes the file.
-     */
-    void close();
-
-    /**
-     * Returns true if the file is open.
-     *
-     * @return true if the file is open
-     */
-    boolean isOpen();
 
     /**
      * Returns the POS associated with this file.
@@ -36,11 +21,11 @@ public interface DictionaryFile extends Owned {
     POS getPOS();
 
     /**
-     * Returns the file.
+     * Returns a filename from the part-of-speech and the file type.
      *
-     * @return the file
+     * @return a filename from the part-of-speech and the file type
      */
-    File getFile();
+    String getFilename();
 
     /**
      * Returns the file type associated with this file.
@@ -52,30 +37,35 @@ public interface DictionaryFile extends Owned {
     /**
      * Opens the file.
      *
-     * @throws IOException IOException
+     * @throws JWNLException JWNLException
      */
-    void open() throws IOException;
+    void open() throws JWNLException;
 
     /**
-     * Deletes the file.
+     * Closes the file.
      *
-     * @return true if succeeded
-     * @throws IOException IOException
+     * @throws JWNLException JWNLException
      */
-    boolean delete() throws IOException;
+    void close() throws JWNLException;
+
+    /**
+     * Returns true if the file is open.
+     *
+     * @return true if the file is open
+     */
+    boolean isOpen();
 
     /**
      * Saves the file.
      *
-     * @throws IOException   IOException
      * @throws JWNLException JWNLException
      */
-    void save() throws IOException, JWNLException;
+    void save() throws JWNLException;
 
     /**
      * Reopens file in write mode.
      *
-     * @throws IOException IOException
+     * @throws JWNLException JWNLException
      */
-    void edit() throws IOException;
+    void edit() throws JWNLException;
 }

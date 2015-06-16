@@ -147,6 +147,7 @@ public abstract class Dictionary {
             return locale;
         }
 
+        @Override
         public boolean equals(Object obj) {
             return (obj instanceof Version)
                     && publisher.equals(((Version) obj).publisher)
@@ -154,10 +155,12 @@ public abstract class Dictionary {
                     && locale.equals(((Version) obj).locale);
         }
 
+        @Override
         public String toString() {
             return messages.resolveMessage("JWNL_TOSTRING_002", new Object[]{publisher, number, locale});
         }
 
+        @Override
         public int hashCode() {
             return publisher.hashCode() ^ (int) (number * 100);
         }
@@ -461,7 +464,7 @@ public abstract class Dictionary {
     /**
      * Shuts down the dictionary, freeing resources.
      */
-    public abstract void close();
+    public abstract void close() throws JWNLException;
 
     public ResourceBundleSet getMessages() {
         return messages;
@@ -832,8 +835,8 @@ public abstract class Dictionary {
      * the frame at its corresponding index. If the bit is set, that verb
      * frame is valid for the word.
      *
-     * @param bits frame flags
-	 * @param verbFrames frames
+     * @param bits       frame flags
+     * @param verbFrames frames
      * @return the frames at the indexes encoded in <var>l</var>
      */
     public static String[] getFrames(BitSet bits, String[] verbFrames) {

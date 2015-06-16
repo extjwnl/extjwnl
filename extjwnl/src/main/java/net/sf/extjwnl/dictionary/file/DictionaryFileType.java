@@ -18,10 +18,15 @@ public enum DictionaryFileType {
     INDEX("index", DictionaryElementType.INDEX_WORD),
     DATA("data", DictionaryElementType.SYNSET),
     EXCEPTION("exception", DictionaryElementType.EXCEPTION),
+    SENSEINDEX("index.sense", null),
     REVCNTLIST("cntlist.rev", null),
     CNTLIST("cntlist", null);
 
-    private static final List<DictionaryFileType> ALL_TYPES = Collections.unmodifiableList(Arrays.asList(INDEX, DATA, EXCEPTION));
+    private static final List<DictionaryFileType> ALL_TYPES =
+            Collections.unmodifiableList(Arrays.asList(
+                    INDEX,
+                    DATA,
+                    EXCEPTION));
 
     public static List<DictionaryFileType> getAllDictionaryFileTypes() {
         return ALL_TYPES;
@@ -30,8 +35,8 @@ public enum DictionaryFileType {
     private final transient String name;
     private final transient DictionaryElementType elementType;
 
-    private DictionaryFileType(String type, DictionaryElementType elementType) {
-        name = type;
+    DictionaryFileType(String type, DictionaryElementType elementType) {
+        this.name = type;
         this.elementType = elementType;
     }
 

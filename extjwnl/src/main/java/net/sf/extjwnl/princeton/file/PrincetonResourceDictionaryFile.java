@@ -1,9 +1,14 @@
 package net.sf.extjwnl.princeton.file;
 
+import net.sf.extjwnl.JWNLException;
+import net.sf.extjwnl.JWNLIOException;
 import net.sf.extjwnl.data.POS;
 import net.sf.extjwnl.dictionary.Dictionary;
 import net.sf.extjwnl.dictionary.file.DictionaryFileFactory;
 import net.sf.extjwnl.dictionary.file.DictionaryFileType;
+import net.sf.extjwnl.util.ByteArrayCharSequence;
+import net.sf.extjwnl.util.CharBufferCharSequence;
+import net.sf.extjwnl.util.PointedCharSequence;
 import net.sf.extjwnl.util.factory.Param;
 
 import java.io.ByteArrayOutputStream;
@@ -11,57 +16,249 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
+import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
 import java.util.Map;
 
 /**
- * A <code>RandomAccessDictionaryFile</code> that accesses files named with Princeton's dictionary file naming convention.
- * The file is loaded from classpath and stored in CharBuffer.
+ * Loads dictionary files from classpath.
  *
  * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
-public class PrincetonResourceDictionaryFile extends PrincetonCharBufferFile implements DictionaryFileFactory<PrincetonResourceDictionaryFile> {
+public class PrincetonResourceDictionaryFile extends AbstractPrincetonRandomAccessDictionaryFile
+        implements DictionaryFileFactory<PrincetonResourceDictionaryFile> {
 
-    private long size;
+    private byte[] buffer;
+    private int firstLineOffset;
+    private final CharsetDecoder decoder;
 
+    /**
+     * Factory constructor.
+     *
+     * @param dictionary dictionary
+     * @param params     params
+     */
     public PrincetonResourceDictionaryFile(Dictionary dictionary, Map<String, Param> params) {
         super(dictionary, params);
+        this.decoder = null;
     }
 
+    /**
+     * Instance constructor.
+     *
+     * @param dictionary dictionary
+     * @param path       file path
+     * @param pos        part of speech
+     * @param fileType   file type
+     * @param params     params
+     */
     public PrincetonResourceDictionaryFile(Dictionary dictionary, String path, POS pos, DictionaryFileType fileType, Map<String, Param> params) {
         super(dictionary, path, pos, fileType, params);
+        this.firstLineOffset = -1;
+        this.buffer = null;
+        if (null != encoding) {
+            Charset charset = Charset.forName(encoding);
+            decoder = charset.newDecoder();
+        } else {
+            decoder = null;
+        }
     }
 
+    @Override
     public PrincetonResourceDictionaryFile newInstance(Dictionary dictionary, String path, POS pos, DictionaryFileType fileType) {
         return new PrincetonResourceDictionaryFile(dictionary, path, pos, fileType, params);
     }
 
-    public void openFile() throws IOException {
+    @Override
+    public void open() throws JWNLException {
         InputStream input = PrincetonResourceDictionaryFile.class.getResourceAsStream(path + "/" + getFilename());
         try {
-            // data.noun is about 16M
-            ByteArrayOutputStream output = new ByteArrayOutputStream(16 * 1024 * 1024);
             try {
-                copyStream(input, output);
-                size = output.size();
-                if (null != encoding) {
-                    buffer = Charset.forName(encoding).newDecoder().decode(ByteBuffer.wrap(output.toByteArray()));
-                } else {
-                    buffer = Charset.defaultCharset().newDecoder().decode(ByteBuffer.wrap(output.toByteArray()));
+                // data.noun is about 16M
+                ByteArrayOutputStream output = new ByteArrayOutputStream(16 * 1024 * 1024);
+                try {
+                    copyStream(input, output);
+                    buffer = output.toByteArray();
+                } finally {
+                    output.close();
                 }
             } finally {
-                output.close();
+                input.close();
             }
-        } finally {
-            input.close();
+        } catch (IOException e) {
+            throw new JWNLIOException(e);
         }
     }
 
-    public long length() throws IOException {
-        return size;
+    @Override
+    public boolean isOpen() {
+        return null != buffer;
+    }
+
+    @Override
+    public void close() {
+        buffer = null;
+    }
+
+    @Override
+    public void save() throws JWNLException {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void edit() throws JWNLException {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public long getFirstLineOffset() throws JWNLException {
+        // fixed DCL idiom: http://en.wikipedia.org/wiki/Double-checked_locking
+        if (-1 == firstLineOffset) {
+            synchronized (this) {
+                if (-1 == firstLineOffset) {
+                    if (!isOpen()) {
+                        throw new JWNLException(dictionary.getMessages().resolveMessage("PRINCETON_EXCEPTION_001"));
+                    }
+
+                    int i = 0;
+                    boolean eol = true;
+                    while (i < buffer.length) {
+                        if (eol && ' ' != buffer[i]) {
+                            break;
+                        }
+                        eol = '\n' == buffer[i];
+                        i++;
+                    }
+
+                    firstLineOffset = i;
+                }
+            }
+        }
+
+        return firstLineOffset;
+    }
+
+    @Override
+    public long getNextLineOffset(long offset) throws JWNLException {
+        if (!isOpen()) {
+            throw new JWNLException(dictionary.getMessages().resolveMessage("PRINCETON_EXCEPTION_001"));
+        }
+
+        int loffset = (int) offset;
+
+        if (loffset >= buffer.length || loffset < 0) {
+            return -1;
+        }
+
+        int i = loffset;
+        while (i < buffer.length && '\n' != buffer[i]) {
+            i++;
+        }
+        // we've read the line
+
+        long result = i + 1;
+        if (result >= buffer.length) {
+            result = -1;
+        }
+
+        return result;
+    }
+
+    @Override
+    public int getOffsetLength() throws JWNLException {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setOffsetLength(int length) throws JWNLException {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public PointedCharSequence readLine(long offset) throws JWNLException {
+        if (!isOpen()) {
+            throw new JWNLException(dictionary.getMessages().resolveMessage("PRINCETON_EXCEPTION_001"));
+        }
+
+        // long files limitation due to limitation in ByteBuffer.
+        int loffset = (int) offset;
+
+        if (loffset >= buffer.length || loffset < 0) {
+            return null;
+        }
+
+        int i = loffset;
+        while (i < buffer.length && '\n' != buffer[i]) {
+            i++;
+        }
+
+        // resulting line ends at i (eol or eof)
+        final PointedCharSequence result;
+
+        if (null == encoding) {
+            result = new ByteArrayCharSequence(buffer, loffset, i, i);
+        } else {
+            final ByteBuffer bb = ByteBuffer.wrap(buffer, loffset, i - loffset);
+
+            try {
+                synchronized (this) {
+                    CharBuffer cb = decoder.decode(bb);
+                    result = new CharBufferCharSequence(cb, i);
+                }
+            } catch (CharacterCodingException e) {
+                throw new JWNLIOException(dictionary.getMessages().resolveMessage("PRINCETON_EXCEPTION_003",
+                        new Object[]{getFilename(), loffset}), e);
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public PointedCharSequence readWord(long offset) throws JWNLException {
+        if (!isOpen()) {
+            throw new JWNLException(dictionary.getMessages().resolveMessage("PRINCETON_EXCEPTION_001"));
+        }
+
+        // long files limitation due to limitation in ByteBuffer.
+        int loffset = (int) offset;
+
+        if (loffset >= buffer.length || loffset < 0) {
+            return null;
+        }
+
+        int i = loffset;
+        while (i < buffer.length && ' ' != buffer[i] && '\n' != buffer[i]) {
+            i++;
+        }
+
+        // resulting word ends at i (space, eol or eof)
+        final PointedCharSequence result;
+
+        if (null == encoding) {
+            result = new ByteArrayCharSequence(buffer, loffset, i, i);
+        } else {
+            final ByteBuffer bb = ByteBuffer.wrap(buffer, loffset, i - loffset);
+
+            try {
+                synchronized (this) {
+                    CharBuffer cb = decoder.decode(bb);
+                    result = new CharBufferCharSequence(cb, i);
+                }
+            } catch (CharacterCodingException e) {
+                throw new JWNLIOException(dictionary.getMessages().resolveMessage("PRINCETON_EXCEPTION_003",
+                        new Object[]{getFilename(), loffset}), e);
+            }
+        }
+        return result;
+    }
+
+    public long length() throws JWNLException {
+        return buffer.length;
     }
 
     private static void fastChannelCopy(final ReadableByteChannel src, final WritableByteChannel dest) throws IOException {
@@ -83,7 +280,7 @@ public class PrincetonResourceDictionaryFile extends PrincetonCharBufferFile imp
         }
     }
 
-    private static void copyStream(InputStream input, OutputStream output) throws IOException {
+    public static void copyStream(InputStream input, OutputStream output) throws IOException {
         WritableByteChannel outputChannel = Channels.newChannel(output);
         try {
             ReadableByteChannel inputChannel = Channels.newChannel(input);
