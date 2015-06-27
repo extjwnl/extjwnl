@@ -1,12 +1,24 @@
+1.9
+
+- IO rewritten to use block reads
+- synchronization removed or replaced with finer-grained blocks
+- parsing rewritten to decrease memory reallocations
+- memory use decreased for ASCII resource dictionaries: char[] -> byte[]
+- reading speed improved: resource random walk ~2.7x, file random walk ~43.8x, file iteration ~11.9x
+- upgrade to Java 7
+- bugs fixed
+
 1.8.1
+
 - maven dependencies updated
 - javadoc 8 lint compatibility
 - fixed issue #6
 
 1.8.0
+
 - changed handling of PrincetonResource_en.properties to be as others are and to avoid classpath conflicts with JWNL. If you had your own configuration files, change resource name to specify it fully: <resource class="net.sf.extjwnl.princeton.PrincetonResource"/>
 
-1.7.1 
+1.7.1
 
 - test data added back
 - database synset loading fixed
@@ -51,7 +63,7 @@
 
 - library is thread-safe
 
-1.6.2 
+1.6.2
 
 - NPE in ewn
 
@@ -121,14 +133,14 @@
 
 changes from version 1.3 to version 1.4
 
-- Updated classes in the data package to be compatible with WordNet 2.1 and WordNet 3.0. 
-- Extended API to add support for word tagged usage count and sense key information, for FileBackedDictionary and DatabaseBackedDictionary. 
-- Added DictionaryToDatabaseWithUsageCount - populates a database with the index.sense file included. 
-- Added a small amount JUnit test cases. 
+- Updated classes in the data package to be compatible with WordNet 2.1 and WordNet 3.0.
+- Extended API to add support for word tagged usage count and sense key information, for FileBackedDictionary and DatabaseBackedDictionary.
+- Added DictionaryToDatabaseWithUsageCount - populates a database with the index.sense file included.
+- Added a small amount JUnit test cases.
 - Multiple bugs fixed with DatabaseManagerImpl:
   - fixed a bug where the wrong offset was being returned
   - fixed a query where incorrect synsets could be accessed
-- Added a new DatabaseManager and ElementFactory for databases using sense key information. 
+- Added a new DatabaseManager and ElementFactory for databases using sense key information.
 - Refactored and improved documentation.
 
 changes from version 1.2.1 to version 1.3
@@ -162,7 +174,7 @@ changes from version 1.1 to version 1.2
  * move factory interfaces/classes (Creatable, Installable, Element, Param) to net.didion.jwnl.util.factory
  * eliminated the caching package
  * moved dictionary file classes (AbstractDictionaryFile, DictionaryCatalog, DictionaryCatalogSet, DictionaryFile, DictionaryFileType, ObjectDictionaryFile, RandomAccessDictionaryFile) to net.didion.jwnl.dictionary.file
-- Shortened the names of the Princeton classes 
+- Shortened the names of the Princeton classes
 - Made the dictionary path a parameter for file-based dictionaries rather than a parameter of version
 - Added clearCache() and clearCache(DictionaryFileType) methods to AbstractCachingDictionary
 - Reversed the key types of DictionaryCatalog and DictionaryCatalogSet so that DictionaryCatalog stores files by POS for a file type and DictionaryCatalogSet stores DictionaryCatalogs by file type
