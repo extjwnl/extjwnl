@@ -18,7 +18,7 @@ public class TestPointerTargetNode {
         Synset s1 = new Synset(null, POS.NOUN);
         PointerTargetNode p1 = new PointerTargetNode(s1, PointerType.ANTONYM);
         Synset s2 = new Synset(null, POS.NOUN);
-        Word w2 = new Word(null, s2, 1, "test");
+        Word w2 = new Word(null, s2, "test");
         PointerTargetNode p2 = new PointerTargetNode(w2, PointerType.ANTONYM);
 
         Assert.assertFalse(p1.isLexical());

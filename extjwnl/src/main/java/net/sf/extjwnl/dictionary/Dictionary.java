@@ -147,6 +147,7 @@ public abstract class Dictionary {
             return locale;
         }
 
+        @Override
         public boolean equals(Object obj) {
             return (obj instanceof Version)
                     && publisher.equals(((Version) obj).publisher)
@@ -154,10 +155,12 @@ public abstract class Dictionary {
                     && locale.equals(((Version) obj).locale);
         }
 
+        @Override
         public String toString() {
             return messages.resolveMessage("JWNL_TOSTRING_002", new Object[]{publisher, number, locale});
         }
 
+        @Override
         public int hashCode() {
             return publisher.hashCode() ^ (int) (number * 100);
         }
@@ -343,7 +346,7 @@ public abstract class Dictionary {
         NodeList dictionaryNodeList = root.getElementsByTagName(DICTIONARY_TAG);
         Node dictionaryNode = dictionaryNodeList.item(0);
 
-        params = new HashMap<String, Param>();
+        params = new HashMap<>();
         for (Param p : getParams(this, dictionaryNode.getChildNodes())) {
             params.put(p.getName(), p);
         }
@@ -461,7 +464,7 @@ public abstract class Dictionary {
     /**
      * Shuts down the dictionary, freeing resources.
      */
-    public abstract void close();
+    public abstract void close() throws JWNLException;
 
     public ResourceBundleSet getMessages() {
         return messages;
@@ -589,13 +592,13 @@ public abstract class Dictionary {
                     IndexWord iw = ii.next();
                     //lex ids should be unique within lex file name
                     //lex file name -> list of words
-                    Map<Long, List<Word>> words = new HashMap<Long, List<Word>>();
+                    Map<Long, List<Word>> words = new HashMap<>();
                     for (Synset sense : iw.getSenses()) {
                         for (Word word : sense.getWords()) {
                             if (word.getLemma().equalsIgnoreCase(iw.getLemma())) {
                                 List<Word> list = words.get(sense.getLexFileNum());
                                 if (null == list) {
-                                    list = new ArrayList<Word>();
+                                    list = new ArrayList<>();
                                     words.put(sense.getLexFileNum(), list);
                                 }
                                 list.add(word);
@@ -747,7 +750,7 @@ public abstract class Dictionary {
         synset.setDictionary(null);
 
         // take care of index words
-        List<Word> copy = new ArrayList<Word>(synset.getWords());
+        List<Word> copy = new ArrayList<>(synset.getWords());
         for (Word word : copy) {
             IndexWord indexWord = getIndexWord(synset.getPOS(), word.getLemma());
             if (null != indexWord) {
@@ -793,9 +796,9 @@ public abstract class Dictionary {
         indexWord.setDictionary(null);
 
         // take care of words in synsets
-        List<Synset> copy = new ArrayList<Synset>(indexWord.getSenses());
+        List<Synset> copy = new ArrayList<>(indexWord.getSenses());
         for (Synset synset : copy) {
-            List<Word> wordsCopy = new ArrayList<Word>(synset.getWords());
+            List<Word> wordsCopy = new ArrayList<>(synset.getWords());
             for (Word word : wordsCopy) {
                 if (word.getLemma().equalsIgnoreCase(indexWord.getLemma())) {
                     synset.getWords().remove(word);
@@ -832,8 +835,8 @@ public abstract class Dictionary {
      * the frame at its corresponding index. If the bit is set, that verb
      * frame is valid for the word.
      *
-     * @param bits frame flags
-	 * @param verbFrames frames
+     * @param bits       frame flags
+     * @param verbFrames frames
      * @return the frames at the indexes encoded in <var>l</var>
      */
     public static String[] getFrames(BitSet bits, String[] verbFrames) {
@@ -925,7 +928,7 @@ public abstract class Dictionary {
     }
 
     private List<Param> getParams(Dictionary dictionary, NodeList list) throws JWNLException {
-        List<Param> params = new ArrayList<Param>();
+        List<Param> params = new ArrayList<>();
         for (int i = 0; i < list.getLength(); i++) {
             Node n = list.item(i);
             if (n.getNodeType() == Node.ELEMENT_NODE && n.getNodeName().equals(PARAM_TAG)) {

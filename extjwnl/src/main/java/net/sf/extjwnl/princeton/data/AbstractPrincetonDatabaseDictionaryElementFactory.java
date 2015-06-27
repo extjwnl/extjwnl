@@ -31,9 +31,8 @@ public abstract class AbstractPrincetonDatabaseDictionaryElementFactory extends 
         }
 
         long[] offsetArray = new long[offsets.size()];
-        Iterator<Long> itr = offsets.iterator();
-        for (int i = 0; itr.hasNext(); i++) {
-            offsetArray[i] = itr.next();
+        for (int i = 0; i < offsets.size(); i++) {
+            offsetArray[i] = offsets.get(i);
         }
 
         return new IndexWord(dictionary, stringCache.replace(lemma), pos, offsetArray);
@@ -63,8 +62,7 @@ public abstract class AbstractPrincetonDatabaseDictionaryElementFactory extends 
 
             while (words.next()) {
                 String lemma = stringCache.replace(words.getString(1));
-                int index = words.getInt(2);
-                Word word = createWord(synset, index, lemma);
+                Word word = createWord(synset, lemma);
                 word.setUseCount(words.getInt(3));
                 word.setLexId(words.getInt(4));
                 synset.getWords().add(word);

@@ -130,7 +130,7 @@ public class ewn {
                         File script = new File(args[1]);
                         if (script.exists()) {
                             //load into args
-                            ArrayList<String> newArgs = new ArrayList<String>();
+                            ArrayList<String> newArgs = new ArrayList<>();
                             BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(script), "UTF-8"));
                             try {
                                 String str;
@@ -187,12 +187,10 @@ public class ewn {
                 String lemma = null;
                 int lexFileNum = -1;
                 int lexId = -1;
-//                String headLemma = null;
-//                int headLexId = -1;
                 POS pos = null;
                 String derivation = null;
 
-                for (int i = 0; i < args.length; i++) {
+                for (int i = 0; i < args.length && null != args[i]; i++) {
                     boolean argProcessed = false;
                     if (null == key && '-' != args[i].charAt(0) && ((-1 < args[i].indexOf('%') && -1 < args[i].indexOf(':')))) {
                         key = args[i];
@@ -214,18 +212,6 @@ public class ewn {
                                         String lexIdString = lexFileString.substring(lexFileString.indexOf(':') + 1);
                                         if (-1 < lexIdString.indexOf(':')) {
                                             lexId = Integer.parseInt(lexIdString.substring(0, lexIdString.indexOf(':')));
-//                                            if (lexIdString.indexOf(':') + 1 < lexIdString.length()) {
-//                                                headLemma = lexIdString.substring(lexIdString.indexOf(':') + 1);
-//                                                if (-1 < headLemma.indexOf(':')) {
-//                                                    headLemma = headLemma.substring(0, headLemma.indexOf(':'));
-//                                                    if (null != headLemma && !"".equals(headLemma) && lexIdString.lastIndexOf(':') + 1 < lexIdString.length()) {
-//                                                        headLexId = Integer.parseInt(lexIdString.substring(lexIdString.lastIndexOf(':') + 1));
-//                                                    }
-//                                                } else {
-//                                                    log.error("Malformed sensekey " + key);
-//                                                    System.exit(1);
-//                                                }
-//                                            }
                                         } else {
                                             log.error("Malformed sensekey. Lexical id not found: " + key);
                                             System.exit(1);
@@ -272,7 +258,7 @@ public class ewn {
                         log.info("Creating " + pos.getLabel() + " synset...");
                         Synset tempSynset = d.createSynset(pos);
                         log.info("Creating word " + lemma + "...");
-                        workWord = new Word(d, tempSynset, 1, lemma);
+                        workWord = new Word(d, tempSynset, lemma);
                         workWord.setLexId(lexId);
                         tempSynset.getWords().add(workWord);
                         tempSynset.setLexFileNum(lexFileNum);
@@ -299,7 +285,7 @@ public class ewn {
                         } else {
                             i++;
                             if (i < args.length && '-' != args[i].charAt(0)) {
-                                Word tempWord = new Word(d, workWord.getSynset(), workWord.getSynset().getWords().size() + 1, args[i].replace('_', ' '));
+                                Word tempWord = new Word(d, workWord.getSynset(), args[i].replace('_', ' '));
                                 workWord.getSynset().getWords().add(tempWord);
                                 key = null;
                             } else {
@@ -640,7 +626,7 @@ public class ewn {
                                             }
                                         }
                                     } else {
-                                        ArrayList<String> list = new ArrayList<String>(1);
+                                        ArrayList<String> list = new ArrayList<>(1);
                                         list.add(baseform);
                                         d.createException(pos, derivation, list);
                                     }
@@ -1354,7 +1340,7 @@ public class ewn {
     }
 
     private static void tracePointers(IndexWord iw, PointerType pt, int depth, int needSense, boolean needGloss, boolean needLex, boolean needOffset, boolean needSenseNum, boolean needSenseKeys) throws JWNLException {
-        Map<Synset, PointerTargetTreeNodeList> ptrs = new HashMap<Synset, PointerTargetTreeNodeList>();
+        Map<Synset, PointerTargetTreeNodeList> ptrs = new HashMap<>();
         for (Synset synset : iw.getSenses()) {
             PointerTargetTreeNodeList list = PointerUtils.makePointerTargetTreeList(synset, pt, depth);
             if (null != list && 0 < list.size()) {

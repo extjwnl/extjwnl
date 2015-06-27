@@ -425,22 +425,22 @@ public class TestIndexWord extends BaseData {
     @Test
     public void testSynsetSortSenses() throws JWNLException {
         AdjectiveSynset s = new AdjectiveSynset(dictionary);
-        Adjective w = new Adjective(dictionary, s, 1, "test", AdjectivePosition.NONE);
+        Adjective w = new Adjective(dictionary, s, "test", AdjectivePosition.NONE);
         w.setUseCount(1);
         s.getWords().add(w);
 
         AdjectiveSynset ss = new AdjectiveSynset(dictionary);
-        Adjective ww = new Adjective(dictionary, ss, 1, "test", AdjectivePosition.ATTRIBUTIVE);
+        Adjective ww = new Adjective(dictionary, ss, "test", AdjectivePosition.ATTRIBUTIVE);
         ww.setUseCount(10);
         ss.getWords().add(ww);
 
         AdjectiveSynset sss = new AdjectiveSynset(dictionary);
-        Adjective www = new Adjective(dictionary, sss, 1, "test", AdjectivePosition.NONE);
+        Adjective www = new Adjective(dictionary, sss, "test", AdjectivePosition.NONE);
         www.setUseCount(0);
         sss.getWords().add(www);
 
         AdjectiveSynset ssss = new AdjectiveSynset(dictionary);
-        Adjective wwww = new Adjective(dictionary, ssss, 1, "test", AdjectivePosition.NONE);
+        Adjective wwww = new Adjective(dictionary, ssss, "test", AdjectivePosition.NONE);
         wwww.setUseCount(0);
         ssss.getWords().add(wwww);
 

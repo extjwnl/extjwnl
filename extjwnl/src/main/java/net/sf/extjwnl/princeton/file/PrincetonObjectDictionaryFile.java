@@ -1,5 +1,7 @@
 package net.sf.extjwnl.princeton.file;
 
+import net.sf.extjwnl.JWNLException;
+import net.sf.extjwnl.JWNLIOException;
 import net.sf.extjwnl.JWNLRuntimeException;
 import net.sf.extjwnl.data.DictionaryElement;
 import net.sf.extjwnl.data.POS;
@@ -22,32 +24,55 @@ import java.util.Map;
  * @author John Didion (jdidion@didion.net)
  * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
-public class PrincetonObjectDictionaryFile extends AbstractPrincetonDictionaryFile implements ObjectDictionaryFile, DictionaryFileFactory<PrincetonObjectDictionaryFile> {
+public class PrincetonObjectDictionaryFile extends AbstractPrincetonDictionaryFile
+        implements ObjectDictionaryFile, DictionaryFileFactory<PrincetonObjectDictionaryFile> {
 
     private static final Logger log = LoggerFactory.getLogger(PrincetonObjectDictionaryFile.class);
+
+    protected final File file;
 
     private ObjectInputStream in = null;
     private ObjectOutputStream out = null;
     private FileInputStream fin = null;
     private FileOutputStream fout = null;
 
+    /**
+     * Factory constructor.
+     *
+     * @param dictionary dictionary
+     * @param params     params
+     */
     public PrincetonObjectDictionaryFile(Dictionary dictionary, Map<String, Param> params) {
         super(dictionary, params);
+        file = null;
     }
 
-    public PrincetonObjectDictionaryFile(Dictionary dictionary, String path, POS pos, DictionaryFileType fileType, Map<String, Param> params) {
+    /**
+     * Instance constructor.
+     *
+     * @param dictionary dictionary
+     * @param path       file path
+     * @param pos        part of speech
+     * @param fileType   file type
+     * @param params     params
+     */
+    protected PrincetonObjectDictionaryFile(Dictionary dictionary, String path, POS pos, DictionaryFileType fileType, Map<String, Param> params) {
         super(dictionary, path, pos, fileType, params);
+        file = new File(path, getFilename());
     }
 
+    @Override
     public PrincetonObjectDictionaryFile newInstance(Dictionary dictionary, String path, POS pos, DictionaryFileType fileType) {
         return new PrincetonObjectDictionaryFile(dictionary, path, pos, fileType, params);
     }
 
+    @Override
     public boolean isOpen() {
         return (null != in || null != out);
     }
 
-    public void save() throws IOException {
+    @Override
+    public void save() throws JWNLException {
         if (dictionary instanceof MapBackedDictionary) {
             MapBackedDictionary dic = (MapBackedDictionary) dictionary;
             if (log.isDebugEnabled()) {
@@ -55,7 +80,12 @@ public class PrincetonObjectDictionaryFile extends AbstractPrincetonDictionaryFi
             }
             Map<Object, ? extends DictionaryElement> map = dic.getTable(getPOS(), getFileType());
 
-            getOutputStream().reset();
+            try {
+                getOutputStream().reset();
+            } catch (IOException e) {
+                throw new JWNLIOException(e);
+            }
+
             writeObject(map);
 
             if (log.isDebugEnabled()) {
@@ -64,6 +94,7 @@ public class PrincetonObjectDictionaryFile extends AbstractPrincetonDictionaryFi
         }
     }
 
+    @Override
     public void close() {
         try {
             if (canRead()) {
@@ -76,7 +107,6 @@ public class PrincetonObjectDictionaryFile extends AbstractPrincetonDictionaryFi
                 fout.flush();
                 fout.close();
             }
-            super.close();
         } catch (IOException e) {
             if (log.isErrorEnabled()) {
                 log.error(dictionary.getMessages().resolveMessage("EXCEPTION_001", e.getMessage()), e);
@@ -89,16 +119,17 @@ public class PrincetonObjectDictionaryFile extends AbstractPrincetonDictionaryFi
         }
     }
 
-    public void edit() throws IOException {
+    @Override
+    public void edit() throws JWNLException {
         openStreams();
     }
 
     /**
      * Open the input and output streams.
      *
-     * @throws IOException IOException
+     * @throws JWNLException JWNLException
      */
-    public synchronized void openStreams() throws IOException {
+    protected synchronized void openStreams() throws JWNLException {
         if (!canWrite()) {
             openOutputStream();
         }
@@ -107,42 +138,57 @@ public class PrincetonObjectDictionaryFile extends AbstractPrincetonDictionaryFi
         }
     }
 
-    private void openOutputStream() throws IOException {
-        fout = new FileOutputStream(getFile());
-        out = new ObjectOutputStream(fout);
+    private void openOutputStream() throws JWNLException {
+        try {
+            fout = new FileOutputStream(getFile());
+            out = new ObjectOutputStream(fout);
+        } catch (IOException e) {
+            throw new JWNLIOException(e);
+        }
     }
 
-    private void openInputStream() throws IOException {
-        fin = new FileInputStream(getFile());
-        in = new ObjectInputStream(fin);
+    private void openInputStream() throws JWNLException {
+        try {
+            fin = new FileInputStream(getFile());
+            in = new ObjectInputStream(fin);
+        } catch (IOException e) {
+            throw new JWNLIOException(e);
+        }
     }
 
-    public ObjectInputStream getInputStream() throws IOException {
+    protected ObjectInputStream getInputStream() throws JWNLException {
         if (!canRead()) {
             openInputStream();
         }
         return in;
     }
 
-    public ObjectOutputStream getOutputStream() throws IOException {
+    protected ObjectOutputStream getOutputStream() throws JWNLException {
         if (!canWrite()) {
             openOutputStream();
         }
         return out;
     }
 
-    public boolean canRead() {
+    protected boolean canRead() {
         return in != null;
     }
 
-    public boolean canWrite() {
+    protected boolean canWrite() {
         return out != null;
     }
 
-    public Object readObject() throws IOException, ClassNotFoundException {
+    @Override
+    public Object readObject() throws JWNLException {
         if (isOpen()) {
             if (canRead()) {
-                return getInputStream().readObject();
+                try {
+                    return getInputStream().readObject();
+                } catch (IOException e) {
+                    throw new JWNLIOException(e);
+                } catch (ClassNotFoundException e) {
+                    throw new JWNLException(e);
+                }
             } else {
                 return new HashMap<Object, DictionaryElement>();
             }
@@ -151,9 +197,14 @@ public class PrincetonObjectDictionaryFile extends AbstractPrincetonDictionaryFi
         }
     }
 
-    public void writeObject(Object obj) throws IOException {
+    @Override
+    public void writeObject(Object obj) throws JWNLException {
         if (isOpen() && canWrite()) {
-            getOutputStream().writeObject(obj);
+            try {
+                getOutputStream().writeObject(obj);
+            } catch (IOException e) {
+                throw new JWNLIOException(e);
+            }
         } else {
             throw new JWNLRuntimeException(dictionary.getMessages().resolveMessage("PRINCETON_EXCEPTION_002"));
         }
@@ -166,12 +217,32 @@ public class PrincetonObjectDictionaryFile extends AbstractPrincetonDictionaryFi
      * we are going to be reading from it. If you want the other stream
      * open, you must do it explicitly by calling <code>openStreams</code>.
      */
-    protected void openFile() throws IOException {
-        if (!file.exists()) {
-            file.createNewFile();
-            openOutputStream();
-        } else {
-            openInputStream();
+    @Override
+    public void open() throws JWNLException {
+        synchronized (file) {
+            if (!isOpen()) {
+                if (!file.exists()) {
+                    try {
+                        file.createNewFile();
+                    } catch (IOException e) {
+                        throw new JWNLIOException(e);
+                    }
+                    openOutputStream();
+                } else {
+                    openInputStream();
+                }
+            }
         }
+    }
+
+    @Override
+    public boolean delete() throws JWNLException {
+        close();
+        return file.delete();
+    }
+
+    @Override
+    public File getFile() {
+        return file;
     }
 }

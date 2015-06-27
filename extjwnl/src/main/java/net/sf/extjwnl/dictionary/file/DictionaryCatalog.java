@@ -6,7 +6,6 @@ import net.sf.extjwnl.dictionary.Dictionary;
 import net.sf.extjwnl.util.factory.Owned;
 import net.sf.extjwnl.util.factory.Param;
 
-import java.io.IOException;
 import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -21,8 +20,8 @@ import java.util.Map;
 public class DictionaryCatalog<E extends DictionaryFile> implements Owned {
 
     /**
-     * Dictionary path install parameter. The value should be the absolute path
-     * of the directory containing the dictionary files.
+     * Dictionary path install parameter.
+     * The value should be the path to the dictionary files.
      */
     public static final String DICTIONARY_PATH_KEY = "dictionary_path";
 
@@ -76,7 +75,7 @@ public class DictionaryCatalog<E extends DictionaryFile> implements Owned {
         return getFileType();
     }
 
-    public void open() throws IOException {
+    public void open() throws JWNLException {
         if (!isOpen()) {
             for (Iterator<E> itr = getFileIterator(); itr.hasNext(); ) {
                 itr.next().open();
@@ -84,10 +83,13 @@ public class DictionaryCatalog<E extends DictionaryFile> implements Owned {
         }
     }
 
-    public boolean delete() throws IOException {
+    public boolean delete() throws JWNLException {
         boolean result = true;
         for (Iterator<E> itr = getFileIterator(); itr.hasNext(); ) {
-            result = result && itr.next().delete();
+            E file = itr.next();
+            if (file instanceof DictionaryDiskFile) {
+                result = result && ((DictionaryDiskFile) file).delete();
+            }
         }
         return result;
     }
@@ -101,7 +103,7 @@ public class DictionaryCatalog<E extends DictionaryFile> implements Owned {
         return true;
     }
 
-    public void close() {
+    public void close() throws JWNLException {
         for (Iterator<E> itr = getFileIterator(); itr.hasNext(); ) {
             itr.next().close();
         }
@@ -131,13 +133,13 @@ public class DictionaryCatalog<E extends DictionaryFile> implements Owned {
         throw new UnsupportedOperationException();
     }
 
-    public void save() throws IOException, JWNLException {
+    public void save() throws JWNLException {
         for (Iterator<E> itr = getFileIterator(); itr.hasNext(); ) {
             itr.next().save();
         }
     }
 
-    public void edit() throws IOException {
+    public void edit() throws JWNLException {
         for (Iterator<E> itr = getFileIterator(); itr.hasNext(); ) {
             itr.next().edit();
         }

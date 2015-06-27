@@ -1,7 +1,6 @@
 package net.sf.extjwnl.dictionary;
 
 import net.sf.extjwnl.JWNLException;
-import org.junit.Ignore;
 
 import java.io.IOException;
 
@@ -11,8 +10,7 @@ import java.io.IOException;
  *
  * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
-@Ignore
-public class LongTestThreadsDictionary extends MultiThreadedTestCase {
+public class TestThreadsDictionary extends MultiThreadedTestCase {
 
     private static final int threadCount = 5;
     private static final int runCount = 3;
@@ -22,7 +20,7 @@ public class LongTestThreadsDictionary extends MultiThreadedTestCase {
      *
      * @param s s
      */
-    public LongTestThreadsDictionary(String s) {
+    public TestThreadsDictionary(String s) {
         super(s);
     }
 
@@ -43,9 +41,20 @@ public class LongTestThreadsDictionary extends MultiThreadedTestCase {
         }
     }
 
-    public void testThreaded() throws IOException, JWNLException {
+    public void testThreadedFile() throws IOException, JWNLException {
         Dictionary d = Dictionary.getInstance(
-                LongTestThreadsDictionary.class.getResourceAsStream("/test_file_properties.xml"));
+                TestThreadsDictionary.class.getResourceAsStream("/test_file_properties.xml"));
+
+        TestCaseRunnable[] runnables = new TestCaseRunnable[threadCount];
+        for (int i = 0; i < threadCount; i++) {
+            runnables[i] = new TestThread(d);
+        }
+
+        runTestCaseRunnables(runnables);
+    }
+
+    public void testThreadedResource() throws IOException, JWNLException {
+        Dictionary d = Dictionary.getDefaultResourceInstance();
 
         TestCaseRunnable[] runnables = new TestCaseRunnable[threadCount];
         for (int i = 0; i < threadCount; i++) {

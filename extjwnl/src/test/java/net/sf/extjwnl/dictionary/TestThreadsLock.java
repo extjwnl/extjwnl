@@ -3,7 +3,6 @@ package net.sf.extjwnl.dictionary;
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.data.Exc;
 import net.sf.extjwnl.data.POS;
-import org.junit.Ignore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,10 +17,7 @@ import java.util.List;
  *
  * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
-@Ignore
-public class LongTestThreadsLock extends MultiThreadedTestCase {
-
-    private static final Logger log = LoggerFactory.getLogger(LongTestThreadsLock.class);
+public class TestThreadsLock extends MultiThreadedTestCase {
 
     private static final int threadCount = 5;
 
@@ -30,19 +26,17 @@ public class LongTestThreadsLock extends MultiThreadedTestCase {
      *
      * @param name test name
      */
-    public LongTestThreadsLock(String name) {
+    public TestThreadsLock(String name) {
         super(name);
     }
 
     protected class LookupThread extends TestCaseRunnable {
 
-        private String name;
         private List<String> list;
         private Dictionary d;
 
-        public LookupThread(Dictionary d, String name, List<String> list) {
+        public LookupThread(Dictionary d, List<String> list) {
             this.d = d;
-            this.name = name;
             this.list = list;
         }
 
@@ -50,9 +44,7 @@ public class LongTestThreadsLock extends MultiThreadedTestCase {
         public void runTestCase() throws JWNLException {
             for (String word : list) {
                 if (!isInterrupted()) {
-                    log.info(name + " querying for " + word);
                     d.getMorphologicalProcessor().lookupBaseForm(POS.NOUN, word);
-                    log.info(name + " finished querying for " + word);
                 } else {
                     break;
                 }
@@ -60,9 +52,9 @@ public class LongTestThreadsLock extends MultiThreadedTestCase {
         }
     }
 
-    public void testThreadedLookup() throws IOException, JWNLException {
+    public void testThreadedLookupFile() throws IOException, JWNLException {
         Dictionary d = Dictionary.getInstance(
-                LongTestThreadsDictionary.class.getResourceAsStream("/test_file_properties.xml"));
+                TestThreadsDictionary.class.getResourceAsStream("/test_file_properties.xml"));
 
         List<String> list = new ArrayList<String>();
         Iterator<Exc> exceptions = d.getExceptionIterator(POS.NOUN);
@@ -72,7 +64,24 @@ public class LongTestThreadsLock extends MultiThreadedTestCase {
 
         TestCaseRunnable[] runnables = new TestCaseRunnable[threadCount];
         for (int i = 0; i < threadCount; i++) {
-            runnables[i] = new LookupThread(d, "t" + (i + 1), list);
+            runnables[i] = new LookupThread(d, list);
+        }
+
+        runTestCaseRunnables(runnables);
+    }
+
+    public void testThreadedLookupResource() throws IOException, JWNLException {
+        Dictionary d = Dictionary.getDefaultResourceInstance();
+
+        List<String> list = new ArrayList<String>();
+        Iterator<Exc> exceptions = d.getExceptionIterator(POS.NOUN);
+        while (exceptions.hasNext()) {
+            list.add(exceptions.next().getLemma());
+        }
+
+        TestCaseRunnable[] runnables = new TestCaseRunnable[threadCount];
+        for (int i = 0; i < threadCount; i++) {
+            runnables[i] = new LookupThread(d, list);
         }
 
         runTestCaseRunnables(runnables);

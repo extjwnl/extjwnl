@@ -58,8 +58,8 @@ public class Verb extends Word {
      */
     private final BitSet verbFrameFlags;
 
-    public Verb(Dictionary dictionary, Synset synset, int index, String lemma, BitSet verbFrameFlags) {
-        super(dictionary, synset, index, lemma);
+    public Verb(Dictionary dictionary, Synset synset, String lemma, BitSet verbFrameFlags) {
+        super(dictionary, synset, lemma);
         this.verbFrameFlags = verbFrameFlags;
     }
 

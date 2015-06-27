@@ -3,7 +3,6 @@ package net.sf.extjwnl.dictionary;
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.data.IndexWord;
 import net.sf.extjwnl.data.POS;
-import org.junit.Ignore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.junit.Assert;
@@ -19,10 +18,9 @@ import java.util.List;
  * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  * @author wangyeee
  */
-@Ignore
-public class LongTestThreads extends MultiThreadedTestCase {
+public class TestThreads extends MultiThreadedTestCase {
 
-    private static final Logger log = LoggerFactory.getLogger(LongTestThreads.class);
+    private static final Logger log = LoggerFactory.getLogger(TestThreads.class);
 
     private static Dictionary dictionary;
 
@@ -36,12 +34,12 @@ public class LongTestThreads extends MultiThreadedTestCase {
             "bboredom", "ffile", "iindex", "llist", "aapple", "oorange", "ppear", "ffind", "ttreasure", "mmemory", "ggood",
             "cclaw", "ffeet", "ccold", "ggreen", "gglee"};
 
-    public LongTestThreads(String s) {
+    public TestThreads(String s) {
         super(s);
     }
 
     public void testThreadedLookupAllIndexWords() throws FileNotFoundException, JWNLException {
-        dictionary = Dictionary.getInstance(LongTestThreads.class.getResourceAsStream("/test_file_properties.xml"));
+        dictionary = Dictionary.getInstance(TestThreads.class.getResourceAsStream("/test_file_properties.xml"));
 
         List<String> words = new ArrayList<String>(Arrays.asList(list));
         List<String> notwords = new ArrayList<String>(Arrays.asList(notlist));

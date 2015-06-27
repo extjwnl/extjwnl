@@ -9,7 +9,7 @@ import java.io.IOException;
 /**
  * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
-public class TestResourceDictionary extends DictionaryReadTester {
+public class TestReadResourceDictionary extends DictionaryReadTester {
 
     @BeforeClass
     public static void initDictionary() throws IOException, JWNLException {

@@ -6,7 +6,6 @@ import net.sf.extjwnl.dictionary.Dictionary;
 import net.sf.extjwnl.util.factory.Owned;
 import net.sf.extjwnl.util.factory.Param;
 
-import java.io.IOException;
 import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -41,7 +40,7 @@ public class DictionaryCatalogSet<E extends DictionaryFile> implements Owned {
         }
     }
 
-    public void open() throws IOException {
+    public void open() throws JWNLException {
         if (!isOpen()) {
             for (Iterator<DictionaryCatalog<E>> itr = getCatalogIterator(); itr.hasNext(); ) {
                 itr.next().open();
@@ -49,10 +48,11 @@ public class DictionaryCatalogSet<E extends DictionaryFile> implements Owned {
         }
     }
 
-    public boolean delete() throws IOException {
+    public boolean delete() throws JWNLException {
         boolean result = true;
         for (Iterator<DictionaryCatalog<E>> itr = getCatalogIterator(); itr.hasNext(); ) {
-            result = result && itr.next().delete();
+            final DictionaryCatalog<E> catalog = itr.next();
+            result = result && catalog.delete();
         }
         return result;
     }
@@ -66,7 +66,7 @@ public class DictionaryCatalogSet<E extends DictionaryFile> implements Owned {
         return true;
     }
 
-    public void close() {
+    public void close() throws JWNLException {
         for (Iterator<DictionaryCatalog<E>> itr = getCatalogIterator(); itr.hasNext(); ) {
             itr.next().close();
         }
@@ -85,7 +85,12 @@ public class DictionaryCatalogSet<E extends DictionaryFile> implements Owned {
     }
 
     public E getDictionaryFile(POS pos, DictionaryFileType fileType) {
-        return get(fileType).get(pos);
+        final DictionaryCatalog<E> catalog = get(fileType);
+        if (null != catalog) {
+            return catalog.get(pos);
+        } else {
+            return null;
+        }
     }
 
     public Dictionary getDictionary() {
@@ -96,13 +101,13 @@ public class DictionaryCatalogSet<E extends DictionaryFile> implements Owned {
         throw new UnsupportedOperationException();
     }
 
-    public void save() throws IOException, JWNLException {
-        catalogs.get(DictionaryFileType.EXCEPTION).save();
-        catalogs.get(DictionaryFileType.DATA).save();
-        catalogs.get(DictionaryFileType.INDEX).save();
+    public void save() throws JWNLException {
+        for (Iterator<DictionaryCatalog<E>> itr = getCatalogIterator(); itr.hasNext(); ) {
+            itr.next().save();
+        }
     }
 
-    public void edit() throws IOException {
+    public void edit() throws JWNLException {
         for (Iterator<DictionaryCatalog<E>> itr = getCatalogIterator(); itr.hasNext(); ) {
             itr.next().edit();
         }

@@ -6,12 +6,10 @@ import net.sf.extjwnl.dictionary.file.DictionaryFileType;
 import net.sf.extjwnl.dictionary.file.RandomAccessDictionaryFile;
 import net.sf.extjwnl.util.factory.Param;
 
-import java.io.IOException;
-import java.util.Collection;
 import java.util.Map;
 
 /**
- * Base class for random access files.
+ * Base class for text files.
  *
  * @author John Didion (jdidion@didion.net)
  * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
@@ -20,59 +18,39 @@ public abstract class AbstractPrincetonRandomAccessDictionaryFile extends Abstra
         implements RandomAccessDictionaryFile {
 
     /**
-     * Dictionary file encoding. Use Java compatible encoding names. See {@link java.nio.charset.Charset}.
+     * Dictionary file encoding. Use Java-compatible encoding names. See {@link java.nio.charset.Charset}.
      */
-    public static final String ENCODING = "encoding";
+    public static final String ENCODING_KEY = "encoding";
+
+    protected final String encoding;
 
     /**
-     * Used for caching the previously accessed file offset.
+     * Factory constructor.
+     *
+     * @param dictionary dictionary
+     * @param params     params
      */
-    private long previousOffset;
-    /**
-     * Used for caching the offset of the line following the line at
-     * <code>previousOffset</code>.
-     */
-    private long nextOffset;
-
-    protected String encoding;
-
     protected AbstractPrincetonRandomAccessDictionaryFile(Dictionary dictionary, Map<String, Param> params) {
         super(dictionary, params);
+        this.encoding = null;
     }
 
+    /**
+     * Instance constructor.
+     *
+     * @param dictionary dictionary
+     * @param path       file path
+     * @param pos        part of speech
+     * @param fileType   file type
+     * @param params     params
+     */
     protected AbstractPrincetonRandomAccessDictionaryFile(Dictionary dictionary, String path, POS pos, DictionaryFileType fileType, Map<String, Param> params) {
         super(dictionary, path, pos, fileType, params);
-        Param param = params.get(ENCODING);
+        Param param = params.get(ENCODING_KEY);
         if (null != param) {
             encoding = param.getValue();
+        } else {
+            encoding = null;
         }
-    }
-
-    public void setNextLineOffset(long previousOffset, long nextOffset) {
-        this.previousOffset = previousOffset;
-        this.nextOffset = nextOffset;
-    }
-
-    public boolean isPreviousLineOffset(long offset) {
-        return previousOffset == offset;
-    }
-
-    public long getNextLineOffset() {
-        return nextOffset;
-    }
-
-    @Override
-    public void edit() throws IOException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void writeStrings(Collection<String> strings) throws IOException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void writeLine(String line) throws IOException {
-        throw new UnsupportedOperationException();
     }
 }

@@ -17,8 +17,9 @@ public class Adjective extends Word {
 
 	private final AdjectivePosition adjectivePosition;
 
-	public Adjective(Dictionary dictionary, Synset synset, int index, String lemma, AdjectivePosition adjectivePosition) {
-		super(dictionary, synset, index, lemma);
+	public Adjective(Dictionary dictionary, Synset synset, String lemma,
+			AdjectivePosition adjectivePosition) {
+		super(dictionary, synset, lemma);
 		this.adjectivePosition = adjectivePosition;
 	}
 

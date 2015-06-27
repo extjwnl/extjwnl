@@ -85,7 +85,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
         connectionManager = new ConnectionManager(dictionary, driverClassName, url, userName, password);
 
         this.dictionary = dictionary;
-        this.minMaxIds = new EnumMap<POS, MinMax>(POS.class);
+        this.minMaxIds = new EnumMap<>(POS.class);
     }
 
     public Query getIndexWordSynsetsQuery(POS pos, String lemma) throws SQLException {

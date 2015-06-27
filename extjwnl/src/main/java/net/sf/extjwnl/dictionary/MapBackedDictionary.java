@@ -1,7 +1,8 @@
 package net.sf.extjwnl.dictionary;
 
 import net.sf.extjwnl.JWNLException;
-import net.sf.extjwnl.data.*;
+import net.sf.extjwnl.data.DictionaryElement;
+import net.sf.extjwnl.data.POS;
 import net.sf.extjwnl.dictionary.file.DictionaryCatalog;
 import net.sf.extjwnl.dictionary.file.DictionaryCatalogSet;
 import net.sf.extjwnl.dictionary.file.DictionaryFileType;
@@ -10,8 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
-import java.io.IOException;
-import java.util.*;
+import java.util.Map;
 
 /**
  * A <code>Dictionary</code> backed by <code>Map</code>s. Warning: this has huge memory requirements.
@@ -28,20 +28,17 @@ public class MapBackedDictionary extends MapDictionary {
 
     public MapBackedDictionary(Document doc) throws JWNLException {
         super(doc);
-        files = new DictionaryCatalogSet<ObjectDictionaryFile>(this, params, ObjectDictionaryFile.class);
+        files = new DictionaryCatalogSet<>(this, params, ObjectDictionaryFile.class);
         this.load();
     }
 
     @Override
     public synchronized boolean delete() throws JWNLException {
-        try {
-            return files.delete();
-        } catch (IOException e) {
-            throw new JWNLException(getMessages().resolveMessage("EXCEPTION_001", e.getMessage()), e);
-        }
+        return files.delete();
     }
 
-    public void close() {
+    @Override
+    public synchronized void close() throws JWNLException {
         files.close();
         super.close();
     }
@@ -49,23 +46,15 @@ public class MapBackedDictionary extends MapDictionary {
     @Override
     public synchronized void edit() throws JWNLException {
         if (!isEditable()) {
-            try {
-                super.edit();
-                files.edit();
-            } catch (IOException e) {
-                throw new JWNLException(getMessages().resolveMessage("EXCEPTION_001", e.getMessage()), e);
-            }
+            super.edit();
+            files.edit();
         }
     }
 
     @Override
     public synchronized void save() throws JWNLException {
-        try {
-            super.save();
-            files.save();
-        } catch (IOException e) {
-            throw new JWNLException(getMessages().resolveMessage("EXCEPTION_001", e.getMessage()), e);
-        }
+        super.save();
+        files.save();
     }
 
     private void load() throws JWNLException {
@@ -74,11 +63,7 @@ public class MapBackedDictionary extends MapDictionary {
             Dictionary.setRestoreDictionary(this);
             try {
                 if (!files.isOpen()) {
-                    try {
-                        files.open();
-                    } catch (IOException e) {
-                        throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_019"), e);
-                    }
+                    files.open();
                 }
                 // load all the hash tables into memory
                 if (log.isDebugEnabled()) {

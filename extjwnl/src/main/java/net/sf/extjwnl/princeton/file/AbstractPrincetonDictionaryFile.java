@@ -42,25 +42,25 @@ public abstract class AbstractPrincetonDictionaryFile extends AbstractDictionary
         super(dictionary, params);
     }
 
-    public AbstractPrincetonDictionaryFile(Dictionary dictionary, String path, POS pos, DictionaryFileType fileType, Map<String, Param> params) {
+    protected AbstractPrincetonDictionaryFile(Dictionary dictionary, String path, POS pos, DictionaryFileType fileType, Map<String, Param> params) {
         super(dictionary, path, pos, fileType, params);
     }
 
-    protected String getFilename() {
-        if (null != getPOS()) {
-            String posString = posToExtMap.get(getPOS());
-            if (getFileType() == DictionaryFileType.EXCEPTION) {
-                return posString + "." + fileTypeToFileNameMap.get(getFileType());
+    public String getFilename() {
+        if (null != pos) {
+            String posString = posToExtMap.get(pos);
+            if (DictionaryFileType.EXCEPTION == fileType) {
+                return posString + "." + fileTypeToFileNameMap.get(fileType);
             } else {
-                return fileTypeToFileNameMap.get(getFileType()) + "." + posString;
+                return fileTypeToFileNameMap.get(fileType) + "." + posString;
             }
         } else {
-            if (DictionaryFileType.REVCNTLIST.equals(getFileType())) {
+            if (DictionaryFileType.REVCNTLIST == fileType) {
                 return "cntlist.rev";
-            } else if (DictionaryFileType.CNTLIST.equals(getFileType())) {
+            } else if (DictionaryFileType.CNTLIST == fileType) {
                 return "cntlist";
-            } else if (DictionaryFileType.INDEX.equals(getFileType())) {
-                return fileTypeToFileNameMap.get(getFileType()) + ".sense";
+            } else if (DictionaryFileType.SENSEINDEX == fileType) {
+                return "index.sense";
             } else {
                 throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_054", new Object[]{getPOS(), getFileType()}));
             }

@@ -44,8 +44,9 @@ public abstract class CacheSet<K, A, B> {
         caches.put(key, createCache(size));
     }
 
-    public void cacheObject(K cacheKey, POS pos, A key, B value) {
+    public B cacheObject(K cacheKey, POS pos, A key, B value) {
         getCache(cacheKey).getCache(pos).put(key, value);
+        return value;
     }
 
     public void clearObject(K cacheKey, POS pos, A key) {

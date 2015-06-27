@@ -11,7 +11,7 @@ import net.sf.extjwnl.dictionary.Dictionary;
 public interface DictionaryFileFactory<E> {
 
     /**
-     * Creates a new instance of the dictionary file.
+     * Creates a new instance of dictionary file.
      *
      * @param dictionary owner dictionary
      * @param path       path to dictionary files

@@ -24,7 +24,7 @@ public abstract class AbstractDelegatingOperation extends AbstractOperation {
     public AbstractDelegatingOperation(Dictionary dictionary, Map<String, Param> params) throws JWNLException {
         super(dictionary);
         this.params = params;
-        operationSets = new HashMap<String, Operation[]>();
+        operationSets = new HashMap<>();
         String[] keys = getKeys();
         for (String key : keys) {
             ParamList paramList = (ParamList) params.get(key);

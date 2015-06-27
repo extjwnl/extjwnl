@@ -16,7 +16,7 @@ public class TestVerb extends BaseData {
         Synset s = new Synset(null, POS.NOUN);
         BitSet verbFrameFlags = new BitSet(1);
         verbFrameFlags.set(1);
-        Verb v = new Verb(null, s, 1, "go", verbFrameFlags);
+        Verb v = new Verb(null, s, "go", verbFrameFlags);
         String[] frames = v.getVerbFrames();
         Assert.assertNotNull(frames);
         Assert.assertEquals(1, frames.length);

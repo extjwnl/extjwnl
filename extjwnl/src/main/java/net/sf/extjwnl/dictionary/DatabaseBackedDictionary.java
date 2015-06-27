@@ -194,7 +194,7 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
         return new ExceptionIterator(pos, query);
     }
 
-    public void close() {
+    public synchronized void close() {
         dbManager.close();
     }
 
@@ -245,9 +245,7 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
                 advanced = false;
                 try {
                     return createElement();
-                } catch (JWNLException e) {
-                    throw new JWNLRuntimeException(e);
-                } catch (SQLException e) {
+                } catch (JWNLException | SQLException e) {
                     throw new JWNLRuntimeException(e);
                 }
             }

@@ -1,9 +1,7 @@
 package net.sf.extjwnl.dictionary.file;
 
 import net.sf.extjwnl.JWNLException;
-
-import java.io.IOException;
-import java.util.Collection;
+import net.sf.extjwnl.util.PointedCharSequence;
 
 /**
  * <code>DictionaryFile</code> that reads lines from a random-access text file.
@@ -14,107 +12,61 @@ import java.util.Collection;
 public interface RandomAccessDictionaryFile extends DictionaryFile {
 
     /**
-     * Reads a byte from the file.
+     * Reads starting at <var>offset</var> and till the end of line.
      *
-     * @return a byte from the file
-     * @throws IOException IOException
-     */
-    int read() throws IOException;
-
-    /**
-     * Reads a line from the file.
-     *
+     * @param offset offset
      * @return a line from the file
-     * @throws IOException IOException
+     * @throws JWNLException JWNLException
      */
-    String readLine() throws IOException;
+    PointedCharSequence readLine(long offset) throws JWNLException;
 
     /**
-     * Writes a line to the file.
+     * Reads starting at <var>offset</var> and till space.
      *
-     * @param line a line to write
-     * @throws IOException IOException
+     * @param offset offset
+     * @return one word from the file (e.g. offset, index word)
+     * @throws JWNLException JWNLException
      */
-    void writeLine(String line) throws IOException;
+    PointedCharSequence readWord(long offset) throws JWNLException;
 
     /**
-     * Reads the first word from a file (ie offset, index word).
+     * Returns offset of the first line.
      *
-     * @return the first word from a file (ie offset, index word)
-     * @throws IOException IOException
+     * @return offset of the first line
+     * @throws JWNLException
      */
-    String readLineWord() throws IOException;
+    long getFirstLineOffset() throws JWNLException;
 
     /**
-     * Goes to position <var>pos</var> in the file.
+     * Returns start of the next line or -1 if no new line.
      *
-     * @param pos position <var>pos</var> in the file
-     * @throws IOException IOException
+     * @param offset starting offset
+     * @return start of the next line or -1 if no new line.
+     * @throws JWNLException JWNLException
      */
-    void seek(long pos) throws IOException;
-
-    /**
-     * Returns the current position of the file pointer.
-     *
-     * @return the current position of the file pointer
-     * @throws IOException IOException
-     */
-    long getFilePointer() throws IOException;
+    long getNextLineOffset(long offset) throws JWNLException;
 
     /**
      * Returns the length, in bytes, of the file.
      *
      * @return the length, in bytes, of the file
-     * @throws IOException IOException
+     * @throws JWNLException JWNLException
      */
-    long length() throws IOException;
-
-    /**
-     * Moves the file pointer so that its next line offset is <var>nextOffset</var>.
-     *
-     * @param previousOffset previous offset
-     * @param nextOffset     next offset
-     */
-    void setNextLineOffset(long previousOffset, long nextOffset);
-
-    /**
-     * Returns true if <var>offset</var> is the previous offset.
-     *
-     * @param offset previous offset
-     * @return true if <var>offset</var> is the previous offset
-     */
-    boolean isPreviousLineOffset(long offset);
-
-    /**
-     * Returns the byte offset of the next line (after the position of the file pointer).
-     *
-     * @return the byte offset of the next line
-     */
-    long getNextLineOffset();
-
-    /**
-     * Writes strings in file.
-     *
-     * @param strings strings to write
-     * @throws IOException IOException
-     */
-    void writeStrings(Collection<String> strings) throws IOException;
+    long length() throws JWNLException;
 
     /**
      * Returns offset length that accommodates largest offset.
      *
      * @return offset length that accommodates largest offset
-     * @throws java.io.IOException          IOException
-     * @throws net.sf.extjwnl.JWNLException IOException
+     * @throws JWNLException JWNLException
      */
-    int getOffsetLength() throws JWNLException, IOException;
+    int getOffsetLength() throws JWNLException;
 
     /**
      * Sets offset length to be used while rendering the file.
      *
      * @param length offset length to be used while rendering the file
-     * @throws java.io.IOException          IOException
-     * @throws net.sf.extjwnl.JWNLException IOException
+     * @throws JWNLException JWNLException
      */
-    void setOffsetLength(int length) throws JWNLException, IOException;
+    void setOffsetLength(int length) throws JWNLException;
 }

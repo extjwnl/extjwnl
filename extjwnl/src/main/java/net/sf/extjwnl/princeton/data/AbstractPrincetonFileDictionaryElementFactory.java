@@ -3,12 +3,15 @@ package net.sf.extjwnl.princeton.data;
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.data.*;
 import net.sf.extjwnl.dictionary.Dictionary;
-import net.sf.extjwnl.util.TokenizerParser;
+import net.sf.extjwnl.util.CharSequenceParser;
+import net.sf.extjwnl.util.CharSequenceTokenizer;
 import net.sf.extjwnl.util.factory.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Map;
 
 /**
  * <code>FileDictionaryElementFactory</code> that parses lines from the dictionary files distributed by the
@@ -25,26 +28,26 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory extends Abst
         super(dictionary, params);
     }
 
-    public IndexWord createIndexWord(POS pos, String line) throws JWNLException {
-        TokenizerParser tokenizer = new TokenizerParser(line, " ");
-        String lemma = stringCache.replace(tokenizer.nextToken().replace('_', ' '));
-        tokenizer.nextToken(); // pos
-        tokenizer.nextToken();    // sense_cnt
+    public IndexWord createIndexWord(POS pos, CharSequence line) throws JWNLException {
+        CharSequenceParser p = new CharSequenceParser(line);
+        String lemma = stringCache.replace(p.nextToken().replace('_', ' '));
+        p.skipToken(); // pos
+        p.skipToken(); // sense_cnt
 
-        int pointerCount = tokenizer.nextInt();
+        int pointerCount = p.nextInt();
         for (int i = 0; i < pointerCount; ++i) {
-            tokenizer.nextToken();    // ptr_symbol
+            p.skipToken();    // ptr_symbol
         }
-        //Same as sense_cnt above. This is redundant, but the field was preserved for compatibility reasons.
-        int senseCount = tokenizer.nextInt();
+        // Same as sense_cnt above. This is redundant, but the field was preserved for compatibility reasons.
+        int senseCount = p.nextInt();
 
-        //Number of senses of lemma that are ranked according to their
-        //frequency of occurrence in semantic concordance texts.
-        tokenizer.nextInt(); // tagged sense count
+        // Number of senses of lemma that are ranked according to their
+        // frequency of occurrence in semantic concordance texts.
+        p.skipToken(); // tagged sense count
 
         long[] synsetOffsets = new long[senseCount];
         for (int i = 0; i < senseCount; i++) {
-            synsetOffsets[i] = tokenizer.nextLong();
+            synsetOffsets[i] = p.nextLong();
         }
         if (log.isTraceEnabled()) {
             log.trace(dictionary.getMessages().resolveMessage("PRINCETON_INFO_003", new Object[]{lemma, pos}));
@@ -52,36 +55,35 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory extends Abst
         return new IndexWord(dictionary, lemma, pos, synsetOffsets);
     }
 
-    public Synset createSynset(POS pos, String line) throws JWNLException {
-        TokenizerParser tokenizer = new TokenizerParser(line, " ");
+    public Synset createSynset(POS pos, CharSequence line) throws JWNLException {
+        CharSequenceParser p = new CharSequenceParser(line);
 
-        long offset = tokenizer.nextLong();
-        long lexFileNum = tokenizer.nextLong();
-        String synsetPOS = tokenizer.nextToken();
+        long offset = p.nextLong();
+        long lexFileNum = p.nextLong();
+        char synsetPOS = p.nextChar();
 
         Synset synset;
         if (POS.VERB == pos) {
             synset = new VerbSynset(dictionary, offset);
         } else if (POS.ADJECTIVE == pos) {
             synset = new AdjectiveSynset(dictionary, offset);
+            if ('s' == synsetPOS) {
+                synset.setIsAdjectiveCluster(true);
+            }
         } else {
             synset = new Synset(dictionary, POS.getPOSForKey(synsetPOS), offset);
         }
 
         synset.setLexFileNum(lexFileNum);
 
-        if ("s".equals(synsetPOS)) {
-            synset.setIsAdjectiveCluster(true);
-        }
-
-        int wordCount = tokenizer.nextHexInt();
+        int wordCount = p.nextHexInt();
         for (int i = 0; i < wordCount; i++) {
-            String lemma = stringCache.replace(tokenizer.nextToken().replace('_', ' '));
+            String lemma = stringCache.replace(p.nextToken().replace('_', ' '));
 
-            int lexId = tokenizer.nextHexInt(); // lex id
+            int lexId = p.nextHexInt(); // lex id
 
             // NB index: Word numbers are assigned to the word fields in a synset, from left to right, beginning with 1
-            Word w = createWord(synset, i + 1, lemma);
+            Word w = createWord(synset, lemma);
             w.setLexId(lexId);
             synset.getWords().add(w);
         }
@@ -89,19 +91,19 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory extends Abst
             ((ArrayList) synset.getWords()).trimToSize();
         }
 
-        int pointerCount = tokenizer.nextInt();
+        int pointerCount = p.nextInt();
         for (int i = 0; i < pointerCount; i++) {
-            String pt = tokenizer.nextToken();
+            CharSequence pt = ((CharSequenceTokenizer) p).nextToken();
             PointerType pointerType = PointerType.getPointerTypeForKey(pt);
-            long targetOffset = tokenizer.nextLong();
-            POS targetPOS = POS.getPOSForKey(tokenizer.nextToken());
-            int linkIndices = tokenizer.nextHexInt();
+            long targetOffset = p.nextLong();
+            POS targetPOS = POS.getPOSForKey(p.nextChar());
+            int linkIndices = p.nextHexInt();
             int sourceIndex = linkIndices / 256;
             int targetIndex = linkIndices & 255;
             PointerTarget source = (sourceIndex == 0) ? synset : synset.getWords().get(sourceIndex - 1);
 
-            Pointer p = new Pointer(source, pointerType, targetPOS, targetOffset, targetIndex);
-            synset.getPointers().add(p);
+            Pointer pointer = new Pointer(source, pointerType, targetPOS, targetOffset, targetIndex);
+            synset.getPointers().add(pointer);
         }
         if (synset.getPointers() instanceof ArrayList) {
             ((ArrayList) synset.getPointers()).trimToSize();
@@ -109,11 +111,11 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory extends Abst
 
         if (POS.VERB == pos) {
             BitSet verbFrames = new BitSet();
-            int verbFrameCount = tokenizer.nextInt();
+            int verbFrameCount = p.nextInt();
             for (int i = 0; i < verbFrameCount; i++) {
-                tokenizer.nextToken();    // "+"
-                int frameNumber = tokenizer.nextInt();
-                int wordIndex = tokenizer.nextHexInt();
+                p.skipToken();    // "+"
+                int frameNumber = p.nextInt();
+                int wordIndex = p.nextHexInt();
                 if (wordIndex > 0) {
                     ((Verb) synset.getWords().get(wordIndex - 1)).getVerbFrameFlags().set(frameNumber);
                 } else {
@@ -126,17 +128,12 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory extends Abst
             synset.setVerbFrameFlags(verbFrames);
         }
 
-        String gloss = null;
-        int index = line.indexOf('|');
-        if (index > 0) {
-            //do not use trim, because some glosses have space before or space after
-            //which changes offsets on load\save even without editing
-            gloss = line.substring(index + 2, line.length() - 2);
-        }
-        synset.setGloss(gloss);
+        p.skipToken(); // |
+        CharSequence gloss = ((CharSequenceTokenizer) p).remainder();
+        synset.setGloss(gloss.subSequence(0, gloss.length() - 2).toString());
 
         Long mOffset = maxOffset.get(synset.getPOS());
-        if (null == maxOffset) {
+        if (null == mOffset) {
             maxOffset.put(synset.getPOS(), synset.getOffset());
         } else {
             if (mOffset < synset.getOffset()) {
@@ -150,12 +147,12 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory extends Abst
         return synset;
     }
 
-    public Exc createExc(POS pos, String line) throws JWNLException {
-        StringTokenizer st = new StringTokenizer(line);
-        String lemma = stringCache.replace(st.nextToken().replace('_', ' '));
+    public Exc createExc(POS pos, CharSequence line) throws JWNLException {
+        CharSequenceParser p = new CharSequenceParser(line);
+        String lemma = stringCache.replace(p.nextToken().replace('_', ' '));
         ArrayList<String> exceptions = new ArrayList<String>();
-        while (st.hasMoreTokens()) {
-            exceptions.add(stringCache.replace(st.nextToken().replace('_', ' ')));
+        while (p.hasMoreTokens()) {
+            exceptions.add(stringCache.replace(p.nextToken().replace('_', ' ')));
         }
         exceptions.trimToSize();
         if (log.isTraceEnabled()) {

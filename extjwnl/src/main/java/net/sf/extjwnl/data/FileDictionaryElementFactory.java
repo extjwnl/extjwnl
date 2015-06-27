@@ -14,14 +14,14 @@ import net.sf.extjwnl.util.factory.Owned;
 public interface FileDictionaryElementFactory extends DictionaryElementFactory {
 
     /**
-     * Create an Exc from a line in an exception file.
+     * Creates an Exc from a line in an exception file.
      *
      * @param pos  - the part of speech
      * @param line - unparsed line
      * @return exception
      * @throws JWNLException JWNLException
      */
-    Exc createExc(POS pos, String line) throws JWNLException;
+    Exc createExc(POS pos, CharSequence line) throws JWNLException;
 
     /**
      * Creates a synset from a line in a data file.
@@ -31,7 +31,7 @@ public interface FileDictionaryElementFactory extends DictionaryElementFactory {
      * @return synset
      * @throws JWNLException JWNLException
      */
-    Synset createSynset(POS pos, String line) throws JWNLException;
+    Synset createSynset(POS pos, CharSequence line) throws JWNLException;
 
     /**
      * Creates an IndexWord from a line in an index file.
@@ -41,5 +41,5 @@ public interface FileDictionaryElementFactory extends DictionaryElementFactory {
      * @return indexword
      * @throws JWNLException JWNLException
      */
-    IndexWord createIndexWord(POS pos, String line) throws JWNLException;
+    IndexWord createIndexWord(POS pos, CharSequence line) throws JWNLException;
 }

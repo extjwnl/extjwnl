@@ -26,12 +26,6 @@ public class Word extends PointerTarget {
     private Synset synset;
 
     /**
-     * This word's index within the synset.
-     * NB Word numbers are assigned to the word fields in a synset, from left to right, beginning with 1
-     */
-    private int index;
-
-    /**
      * The string representation of the word.
      */
     private String lemma;
@@ -54,10 +48,9 @@ public class Word extends PointerTarget {
      *
      * @param dictionary owner
      * @param synset     the synset this word is contained in
-     * @param index      the position of the word in the synset (usage)
      * @param lemma      the lemma of this word
      */
-    public Word(Dictionary dictionary, Synset synset, int index, String lemma) {
+    public Word(Dictionary dictionary, Synset synset, String lemma) {
         super(dictionary);
         if (null == synset) {
             if (null != dictionary) {
@@ -74,14 +67,6 @@ public class Word extends PointerTarget {
             }
         }
         this.synset = synset;
-        if (index < 1) {
-            if (null != dictionary) {
-                throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_045"));
-            } else {
-                throw new IllegalArgumentException("Word index must be greater or equal than 1");
-            }
-        }
-        this.index = index;
         if (null == lemma || "".equals(lemma)) {
             if (null != dictionary) {
                 throw new IllegalArgumentException(dictionary.getMessages().resolveMessage("DICTIONARY_EXCEPTION_046"));
@@ -153,23 +138,18 @@ public class Word extends PointerTarget {
     }
 
     /**
-     * Returns the index of this word.
+     * Returns the number of this word (1-based) or 0 if not found.
      * NB Word numbers are assigned to the word fields in a synset, from left to right, beginning with 1.
      *
-     * @return the index of this word
+     * @return the number of this word
      */
+    @Override
     public int getIndex() {
-        return index;
-    }
-
-    /**
-     * Sets the index of this word.
-     * NB Word numbers are assigned to the word fields in a synset, from left to right, beginning with 1.
-     *
-     * @param index the index of this word
-     */
-    public void setIndex(int index) {
-        this.index = index;
+        int result = 0;
+        if (null != synset) {
+            result = synset.getWords().indexOf(this) + 1;
+        }
+        return result;
     }
 
     /**
@@ -235,7 +215,7 @@ public class Word extends PointerTarget {
         }
         senseKey.append(lexId).append(":");
 
-        if (5 == ss_type) {
+        if (POS.ADJECTIVE_SATELLITE_ID == ss_type) {
             List<Pointer> p = synset.getPointers(PointerType.SIMILAR_TO);
             if (0 < p.size()) {
                 Pointer headWord = p.get(0);
@@ -268,7 +248,16 @@ public class Word extends PointerTarget {
             ss_type = POS.ADJECTIVE_SATELLITE_ID;
         }
 
-        StringBuilder senseKey = new StringBuilder(String.format("%s%%%d:%02d:%02d:", lemma.toLowerCase().replace(' ', '_'), ss_type, synset.getLexFileNum(), lexId));
+        StringBuilder senseKey = new StringBuilder(lemma.toLowerCase().replace(' ', '_'));
+        senseKey.append("%").append(ss_type).append(":");
+        if (synset.getLexFileNum() < 10) {
+            senseKey.append("0");
+        }
+        senseKey.append(synset.getLexFileNum()).append(":");
+        if (lexId < 10) {
+            senseKey.append("0");
+        }
+        senseKey.append(lexId).append(":");
 
         if (POS.ADJECTIVE_SATELLITE_ID == ss_type) {
             List<Pointer> p = synset.getPointers(PointerType.SIMILAR_TO);
@@ -284,7 +273,11 @@ public class Word extends PointerTarget {
                             lemma = lemma + "(" + a.getAdjectivePosition().getKey() + ")";
                         }
                     }
-                    senseKey.append(String.format("%s:%02d", lemma, word.getLexId()));
+                    senseKey.append(lemma);
+                    if (word.getLexId() < 10) {
+                        senseKey.append("0");
+                    }
+                    senseKey.append(word.getLexId());
                 }
             }
         } else {
@@ -292,6 +285,25 @@ public class Word extends PointerTarget {
         }
 
         return senseKey.toString();
+    }
+
+    /**
+     * Returns sense number of this word (1-based) or 0 if not found.
+     * sense_number is a decimal integer indicating the sense number of the word,
+     * within the part of speech encoded in sense_key, in the WordNet database.
+     *
+     * @return sense number or 0 if not found
+     * @throws JWNLException JWNLException
+     */
+    public int getSenseNumber() throws JWNLException {
+        int result = 0;
+        if (null != dictionary) {
+            IndexWord indexWord = dictionary.getIndexWord(getPOS(), lemma);
+            if (null != indexWord) {
+                result = indexWord.getSenses().indexOf(synset) + 1;
+            }
+        }
+        return result;
     }
 
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
