@@ -1,3 +1,8 @@
+1.9.1
+
+- buffered reading of map-backed files (issue #10)
+- maven plugins updated
+
 1.9
 
 - IO rewritten to use block reads
