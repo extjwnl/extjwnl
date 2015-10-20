@@ -150,7 +150,7 @@ public class PrincetonObjectDictionaryFile extends AbstractPrincetonDictionaryFi
     private void openInputStream() throws JWNLException {
         try {
             fin = new FileInputStream(getFile());
-            in = new ObjectInputStream(new BufferedInputStream(fin, 8192));
+            in = new ObjectInputStream(new BufferedInputStream(fin));
         } catch (IOException e) {
             throw new JWNLIOException(e);
         }
