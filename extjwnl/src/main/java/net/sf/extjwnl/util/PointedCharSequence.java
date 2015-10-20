@@ -16,7 +16,7 @@ public interface PointedCharSequence extends CharSequence {
 
     /**
      * Returns the index within this sequence of the first occurrence of the specified substring.
-     * <p/>
+     *
      * <p>The returned index is the smallest value <i>k</i> for which:
      * <blockquote><pre>
      * this.startsWith(str, <i>k</i>)
@@ -40,7 +40,7 @@ public interface PointedCharSequence extends CharSequence {
      * positive integer if this object lexicographically
      * follows the argument string. The result is zero if the strings
      * are equal; {@code compareTo} returns {@code 0} exactly when
-     * the {@link #equals(Object)} method would return {@code true}.
+     * the equals(Object) method would return {@code true}.
      * <p>
      * This is the definition of lexicographic ordering. If two strings are
      * different, then either they have different characters at some index

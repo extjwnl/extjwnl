@@ -33,7 +33,7 @@ public interface RandomAccessDictionaryFile extends DictionaryFile {
      * Returns offset of the first line.
      *
      * @return offset of the first line
-     * @throws JWNLException
+     * @throws JWNLException JWNLException
      */
     long getFirstLineOffset() throws JWNLException;
 

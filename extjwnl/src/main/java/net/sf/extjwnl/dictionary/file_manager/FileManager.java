@@ -81,6 +81,8 @@ public interface FileManager extends Owned {
 
     /**
      * Shuts down the file manager.
+     *
+     * @throws JWNLException JWNLException
      */
     void close() throws JWNLException;
 

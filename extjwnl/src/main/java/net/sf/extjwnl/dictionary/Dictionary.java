@@ -196,11 +196,7 @@ public abstract class Dictionary {
             factory.setValidating(false);
             DocumentBuilder docBuilder = factory.newDocumentBuilder();
             doc = docBuilder.parse(properties);
-        } catch (IOException e) {
-            throw new JWNLException(staticMessages.resolveMessage("DICTIONARY_ERROR_PARSING_PROPERTIES"), e);
-        } catch (ParserConfigurationException e) {
-            throw new JWNLException(staticMessages.resolveMessage("DICTIONARY_ERROR_PARSING_PROPERTIES"), e);
-        } catch (SAXException e) {
+        } catch (IOException | ParserConfigurationException | SAXException e) {
             throw new JWNLException(staticMessages.resolveMessage("DICTIONARY_ERROR_PARSING_PROPERTIES"), e);
         }
 
@@ -218,15 +214,7 @@ public abstract class Dictionary {
             Class clazz = Class.forName(dictionaryClassName);
             Constructor c = clazz.getConstructor(Document.class);
             dictionary = (Dictionary) c.newInstance(doc);
-        } catch (ClassNotFoundException e) {
-            throw new JWNLException(staticMessages.resolveMessage("DICTIONARY_UNABLE_TO_CREATE_INSTANCE", new Object[]{dictionaryClassName, Util.getRootCause(e)}), e);
-        } catch (NoSuchMethodException e) {
-            throw new JWNLException(staticMessages.resolveMessage("DICTIONARY_UNABLE_TO_CREATE_INSTANCE", new Object[]{dictionaryClassName, Util.getRootCause(e)}), e);
-        } catch (InstantiationException e) {
-            throw new JWNLException(staticMessages.resolveMessage("DICTIONARY_UNABLE_TO_CREATE_INSTANCE", new Object[]{dictionaryClassName, Util.getRootCause(e)}), e);
-        } catch (IllegalAccessException e) {
-            throw new JWNLException(staticMessages.resolveMessage("DICTIONARY_UNABLE_TO_CREATE_INSTANCE", new Object[]{dictionaryClassName, Util.getRootCause(e)}), e);
-        } catch (InvocationTargetException e) {
+        } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | InvocationTargetException | IllegalAccessException e) {
             throw new JWNLException(staticMessages.resolveMessage("DICTIONARY_UNABLE_TO_CREATE_INSTANCE", new Object[]{dictionaryClassName, Util.getRootCause(e)}), e);
         }
 
@@ -463,6 +451,8 @@ public abstract class Dictionary {
 
     /**
      * Shuts down the dictionary, freeing resources.
+     *
+     * @throws JWNLException JWNLException
      */
     public abstract void close() throws JWNLException;
 
