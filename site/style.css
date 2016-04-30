@@ -1,90 +1,93 @@
-.img {
-    margin-top: 10px;
-}
-
-.navbar-static-top {
-    margin-bottom: 1px;
-}
-
 body {
-    padding-bottom: 20px;
+    background-color: #c9d2da;
 }
 
-.navbar-brand {
-    float: left;
-    height: 50px;
+.row {
+    height: 450px;
 }
 
-.navbar-right {
-    float: right !important;
-    margin-right: -15px;
-    margin-top: 9px;
-    font-size: 16px;
+.container {
+    margin-top: 50px;
 }
 
-.header,
-.footer {
-    padding: 15px;
+.sections {
+    padding: 3%;
+    border-radius: 4px;
+    background-color: #f4f4f4;
 }
 
-h2 {
-    font-size: 24px;
-}
-
-.cp {
-    color: #0000CC;
-}
-
-.pre {
-    display: block;
-    font-family: monospace;
-    white-space: pre;
-    margin: 1em;
-}
-
-pre code {
-    padding: 0;
-    font-size: inherit;
-    color: inherit;
-    white-space: pre-wrap;
-    background-color: transparent;
-    border-radius: 0;
+.code {
     text-align: left;
 }
 
-.header {
-    padding-bottom: 10px;
-    margin-bottom: 1px;
-    border-left: 1px solid #e5e5e5;
-    border-right: 1px solid #e5e5e5;
+.nt {
+    color: #673AB7;
 }
 
-.header h3 {
+.na {
+    color: #009688;
+}
+
+.navbar-brand {
+    padding: 5px;
+}
+
+.navbar > .container-fluid .navbar-brand {
+    margin-left: 5px;
+}
+
+.highlight {
+    padding: 9px 14px;
+    margin-bottom: 14px;
+    background-color: #f7f7f9;
+    border: 1px solid #e1e1e8;
+    border-radius: 4px;
+}
+
+.highlight pre {
+    padding: 0;
     margin-top: 0;
     margin-bottom: 0;
-    line-height: 40px;
+    word-break: normal;
+    white-space: nowrap;
+    background-color: transparent;
+    border: 0;
 }
 
-.footer {
-    padding-top: 20px;
-    color: #777;
-    border-top: 1px solid #e5e5e5;
+pre {
+    overflow: auto;
+    font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 
-@media (min-width: 768px) {
-    .container {
-        max-width: 730px;
+footer {
+    background: #32383e;
+    color: #fff;
+    padding: 10px 0;
+    text-align: center;
+}
+
+footer a {
+    color: #fff;
+}
+
+@media screen and (max-width: 767px) {
+    .row {
+        height: auto;
     }
 }
 
-.container-narrow > hr {
-    margin: 30px 0;
+@media screen and (min-width: 768px) {
+    body {
+        margin-top: 10%;
+    }
+
+    .container {
+        margin-bottom: 30px;
+    }
 }
 
-@media screen and (min-width: 768px) {
-    .highlight,
-    .footer {
-        padding-right: 0;
-        padding-left: 0;
+@media screen and (min-width: 1024px) {
+    body {
+        margin-top: 80px;
     }
 }

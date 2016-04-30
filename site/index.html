@@ -4,12 +4,16 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <meta name="description"
-          content="extJWNL (Extended Java WordNet Library) is a Java API for creating, reading and updating dictionaries in WordNet format.">
+          content="extJWNL (Extended Java WordNet Library) is a Java API for creating, reading and updating dictionaries in
+          WordNet format.">
     <meta name="author" content="Aliaksandr Autayeu">
+    <meta name="author" content="Olga Fedoseeva">
     <link rel="icon" href="favicon.ico">
     <meta name="keywords"
-          content="extJWNL, Extended Java WordNet Library, JWNL, Java, Java API, API, create, read, update, edit, command-line, dictionary, WordNet, open source">
+          content="extJWNL, Extended Java WordNet Library, JWNL, Java, Java API, API, create, read, update, edit,
+          command-line, dictionary, WordNet, open source">
 
     <link rel="stylesheet" type="text/css" href="style.css" media="screen">
     <link rel="alternate" type="application/rss+xml" title="extJWNL - News"
@@ -21,132 +25,128 @@
 
     <title>extJWNL (Extended Java WordNet Library)</title>
 
-    <!-- Bootstrap core CSS -->
-    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
-    <!-- customizations -->
-    <link href="style.css" rel="stylesheet">
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" type='text/css'>
+    <link href="style.css" rel="stylesheet" type='text/css'>
 
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-    <script src="//oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-    <script src="//oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
-
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-
-    <script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-      ga('create', 'UA-21951609-1', 'auto');
-      ga('send', 'pageview');
-    </script>
 </head>
-
 <body>
-
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-6" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="./"><img class="navbar-brand img-responsive" src="extjwnl-logo-web.svg"
+                 alt="extjwnl-logo" width="120" height="50"></a>
+        </div>
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-6">
+            <ul class="nav navbar-nav">
+                <li><a href="#">About</a></li>
+                <li><a href="#about">License</a></li>
+                <li><a href="#license">Download</a></li>
+                <li><a href="#documentation">Documentation</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
 <div class="container">
-    <nav class="navbar navbar-default navbar-static-top">
-        <div class="header">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand"><img src="img/extjwnl-logo-web.svg" width="107" height="37" alt="extJWNL logo"></a>
-            </div>
-            <div id="navbar" class="navbar-collapse collapse">
-                <ul class="nav navbar-nav navbar-right">
-                    <li class="current-tab"><a href="#">About</a></li>
-                    <li><a href="#license">License</a></li>
-                    <li><a href="#download">Download</a></li>
-                    <li><a href="#documentation">Documentation</a></li>
+    <div class="row">
+        <div class="sections col-sm-8 col-sm-offset-2 col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2">
+            <section class="about" id="about">
+                <h2>About</h2>
+
+                <p><strong>extJWNL</strong> (Extended Java WordNet Library) is a Java API for creating, reading and
+                    updating dictionaries in WordNet format. <strong>extJWNL</strong> is an upgraded version of <a
+                            href="http://jwordnet.sourceforge.net">JWNL</a>. The library was improved and now features
+                    support for:</p>
+                <ul>
+                    <li>creating, editing and writing dictionaries</li>
+                    <li>encodings, including UTF-8</li>
+                    <li>Java generics</li>
+                    <li>huge dictionaries</li>
+                    <li>instance dictionaries and static singletone dictionary</li>
+                    <li>Maven</li>
+                    <li>ewn: command-line tool to browse, create and edit dictionaries in WordNet format</li>
+                    <li>and more</li>
                 </ul>
-            </div>
+            </section>
+            <hr>
+            <section class="license" id="license">
+                <h2>License</h2>
+
+                <p><strong>extJWNL</strong> is an open source library written in Java and licensed
+                    under BSD license (see <a href="license.txt">license.txt</a>).</p>
+            </section>
+            <hr>
+            <section class="download" id="download">
+                <h2>Download</h2>
+
+                <p><a href="http://sourceforge.net/projects/extjwnl/files">Download extJWNL binary release</a></p>
+
+                <p><a href="https://github.com/extjwnl/extjwnl">Clone extJWNL source code</a></p>
+
+                <p>Maven dependency:</p>
+                <figure class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;dependency&gt;</span><br><span
+                        class="na">  &lt;groupId&gt;</span>net.sf.extjwnl<span
+                        class="na">&lt;/groupId&gt;</span><br><span
+                        class="na">  &lt;artifactId&gt;</span>extjwnl<span
+                        class="na">&lt;/artifactId&gt;</span><br><span
+                        class="na">  &lt;version&gt;</span>1.8.0<span class="na">&lt;/version&gt;</span><br><span
+                        class="nt">&lt;/dependency&gt;</span><br><span class="nt">&lt;dependency&gt;</span><br><span
+                        class="na">  &lt;groupId&gt;</span>net.sf.extjwnl<span
+                        class="na">&lt;/groupId&gt;</span><br><span
+                        class="na">  &lt;artifactId&gt;</span>extjwnl-data-wn31<span
+                        class="na">&lt;/artifactId&gt;</span><br><span class="na">  &lt;version&gt;</span>1.2<span
+                        class="na">&lt;/version&gt;</span><br><span class="nt">&lt;/dependency&gt;</span></code></pre>
+                </figure>
+            </section>
+            <hr>
+            <section class="documentation" id="documentation">
+                <h2>Documentation</h2>
+
+                <p><strong>extJWNL</strong> is accompanied with <a href="javadocs/index.html">JavaDocs</a>,
+                    <a href="https://github.com/extjwnl/extjwnl/wiki">extJWNL Wiki</a>, <a
+                            href="http://sourceforge.net/projects/extjwnl/forums">extJWNL forums</a> where you can ask
+                    questions and <a href="https://github.com/extjwnl/extjwnl/issues">Issues</a> where you can submit
+                    bugs.</p>
+            </section>
+            <hr>
+            <section class="acknowledgements">
+                <h2>Acknowledgements</h2>
+
+                <p>This refactoring was done by <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a> as a
+                    part of work on
+                    <a href="http://geowordnet.semanticmatching.org/">GeoWordNet</a> in
+                    <a href="http://disi.unitn.it/~knowdive/">KnowDive</a> group.</p>
+            </section>
         </div>
-    </nav>
-
-    <div>
-        <h2>About</h2>
-
-        <p><strong>extJWNL</strong> (Extended Java WordNet Library) is a Java API for
-            creating, reading and updating dictionaries in WordNet format.
-            <strong>extJWNL</strong> started from <a href="http://jwordnet.sourceforge.net">JWNL</a>,
-            improved it and now features support for: </p>
-        <ul>
-            <li>creating, editing and writing dictionaries</li>
-            <li>encodings, including UTF-8</li>
-            <li>Java generics</li>
-            <li>huge dictionaries</li>
-            <li>instance dictionaries and static singletone dictionary</li>
-            <li>Maven</li>
-            <li>ewn: command-line tool to browse, create and edit dictionaries in WordNet format</li>
-            <li>and more</li>
-        </ul>
     </div>
-    <div id="license">
-        <h2>License</h2>
-
-        <p><strong>extJWNL</strong> is an open source library written in Java and licensed
-            under BSD license (see <a href="license.txt">license.txt</a>).</p>
-    </div>
-    <div id="download">
-        <h2>Download</h2>
-
-        <p><a href="http://sourceforge.net/projects/extjwnl/files">Download extJWNL binary release</a></p>
-
-        <p><a href="https://github.com/extjwnl/extjwnl">Clone extJWNL source code</a></p>
-
-        <p>Maven dependency:</p>
-
-        <div class="highlight">
-<pre><code class="language-html" data-lang="html"><span class="cp">&lt;dependency&gt;</span>
-<span class="cp">  &lt;groupId&gt;</span>net.sf.extjwnl<span class="cp">&lt;/groupId&gt;</span>
-<span class="cp">  &lt;artifactId&gt;</span>extjwnl<span class="cp">&lt;/artifactId&gt;</span>
-<span class="cp">  &lt;version&gt;</span>1.9.1<span class="cp">&lt;/version&gt;</span>
-<span class="cp">&lt;/dependency&gt;</span>
-<span class="cp">&lt;dependency&gt;</span>
-<span class="cp">  &lt;groupId&gt;</span>net.sf.extjwnl<span class="cp">&lt;/groupId&gt;</span>
-<span class="cp">  &lt;artifactId&gt;</span>extjwnl-data-wn31<span class="cp">&lt;/artifactId&gt;</span>
-<span class="cp">  &lt;version&gt;</span>1.2<span class="cp">&lt;/version&gt;</span>
-<span class="cp">&lt;/dependency&gt;</span>
-</code></pre>
-        </div>
-    </div>
-    <div id="documentation">
-        <h2>Documentation</h2>
-
-        <p><strong>extJWNL</strong> is accompanied with <a href="javadocs/index.html">JavaDocs</a>,
-            <a href="https://github.com/extjwnl/extjwnl/wiki">extJWNL Wiki</a>,
-            <a href="http://sourceforge.net/projects/extjwnl/forums">extJWNL forums</a> where you can ask questions
-            and <a href="https://github.com/extjwnl/extjwnl/issues">Issues</a> where you can submit bugs.</p>
-    </div>
-    <div>
-        <h2>Acknowledgements</h2>
-
-        <p>This refactoring was done by <a rel="author" href="http://autayeu.com/">Aliaksandr
-            Autayeu</a>
-            as a part of work on <a href="http://geowordnet.semanticmatching.org/">GeoWordNet</a>
-            in <a href="http://disi.unitn.it/~knowdive/">KnowDive</a> group.</p>
-
-        <p>
-            <img width="185" height="44" src="https://www.yourkit.com/images/yklogo.png">
-            <br>
-            extJWNL is supported by YourKit Open Source License. YourKit, LLC is the creator of
-            <a href="https://www.yourkit.com/java/profiler/index.jsp">YourKit Java Profiler</a>
-            and <a href="https://www.yourkit.com/.net/profiler/index.jsp">YourKit .NET Profiler</a>,
-            innovative and intelligent tools for profiling Java and .NET applications.</p>
-    </div>
-
-    <footer class="footer">
-        <p>&copy; 2011-2015 <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a></p>
-        <!-- Responsive design by Olga Fedoseeva (http://fedoseeva.net) -->
-    </footer>
 </div>
+<footer>
+    <p>&copy;2011-2016 <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a></p>
+    <!-- Responsive design by Olga Fedoseeva (fedoseeva.net)-->
+</footer>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+<script>
+    (function (i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        i[r] = i[r] || function () {
+                    (i[r].q = i[r].q || []).push(arguments)
+                }, i[r].l = 1 * new Date();
+        a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+    ga('create', 'UA-21951609-1', 'auto');
+    ga('send', 'pageview');
+</script>
 </body>
 </html>
