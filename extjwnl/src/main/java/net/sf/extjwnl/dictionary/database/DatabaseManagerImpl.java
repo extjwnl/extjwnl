@@ -49,7 +49,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
     protected static final String SYNSET_WORD_SQL =
             "SELECT sw.word, sw.word_index, sw.usage_cnt, sw.lex_id " +
                     "FROM synset s, synsetword sw " +
-                    "WHERE s.synset_id = sw.synset_id AND s.pos = ? AND s.file_offset = ?" +
+                    "WHERE s.synset_id = sw.synset_id AND s.pos = ? AND s.file_offset = ? " +
                     "ORDER BY sw.word_index";
 
     protected static final String SYNSET_POINTER_SQL =
