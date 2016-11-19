@@ -48,14 +48,14 @@
             <scope>test</scope>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <version>1.4.187</version>
+            <version>1.4.193</version>
         </dependency>
 
         <dependency>
             <scope>runtime</scope>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.35</version>
+            <version>6.0.5</version>
         </dependency>
 
         <dependency>
@@ -69,7 +69,7 @@
             <scope>runtime</scope>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>9.4-1201-jdbc41</version>
+            <version>9.4.1212</version>
         </dependency>
 
     </dependencies>
@@ -234,7 +234,7 @@
             </build>
         </profile>
         <profile>
-            <id>sonatype-oss-release</id>
+            <id>release</id>
 
             <activation>
                 <property>

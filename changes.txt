@@ -1,3 +1,9 @@
+1.9.2
+
+- maintenance release
+- oss-parent removed
+- dependencies updated
+
 1.9.1
 
 - buffered reading of map-backed files (issue #10)
