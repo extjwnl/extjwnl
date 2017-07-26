@@ -4,6 +4,7 @@
 /target
 /data/
 /extjwnl/data/
+/site/javadocs/
 **/.classpath
 .project
 .settings/

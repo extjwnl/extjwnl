@@ -40,6 +40,16 @@ Dictionary d = Dictionary.getDefaultResourceInstance();
 
 extJWNL contains [Examples.java](utilities/src/main/java/net/sf/extjwnl/utilities/Examples.java) with examples of API use.
 
+# Acknowledgements
+
+![YourKit logo](https://www.yourkit.com/images/yklogo.png)
+
+extJWNL is supported by YourKit Open Source License. YourKit, LLC is the creator of
+[YourKit Java Profiler](https://www.yourkit.com/java/profiler/index.jsp)
+and [YourKit .NET Profiler](https://www.yourkit.com/.net/profiler/index.jsp),
+innovative and intelligent tools for profiling Java and .NET applications.
+
+
 # Resources
 
 * [Homepage](http://extjwnl.sourceforge.net)
