@@ -32,7 +32,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
     protected static final String SYNSET_IDS_FOR_INDEX_WORD_SQL =
             "SELECT syn.file_offset, iws.synset_id, syn.synset_id "
                     + "FROM indexwordsynset iws, indexword iw, synset syn "
-                    + "WHERE iws.index_word_id = iw.index_word_id AND syn.synset_id = iws.synset_id AND iw.pos = ?  AND iw.lemma = ?";
+                    + "WHERE iws.index_word_id = iw.index_word_id AND syn.synset_id = iws.synset_id AND iw.pos = ?  AND iw.lemma = ? ORDER BY iws.synset_rank ASC";
 
     protected static final String COUNT_INDEX_WORDS_SQL =
             "SELECT MIN(index_word_id), MAX(index_word_id) FROM indexword WHERE pos = ?";

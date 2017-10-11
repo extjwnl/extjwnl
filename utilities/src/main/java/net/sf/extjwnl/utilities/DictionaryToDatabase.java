@@ -353,7 +353,7 @@ public class DictionaryToDatabase {
      */
     protected void storeIndexWordSynsets() throws SQLException {
         log.info("storing index word synsets");
-        PreparedStatement iwsStmt = connection.prepareStatement("INSERT INTO indexwordsynset VALUES(?,?,?)");
+        PreparedStatement iwsStmt = connection.prepareStatement("INSERT INTO indexwordsynset VALUES(?,?,?,?)");
         int count = 0;
         int batch = 0;
         for (Map.Entry<Integer, long[]> entry : idToSynsetOffset.entrySet()) {
@@ -367,11 +367,14 @@ public class DictionaryToDatabase {
             int iwId = entry.getKey();
             iwsStmt.setInt(2, iwId);
             long offsets[] = entry.getValue();
+            int rank = 0;
             for (long offset : offsets) {
                 int synsetId = synsetOffsetToId.get(offset);
                 iwsStmt.setInt(1, nextId());
                 iwsStmt.setLong(3, synsetId);
+                iwsStmt.setInt(4,  rank);
                 iwsStmt.addBatch();
+                rank++;
             }
         }
         if (batch < count) {
