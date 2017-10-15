@@ -2,8 +2,6 @@ dist: trusty
 language: java
 jdk:
   - openjdk8
-  - oraclejdk7
   - oraclejdk8
-  - oraclejdk9
 install: mvn -B install -DskipTests=true
 script: mvn -B verify -Pintegration-tests
