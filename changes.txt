@@ -1,3 +1,7 @@
+1.9.3
+- dependencies updated
+- breaking change for db-based dictionary users: issue #15 fixed; db-based dictionaries now provide synsets in the same order as file-based dictionaries
+
 1.9.2
 
 - maintenance release
