@@ -3,3 +3,5 @@
 readLineASCII.txt         text
 firstLineOffset.txt       text
 readLineUTF.txt           text
+log4j.properties          text
+*.xml                     text
