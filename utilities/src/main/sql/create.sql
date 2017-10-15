@@ -52,10 +52,11 @@ CREATE INDEX i_synsetverbframe ON synsetverbframe (synset_id);
 CREATE TABLE indexwordsynset (
   index_word_synset_id  integer,
   index_word_id         integer,
-  synset_id             integer
+  synset_id             integer,
+  synset_rank           integer
 );
 
-CREATE INDEX i_indexwordsynset ON indexwordsynset (index_word_id, synset_id);
+CREATE INDEX i_indexwordsynset ON indexwordsynset (index_word_id, synset_id, synset_rank);
 
 CREATE TABLE exceptions (
   exception_id    integer,
