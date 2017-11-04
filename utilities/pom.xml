@@ -5,6 +5,7 @@
         <groupId>net.sf.extjwnl</groupId>
         <artifactId>extjwnl-parent</artifactId>
         <version>1.9.4-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>extjwnl-utilities</artifactId>
@@ -13,35 +14,27 @@
     <name>extJWNL Utilities</name>
     <description>Utilities for extJWNL library</description>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>${slf4j.version}</version>
         </dependency>
 
         <dependency>
-            <scope>runtime</scope>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
-            <version>${slf4j.version}</version>
         </dependency>
 
         <dependency>
             <groupId>net.sf.extjwnl</groupId>
             <artifactId>extjwnl</artifactId>
-            <version>1.9.4-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <scope>test</scope>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.12</version>
         </dependency>
 
         <dependency>
