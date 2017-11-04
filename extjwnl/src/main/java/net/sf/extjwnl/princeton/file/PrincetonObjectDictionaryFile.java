@@ -2,37 +2,31 @@ package net.sf.extjwnl.princeton.file;
 
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.JWNLIOException;
-import net.sf.extjwnl.JWNLRuntimeException;
-import net.sf.extjwnl.data.DictionaryElement;
 import net.sf.extjwnl.data.POS;
 import net.sf.extjwnl.dictionary.Dictionary;
-import net.sf.extjwnl.dictionary.MapBackedDictionary;
+import net.sf.extjwnl.dictionary.file.DictionaryDiskFile;
 import net.sf.extjwnl.dictionary.file.DictionaryFileFactory;
 import net.sf.extjwnl.dictionary.file.DictionaryFileType;
-import net.sf.extjwnl.dictionary.file.ObjectDictionaryFile;
 import net.sf.extjwnl.util.factory.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
- * <code>ObjectDictionaryFile</code> that accesses files names with the Princeton dictionary file naming convention.
+ * <code>ObjectDictionaryFile</code> that loads dictionary files from file system.
  *
  * @author John Didion (jdidion@didion.net)
  * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
-public class PrincetonObjectDictionaryFile extends AbstractPrincetonDictionaryFile
-        implements ObjectDictionaryFile, DictionaryFileFactory<PrincetonObjectDictionaryFile> {
+public class PrincetonObjectDictionaryFile extends AbstractPrincetonObjectDictionaryFile
+        implements DictionaryDiskFile, DictionaryFileFactory<PrincetonObjectDictionaryFile> {
 
     private static final Logger log = LoggerFactory.getLogger(PrincetonObjectDictionaryFile.class);
 
     protected final File file;
 
-    private ObjectInputStream in = null;
-    private ObjectOutputStream out = null;
     private FileInputStream fin = null;
     private FileOutputStream fout = null;
 
@@ -42,7 +36,7 @@ public class PrincetonObjectDictionaryFile extends AbstractPrincetonDictionaryFi
      * @param dictionary dictionary
      * @param params     params
      */
-    public PrincetonObjectDictionaryFile(Dictionary dictionary, Map<String, Param> params) {
+    public PrincetonObjectDictionaryFile(final Dictionary dictionary, final Map<String, Param> params) {
         super(dictionary, params);
         file = null;
     }
@@ -56,89 +50,39 @@ public class PrincetonObjectDictionaryFile extends AbstractPrincetonDictionaryFi
      * @param fileType   file type
      * @param params     params
      */
-    protected PrincetonObjectDictionaryFile(Dictionary dictionary, String path, POS pos, DictionaryFileType fileType, Map<String, Param> params) {
+    private PrincetonObjectDictionaryFile(final Dictionary dictionary,
+                                            final String path,
+                                            final POS pos,
+                                            final DictionaryFileType fileType,
+                                            final Map<String, Param> params) {
         super(dictionary, path, pos, fileType, params);
         file = new File(path, getFilename());
     }
 
     @Override
-    public PrincetonObjectDictionaryFile newInstance(Dictionary dictionary, String path, POS pos, DictionaryFileType fileType) {
+    public PrincetonObjectDictionaryFile newInstance(final Dictionary dictionary,
+                                                     final String path,
+                                                     final POS pos,
+                                                     final DictionaryFileType fileType) {
         return new PrincetonObjectDictionaryFile(dictionary, path, pos, fileType, params);
     }
 
     @Override
-    public boolean isOpen() {
-        return (null != in || null != out);
-    }
-
-    @Override
-    public void save() throws JWNLException {
-        if (dictionary instanceof MapBackedDictionary) {
-            MapBackedDictionary dic = (MapBackedDictionary) dictionary;
-            if (log.isDebugEnabled()) {
-                log.debug(dictionary.getMessages().resolveMessage("PRINCETON_INFO_004", getFilename()));
-            }
-            Map<Object, ? extends DictionaryElement> map = dic.getTable(getPOS(), getFileType());
-
-            try {
-                getOutputStream().reset();
-            } catch (IOException e) {
-                throw new JWNLIOException(e);
-            }
-
-            writeObject(map);
-
-            if (log.isDebugEnabled()) {
-                log.debug(dictionary.getMessages().resolveMessage("PRINCETON_INFO_012", getFilename()));
-            }
-        }
-    }
-
-    @Override
     public void close() {
+        super.close();
         try {
-            if (canRead()) {
-                in.close();
-                fin.close();
-            }
-            if (canWrite()) {
-                out.flush();
-                out.close();
-                fout.flush();
-                fout.close();
-            }
+            closeStreams(fin, fout);
         } catch (IOException e) {
             if (log.isErrorEnabled()) {
                 log.error(dictionary.getMessages().resolveMessage("EXCEPTION_001", e.getMessage()), e);
             }
         } finally {
-            in = null;
             fin = null;
-            out = null;
             fout = null;
         }
     }
 
-    @Override
-    public void edit() throws JWNLException {
-        openStreams();
-    }
-
-    /**
-     * Open the input and output streams.
-     *
-     * @throws JWNLException JWNLException
-     */
-    protected synchronized void openStreams() throws JWNLException {
-        if (!canWrite()) {
-            openOutputStream();
-        }
-        if (!canRead()) {
-            openInputStream();
-        }
-    }
-
-    private void openOutputStream() throws JWNLException {
+    protected void openOutputStream() throws JWNLException {
         try {
             fout = new FileOutputStream(getFile());
             out = new ObjectOutputStream(fout);
@@ -147,66 +91,12 @@ public class PrincetonObjectDictionaryFile extends AbstractPrincetonDictionaryFi
         }
     }
 
-    private void openInputStream() throws JWNLException {
+    protected void openInputStream() throws JWNLException {
         try {
             fin = new FileInputStream(getFile());
             in = new ObjectInputStream(new BufferedInputStream(fin));
         } catch (IOException e) {
             throw new JWNLIOException(e);
-        }
-    }
-
-    protected ObjectInputStream getInputStream() throws JWNLException {
-        if (!canRead()) {
-            openInputStream();
-        }
-        return in;
-    }
-
-    protected ObjectOutputStream getOutputStream() throws JWNLException {
-        if (!canWrite()) {
-            openOutputStream();
-        }
-        return out;
-    }
-
-    protected boolean canRead() {
-        return in != null;
-    }
-
-    protected boolean canWrite() {
-        return out != null;
-    }
-
-    @Override
-    public Object readObject() throws JWNLException {
-        if (isOpen()) {
-            if (canRead()) {
-                try {
-                    return getInputStream().readObject();
-                } catch (IOException e) {
-                    throw new JWNLIOException(e);
-                } catch (ClassNotFoundException e) {
-                    throw new JWNLException(e);
-                }
-            } else {
-                return new HashMap<Object, DictionaryElement>();
-            }
-        } else {
-            throw new JWNLRuntimeException(dictionary.getMessages().resolveMessage("PRINCETON_EXCEPTION_001"));
-        }
-    }
-
-    @Override
-    public void writeObject(Object obj) throws JWNLException {
-        if (isOpen() && canWrite()) {
-            try {
-                getOutputStream().writeObject(obj);
-            } catch (IOException e) {
-                throw new JWNLIOException(e);
-            }
-        } else {
-            throw new JWNLRuntimeException(dictionary.getMessages().resolveMessage("PRINCETON_EXCEPTION_002"));
         }
     }
 

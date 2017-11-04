@@ -8,7 +8,7 @@ import net.sf.extjwnl.JWNLException;
  * @author John Didion (jdidion@didion.net)
  * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
-public interface ObjectDictionaryFile extends DictionaryDiskFile {
+public interface ObjectDictionaryFile extends DictionaryFile {
 
     /**
      * Reads and deserializes an object from the file.

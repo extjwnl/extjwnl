@@ -98,7 +98,7 @@ public class MapBackedDictionary extends MapDictionary {
             Map<Object, DictionaryElement> result = (Map<Object, DictionaryElement>) file.readObject();
             return result;
         } catch (Exception e) {
-            throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_020", file.getFile().getName()), e);
+            throw new JWNLException(getMessages().resolveMessage("DICTIONARY_EXCEPTION_020", file.getFilename()), e);
         }
     }
 
