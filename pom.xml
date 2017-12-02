@@ -9,7 +9,7 @@
     <groupId>net.sf.extjwnl</groupId>
     <artifactId>extjwnl-parent</artifactId>
     <packaging>pom</packaging>
-    <version>1.9.4-SNAPSHOT</version>
+    <version>1.9.4</version>
     <name>extJWNL Parent</name>
     <description>extJWNL Parent</description>
     <url>http://extjwnl.sf.net</url>
@@ -35,7 +35,7 @@
         <connection>scm:git:https://github.com/extjwnl/extjwnl.git</connection>
         <developerConnection>scm:git:git@github.com:extjwnl/extjwnl.git</developerConnection>
         <url>https://github.com/extjwnl/extjwnl</url>
-      <tag>HEAD</tag>
+      <tag>extjwnl-parent-1.9.4</tag>
     </scm>
 
     <mailingLists>
