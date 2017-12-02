@@ -20,11 +20,13 @@ extJWNL (Extended Java WordNet Library) is a Java API for creating, reading and 
 In the pom.xml:
 
 ```xml
+<!-- main library dependency -->
 <dependency>
     <groupId>net.sf.extjwnl</groupId>
     <artifactId>extjwnl</artifactId>
-    <version>1.9.3</version>
+    <version>1.9.4</version>
 </dependency>
+<!-- Princeton WordNet 3.1 data dependency -->
 <dependency>
     <groupId>net.sf.extjwnl</groupId>
     <artifactId>extjwnl-data-wn31</artifactId>
@@ -39,6 +41,23 @@ Dictionary d = Dictionary.getDefaultResourceInstance();
 ```
 
 extJWNL contains [Examples.java](utilities/src/main/java/net/sf/extjwnl/utilities/Examples.java) with examples of API use.
+
+# WordNet Data Dependencies
+extJWNL can load WordNet data from resources on the classpath.
+One way to do that is to add a dependency like illustrated above. 
+There are several dependencies available that contain data from Princeton WordNet:
+ * [extjwnl-data-wn21](https://github.com/extjwnl/extjwnl-data-wn21) WordNet 2.1 Unix version (text)
+ * [extjwnl-data-wn30](https://github.com/extjwnl/extjwnl-data-wn30) WordNet 3.0 Unix version (text)
+ * [extjwnl-data-wn31](https://github.com/extjwnl/extjwnl-data-wn31) WordNet 3.1 Unix version (text)
+ * [extjwnl-data-wn31-map](https://github.com/extjwnl/extjwnl-data-wn31-map) WordNet 3.1 Unix version (serialized)
+
+Dependencies with text data contain original Princeton WordNet files augmented with extJWNL configuration file.
+Dependencies with serialized data contain Princeton WordNet files serialized into HashMaps 
+and augmented with extJWNL configuration file.
+
+Serialized data is larger, but might work faster for some use cases. 
+
+If you use ```Dictionary.getDefaultResourceInstance()```, then make sure you use only one dependency.  
 
 # Acknowledgements
 
