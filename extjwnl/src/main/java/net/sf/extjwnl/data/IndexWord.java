@@ -331,6 +331,12 @@ public class IndexWord extends BaseDictionaryElement {
             }
         }
 
+        @Override
+        public Spliterator<Synset> spliterator() {
+            loadAllSynsets();
+            return super.spliterator();
+        }
+
         private void checkIfWeReEmptyAndRemoveIndexWord(Dictionary d) {
             if (0 == super.size()) {
                 try {
