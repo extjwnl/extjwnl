@@ -951,7 +951,7 @@ public class ewn {
 
                         if (arg.startsWith("-smem") && 6 == arg.length()) {
                             if (needHelp) {
-                                System.out.println("Display all holonyms of the search string.\n" +
+                                System.out.println("Display all member holonyms of the search string.\n" +
                                         "\n" +
                                         "A holonym is the name of the whole of which the 'meronym' names a part.\n" +
                                         "Y is a holonym of X if X is a part of Y.\n" +
@@ -969,7 +969,7 @@ public class ewn {
 
                         if (arg.startsWith("-ssub") && 6 == arg.length()) {
                             if (needHelp) {
-                                System.out.println("Display all holonyms of the search string.\n" +
+                                System.out.println("Display all substance holonyms of the search string.\n" +
                                         "\n" +
                                         "A holonym is the name of the whole of which the 'meronym' names a part.\n" +
                                         "Y is a holonym of X if X is a part of Y.\n" +
@@ -987,7 +987,7 @@ public class ewn {
 
                         if (arg.startsWith("-sprt") && 6 == arg.length()) {
                             if (needHelp) {
-                                System.out.println("Display all holonyms of the search string.\n" +
+                                System.out.println("Display all part holonyms of the search string.\n" +
                                         "\n" +
                                         "A holonym is the name of the whole of which the 'meronym' names a part.\n" +
                                         "Y is a holonym of X if X is a part of Y.\n" +
@@ -1005,7 +1005,7 @@ public class ewn {
 
                         if (arg.startsWith("-memb") && 6 == arg.length()) {
                             if (needHelp) {
-                                System.out.println("Display all meronyms of the search string. \n" +
+                                System.out.println("Display all member meronyms of the search string. \n" +
                                         "\n" +
                                         "A meronym is the name of a constituent part, the substance of, or a\n" +
                                         "member of something.  X is a meronym of Y if X is a part of Y.\n" +
@@ -1024,7 +1024,7 @@ public class ewn {
 
                         if (arg.startsWith("-subs") && 6 == arg.length()) {
                             if (needHelp) {
-                                System.out.println("Display all meronyms of the search string. \n" +
+                                System.out.println("Display all substance meronyms of the search string. \n" +
                                         "\n" +
                                         "A meronym is the name of a constituent part, the substance of, or a\n" +
                                         "member of something.  X is a meronym of Y if X is a part of Y.\n" +
@@ -1042,7 +1042,7 @@ public class ewn {
 
                         if (arg.startsWith("-part") && 6 == arg.length()) {
                             if (needHelp) {
-                                System.out.println("Display all meronyms of the search string. \n" +
+                                System.out.println("Display all part meronyms of the search string. \n" +
                                         "\n" +
                                         "A meronym is the name of a constituent part, the substance of, or a\n" +
                                         "member of something.  X is a meronym of Y if X is a part of Y.\n" +
