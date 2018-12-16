@@ -452,6 +452,17 @@ public class TestIndexWord extends BaseData {
     }
 
     @Test
+    public void testSynsetListStream() throws JWNLException {
+        dictionary.edit();
+        Synset s = new Synset(dictionary, POS.NOUN, 123);
+        dictionary.addSynset(s);
+        s.setGloss("test gloss");
+        IndexWord iws = new IndexWord(dictionary, "test", POS.NOUN, new long[]{123});
+
+        Assert.assertEquals(s, iws.getSenses().stream().findFirst().orElse(null));
+    }
+
+    @Test
     public void testHashCode() throws JWNLException {
         IndexWord i = new IndexWord(dictionary, "test", POS.NOUN);
         IndexWord ii = new IndexWord(dictionary, "rest", POS.NOUN);
