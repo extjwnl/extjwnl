@@ -472,6 +472,10 @@ public abstract class Dictionary {
      * @throws JWNLException JWNLException
      */
     public Word getWordBySenseKey(String senseKey) throws JWNLException {
+        if (senseKey == null || senseKey.isEmpty()) {
+            return null;
+        }
+
         final int percentIndex = senseKey.indexOf('%');
         if (percentIndex == -1) {
             return null;

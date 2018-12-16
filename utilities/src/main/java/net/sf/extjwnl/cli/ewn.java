@@ -191,9 +191,8 @@ public class ewn {
                         key = args[i];
                         argProcessed = true;
                         log.info("Searching {}...", key);
-                        if (null != key) {
-                            workWord = d.getWordBySenseKey(key);
-                        }
+                        workWord = d.getWordBySenseKey(key);
+
                         if (null == workWord) {
                             // parse sensekey
                             final int percentIndex = key.indexOf('%');
@@ -282,12 +281,13 @@ public class ewn {
                             System.exit(1);
                         }
                         log.info("Creating {} synset...", pos.getLabel());
-                        Synset tempSynset = d.createSynset(pos);
+                        final Synset tempSynset = d.createSynset(pos);
                         log.info("Creating word {}...", lemma);
                         workWord = new Word(d, tempSynset, lemma);
                         workWord.setLexId(lexId);
                         tempSynset.getWords().add(workWord);
                         tempSynset.setLexFileNum(lexFileNum);
+
                         key = null;
                         argProcessed = true;
                     }
@@ -1539,7 +1539,7 @@ public class ewn {
         if (POS.NOUN == iw.getPOS() && (hasPointer(iw, PointerType.MEMBER_MERONYM) || hasPointer(iw, PointerType.SUBSTANCE_MERONYM) || hasPointer(iw, PointerType.PART_MERONYM))) {
             System.out.println("\t-mero" + iw.getPOS().getKey() + "\tAll Meronyms");
         }
-        if (POS.NOUN == iw.getPOS() && (hasPointer(iw, PointerType.MEMBER_HOLONYM) || hasPointer(iw, PointerType.SUBSTANCE_HOLONYM) || hasPointer(iw, PointerType.SUBSTANCE_HOLONYM))) {
+        if (POS.NOUN == iw.getPOS() && (hasPointer(iw, PointerType.MEMBER_HOLONYM) || hasPointer(iw, PointerType.SUBSTANCE_HOLONYM) || hasPointer(iw, PointerType.PART_HOLONYM))) {
             System.out.println("\t-holo" + iw.getPOS().getKey() + "\tAll Holonyms");
         }
         if (POS.VERB == iw.getPOS() && hasPointer(iw, PointerType.CAUSE)) {
