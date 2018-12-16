@@ -1,3 +1,10 @@
+2.0.0
+- breaking change: upgrade to Java 8
+- fixed #26
+- fixed misc bugs
+- misc code cleanups
+- dependencies updated
+
 1.9.4
 - added PrincetonResourceObjectDictionaryFile to allow for map-backed dictionaries in resources.
 - added net.sf.extjwnl:extjwnl-data-wn31-map:1.0 artifact - extJWNL WordNet 3.1 Serialized Data for map-backed dictionary
