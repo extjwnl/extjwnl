@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.util.*;
 
@@ -127,17 +128,16 @@ public class ewn {
                         log.error("Filename missing for -script command");
                         System.exit(1);
                     } else {
-                        File script = new File(args[1]);
+                        final File script = new File(args[1]);
                         if (script.exists()) {
                             //load into args
-                            ArrayList<String> newArgs = new ArrayList<>();
-                            BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(script), "UTF-8"));
-                            try {
+                            final ArrayList<String> newArgs = new ArrayList<>();
+                            try (final BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(script), StandardCharsets.UTF_8))) {
                                 String str;
                                 while ((str = in.readLine()) != null) {
-                                    String[] bits = str.split(" ");
+                                    final String[] bits = str.split(" ");
                                     StringBuilder tempArg = null;
-                                    for (String bit : bits) {
+                                    for (final String bit : bits) {
                                         int quoteCnt = 0;
                                         for (int j = 0; j < bit.length(); j++) {
                                             if ('"' == bit.charAt(j)) {
@@ -170,13 +170,8 @@ public class ewn {
                                         newArgs.add(tempArg.toString());
                                     }
                                 }
-                            } finally {
-                                try {
-                                    in.close();
-                                } catch (IOException e) {
-                                    //nop
-                                }
                             }
+                            //nop
                             args = newArgs.toArray(args);
                         }
                     }
@@ -195,69 +190,100 @@ public class ewn {
                     if (null == key && '-' != args[i].charAt(0) && ((-1 < args[i].indexOf('%') && -1 < args[i].indexOf(':')))) {
                         key = args[i];
                         argProcessed = true;
-                        log.info("Searching " + key + "...");
+                        log.info("Searching {}...", key);
                         if (null != key) {
                             workWord = d.getWordBySenseKey(key);
                         }
                         if (null == workWord) {
-                            //parse sensekey
-                            lemma = key.substring(0, key.indexOf('%')).replace('_', ' ');
-                            String posId = key.substring(key.indexOf('%') + 1, key.indexOf(':'));
-                            if ("1".equals(posId) || "2".equals(posId) || "3".equals(posId) || "4".equals(posId) || "5".equals(posId)) {
-                                pos = POS.getPOSForId(Integer.parseInt(posId));
-                                String lexFileString = key.substring(key.indexOf(':') + 1);
-                                if (-1 < lexFileString.indexOf(':')) {
-                                    lexFileNum = Integer.parseInt(lexFileString.substring(0, lexFileString.indexOf(':')));
-                                    if (lexFileString.indexOf(':') + 1 < lexFileString.length()) {
-                                        String lexIdString = lexFileString.substring(lexFileString.indexOf(':') + 1);
-                                        if (-1 < lexIdString.indexOf(':')) {
-                                            lexId = Integer.parseInt(lexIdString.substring(0, lexIdString.indexOf(':')));
-                                        } else {
-                                            log.error("Malformed sensekey. Lexical id not found: " + key);
-                                            System.exit(1);
-                                        }
-                                    } else {
-                                        log.error("Malformed sensekey. Lexical id marker not found: " + key);
-                                        System.exit(1);
-                                    }
-                                } else {
-                                    log.error("Malformed sensekey. Lexical file number not found: " + key);
-                                    System.exit(1);
-                                }
-                            } else {
-                                log.error("Malformed sensekey. POS is not recognized: " + key);
+                            // parse sensekey
+                            final int percentIndex = key.indexOf('%');
+                            if (percentIndex == -1) {
+                                log.error("Malformed sensekey. Percent is not found: {}", key);
                                 System.exit(1);
                             }
+
+                            lemma = key.substring(0, percentIndex).replace('_', ' ').trim();
+                            if (lemma.isEmpty()) {
+                                log.error("Malformed sensekey. Lemma is empty: {}", key);
+                                System.exit(1);
+                            }
+
+                            final int colonIndex = key.indexOf(':');
+                            if (colonIndex == -1) {
+                                log.error("Malformed sensekey. Colon is not found: {}", key);
+                                System.exit(1);
+                            }
+
+                            final String posId = key.substring(percentIndex + 1, colonIndex);
+                            if (posId.isEmpty()) {
+                                log.error("Malformed sensekey. POS id is missing: {}", key);
+                                System.exit(1);
+                            }
+
+                            final int posIntId = posId.charAt(0) - '0';
+                            if (1 > posIntId || posIntId > 5) {
+                                log.error("Malformed sensekey. POS id is out of bounds: {}", key);
+                                System.exit(1);
+                            }
+
+                            pos = POS.getPOSForId(posIntId);
+                            final String lexFileString = key.substring(colonIndex + 1);
+                            int lexColonIndex = lexFileString.indexOf(':');
+                            if (lexColonIndex == -1) {
+                                log.error("Malformed sensekey. Lexical file number not found: {}", key);
+                                System.exit(1);
+                            }
+
+                            try {
+                                lexFileNum = Integer.parseInt(lexFileString.substring(0, lexColonIndex));
+                            } catch (NumberFormatException e) {
+                                log.error("Malformed sensekey. Lexical file number is malformed: {}", key);
+                                System.exit(1);
+                            }
+
+                            if (lexColonIndex + 1 >= lexFileString.length()) {
+                                log.error("Malformed sensekey. Lexical id marker not found: {}", key);
+                                System.exit(1);
+                            }
+
+                            final String lexIdString = lexFileString.substring(lexColonIndex + 1);
+                            int lexIdColonIndex = lexIdString.indexOf(':');
+                            if (lexIdColonIndex == -1) {
+                                log.error("Malformed sensekey. Lexical id not found: {}", key);
+                                System.exit(1);
+                            }
+                            lexId = Integer.parseInt(lexIdString.substring(0, lexIdColonIndex));
                         }
                     } else if (-1 < args[i].indexOf('#')) {
                         if (2 < args[i].length()) {
                             derivation = args[i].substring(2).replace('_', ' ');
-                            if (null == derivation || "".equals(derivation)) {
+                            if (derivation.isEmpty()) {
                                 log.error("Missing derivation");
                                 System.exit(1);
-                            } else {
-                                pos = POS.getPOSForKey(args[i].substring(0, 1));
-                                if (null == pos) {
-                                    log.error("POS " + args[i] + " is not recognized for derivation " + derivation);
-                                    System.exit(1);
-                                }
                             }
+
+                            pos = POS.getPOSForKey(args[i].substring(0, 1));
+                            if (pos == null) {
+                                log.error("POS {} is not recognized for derivation {}", args[i], derivation);
+                                System.exit(1);
+                            }
+
                             argProcessed = true;
                         }
                     }
 
                     if ("-add".equals(args[i])) {
-                        if (null == key) {
+                        if (key == null) {
                             log.error("Missing sensekey for -add");
                             System.exit(1);
                         }
                         if (null != workWord) {
-                            log.error("Duplicate sensekey for -add: " + workWord.getSenseKey());
+                            log.error("Duplicate sensekey for -add: {}", workWord.getSenseKey());
                             System.exit(1);
                         }
-                        log.info("Creating " + pos.getLabel() + " synset...");
+                        log.info("Creating {} synset...", pos.getLabel());
                         Synset tempSynset = d.createSynset(pos);
-                        log.info("Creating word " + lemma + "...");
+                        log.info("Creating word {}...", lemma);
                         workWord = new Word(d, tempSynset, lemma);
                         workWord.setLexId(lexId);
                         tempSynset.getWords().add(workWord);
@@ -267,232 +293,242 @@ public class ewn {
                     }
 
                     if ("-remove".equals(args[i])) {
-                        if (null == workWord) {
+                        if (workWord == null) {
                             log.error("Missing current word for -remove. Perhaps, word not found in synset, or synset not found.");
                             System.exit(1);
-                        } else {
-                            d.removeSynset(workWord.getSynset());
-                            workWord = null;
-                            key = null;
                         }
+
+                        d.removeSynset(workWord.getSynset());
+                        workWord = null;
+                        key = null;
+
                         argProcessed = true;
                     }
 
                     if ("-addword".equals(args[i])) {
-                        if (null == workWord) {
+                        if (workWord == null) {
                             log.error("Missing current word for -addword. Perhaps, word not found in synset, or synset not found.");
                             System.exit(1);
-                        } else {
-                            i++;
-                            if (i < args.length && '-' != args[i].charAt(0)) {
-                                Word tempWord = new Word(d, workWord.getSynset(), args[i].replace('_', ' '));
-                                workWord.getSynset().getWords().add(tempWord);
-                                key = null;
-                            } else {
-                                log.error("Missing word for addword command for sensekey " + workWord.getSenseKey());
-                                System.exit(1);
-                            }
                         }
+
+                        i++;
+                        if (i < args.length && '-' != args[i].charAt(0)) {
+                            final Word tempWord = new Word(d, workWord.getSynset(), args[i].replace('_', ' '));
+                            workWord.getSynset().getWords().add(tempWord);
+                            key = null;
+                        } else {
+                            log.error("Missing word for addword command for sensekey {}", workWord.getSenseKey());
+                            System.exit(1);
+                        }
+
                         argProcessed = true;
                     }
 
                     if ("-removeword".equals(args[i])) {
-                        if (null == workWord) {
+                        if (workWord == null) {
                             log.error("Missing current word for -removeword. Perhaps, word not found in synset, or synset not found.");
                             System.exit(1);
-                        } else {
-                            workWord.getSynset().getWords().remove(workWord);
-                            key = null;
                         }
+
+                        workWord.getSynset().getWords().remove(workWord);
+                        key = null;
+
                         argProcessed = true;
                     }
 
                     if ("-setgloss".equals(args[i])) {
-                        if (null == workWord) {
+                        if (workWord == null) {
                             log.error("Missing current word for -setgloss. Perhaps, word not found in synset, or synset not found.");
                             System.exit(1);
-                        } else {
-                            i++;
-                            if (i < args.length && '-' != args[i].charAt(0)) {
-                                workWord.getSynset().setGloss(args[i]);
-                                key = null;
-                            } else {
-                                log.error("Missing gloss for setgloss command for sensekey " + workWord.getSenseKey());
-                                System.exit(1);
-                            }
                         }
+
+                        i++;
+                        if (i < args.length && '-' != args[i].charAt(0)) {
+                            workWord.getSynset().setGloss(args[i]);
+                            key = null;
+                        } else {
+                            log.error("Missing gloss for setgloss command for sensekey {}", workWord.getSenseKey());
+                            System.exit(1);
+                        }
+
                         argProcessed = true;
                     }
 
                     if ("-setadjclus".equals(args[i])) {
-                        if (null == workWord) {
+                        if (workWord == null) {
                             log.error("Missing current word for -setadjclus. Perhaps, word not found in synset, or synset not found.");
                             System.exit(1);
-                        } else {
-                            i++;
-                            if (i < args.length && '-' != args[i].charAt(0)) {
-                                workWord.getSynset().setIsAdjectiveCluster(Boolean.parseBoolean(args[i]));
-                                key = null;
-                            } else {
-                                log.error("Missing flag for setadjclus command for sensekey " + workWord.getSenseKey());
-                                System.exit(1);
-                            }
                         }
+
+                        i++;
+                        if (i < args.length && '-' != args[i].charAt(0)) {
+                            workWord.getSynset().setIsAdjectiveCluster(Boolean.parseBoolean(args[i]));
+                            key = null;
+                        } else {
+                            log.error("Missing flag for setadjclus command for sensekey {}", workWord.getSenseKey());
+                            System.exit(1);
+                        }
+
                         argProcessed = true;
                     }
 
                     if ("-setverbframe".equals(args[i])) {
-                        if (null == workWord) {
+                        if (workWord == null) {
                             log.error("Missing current word for -setverbframe. Perhaps, word not found in synset, or synset not found.");
                             System.exit(1);
-                        } else {
-                            i++;
-                            if (i < args.length) {
-                                if (workWord instanceof Verb) {
-                                    Verb verb = (Verb) workWord;
-                                    if ('-' == args[i].charAt(0)) {
-                                        verb.getVerbFrameFlags().clear(Integer.parseInt(args[i].substring(1)));
-                                    } else {
-                                        verb.getVerbFrameFlags().set(Integer.parseInt(args[i]));
-                                    }
-                                } else {
-                                    log.error("Word at " + workWord.getSenseKey() + " should be verb");
-                                    System.exit(1);
-                                }
-                                key = null;
-                            } else {
-                                log.error("Missing index for setverbframe command for sensekey " + workWord.getSenseKey());
-                                System.exit(1);
-                            }
                         }
+
+                        i++;
+                        if (i >= args.length) {
+                            log.error("Missing index for setverbframe command for sensekey {}", workWord.getSenseKey());
+                            System.exit(1);
+                        }
+
+                        if (!(workWord instanceof Verb)) {
+                            log.error("Word at {} should be verb", workWord.getSenseKey());
+                            System.exit(1);
+                        }
+
+                        final Verb verb = (Verb) workWord;
+                        if ('-' == args[i].charAt(0)) {
+                            verb.getVerbFrameFlags().clear(Integer.parseInt(args[i].substring(1)));
+                        } else {
+                            verb.getVerbFrameFlags().set(Integer.parseInt(args[i]));
+                        }
+                        key = null;
+
                         argProcessed = true;
                     }
 
                     if ("-setverbframeall".equals(args[i])) {
-                        if (null == workWord) {
+                        if (workWord == null) {
                             log.error("Missing current word for -setverbframeall. Perhaps, word not found in synset, or synset not found.");
                             System.exit(1);
-                        } else {
-                            i++;
-                            if (i < args.length) {
-                                if (workWord.getSynset() instanceof VerbSynset) {
-                                    if ('-' == args[i].charAt(0)) {
-                                        workWord.getSynset().getVerbFrameFlags().clear(Integer.parseInt(args[i].substring(1)));
-                                    } else {
-                                        workWord.getSynset().getVerbFrameFlags().set(Integer.parseInt(args[i]));
-                                    }
-                                } else {
-                                    log.error("Synset at " + workWord.getSenseKey() + " should be verb");
-                                    System.exit(1);
-                                }
-                                key = null;
-                            } else {
-                                log.error("Missing index for setverbframeall command for sensekey " + workWord.getSenseKey());
-                                System.exit(1);
-                            }
                         }
+
+                        i++;
+                        if (i >= args.length) {
+                            log.error("Missing index for setverbframeall command for sensekey {}", workWord.getSenseKey());
+                            System.exit(1);
+                        }
+
+                        if (!(workWord.getSynset() instanceof VerbSynset)) {
+                            log.error("Synset at {} should be verb", workWord.getSenseKey());
+                            System.exit(1);
+                        }
+
+                        if ('-' == args[i].charAt(0)) {
+                            workWord.getSynset().getVerbFrameFlags().clear(Integer.parseInt(args[i].substring(1)));
+                        } else {
+                            workWord.getSynset().getVerbFrameFlags().set(Integer.parseInt(args[i]));
+                        }
+                        key = null;
+
                         argProcessed = true;
                     }
 
                     if ("-setlexfile".equals(args[i])) {
-                        if (null == workWord) {
+                        if (workWord == null) {
                             log.error("Missing current word for -setlexfile. Perhaps, word not found in synset, or synset not found.");
                             System.exit(1);
-                        } else {
-                            i++;
-                            if (i < args.length && '-' != args[i].charAt(0)) {
-                                if (-1 < args[i].indexOf('.')) {
-                                    workWord.getSynset().setLexFileNum(LexFileNameFileIdMap.getMap().get(args[i]));
-                                } else {
-                                    workWord.getSynset().setLexFileNum(Integer.parseInt(args[i]));
-                                }
-                            } else {
-                                log.error("Missing file number or name for setlexfile command for sensekey " + workWord.getSenseKey());
-                                System.exit(1);
-                            }
                         }
+
+                        i++;
+                        if (i < args.length && '-' != args[i].charAt(0)) {
+                            if (-1 < args[i].indexOf('.')) {
+                                workWord.getSynset().setLexFileNum(LexFileNameFileIdMap.getMap().get(args[i]));
+                            } else {
+                                workWord.getSynset().setLexFileNum(Integer.parseInt(args[i]));
+                            }
+                        } else {
+                            log.error("Missing file number or name for setlexfile command for sensekey {}", workWord.getSenseKey());
+                            System.exit(1);
+                        }
+
                         argProcessed = true;
                     }
 
                     if ("-addsemptr".equals(args[i])) {
-                        if (null == workWord) {
+                        if (workWord == null) {
                             log.error("Missing current word for -addsemptr. Perhaps, word not found in synset, or synset not found.");
                             System.exit(1);
-                        } else {
-                            i++;
-                            if (i < args.length) {
-                                Word targetWord = d.getWordBySenseKey(args[i]);
-                                if (null != targetWord) {
-                                    i++;
-                                    if (i < args.length) {
-                                        PointerType pt = PointerType.getPointerTypeForKey(args[i]);
-                                        if (null != pt) {
-                                            Pointer p = new Pointer(pt, workWord.getSynset(), targetWord.getSynset());
-                                            if (!workWord.getSynset().getPointers().contains(p)) {
-                                                workWord.getSynset().getPointers().add(p);
-                                            } else {
-                                                log.error("Duplicate pointer of type " + pt + " to " + targetWord.getSenseKey() + " in addsemptr command for sensekey " + workWord.getSenseKey());
-                                                System.exit(1);
-                                            }
-                                        } else {
-                                            log.error("Invalid pointer type at " + args[i] + " in addsemptr command for sensekey " + workWord.getSenseKey());
-                                            System.exit(1);
-                                        }
-                                    } else {
-                                        log.error("Missing pointer type at " + args[i] + " in addsemptr command for sensekey " + workWord.getSenseKey());
-                                        System.exit(1);
-                                    }
-                                } else {
-                                    log.error("Missing target at " + args[i] + " in addsemptr command for sensekey " + workWord.getSenseKey());
-                                    System.exit(1);
-                                }
-                                key = null;
-                            } else {
-                                log.error("Missing sensekey for addsemptr command for sensekey " + workWord.getSenseKey());
-                                System.exit(1);
-                            }
                         }
+
+                        i++;
+                        if (i >= args.length) {
+                            log.error("Missing sensekey for addsemptr command for sensekey {}", workWord.getSenseKey());
+                            System.exit(1);
+                        }
+
+                        final Word targetWord = d.getWordBySenseKey(args[i]);
+                        if (targetWord == null) {
+                            log.error("Missing target at {} in addsemptr command for sensekey {}", args[i], workWord.getSenseKey());
+                            System.exit(1);
+                        }
+
+                        i++;
+                        if (i >= args.length) {
+                            log.error("Missing pointer type in addsemptr command for sensekey {}", workWord.getSenseKey());
+                            System.exit(1);
+                        }
+
+                        final PointerType pt = PointerType.getPointerTypeForKey(args[i]);
+                        if (pt == null) {
+                            log.error("Invalid pointer type at {} in addsemptr command for sensekey {}", args[i], workWord.getSenseKey());
+                            System.exit(1);
+                        }
+
+                        final Pointer p = new Pointer(pt, workWord.getSynset(), targetWord.getSynset());
+                        if (workWord.getSynset().getPointers().contains(p)) {
+                            log.error("Duplicate pointer of type {} to {} in addsemptr command for sensekey {}", pt, targetWord.getSenseKey(), workWord.getSenseKey());
+                            System.exit(1);
+                        }
+
+                        workWord.getSynset().getPointers().add(p);
+                        key = null;
+
                         argProcessed = true;
                     }
 
                     if ("-addlexptr".equals(args[i])) {
-                        if (null == workWord) {
+                        if (workWord == null) {
                             log.error("Missing current word for -addlexptr. Perhaps, word not found in synset, or synset not found.");
                             System.exit(1);
-                        } else {
-                            i++;
-                            if (i < args.length) {
-                                Word targetWord = d.getWordBySenseKey(args[i]);
-                                if (null != targetWord) {
-                                    i++;
-                                    if (i < args.length) {
-                                        PointerType pt = PointerType.getPointerTypeForKey(args[i]);
-                                        if (null != pt) {
-                                            Pointer p = new Pointer(pt, workWord, targetWord);
-                                            if (!workWord.getSynset().getPointers().contains(p)) {
-                                                workWord.getSynset().getPointers().add(p);
-                                            } else {
-                                                log.error("Duplicate pointer of type " + pt + " to " + targetWord.getSenseKey() + " in addlexptr command for sensekey " + workWord.getSenseKey());
-                                                System.exit(1);
-                                            }
-                                        } else {
-                                            log.error("Invalid pointer type at " + args[i] + " in addlexptr command for sensekey " + workWord.getSenseKey());
-                                            System.exit(1);
-                                        }
-                                    } else {
-                                        log.error("Missing pointer type at " + args[i] + " in addlexptr command for sensekey " + workWord.getSenseKey());
-                                        System.exit(1);
-                                    }
-                                } else {
-                                    log.error("Missing target at " + args[i] + " in addlexptr command for sensekey " + workWord.getSenseKey());
-                                    System.exit(1);
-                                }
-                                key = null;
-                            } else {
-                                log.error("Missing sensekey for addlexptr command for sensekey " + workWord.getSenseKey());
-                                System.exit(1);
-                            }
                         }
+
+                        i++;
+                        if (i >= args.length) {
+                            log.error("Missing sensekey for addlexptr command for sensekey " + workWord.getSenseKey());
+                            System.exit(1);
+                        }
+
+                        final Word targetWord = d.getWordBySenseKey(args[i]);
+                        if (targetWord == null) {
+                            log.error("Missing target at {} in addlexptr command for sensekey {}", args[i], workWord.getSenseKey());
+                            System.exit(1);
+                        }
+
+                        i++;
+                        if (i >= args.length) {
+                            log.error("Missing pointer type at {} in addlexptr command for sensekey {}", args[i], workWord.getSenseKey());
+                            System.exit(1);
+                        }
+
+                        final PointerType pt = PointerType.getPointerTypeForKey(args[i]);
+                        if (pt == null) {
+                            log.error("Invalid pointer type at {} in addlexptr command for sensekey {}", args[i], workWord.getSenseKey());
+                            System.exit(1);
+                        }
+
+                        final Pointer p = new Pointer(pt, workWord, targetWord);
+                        if (workWord.getSynset().getPointers().contains(p)) {
+                            log.error("Duplicate pointer of type {} to {} in addlexptr command for sensekey {}", pt, targetWord.getSenseKey(), workWord.getSenseKey());
+                            System.exit(1);
+                        }
+
+                        workWord.getSynset().getPointers().add(p);
+
+                        key = null;
                         argProcessed = true;
                     }
 
@@ -500,40 +536,41 @@ public class ewn {
                         if (null == workWord) {
                             log.error("Missing current word for -removesemptr. Perhaps, word not found in synset, or synset not found.");
                             System.exit(1);
-                        } else {
-                            i++;
-                            if (i < args.length) {
-                                Word targetWord = d.getWordBySenseKey(args[i]);
-                                if (null != targetWord) {
-                                    i++;
-                                    if (i < args.length) {
-                                        PointerType pt = PointerType.getPointerTypeForKey(args[i]);
-                                        if (null != pt) {
-                                            Pointer p = new Pointer(pt, workWord.getSynset(), targetWord.getSynset());
-                                            if (workWord.getSynset().getPointers().contains(p)) {
-                                                workWord.getSynset().getPointers().remove(p);
-                                            } else {
-                                                log.error("Missing pointer of type " + pt + " to " + targetWord.getSenseKey() + " in removesemptr command for sensekey " + workWord.getSenseKey());
-                                                System.exit(1);
-                                            }
-                                        } else {
-                                            log.error("Invalid pointer type at " + args[i] + " in removesemptr command for sensekey " + workWord.getSenseKey());
-                                            System.exit(1);
-                                        }
-                                    } else {
-                                        log.error("Missing pointer type at " + args[i] + " in removesemptr command for sensekey " + workWord.getSenseKey());
-                                        System.exit(1);
-                                    }
-                                } else {
-                                    log.error("Missing target at " + args[i] + " in removesemptr command for sensekey " + workWord.getSenseKey());
-                                    System.exit(1);
-                                }
-                                key = null;
-                            } else {
-                                log.error("Missing sensekey for removesemptr command for sensekey " + workWord.getSenseKey());
-                                System.exit(1);
-                            }
                         }
+
+                        i++;
+                        if (i >= args.length) {
+                            log.error("Missing sensekey for removesemptr command for sensekey {}", workWord.getSenseKey());
+                            System.exit(1);
+                        }
+
+                        final Word targetWord = d.getWordBySenseKey(args[i]);
+                        if (targetWord == null) {
+                            log.error("Missing target at {} in removesemptr command for sensekey {}", args[i], workWord.getSenseKey());
+                            System.exit(1);
+                        }
+
+                        i++;
+                        if (i >= args.length) {
+                            log.error("Missing pointer type in removesemptr command for sensekey {}", workWord.getSenseKey());
+                            System.exit(1);
+                        }
+
+                        final PointerType pt = PointerType.getPointerTypeForKey(args[i]);
+                        if (pt == null) {
+                            log.error("Invalid pointer type at {} in removesemptr command for sensekey {}", args[i], workWord.getSenseKey());
+                            System.exit(1);
+                        }
+
+                        final Pointer p = new Pointer(pt, workWord.getSynset(), targetWord.getSynset());
+                        if (!workWord.getSynset().getPointers().contains(p)) {
+                            log.error("Missing pointer of type {} to {} in removesemptr command for sensekey {}", pt, targetWord.getSenseKey(), workWord.getSenseKey());
+                            System.exit(1);
+                        }
+
+                        workWord.getSynset().getPointers().remove(p);
+
+                        key = null;
                         argProcessed = true;
                     }
 
@@ -541,40 +578,40 @@ public class ewn {
                         if (null == workWord) {
                             log.error("Missing current word for -removelexptr. Perhaps, word not found in synset, or synset not found.");
                             System.exit(1);
-                        } else {
-                            i++;
-                            if (i < args.length) {
-                                Word targetWord = d.getWordBySenseKey(args[i]);
-                                if (null != targetWord) {
-                                    i++;
-                                    if (i < args.length) {
-                                        PointerType pt = PointerType.getPointerTypeForKey(args[i]);
-                                        if (null != pt) {
-                                            Pointer p = new Pointer(pt, workWord, targetWord);
-                                            if (workWord.getSynset().getPointers().contains(p)) {
-                                                workWord.getSynset().getPointers().remove(p);
-                                            } else {
-                                                log.error("Missing pointer of type " + pt + " to " + targetWord.getSenseKey() + " in removelexptr command for sensekey " + workWord.getSenseKey());
-                                                System.exit(1);
-                                            }
-                                        } else {
-                                            log.error("Invalid pointer type at " + args[i] + " in removelexptr command for sensekey " + workWord.getSenseKey());
-                                            System.exit(1);
-                                        }
-                                    } else {
-                                        log.error("Missing pointer type at " + args[i] + " in removelexptr command for sensekey " + workWord.getSenseKey());
-                                        System.exit(1);
-                                    }
-                                } else {
-                                    log.error("Missing target at " + args[i] + " in removelexptr command for sensekey " + workWord.getSenseKey());
-                                    System.exit(1);
-                                }
-                                key = null;
-                            } else {
-                                log.error("Missing sensekey for removelexptr command for sensekey " + workWord.getSenseKey());
-                                System.exit(1);
-                            }
                         }
+
+                        i++;
+                        if (i >= args.length) {
+                            log.error("Missing sensekey for removelexptr command for sensekey {}", workWord.getSenseKey());
+                            System.exit(1);
+                        }
+
+                        final Word targetWord = d.getWordBySenseKey(args[i]);
+                        if (targetWord == null) {
+                            log.error("Missing target at {} in removelexptr command for sensekey {}", args[i], workWord.getSenseKey());
+                            System.exit(1);
+                        }
+
+                        i++;
+                        if (i >= args.length) {
+                            log.error("Missing pointer type in removelexptr command for sensekey {}", workWord.getSenseKey());
+                            System.exit(1);
+                        }
+
+                        final PointerType pt = PointerType.getPointerTypeForKey(args[i]);
+                        if (pt == null) {
+                            log.error("Invalid pointer type at {} in removelexptr command for sensekey {}", args[i], workWord.getSenseKey());
+                            System.exit(1);
+                        }
+
+                        final Pointer p = new Pointer(pt, workWord, targetWord);
+                        if (!workWord.getSynset().getPointers().contains(p)) {
+                            log.error("Missing pointer of type {} to {} in removelexptr command for sensekey {}", pt, targetWord.getSenseKey(), workWord.getSenseKey());
+                            System.exit(1);
+                        }
+                        workWord.getSynset().getPointers().remove(p);
+
+                        key = null;
                         argProcessed = true;
                     }
 
@@ -582,16 +619,17 @@ public class ewn {
                         if (null == workWord) {
                             log.error("Missing current word for -setlexid. Perhaps, word not found in synset, or synset not found.");
                             System.exit(1);
-                        } else {
-                            i++;
-                            if (i < args.length && '-' != args[i].charAt(0)) {
-                                workWord.setLexId(Integer.parseInt(args[i]));
-                                key = null;
-                            } else {
-                                log.error("Missing lexid for setlexid command for sensekey " + workWord.getSenseKey());
-                                System.exit(1);
-                            }
                         }
+
+                        i++;
+                        if (i < args.length && '-' != args[i].charAt(0)) {
+                            workWord.setLexId(Integer.parseInt(args[i]));
+                            key = null;
+                        } else {
+                            log.error("Missing lexid for setlexid command for sensekey {}", workWord.getSenseKey());
+                            System.exit(1);
+                        }
+
                         argProcessed = true;
                     }
 
@@ -599,91 +637,93 @@ public class ewn {
                         if (null == workWord) {
                             log.error("Missing current word for -setusecount. Perhaps, word not found in synset, or synset not found.");
                             System.exit(1);
-                        } else {
-                            i++;
-                            if (i < args.length && '-' != args[i].charAt(0)) {
-                                workWord.setUseCount(Integer.parseInt(args[i]));
-                                key = null;
-                            } else {
-                                log.error("Missing count for setusecount command for sensekey " + workWord.getSenseKey());
-                                System.exit(1);
-                            }
                         }
+
+                        i++;
+                        if (i < args.length && '-' != args[i].charAt(0)) {
+                            workWord.setUseCount(Integer.parseInt(args[i]));
+                            key = null;
+                        } else {
+                            log.error("Missing count for setusecount command for sensekey {}", workWord.getSenseKey());
+                            System.exit(1);
+                        }
+
                         argProcessed = true;
                     }
 
                     if ("-addexc".equals(args[i])) {
                         i++;
-                        if (null != derivation) {
-                            if (null != pos) {
-                                if (i < args.length && '-' != args[i].charAt(0)) {
-                                    String baseform = args[i].replace('_', ' ');
-                                    Exc e = d.getException(pos, derivation);
-                                    if (null != e) {
-                                        if (null != e.getExceptions()) {
-                                            if (!e.getExceptions().contains(baseform)) {
-                                                e.getExceptions().add(baseform);
-                                            }
-                                        }
-                                    } else {
-                                        ArrayList<String> list = new ArrayList<>(1);
-                                        list.add(baseform);
-                                        d.createException(pos, derivation, list);
+                        if (derivation == null) {
+                            log.error("Missing derivation for addexc command");
+                            System.exit(1);
+                        }
+
+                        if (pos == null) {
+                            log.error("Missing pos for addexc command for derivation {}", derivation);
+                            System.exit(1);
+                        }
+
+                        if (i < args.length && '-' != args[i].charAt(0)) {
+                            final String baseform = args[i].replace('_', ' ');
+                            final Exc e = d.getException(pos, derivation);
+                            if (null != e) {
+                                if (null != e.getExceptions()) {
+                                    if (!e.getExceptions().contains(baseform)) {
+                                        e.getExceptions().add(baseform);
                                     }
-                                    derivation = null;
-                                } else {
-                                    log.error("Missing baseform for addexc command for derivation " + derivation);
-                                    System.exit(1);
                                 }
                             } else {
-                                log.error("Missing pos for addexc command for derivation " + derivation);
-                                System.exit(1);
+                                final ArrayList<String> list = new ArrayList<>(1);
+                                list.add(baseform);
+                                d.createException(pos, derivation, list);
                             }
+                            derivation = null;
                         } else {
-                            log.error("Missing derivation for addexc command");
+                            log.error("Missing baseform for addexc command for derivation {}", derivation);
                             System.exit(1);
                         }
                         argProcessed = true;
                     }
 
                     if ("-removeexc".equals(args[i])) {
-                        Exc e = d.getException(pos, derivation);
-                        if (null != e) {
-                            i++;
-                            if (i < args.length && '-' != args[i].charAt(0)) {
-                                String baseform = args[i].replace('_', ' ');
-                                if (null != e.getExceptions()) {
-                                    if (e.getExceptions().contains(baseform)) {
-                                        e.getExceptions().remove(baseform);
-                                    }
-                                    if (0 == e.getExceptions().size()) {
-                                        d.removeException(e);
-                                    }
-                                }
-                            } else {
-                                d.removeException(e);
-                            }
-                        } else {
-                            log.error("Missing derivation " + derivation);
+                        final Exc e = d.getException(pos, derivation);
+                        if (e == null) {
+                            log.error("Missing derivation {}", derivation);
                             System.exit(1);
                         }
+
+                        i++;
+                        if (i < args.length && '-' != args[i].charAt(0)) {
+                            final String baseform = args[i].replace('_', ' ');
+                            if (null != e.getExceptions()) {
+                                if (e.getExceptions().contains(baseform)) {
+                                    e.getExceptions().remove(baseform);
+                                }
+                                if (0 == e.getExceptions().size()) {
+                                    d.removeException(e);
+                                }
+                            }
+                        } else {
+                            d.removeException(e);
+                        }
+
                         derivation = null;
                         argProcessed = true;
                     }
 
                     if (!argProcessed) {
-                        log.warn("Argument ignored: " + args[i]);
+                        log.warn("Argument ignored: {}", args[i]);
                     }
                 }
 
                 d.save();
             } else {
-                //browse
-                String key = args[0];
+                // browse
+                final String key = args[0];
                 if (1 == args.length) {
-                    for (POS pos : POS.getAllPOS()) {
+                    for (final POS pos : POS.getAllPOS()) {
                         IndexWord iw = d.getIndexWord(pos, key);
-                        if (null == iw) {
+                        if (iw == null) {
                             System.out.println("\nNo information available for " + pos.getLabel() + " " + key);
                         } else {
                             System.out.println("\nInformation available for " + iw.getPOS().getLabel() + " " + iw.getLemma());
@@ -737,7 +777,7 @@ public class ewn {
                         }
                     }
 
-                    for (String arg : args) {
+                    for (final String arg : args) {
                         if (arg.startsWith("-ants") && 6 == arg.length()) {
                             if (needHelp) {
                                 System.out.println("Display synsets containing direct antonyms of the search string.\n" +
@@ -747,10 +787,10 @@ public class ewn {
                                         "\n" +
                                         "Antonym synsets are preceded by \"=>\".");
                             }
-                            POS p = POS.getPOSForKey(arg.substring(5));
-                            IndexWord iw = d.lookupIndexWord(p, key);
-                            if (null != iw) {
-                                System.out.println("\nAntonyms of " + p.getLabel() + " " + iw.getLemma());
+                            final POS p = POS.getPOSForKey(arg.substring(5));
+                            final IndexWord iw = d.lookupIndexWord(p, key);
+                            if (iw != null) {
+                                System.out.println("\nAntonyms of " + (p == null ? "" : p.getLabel()) + " " + iw.getLemma());
                                 tracePointers(iw, PointerType.ANTONYM, 1, needSense, needGloss, needLex, needOffset, needSenseNum, needSenseKeys);
                             }
                         }//ants
@@ -766,10 +806,10 @@ public class ewn {
                                         "Hypernym synsets are preceded by \"=>\", and are indented from\n" +
                                         "the left according to their level in the hierarchy.");
                             }
-                            POS p = POS.getPOSForKey(arg.substring(5));
-                            IndexWord iw = d.lookupIndexWord(p, key);
+                            final POS p = POS.getPOSForKey(arg.substring(5));
+                            final IndexWord iw = d.lookupIndexWord(p, key);
                             if (null != iw) {
-                                System.out.println("\nHypernyms of " + p.getLabel() + " " + iw.getLemma());
+                                System.out.println("\nHypernyms of " + (p == null ? "" : p.getLabel()) + " " + iw.getLemma());
                                 tracePointers(iw, PointerType.HYPERNYM, PointerUtils.INFINITY, needSense, needGloss, needLex, needOffset, needSenseNum, needSenseKeys);
                             }
                         }//hype
@@ -783,10 +823,10 @@ public class ewn {
                                         "\n" +
                                         "Hyponym synsets are preceded by \"=>\".");
                             }
-                            POS p = POS.getPOSForKey(arg.substring(5));
-                            IndexWord iw = d.lookupIndexWord(p, key);
+                            final POS p = POS.getPOSForKey(arg.substring(5));
+                            final IndexWord iw = d.lookupIndexWord(p, key);
                             if (null != iw) {
-                                System.out.println("\nHyponyms of " + p.getLabel() + " " + iw.getLemma());
+                                System.out.println("\nHyponyms of " + (p == null ? "" : p.getLabel()) + " " + iw.getLemma());
                                 tracePointers(iw, PointerType.HYPONYM, 1, needSense, needGloss, needLex, needOffset, needSenseNum, needSenseKeys);
                             }
                         }//hypo
@@ -802,10 +842,10 @@ public class ewn {
                                         "Hyponym synsets are preceded by \"=>\", and are indented from the left\n" +
                                         "according to their level in the hierarchy.");
                             }
-                            POS p = POS.getPOSForKey(arg.substring(5));
-                            IndexWord iw = d.lookupIndexWord(p, key);
+                            final POS p = POS.getPOSForKey(arg.substring(5));
+                            final IndexWord iw = d.lookupIndexWord(p, key);
                             if (null != iw) {
-                                System.out.println("\nHyponyms of " + p.getLabel() + " " + iw.getLemma());
+                                System.out.println("\nHyponyms of " + (p == null ? "" : p.getLabel()) + " " + iw.getLemma());
                                 tracePointers(iw, PointerType.HYPONYM, PointerUtils.INFINITY, needSense, needGloss, needLex, needOffset, needSenseNum, needSenseKeys);
                             }
                         }//tree
@@ -820,20 +860,20 @@ public class ewn {
                                         "Entailment synsets are preceded by \"=>\", and are indented from the left\n" +
                                         "according to their level in the hierarchy.");
                             }
-                            POS p = POS.getPOSForKey(arg.substring(5));
-                            IndexWord iw = d.lookupIndexWord(p, key);
+                            final POS p = POS.getPOSForKey(arg.substring(5));
+                            final IndexWord iw = d.lookupIndexWord(p, key);
                             if (null != iw) {
-                                System.out.println("\nEntailment of " + p.getLabel() + " " + iw.getLemma());
+                                System.out.println("\nEntailment of " + (p == null ? "" : p.getLabel()) + " " + iw.getLemma());
                                 tracePointers(iw, PointerType.ENTAILMENT, PointerUtils.INFINITY, needSense, needGloss, needLex, needOffset, needSenseNum, needSenseKeys);
                             }
                         }//enta
 
 
                         if (arg.startsWith("-syns") && 6 == arg.length()) {
-                            POS p = POS.getPOSForKey(arg.substring(5));
-                            IndexWord iw = d.lookupIndexWord(p, key);
+                            final POS p = POS.getPOSForKey(arg.substring(5));
+                            final IndexWord iw = d.lookupIndexWord(p, key);
                             if (null != iw) {
-                                System.out.println("\nSynonyms of " + p.getLabel() + " " + iw.getLemma());
+                                System.out.println("\nSynonyms of " + (p == null ? "" : p.getLabel()) + " " + iw.getLemma());
                                 if (POS.ADJECTIVE == p) {
                                     if (needHelp) {
                                         System.out.println("Display synonyms and synsets related to synsets containing\n" +
@@ -919,10 +959,10 @@ public class ewn {
                                         "A meronym is the name of a constituent part, the substance of, or a\n" +
                                         "member of something.  X is a meronym of Y if X is a part of Y.");
                             }
-                            POS p = POS.getPOSForKey(arg.substring(5));
-                            IndexWord iw = d.lookupIndexWord(p, key);
+                            final POS p = POS.getPOSForKey(arg.substring(5));
+                            final IndexWord iw = d.lookupIndexWord(p, key);
                             if (null != iw) {
-                                System.out.println("\nMember Holonyms of " + p.getLabel() + " " + iw.getLemma());
+                                System.out.println("\nMember Holonyms of " + (p == null ? "" : p.getLabel()) + " " + iw.getLemma());
                                 tracePointers(iw, PointerType.MEMBER_HOLONYM, 1, needSense, needGloss, needLex, needOffset, needSenseNum, needSenseKeys);
                             }
                         }//smem
@@ -937,10 +977,10 @@ public class ewn {
                                         "A meronym is the name of a constituent part, the substance of, or a\n" +
                                         "member of something.  X is a meronym of Y if X is a part of Y.");
                             }
-                            POS p = POS.getPOSForKey(arg.substring(5));
-                            IndexWord iw = d.lookupIndexWord(p, key);
+                            final POS p = POS.getPOSForKey(arg.substring(5));
+                            final IndexWord iw = d.lookupIndexWord(p, key);
                             if (null != iw) {
-                                System.out.println("\nSubstance Holonyms of " + p.getLabel() + " " + iw.getLemma());
+                                System.out.println("\nSubstance Holonyms of " + (p == null ? "" : p.getLabel()) + " " + iw.getLemma());
                                 tracePointers(iw, PointerType.SUBSTANCE_HOLONYM, 1, needSense, needGloss, needLex, needOffset, needSenseNum, needSenseKeys);
                             }
                         }//ssub
@@ -955,10 +995,10 @@ public class ewn {
                                         "A meronym is the name of a constituent part, the substance of, or a\n" +
                                         "member of something.  X is a meronym of Y if X is a part of Y.");
                             }
-                            POS p = POS.getPOSForKey(arg.substring(5));
-                            IndexWord iw = d.lookupIndexWord(p, key);
+                            final POS p = POS.getPOSForKey(arg.substring(5));
+                            final IndexWord iw = d.lookupIndexWord(p, key);
                             if (null != iw) {
-                                System.out.println("\nPart Holonyms of " + p.getLabel() + " " + iw.getLemma());
+                                System.out.println("\nPart Holonyms of " + (p == null ? "" : p.getLabel()) + " " + iw.getLemma());
                                 tracePointers(iw, PointerType.PART_HOLONYM, 1, needSense, needGloss, needLex, needOffset, needSenseNum, needSenseKeys);
                             }
                         }//sprt
@@ -973,10 +1013,10 @@ public class ewn {
                                         "A holonym is the name of the whole of which the meronym names a part.\n" +
                                         "Y is a holonym of X if X is a part of Y.");
                             }
-                            POS p = POS.getPOSForKey(arg.substring(5));
-                            IndexWord iw = d.lookupIndexWord(p, key);
+                            final POS p = POS.getPOSForKey(arg.substring(5));
+                            final IndexWord iw = d.lookupIndexWord(p, key);
                             if (null != iw) {
-                                System.out.println("\nMember Meronyms of " + p.getLabel() + " " + iw.getLemma());
+                                System.out.println("\nMember Meronyms of " + (p == null ? "" : p.getLabel()) + " " + iw.getLemma());
                                 tracePointers(iw, PointerType.MEMBER_MERONYM, 1, needSense, needGloss, needLex, needOffset, needSenseNum, needSenseKeys);
                             }
                         }//memb
@@ -992,10 +1032,10 @@ public class ewn {
                                         "A holonym is the name of the whole of which the meronym names a part.\n" +
                                         "Y is a holonym of X if X is a part of Y.");
                             }
-                            POS p = POS.getPOSForKey(arg.substring(5));
-                            IndexWord iw = d.lookupIndexWord(p, key);
+                            final POS p = POS.getPOSForKey(arg.substring(5));
+                            final IndexWord iw = d.lookupIndexWord(p, key);
                             if (null != iw) {
-                                System.out.println("\nSubstance Meronyms of " + p.getLabel() + " " + iw.getLemma());
+                                System.out.println("\nSubstance Meronyms of " + (p == null ? "" : p.getLabel()) + " " + iw.getLemma());
                                 tracePointers(iw, PointerType.SUBSTANCE_MERONYM, 1, needSense, needGloss, needLex, needOffset, needSenseNum, needSenseKeys);
                             }
                         }//subs
@@ -1010,10 +1050,10 @@ public class ewn {
                                         "A holonym is the name of the whole of which the meronym names a part.\n" +
                                         "Y is a holonym of X if X is a part of Y.");
                             }
-                            POS p = POS.getPOSForKey(arg.substring(5));
-                            IndexWord iw = d.lookupIndexWord(p, key);
+                            final POS p = POS.getPOSForKey(arg.substring(5));
+                            final IndexWord iw = d.lookupIndexWord(p, key);
                             if (null != iw) {
-                                System.out.println("\nPart Meronyms of " + p.getLabel() + " " + iw.getLemma());
+                                System.out.println("\nPart Meronyms of " + (p == null ? "" : p.getLabel()) + " " + iw.getLemma());
                                 tracePointers(iw, PointerType.PART_MERONYM, 1, needSense, needGloss, needLex, needOffset, needSenseNum, needSenseKeys);
                             }
                         }//part
@@ -1028,10 +1068,10 @@ public class ewn {
                                         "A holonym is the name of the whole of which the meronym names a part.\n" +
                                         "Y is a holonym of X if X is a part of Y.");
                             }
-                            POS p = POS.getPOSForKey(arg.substring(5));
-                            IndexWord iw = d.lookupIndexWord(p, key);
+                            final POS p = POS.getPOSForKey(arg.substring(5));
+                            final IndexWord iw = d.lookupIndexWord(p, key);
                             if (null != iw) {
-                                System.out.println("\nMeronyms of " + p.getLabel() + " " + iw.getLemma());
+                                System.out.println("\nMeronyms of " + (p == null ? "" : p.getLabel()) + " " + iw.getLemma());
                                 tracePointers(iw, PointerType.MEMBER_MERONYM, 1, needSense, needGloss, needLex, needOffset, needSenseNum, needSenseKeys);
                                 tracePointers(iw, PointerType.SUBSTANCE_MERONYM, 1, needSense, needGloss, needLex, needOffset, needSenseNum, needSenseKeys);
                                 tracePointers(iw, PointerType.PART_MERONYM, 1, needSense, needGloss, needLex, needOffset, needSenseNum, needSenseKeys);
@@ -1049,10 +1089,10 @@ public class ewn {
                                         "A meronym is the name of a constituent part, the substance of, or a\n" +
                                         "member of something.  X is a meronym of Y if X is a part of Y.");
                             }
-                            POS p = POS.getPOSForKey(arg.substring(5));
-                            IndexWord iw = d.lookupIndexWord(p, key);
+                            final POS p = POS.getPOSForKey(arg.substring(5));
+                            final IndexWord iw = d.lookupIndexWord(p, key);
                             if (null != iw) {
-                                System.out.println("\nHolonyms of " + p.getLabel() + " " + iw.getLemma());
+                                System.out.println("\nHolonyms of " + (p == null ? "" : p.getLabel()) + " " + iw.getLemma());
                                 tracePointers(iw, PointerType.MEMBER_HOLONYM, 1, needSense, needGloss, needLex, needOffset, needSenseNum, needSenseKeys);
                                 tracePointers(iw, PointerType.SUBSTANCE_HOLONYM, 1, needSense, needGloss, needLex, needOffset, needSenseNum, needSenseKeys);
                                 tracePointers(iw, PointerType.PART_HOLONYM, 1, needSense, needGloss, needLex, needOffset, needSenseNum, needSenseKeys);
@@ -1069,25 +1109,25 @@ public class ewn {
                                         "CAUSE TO synsets are preceded by \"=>\", and are indented from the left\n" +
                                         "according to their level in the hierarchy.");
                             }
-                            POS p = POS.getPOSForKey(arg.substring(5));
-                            IndexWord iw = d.lookupIndexWord(p, key);
+                            final POS p = POS.getPOSForKey(arg.substring(5));
+                            final IndexWord iw = d.lookupIndexWord(p, key);
                             if (null != iw) {
-                                System.out.println("\n'Cause to' of " + p.getLabel() + " " + iw.getLemma());
+                                System.out.println("\n'Cause to' of " + (p == null ? "" : p.getLabel()) + " " + iw.getLemma());
                                 tracePointers(iw, PointerType.CAUSE, PointerUtils.INFINITY, needSense, needGloss, needLex, needOffset, needSenseNum, needSenseKeys);
                             }
                         }//caus
 
                         if (arg.startsWith("-pert") && 6 == arg.length()) {
-                            POS p = POS.getPOSForKey(arg.substring(5));
-                            IndexWord iw = d.lookupIndexWord(p, key);
+                            final POS p = POS.getPOSForKey(arg.substring(5));
+                            final IndexWord iw = d.lookupIndexWord(p, key);
                             if (null != iw) {
-                                System.out.println("\nPertainyms of " + p.getLabel() + " " + iw.getLemma());
+                                System.out.println("\nPertainyms of " + (p == null ? "" : p.getLabel()) + " " + iw.getLemma());
                                 tracePointers(iw, PointerType.PERTAINYM, 1, needSense, needGloss, needLex, needOffset, needSenseNum, needSenseKeys);
                             }
                         }//pert
 
                         if (arg.startsWith("-attr") && 6 == arg.length()) {
-                            POS p = POS.getPOSForKey(arg.substring(5));
+                            final POS p = POS.getPOSForKey(arg.substring(5));
                             if (needHelp) {
                                 if (POS.NOUN == p) {
                                     System.out.println("Display adjectives for which search string is an attribute.");
@@ -1096,9 +1136,9 @@ public class ewn {
                                     System.out.println("Display nouns that are attributes of search string.");
                                 }
                             }
-                            IndexWord iw = d.lookupIndexWord(p, key);
+                            final IndexWord iw = d.lookupIndexWord(p, key);
                             if (null != iw) {
-                                System.out.println("\nAttributes of " + p.getLabel() + " " + iw.getLemma());
+                                System.out.println("\nAttributes of " + (p == null ? "" : p.getLabel()) + " " + iw.getLemma());
                                 tracePointers(iw, PointerType.ATTRIBUTE, 1, needSense, needGloss, needLex, needOffset, needSenseNum, needSenseKeys);
                             }
                         }//attr
@@ -1109,10 +1149,10 @@ public class ewn {
                                         "Each related synset is preceeded by its part of speech. Each word in the\n" +
                                         "synset is followed by its sense number.");
                             }
-                            POS p = POS.getPOSForKey(arg.substring(5));
-                            IndexWord iw = d.lookupIndexWord(p, key);
+                            final POS p = POS.getPOSForKey(arg.substring(5));
+                            final IndexWord iw = d.lookupIndexWord(p, key);
                             if (null != iw) {
-                                System.out.println("\nDerived forms of " + p.getLabel() + " " + iw.getLemma());
+                                System.out.println("\nDerived forms of " + (p == null ? "" : p.getLabel()) + " " + iw.getLemma());
                                 tracePointers(iw, PointerType.DERIVATION, 1, needSense, needGloss, needLex, needOffset, needSenseNum, needSenseKeys);
                             }
                         }//deri
@@ -1121,10 +1161,10 @@ public class ewn {
                             if (needHelp) {
                                 System.out.println("Display domain to which this synset belongs.");
                             }
-                            POS p = POS.getPOSForKey(arg.substring(5));
-                            IndexWord iw = d.lookupIndexWord(p, key);
+                            final POS p = POS.getPOSForKey(arg.substring(5));
+                            final IndexWord iw = d.lookupIndexWord(p, key);
                             if (null != iw) {
-                                System.out.println("\nDomain of " + p.getLabel() + " " + iw.getLemma());
+                                System.out.println("\nDomain of " + (p == null ? "" : p.getLabel()) + " " + iw.getLemma());
                                 tracePointers(iw, PointerType.CATEGORY, 1, needSense, needGloss, needLex, needOffset, needSenseNum, needSenseKeys);
                                 tracePointers(iw, PointerType.USAGE, 1, needSense, needGloss, needLex, needOffset, needSenseNum, needSenseKeys);
                                 tracePointers(iw, PointerType.REGION, 1, needSense, needGloss, needLex, needOffset, needSenseNum, needSenseKeys);
@@ -1135,10 +1175,10 @@ public class ewn {
                             if (needHelp) {
                                 System.out.println("Display all synsets belonging to the domain.");
                             }
-                            POS p = POS.getPOSForKey(arg.substring(5));
-                            IndexWord iw = d.lookupIndexWord(p, key);
+                            final POS p = POS.getPOSForKey(arg.substring(5));
+                            final IndexWord iw = d.lookupIndexWord(p, key);
                             if (null != iw) {
-                                System.out.println("\nDomain of " + p.getLabel() + " " + iw.getLemma());
+                                System.out.println("\nDomain of " + (p == null ? "" : p.getLabel()) + " " + iw.getLemma());
                                 tracePointers(iw, PointerType.CATEGORY_MEMBER, 1, needSense, needGloss, needLex, needOffset, needSenseNum, needSenseKeys);
                                 tracePointers(iw, PointerType.USAGE_MEMBER, 1, needSense, needGloss, needLex, needOffset, needSenseNum, needSenseKeys);
                                 tracePointers(iw, PointerType.REGION_MEMBER, 1, needSense, needGloss, needLex, needOffset, needSenseNum, needSenseKeys);
@@ -1150,13 +1190,13 @@ public class ewn {
                                 System.out.println("Display familiarity and polysemy information for the search string.\n" +
                                         "The polysemy count is the number of senses in WordNet.");
                             }
-                            POS p = POS.getPOSForKey(arg.substring(5));
-                            IndexWord iw = d.lookupIndexWord(p, key);
+                            final POS p = POS.getPOSForKey(arg.substring(5));
+                            final IndexWord iw = d.lookupIndexWord(p, key);
                             if (null != iw) {
-                                String[] freqs = {"extremely rare", "very rare", "rare", "uncommon", "common",
+                                final String[] freqs = {"extremely rare", "very rare", "rare", "uncommon", "common",
                                         "familiar", "very familiar", "extremely familiar"};
-                                String[] pos = {"a noun", "a verb", "an adjective", "an adverb"};
-                                int cnt = iw.getSenses().size();
+                                final String[] pos = {"a noun", "a verb", "an adjective", "an adverb"};
+                                final int cnt = iw.getSenses().size();
                                 int familiar = 0;
                                 if (cnt == 0) {
                                     familiar = 0;
@@ -1196,20 +1236,20 @@ public class ewn {
                                         "frame is acceptable for all of the words in the synset, and with \"=>\"\n" +
                                         "if a sentence frame is acceptable for the search string only.");
                             }
-                            POS p = POS.getPOSForKey(arg.substring(5));
-                            IndexWord iw = d.lookupIndexWord(p, key);
+                            final POS p = POS.getPOSForKey(arg.substring(5));
+                            final IndexWord iw = d.lookupIndexWord(p, key);
                             if (null != iw) {
-                                System.out.println("\nVerb frames of " + p.getLabel() + " " + iw.getLemma());
+                                System.out.println("\nVerb frames of " + (p == null ? "" : p.getLabel()) + " " + iw.getLemma());
                                 for (int i = 0; i < iw.getSenses().size(); i++) {
-                                    Synset synset = iw.getSenses().get(i);
-                                    for (String vf : synset.getVerbFrames()) {
+                                    final Synset synset = iw.getSenses().get(i);
+                                    for (final String vf : synset.getVerbFrames()) {
                                         System.out.println("\t*> " + vf);
                                     }
-                                    for (Word word : synset.getWords()) {
+                                    for (final Word word : synset.getWords()) {
                                         if (iw.getLemma().equalsIgnoreCase(word.getLemma())) {
                                             if (word instanceof Verb) {
-                                                Verb verb = (Verb) word;
-                                                for (String vf : verb.getVerbFrames()) {
+                                                final Verb verb = (Verb) word;
+                                                for (final String vf : verb.getVerbFrames()) {
                                                     System.out.println("\t=> " + vf);
                                                 }
                                             }
@@ -1228,10 +1268,10 @@ public class ewn {
                                         "A meronym is the name of a constituent part, the substance of, or a\n" +
                                         "member of something.  X is a meronym of Y if X is a part of Y.");
                             }
-                            POS p = POS.getPOSForKey(arg.substring(5));
-                            IndexWord iw = d.lookupIndexWord(p, key);
+                            final POS p = POS.getPOSForKey(arg.substring(5));
+                            final IndexWord iw = d.lookupIndexWord(p, key);
                             if (null != iw) {
-                                System.out.println("\nMeronyms of " + p.getLabel() + " " + iw.getLemma());
+                                System.out.println("\nMeronyms of " + (p == null ? "" : p.getLabel()) + " " + iw.getLemma());
                                 tracePointers(iw, PointerType.MEMBER_MERONYM, PointerUtils.INFINITY, needSense, needGloss, needLex, needOffset, needSenseNum, needSenseKeys);
                                 tracePointers(iw, PointerType.SUBSTANCE_MERONYM, PointerUtils.INFINITY, needSense, needGloss, needLex, needOffset, needSenseNum, needSenseKeys);
                                 tracePointers(iw, PointerType.PART_MERONYM, PointerUtils.INFINITY, needSense, needGloss, needLex, needOffset, needSenseNum, needSenseKeys);
@@ -1248,10 +1288,10 @@ public class ewn {
                                         "A holonym is the name of the whole of which the meronym names a part.\n" +
                                         "Y is a holonym of X if X is a part of Y.");
                             }
-                            POS p = POS.getPOSForKey(arg.substring(5));
-                            IndexWord iw = d.lookupIndexWord(p, key);
+                            final POS p = POS.getPOSForKey(arg.substring(5));
+                            final IndexWord iw = d.lookupIndexWord(p, key);
                             if (null != iw) {
-                                System.out.println("\nHolonyms of " + p.getLabel() + " " + iw.getLemma());
+                                System.out.println("\nHolonyms of " + (p == null ? "" : p.getLabel()) + " " + iw.getLemma());
                                 tracePointers(iw, PointerType.MEMBER_HOLONYM, PointerUtils.INFINITY, needSense, needGloss, needLex, needOffset, needSenseNum, needSenseKeys);
                                 tracePointers(iw, PointerType.SUBSTANCE_HOLONYM, PointerUtils.INFINITY, needSense, needGloss, needLex, needOffset, needSenseNum, needSenseKeys);
                                 tracePointers(iw, PointerType.PART_HOLONYM, PointerUtils.INFINITY, needSense, needGloss, needLex, needOffset, needSenseNum, needSenseKeys);
@@ -1268,10 +1308,10 @@ public class ewn {
                                         "A holonym is the name of the whole of which the meronym names a part.\n" +
                                         "Y is a holonym of X if X is a part of Y.");
                             }
-                            POS p = POS.getPOSForKey(arg.substring(5));
-                            IndexWord iw = d.lookupIndexWord(p, key);
+                            final POS p = POS.getPOSForKey(arg.substring(5));
+                            final IndexWord iw = d.lookupIndexWord(p, key);
                             if (null != iw) {
-                                System.out.println("\nMeronyms of " + p.getLabel() + " " + iw.getLemma());
+                                System.out.println("\nMeronyms of " + (p == null ? "" : p.getLabel()) + " " + iw.getLemma());
                                 tracePointers(iw, PointerType.MEMBER_MERONYM, 1, needSense, needGloss, needLex, needOffset, needSenseNum, needSenseKeys);
                                 tracePointers(iw, PointerType.SUBSTANCE_MERONYM, 1, needSense, needGloss, needLex, needOffset, needSenseNum, needSenseKeys);
                                 tracePointers(iw, PointerType.PART_MERONYM, 1, needSense, needGloss, needLex, needOffset, needSenseNum, needSenseKeys);
@@ -1285,16 +1325,16 @@ public class ewn {
                                         "as an individual word, or as the first or last string in a word or\n" +
                                         "collocation.");
                             }
-                            POS p = POS.getPOSForKey(arg.substring(5));
-                            System.out.println("\nGrep of " + p.getLabel() + " " + key);
-                            Iterator<IndexWord> ii = d.getIndexWordIterator(p, key);
+                            final POS p = POS.getPOSForKey(arg.substring(5));
+                            System.out.println("\nGrep of " + (p == null ? "" : p.getLabel()) + " " + key);
+                            final Iterator<IndexWord> ii = d.getIndexWordIterator(p, key);
                             while (ii.hasNext()) {
                                 System.out.println(ii.next().getLemma());
                             }
                         }//grep
 
                         if ("-over".equals(arg)) {
-                            for (POS pos : POS.getAllPOS()) {
+                            for (final POS pos : POS.getAllPOS()) {
                                 if (null != d.getMorphologicalProcessor()) {
                                     IndexWord iw = d.getIndexWord(pos, key);
                                     //for plurals like species, glasses
@@ -1302,9 +1342,9 @@ public class ewn {
                                         printOverview(pos, iw, needGloss, needLex, needOffset, needSenseNum, needSenseKeys);
                                     }
 
-                                    List<String> forms = d.getMorphologicalProcessor().lookupAllBaseForms(pos, key);
+                                    final List<String> forms = d.getMorphologicalProcessor().lookupAllBaseForms(pos, key);
                                     if (null != forms) {
-                                        for (String form : forms) {
+                                        for (final String form : forms) {
                                             if (!form.equals(key)) {
                                                 iw = d.getIndexWord(pos, form);
                                                 if (null != iw) {
@@ -1322,15 +1362,17 @@ public class ewn {
         }
     }
 
-    private static void printOverview(POS pos, IndexWord iw, boolean needGloss, boolean needLex, boolean needOffset, boolean needSenseNum, boolean needSenseKeys) throws JWNLException {
+    private static void printOverview(final POS pos, final IndexWord iw, final boolean needGloss,
+                                      final boolean needLex, final boolean needOffset,
+                                      final boolean needSenseNum, final boolean needSenseKeys) throws JWNLException {
         System.out.println("\nOverview of " + pos.getLabel() + " " + iw.getLemma());
         System.out.println("\nThe " + pos.getLabel() + " " + iw.getLemma() + " has " + iw.getSenses().size() + " senses");
         for (int i = 0; i < iw.getSenses().size(); i++) {
-            Synset synset = iw.getSenses().get(i);
+            final Synset synset = iw.getSenses().get(i);
             System.out.print((i + 1) + ". ");
-            int widx = synset.indexOfWord(iw.getLemma());
+            final int widx = synset.indexOfWord(iw.getLemma());
             if (-1 < widx) {
-                Word word = synset.getWords().get(widx);
+                final Word word = synset.getWords().get(widx);
                 if (0 < word.getUseCount()) {
                     System.out.print("(" + word.getUseCount() + ") ");
                 }
@@ -1339,10 +1381,13 @@ public class ewn {
         }
     }
 
-    private static void tracePointers(IndexWord iw, PointerType pt, int depth, int needSense, boolean needGloss, boolean needLex, boolean needOffset, boolean needSenseNum, boolean needSenseKeys) throws JWNLException {
-        Map<Synset, PointerTargetTreeNodeList> ptrs = new HashMap<>();
-        for (Synset synset : iw.getSenses()) {
-            PointerTargetTreeNodeList list = PointerUtils.makePointerTargetTreeList(synset, pt, depth);
+    private static void tracePointers(final IndexWord iw, final PointerType pt, final int depth,
+                                      final int needSense, final boolean needGloss,
+                                      final boolean needLex, final boolean needOffset, final boolean needSenseNum,
+                                      final boolean needSenseKeys) throws JWNLException {
+        final Map<Synset, PointerTargetTreeNodeList> ptrs = new HashMap<>();
+        for (final Synset synset : iw.getSenses()) {
+            final PointerTargetTreeNodeList list = PointerUtils.makePointerTargetTreeList(synset, pt, depth);
             if (null != list && 0 < list.size()) {
                 ptrs.put(synset, list);
             }
@@ -1351,12 +1396,12 @@ public class ewn {
             System.out.println("\n" + ptrs.size() + " of " + iw.getSenses().size() + " senses of " + iw.getLemma());
             for (int i = 0; i < iw.getSenses().size(); i++) {
                 if (0 == needSense || i == (needSense - 1)) {
-                    Synset synset = iw.getSenses().get(i);
-                    PointerTargetTreeNodeList list = ptrs.get(synset);
+                    final Synset synset = iw.getSenses().get(i);
+                    final PointerTargetTreeNodeList list = ptrs.get(synset);
                     if (null != list) {
                         System.out.println("\nSense " + (i + 1));
                         printSense("", synset, needGloss, needLex, needOffset, needSenseNum, needSenseKeys);
-                        for (PointerTargetTreeNode node : list) {
+                        for (final PointerTargetTreeNode node : list) {
                             printPointerTargetTree("\t", node, needGloss, needLex, needOffset, needSenseNum, needSenseKeys);
                         }
                     }
@@ -1365,16 +1410,21 @@ public class ewn {
         }
     }
 
-    private static void printPointerTargetTree(String lead, PointerTargetTreeNode hypTree, boolean needGloss, boolean needLex, boolean needOffset, boolean needSenseNum, boolean needSenseKeys) throws JWNLException {
+    private static void printPointerTargetTree(final String lead, final PointerTargetTreeNode hypTree,
+                                               final boolean needGloss, final boolean needLex,
+                                               final boolean needOffset, final boolean needSenseNum,
+                                               final boolean needSenseKeys) throws JWNLException {
         printSense(lead, hypTree.getSynset(), needGloss, needLex, needOffset, needSenseNum, needSenseKeys);
         if (null != hypTree.getChildTreeList()) {
-            for (PointerTargetTreeNode node : hypTree.getChildTreeList()) {
+            for (final PointerTargetTreeNode node : hypTree.getChildTreeList()) {
                 printPointerTargetTree(lead + "\t", node, needGloss, needLex, needOffset, needSenseNum, needSenseKeys);
             }
         }
     }
 
-    private static void printSense(String lead, Synset synset, boolean needGloss, boolean needLex, boolean needOffset, boolean needSenseNum, boolean needSenseKeys) throws JWNLException {
+    private static void printSense(final String lead, final Synset synset, final boolean needGloss,
+                                   final boolean needLex, final boolean needOffset,
+                                   final boolean needSenseNum, final boolean needSenseKeys) throws JWNLException {
         System.out.print(lead);
         if (needOffset) {
             System.out.print("{" + df.format(synset.getOffset()) + "} ");
@@ -1382,9 +1432,9 @@ public class ewn {
         if (needLex) {
             System.out.print("<" + synset.getLexFileName() + "> ");
         }
-        List<Word> words = synset.getWords();
+        final List<Word> words = synset.getWords();
         for (int i = 0; i < words.size(); i++) {
-            Word word = words.get(i);
+            final Word word = words.get(i);
             System.out.print(word.getLemma());
             if (needLex && 0 < word.getLexId()) {
                 System.out.print(word.getLexId());
@@ -1405,8 +1455,8 @@ public class ewn {
         System.out.println();
     }
 
-    private static int getSenseNo(Word word) throws JWNLException {
-        IndexWord iw = word.getDictionary().getIndexWord(word.getPOS(), word.getLemma());
+    private static int getSenseNo(final Word word) throws JWNLException {
+        final IndexWord iw = word.getDictionary().getIndexWord(word.getPOS(), word.getLemma());
         for (int i = 0; i < iw.getSenses().size(); i++) {
             if (iw.getSenses().get(i).getOffset() == word.getSynset().getOffset()) {
                 return i;
@@ -1415,9 +1465,9 @@ public class ewn {
         return -1;
     }
 
-    private static boolean hasPointer(IndexWord iw, PointerType pointerType) {
-        for (Synset synset : iw.getSenses()) {
-            for (Pointer pointer : synset.getPointers()) {
+    private static boolean hasPointer(final IndexWord iw, final PointerType pointerType) {
+        for (final Synset synset : iw.getSenses()) {
+            for (final Pointer pointer : synset.getPointers()) {
                 if (pointerType == pointer.getType()) {
                     return true;
                 }
@@ -1426,9 +1476,9 @@ public class ewn {
         return false;
     }
 
-    private static boolean hasUseCount(IndexWord iw) {
-        for (Synset synset : iw.getSenses()) {
-            for (Word word : synset.getWords()) {
+    private static boolean hasUseCount(final IndexWord iw) {
+        for (final Synset synset : iw.getSenses()) {
+            for (final Word word : synset.getWords()) {
                 if (0 < word.getUseCount()) {
                     return true;
                 }
@@ -1437,7 +1487,7 @@ public class ewn {
         return false;
     }
 
-    private static void printAvailableInfo(IndexWord iw) {
+    private static void printAvailableInfo(final IndexWord iw) {
         if (hasPointer(iw, PointerType.ANTONYM)) {
             System.out.println("\t-ants" + iw.getPOS().getKey() + "\tAntonyms");
         }
