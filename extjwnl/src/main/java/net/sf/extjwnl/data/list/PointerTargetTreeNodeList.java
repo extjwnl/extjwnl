@@ -5,7 +5,10 @@ import net.sf.extjwnl.data.PointerType;
 import net.sf.extjwnl.util.DeepCloneable;
 
 import java.io.PrintStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
 
 /**
  * A list of <code>PointerTargetTreeNode</code>s.
@@ -17,9 +20,7 @@ public class PointerTargetTreeNodeList extends LinkedList<PointerTargetTreeNode>
     private static final NodePrinter<PointerTargetTreeNode> PRINTER =
             new NodePrinter<PointerTargetTreeNode>(2) {
                 public void print(PrintStream stream, PointerTargetTreeNode node, int indent, int indentIncrement) {
-                    char c[] = new char[indent >= 0 ? indent : 0];
-                    Arrays.fill(c, ' ');
-                    stream.println(new String(c) + node);
+                    PointerTargetNodeList.printIndented(stream, node, indent);
                     if (node.hasValidChildTreeList()) {
                         node.getChildTreeList().print(stream, indent + indentIncrement, indentIncrement);
                     }

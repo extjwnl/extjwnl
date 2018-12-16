@@ -21,9 +21,7 @@ public class PointerTargetNodeList extends LinkedList<PointerTargetNode> impleme
     private static final NodePrinter<PointerTargetNode> PRINTER =
             new NodePrinter<PointerTargetNode>(System.out, 2) {
                 public void print(PrintStream stream, PointerTargetNode node, int indent, int indentIncrement) {
-                    char c[] = new char[indent >= 0 ? indent : 0];
-                    Arrays.fill(c, ' ');
-                    stream.println(new String(c) + node);
+                    printIndented(stream, node, indent);
                 }
             };
 
@@ -44,6 +42,12 @@ public class PointerTargetNodeList extends LinkedList<PointerTargetNode> impleme
 
     public void add(PointerTarget target, PointerType pointerType) {
         add(new PointerTargetNode(target, pointerType));
+    }
+
+    protected static void printIndented(PrintStream stream, PointerTargetNode node, int indent) {
+        char[] c = new char[indent >= 0 ? indent : 0];
+        Arrays.fill(c, ' ');
+        stream.println(new String(c) + node);
     }
 
     protected NodePrinter<PointerTargetNode> getNodePrinter() {
