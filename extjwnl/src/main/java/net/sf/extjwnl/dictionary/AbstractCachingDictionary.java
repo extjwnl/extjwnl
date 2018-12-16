@@ -266,69 +266,40 @@ public abstract class AbstractCachingDictionary extends Dictionary {
         }
     }
 
+    private void iterateIterator(final Iterator i) {
+        int count = 0;
+        while (i.hasNext()) {
+            if (count % 10000 == 0) {
+                if (log.isDebugEnabled()) {
+                    log.debug(getMessages().resolveMessage("DICTIONARY_INFO_005", count));
+                }
+            }
+            count++;
+            i.next();
+        }
+        if (log.isDebugEnabled()) {
+            log.debug(getMessages().resolveMessage("DICTIONARY_INFO_006", count));
+        }
+    }
+
     protected void cachePOS(POS pos) throws JWNLException {
         if (log.isDebugEnabled()) {
             log.debug(getMessages().resolveMessage("DICTIONARY_INFO_003", pos.getLabel()));
         }
 
-        {
-            if (log.isDebugEnabled()) {
-                log.debug(getMessages().resolveMessage("DICTIONARY_INFO_007"));
-            }
-            int count = 0;
-            Iterator<Exc> ei = getExceptionIterator(pos);
-            while (ei.hasNext()) {
-                if (count % 10000 == 0) {
-                    if (log.isDebugEnabled()) {
-                        log.debug(getMessages().resolveMessage("DICTIONARY_INFO_005", count));
-                    }
-                }
-                count++;
-                ei.next();
-            }
-            if (log.isDebugEnabled()) {
-                log.debug(getMessages().resolveMessage("DICTIONARY_INFO_006", count));
-            }
+        if (log.isDebugEnabled()) {
+            log.debug(getMessages().resolveMessage("DICTIONARY_INFO_007"));
         }
+        iterateIterator(getExceptionIterator(pos));
 
-        {
-            if (log.isDebugEnabled()) {
-                log.debug(getMessages().resolveMessage("DICTIONARY_INFO_008"));
-            }
-            int count = 0;
-            Iterator<Synset> si = getSynsetIterator(pos);
-            while (si.hasNext()) {
-                if (count % 10000 == 0) {
-                    if (log.isDebugEnabled()) {
-                        log.debug(getMessages().resolveMessage("DICTIONARY_INFO_005", count));
-                    }
-                }
-                count++;
-                si.next();
-            }
-            if (log.isDebugEnabled()) {
-                log.debug(getMessages().resolveMessage("DICTIONARY_INFO_006", count));
-            }
+        if (log.isDebugEnabled()) {
+            log.debug(getMessages().resolveMessage("DICTIONARY_INFO_008"));
         }
+        iterateIterator(getSynsetIterator(pos));
 
-        {
-            if (log.isDebugEnabled()) {
-                log.debug(getMessages().resolveMessage("DICTIONARY_INFO_004"));
-            }
-            int count = 0;
-            Iterator<IndexWord> ii = getIndexWordIterator(pos);
-            while (ii.hasNext()) {
-                if (count % 10000 == 0) {
-                    if (log.isDebugEnabled()) {
-                        log.debug(getMessages().resolveMessage("DICTIONARY_INFO_005", count));
-                    }
-                }
-                count++;
-                ii.next();
-            }
-            if (log.isDebugEnabled()) {
-                log.debug(getMessages().resolveMessage("DICTIONARY_INFO_006", count));
-            }
+        if (log.isDebugEnabled()) {
+            log.debug(getMessages().resolveMessage("DICTIONARY_INFO_004"));
         }
+        iterateIterator(getIndexWordIterator(pos));
     }
 }
