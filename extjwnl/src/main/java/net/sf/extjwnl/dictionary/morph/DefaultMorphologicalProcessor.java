@@ -52,7 +52,7 @@ public class DefaultMorphologicalProcessor implements MorphologicalProcessor {
         }
         @SuppressWarnings("unchecked")
         List<Operation> operations = (List<Operation>) operationParams.create();
-        this.operations = operations.toArray(new Operation[operations.size()]);
+        this.operations = operations.toArray(new Operation[0]);
 
         Param param = params.get(CACHE_CAPACITY);
         int capacity = (param == null) ? CacheSet.DEFAULT_CACHE_CAPACITY : Integer.parseInt(param.getValue());

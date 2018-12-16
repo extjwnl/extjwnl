@@ -51,7 +51,7 @@ public abstract class Util {
         if (buf.length() > 0) {
             tokens.add(buf.toString());
         }
-        return tokens.toArray(new String[tokens.size()]);
+        return tokens.toArray(new String[0]);
     }
 
     public static Throwable getRootCause(Throwable e) {

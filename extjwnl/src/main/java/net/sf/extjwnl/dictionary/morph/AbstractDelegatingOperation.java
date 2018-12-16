@@ -31,7 +31,7 @@ public abstract class AbstractDelegatingOperation extends AbstractOperation {
             if (paramList != null) {
                 @SuppressWarnings("unchecked")
                 List<Operation> operations = (List<Operation>) paramList.create();
-                Operation[] operationArray = operations.toArray(new Operation[operations.size()]);
+                Operation[] operationArray = operations.toArray(new Operation[0]);
                 this.addDelegate(key, operationArray);
             }
         }
