@@ -6,7 +6,6 @@ import net.sf.extjwnl.util.ResourceBundleSet;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 
 /**
  * A node in a <code>PointerTargetTreeNodeList</code>. Each node can have a childTreeList, which is a list of nodes that
@@ -146,12 +145,11 @@ public class PointerTargetTreeNode extends PointerTargetNode {
      */
     public List<PointerTargetNodeList> toList(PointerTargetNodeList list) {
         list.add(getPointerTarget(), getType());
-        List<PointerTargetNodeList> l = new ArrayList<PointerTargetNodeList>();
+        List<PointerTargetNodeList> l = new ArrayList<>();
         if (hasValidChildTreeList()) {
-            PointerTargetTreeNodeList childTreeList = getChildTreeList();
-            ListIterator itr = childTreeList.listIterator();
-            while (itr.hasNext()) {
-                l.addAll(((PointerTargetTreeNode) itr.next()).toList(list.clone()));
+            final PointerTargetTreeNodeList childTreeList = getChildTreeList();
+            for (final PointerTargetTreeNode pointerTargetTreeNode : childTreeList) {
+                l.addAll(pointerTargetTreeNode.toList(list.clone()));
             }
         } else {
             l.add(list);

@@ -65,7 +65,7 @@ public class DictionaryToDatabase {
 	 * @throws SQLException SQLException
 	 * @throws IOException IOException
      */
-    public static void main(String args[]) throws JWNLException, SQLException, IOException {
+    public static void main(String[] args) throws JWNLException, SQLException, IOException {
         if (args.length < 4) {
             System.out.println("Usage: DictionaryToDatabase <property file> <create tables script> <driver class> <connection url> [username [password]]");
         } else {
@@ -366,7 +366,7 @@ public class DictionaryToDatabase {
 
             int iwId = entry.getKey();
             iwsStmt.setInt(2, iwId);
-            long offsets[] = entry.getValue();
+            long[] offsets = entry.getValue();
             int rank = 0;
             for (long offset : offsets) {
                 int synsetId = synsetOffsetToId.get(offset);

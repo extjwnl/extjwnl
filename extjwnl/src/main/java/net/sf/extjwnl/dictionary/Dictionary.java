@@ -101,12 +101,7 @@ public abstract class Dictionary {
      */
     public static final String DEFAULT_RESOURCE_CONFIG_PATH = "/extjwnl_resource_properties.xml";
 
-    private static final Comparator<Word> wordLexIdComparator = new Comparator<Word>() {
-        @Override
-        public int compare(Word o1, Word o2) {
-            return o1.getLexId() - o2.getLexId();
-        }
-    };
+    private static final Comparator<Word> wordLexIdComparator = Comparator.comparingInt(Word::getLexId);
 
     private final String[] verbFrames;
 
@@ -610,11 +605,7 @@ public abstract class Dictionary {
                     for (Synset sense : iw.getSenses()) {
                         for (Word word : sense.getWords()) {
                             if (word.getLemma().equalsIgnoreCase(iw.getLemma())) {
-                                List<Word> list = words.get(sense.getLexFileNum());
-                                if (null == list) {
-                                    list = new ArrayList<>();
-                                    words.put(sense.getLexFileNum(), list);
-                                }
+                                List<Word> list = words.computeIfAbsent(sense.getLexFileNum(), k -> new ArrayList<>());
                                 list.add(word);
                             }
                         }
@@ -622,7 +613,7 @@ public abstract class Dictionary {
 
                     for (Map.Entry<Long, List<Word>> entry : words.entrySet()) {
                         List<Word> list = entry.getValue();
-                        Collections.sort(list, wordLexIdComparator);
+                        list.sort(wordLexIdComparator);
                         int maxId = -1;
                         for (Word word : list) {
                             if (maxId < word.getLexId()) {
@@ -988,28 +979,14 @@ public abstract class Dictionary {
     }
 
     private static String getResourceProperties(String resourceName) throws IOException {
-        InputStream inputStream = Dictionary.class.getResourceAsStream(resourceName);
-        try {
-            BufferedReader fileCheck = new BufferedReader(new InputStreamReader(inputStream));
-            try {
-                StringBuilder fileText = new StringBuilder();
+        try (final InputStream inputStream = Dictionary.class.getResourceAsStream(resourceName)) {
+            try (final BufferedReader fileCheck = new BufferedReader(new InputStreamReader(inputStream))) {
+                final StringBuilder fileText = new StringBuilder();
                 String line;
                 while (null != (line = fileCheck.readLine())) {
                     fileText.append(line).append("\n");
                 }
                 return fileText.toString();
-            } finally {
-                try {
-                    fileCheck.close();
-                } catch (IOException e) {
-                    // doesn't matter.
-                }
-            }
-        } finally {
-            try {
-                inputStream.close();
-            } catch (IOException e) {
-                // doesn't matter.
             }
         }
     }

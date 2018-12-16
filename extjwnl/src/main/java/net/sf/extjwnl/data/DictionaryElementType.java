@@ -46,7 +46,7 @@ public enum DictionaryElementType {
      *
      * @param name name
      */
-    private DictionaryElementType(String name) {
+    DictionaryElementType(String name) {
         this.name = name;
     }
 

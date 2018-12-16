@@ -76,19 +76,12 @@ public class PrincetonResourceDictionaryFile extends AbstractPrincetonRandomAcce
 
     @Override
     public void open() throws JWNLException {
-        InputStream input = PrincetonResourceDictionaryFile.class.getResourceAsStream(path + "/" + getFilename());
-        try {
-            try {
-                // data.noun is about 16M
-                ByteArrayOutputStream output = new ByteArrayOutputStream(16 * 1024 * 1024);
-                try {
-                    copyStream(input, output);
-                    buffer = output.toByteArray();
-                } finally {
-                    output.close();
-                }
-            } finally {
-                input.close();
+        try (final InputStream input =
+                     PrincetonResourceDictionaryFile.class.getResourceAsStream(path + "/" + getFilename())) {
+            // data.noun is about 16M
+            try (final ByteArrayOutputStream output = new ByteArrayOutputStream(16 * 1024 * 1024)) {
+                copyStream(input, output);
+                buffer = output.toByteArray();
             }
         } catch (IOException e) {
             throw new JWNLIOException(e);
@@ -281,16 +274,10 @@ public class PrincetonResourceDictionaryFile extends AbstractPrincetonRandomAcce
     }
 
     public static void copyStream(InputStream input, OutputStream output) throws IOException {
-        WritableByteChannel outputChannel = Channels.newChannel(output);
-        try {
-            ReadableByteChannel inputChannel = Channels.newChannel(input);
-            try {
+        try (final WritableByteChannel outputChannel = Channels.newChannel(output)) {
+            try (final ReadableByteChannel inputChannel = Channels.newChannel(input)) {
                 fastChannelCopy(inputChannel, outputChannel);
-            } finally {
-                inputChannel.close();
             }
-        } finally {
-            outputChannel.close();
         }
     }
 }

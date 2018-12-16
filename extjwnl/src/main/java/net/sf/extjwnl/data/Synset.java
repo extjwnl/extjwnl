@@ -203,7 +203,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
         @Override
         public void clear() {
             if (null != dictionary && dictionary.isEditable()) {
-                List<Pointer> copy = new ArrayList<Pointer>(this);
+                List<Pointer> copy = new ArrayList<>(this);
                 super.clear();
                 if (dictionary.getManageSymmetricPointers()) {
                     for (Pointer pointer : copy) {
@@ -218,7 +218,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
         @Override
         protected void removeRange(int fromIndex, int toIndex) {
             if (null != dictionary && dictionary.isEditable()) {
-                List<Pointer> copy = new ArrayList<Pointer>(super.subList(fromIndex, toIndex));
+                List<Pointer> copy = new ArrayList<>(super.subList(fromIndex, toIndex));
                 super.removeRange(fromIndex, toIndex);
                 for (Pointer pointer : copy) {
                     deleteSymmetricPointerFromTarget(pointer);
@@ -261,7 +261,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
         @Override
         public boolean removeAll(Collection<?> c) {
             if (null != dictionary && dictionary.isEditable()) {
-                List<Pointer> copy = new ArrayList<Pointer>(this);
+                List<Pointer> copy = new ArrayList<>(this);
                 boolean result = super.removeAll(c);
                 if (dictionary.getManageSymmetricPointers()) {
                     for (Object object : c) {
@@ -282,7 +282,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
         @Override
         public boolean retainAll(Collection<?> c) {
             if (null != dictionary && dictionary.isEditable()) {
-                List<Pointer> copy = new ArrayList<Pointer>(this);
+                List<Pointer> copy = new ArrayList<>(this);
                 boolean result = super.retainAll(c);
                 if (dictionary.getManageSymmetricPointers()) {
                     for (Pointer pointer : copy) {
@@ -354,7 +354,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
                             try {
                                 if (dictionary != pointer.getSource().getDictionary() || null == pointer.getTarget() || dictionary != pointer.getTarget().getDictionary()) {
                                     if (null == toDelete) {
-                                        toDelete = new ArrayList<Pointer>();
+                                        toDelete = new ArrayList<>();
                                     }
                                     toDelete.add(pointer);
                                 }
@@ -486,7 +486,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
         @Override
         public void clear() {
             if (null != dictionary && dictionary.isEditable()) {
-                List<Word> copy = new ArrayList<Word>(this);
+                List<Word> copy = new ArrayList<>(this);
                 super.clear();
                 for (Word word : copy) {
                     removeThisSynsetFromIndexWords(word);
@@ -499,7 +499,7 @@ public class Synset extends PointerTarget implements DictionaryElement {
         @Override
         protected void removeRange(int fromIndex, int toIndex) {
             if (null != dictionary && dictionary.isEditable()) {
-                List<Word> copy = new ArrayList<Word>(subList(fromIndex, toIndex));
+                List<Word> copy = new ArrayList<>(subList(fromIndex, toIndex));
                 super.removeRange(fromIndex, toIndex);
                 for (Word word : copy) {
                     removeThisSynsetFromIndexWords(word);

@@ -67,7 +67,7 @@ public class PointerTargetTree {
      * @return list of operation results
      */
     public List<PointerTargetTreeNode> getAllMatches(PointerTargetTreeNodeList.Operation opr) {
-        List<PointerTargetTreeNode> list = new ArrayList<PointerTargetTreeNode>();
+        List<PointerTargetTreeNode> list = new ArrayList<>();
         if (opr.execute(getRootNode()) != null) {
             list.add(getRootNode());
         }
@@ -138,7 +138,7 @@ public class PointerTargetTree {
     public List<PointerTargetNodeList> reverse() {
         List<PointerTargetNodeList> list = toList();
         if (list != null) {
-            List<PointerTargetNodeList> reversedLists = new ArrayList<PointerTargetNodeList>(list.size());
+            List<PointerTargetNodeList> reversedLists = new ArrayList<>(list.size());
             for (PointerTargetNodeList l : list) {
                 reversedLists.add(l.reverse());
             }

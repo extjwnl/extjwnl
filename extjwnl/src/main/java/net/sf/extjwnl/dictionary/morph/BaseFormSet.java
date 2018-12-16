@@ -15,7 +15,7 @@ import java.util.List;
 public class BaseFormSet {
 
     private final Dictionary dictionary;
-    private final List<String> forms = new ArrayList<String>();
+    private final List<String> forms = new ArrayList<>();
     private final boolean allowDuplicates;
     private int index = -1;
 

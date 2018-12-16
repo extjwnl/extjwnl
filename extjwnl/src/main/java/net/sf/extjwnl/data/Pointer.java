@@ -6,6 +6,7 @@ import net.sf.extjwnl.util.ResourceBundleSet;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * A <code>Pointer</code> encodes a lexical or semantic relationship between WordNet entities.  A lexical
@@ -239,7 +240,7 @@ public class Pointer implements Serializable {
             return false;
         }
         if (null == target) {
-            if (targetIndex != null ? !targetIndex.equals(pointer.targetIndex) : pointer.targetIndex != null) {
+            if (!Objects.equals(targetIndex, pointer.targetIndex)) {
                 return false;
             }
         } else {
@@ -298,7 +299,7 @@ public class Pointer implements Serializable {
                 return false;
             }
             //noinspection RedundantIfStatement
-            if (pos != null ? !pos.equals(that.pos) : that.pos != null) {
+            if (!Objects.equals(pos, that.pos)) {
                 return false;
             }
 

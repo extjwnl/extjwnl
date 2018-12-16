@@ -89,7 +89,7 @@ public enum PointerType {
     INSTANCE_HYPERNYM("@i", "instance hypernym", PointerTypeFlags.N | PointerTypeFlags.V),
     INSTANCES_HYPONYM("~i", "instances hyponym", PointerTypeFlags.N | PointerTypeFlags.V);
 
-    private static final Map<POS, Integer> POS_TO_MASK_MAP = new EnumMap<POS, Integer>(POS.class);
+    private static final Map<POS, Integer> POS_TO_MASK_MAP = new EnumMap<>(POS.class);
 
     static {
         POS_TO_MASK_MAP.put(POS.NOUN, PointerTypeFlags.N);
@@ -361,7 +361,7 @@ public enum PointerType {
     }
 
     public static List<PointerType> getAllPointerTypesForPOS(POS pos) {
-        List<PointerType> types = new ArrayList<PointerType>();
+        List<PointerType> types = new ArrayList<>();
         for (PointerType pt : ALL_TYPES) {
             if (pt.appliesTo(pos)) {
                 types.add(pt);
@@ -378,7 +378,7 @@ public enum PointerType {
      */
     private transient PointerType symmetricType;
 
-    private PointerType(String key, String label, int flags) {
+    PointerType(String key, String label, int flags) {
         this.key = key;
         this.label = label;
         this.flags = flags;

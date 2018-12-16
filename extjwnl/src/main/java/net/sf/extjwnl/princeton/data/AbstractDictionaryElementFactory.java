@@ -23,7 +23,7 @@ public abstract class AbstractDictionaryElementFactory implements DictionaryElem
     protected final Dictionary dictionary;
 
     // stores max offset for each POS
-    protected final Map<POS, Long> maxOffset = new EnumMap<POS, Long>(POS.class);
+    protected final Map<POS, Long> maxOffset = new EnumMap<>(POS.class);
 
     /**
      * Whether to cache strings in .intern like manner. Reduces memory snapshot for fully-loaded WordNets, default true.
@@ -31,7 +31,7 @@ public abstract class AbstractDictionaryElementFactory implements DictionaryElem
      */
     public static final String CACHE_STRINGS_KEY = "cache_strings";
     protected boolean cacheStrings = true;
-    protected Pool<String> stringCache = new ZeroPool<String>();
+    protected Pool<String> stringCache = new ZeroPool<>();
 
     public AbstractDictionaryElementFactory(Dictionary dictionary, Map<String, Param> params) {
         this.dictionary = dictionary;
@@ -113,13 +113,13 @@ public abstract class AbstractDictionaryElementFactory implements DictionaryElem
 
     public void startCaching() {
         if (cacheStrings) {
-            stringCache = new HashPool<String>();
+            stringCache = new HashPool<>();
         }
     }
 
     public void stopCaching() {
         if (cacheStrings) {
-            stringCache = new ZeroPool<String>();
+            stringCache = new ZeroPool<>();
         }
     }
 

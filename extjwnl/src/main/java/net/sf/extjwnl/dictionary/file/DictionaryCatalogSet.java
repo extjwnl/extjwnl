@@ -33,9 +33,9 @@ public class DictionaryCatalogSet<E extends DictionaryFile> implements Owned {
      */
     public DictionaryCatalogSet(Dictionary dictionary, Map<String, Param> params, Class desiredDictionaryFileType) throws JWNLException {
         this.dictionary = dictionary;
-        this.catalogs = new EnumMap<DictionaryFileType, DictionaryCatalog<E>>(DictionaryFileType.class);
+        this.catalogs = new EnumMap<>(DictionaryFileType.class);
         for (DictionaryFileType d : DictionaryFileType.getAllDictionaryFileTypes()) {
-            DictionaryCatalog<E> cat = new DictionaryCatalog<E>(dictionary, d, desiredDictionaryFileType, params);
+            DictionaryCatalog<E> cat = new DictionaryCatalog<>(dictionary, d, desiredDictionaryFileType, params);
             catalogs.put(cat.getKey(), cat);
         }
     }

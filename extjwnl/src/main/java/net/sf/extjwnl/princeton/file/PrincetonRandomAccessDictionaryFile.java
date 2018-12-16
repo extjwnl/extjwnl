@@ -171,11 +171,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
             '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
     };
 
-    private final static Comparator<Synset> synsetOffsetComparator = new Comparator<Synset>() {
-        public int compare(Synset o1, Synset o2) {
-            return (int) (o1.getOffset() - o2.getOffset());
-        }
-    };
+    private final static Comparator<Synset> synsetOffsetComparator = (o1, o2) -> (int) (o1.getOffset() - o2.getOffset());
 
     protected final File file;
     protected RandomAccessFile raFile;
@@ -308,13 +304,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
 
     @Override
     public PointedCharSequence readLine(long offset) throws JWNLException {
-        if (!isOpen()) {
-            throw new JWNLException(dictionary.getMessages().resolveMessage("PRINCETON_EXCEPTION_001"));
-        }
-
-        if (offset >= raFileLength || offset < 0) {
-            return null;
-        }
+        if (isInvalidOffset(offset)) return null;
 
         // max line values
         // exc files - 46
@@ -366,35 +356,12 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
         }
 
         // resulting line ends at i (eol or eof)
-        final PointedCharSequence result;
-
-        if (null == encoding) {
-            result = new ByteArrayCharSequence(line, 0, i, offset + i);
-        } else {
-            final ByteBuffer bb = ByteBuffer.wrap(line, 0, i);
-
-            try {
-                synchronized (this) {
-                    CharBuffer cb = decoder.decode(bb);
-                    result = new CharBufferCharSequence(cb, offset + i);
-                }
-            } catch (CharacterCodingException e) {
-                throw new JWNLIOException(dictionary.getMessages().resolveMessage("PRINCETON_EXCEPTION_003",
-                        new Object[]{getFilename(), offset}), e);
-            }
-        }
-        return result;
+        return getPointedCharSequence(offset, line, i);
     }
 
     @Override
     public PointedCharSequence readWord(long offset) throws JWNLException {
-        if (!isOpen()) {
-            throw new JWNLException(dictionary.getMessages().resolveMessage("PRINCETON_EXCEPTION_001"));
-        }
-
-        if (offset >= raFileLength || offset < 0) {
-            return null;
-        }
+        if (isInvalidOffset(offset)) return null;
 
         int LINE_MAX = 32;
 
@@ -431,24 +398,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
         }
 
         // resulting word ends at i (space, eol or eof)
-        final PointedCharSequence result;
-
-        if (null == encoding) {
-            result = new ByteArrayCharSequence(line, 0, i, offset + i);
-        } else {
-            final ByteBuffer bb = ByteBuffer.wrap(line, 0, i);
-
-            try {
-                synchronized (this) {
-                    CharBuffer cb = decoder.decode(bb);
-                    result = new CharBufferCharSequence(cb, offset + i);
-                }
-            } catch (CharacterCodingException e) {
-                throw new JWNLIOException(dictionary.getMessages().resolveMessage("PRINCETON_EXCEPTION_003",
-                        new Object[]{getFilename(), offset}), e);
-            }
-        }
-        return result;
+        return getPointedCharSequence(offset, line, i);
     }
 
     @Override
@@ -567,7 +517,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
             if (!isOpen()) {
                 try {
 
-                    /**
+                    /*
                      * Here we try to be intelligent about opening files.
                      * If the file exists, we assume that we are going to be reading from it,
                      * otherwise we assume that we are going to be creating it and writing to it.
@@ -632,7 +582,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
             initBuffers();
 
             if (DictionaryFileType.EXCEPTION == fileType) {
-                ArrayList<String> exceptions = new ArrayList<String>();
+                ArrayList<String> exceptions = new ArrayList<>();
                 Iterator<Exc> ei = dictionary.getExceptionIterator(getPOS());
                 StringBuilder sb = new StringBuilder(512);
                 while (ei.hasNext()) {
@@ -651,7 +601,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                     truncate();
                 }
             } else if (DictionaryFileType.DATA == fileType) {
-                ArrayList<Synset> synsets = new ArrayList<Synset>();
+                ArrayList<Synset> synsets = new ArrayList<>();
                 Iterator<Synset> si = dictionary.getSynsetIterator(getPOS());
                 while (si.hasNext()) {
                     synsets.add(si.next());
@@ -661,7 +611,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                     log.debug(dictionary.getMessages().resolveMessage("PRINCETON_INFO_005", synsets.size()));
                 }
                 // dictionary is cached in a hashmap, synset order is not guaranteed
-                Collections.sort(synsets, synsetOffsetComparator);
+                synsets.sort(synsetOffsetComparator);
 
                 if (log.isDebugEnabled()) {
                     log.debug(dictionary.getMessages().resolveMessage("PRINCETON_INFO_007", synsets.size()));
@@ -697,7 +647,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                     log.debug(dictionary.getMessages().resolveMessage("PRINCETON_INFO_009", getFilename()));
                 }
             } else if (DictionaryFileType.INDEX == fileType) {
-                ArrayList<String> indexes = new ArrayList<String>();
+                ArrayList<String> indexes = new ArrayList<>();
 
                 if (log.isDebugEnabled()) {
                     log.debug(dictionary.getMessages().resolveMessage("PRINCETON_INFO_011", getFilename()));
@@ -724,14 +674,11 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                 ArrayList<Word> toRender = collectWordsToRender();
 
                 // sort by sense key
-                Collections.sort(toRender, new Comparator<Word>() {
-                    @Override
-                    public int compare(Word o1, Word o2) {
-                        try {
-                            return o1.getSenseKeyWithAdjClass().compareTo(o2.getSenseKeyWithAdjClass());
-                        } catch (JWNLException e) {
-                            throw new JWNLRuntimeException(e);
-                        }
+                toRender.sort((o1, o2) -> {
+                    try {
+                        return o1.getSenseKeyWithAdjClass().compareTo(o2.getSenseKeyWithAdjClass());
+                    } catch (JWNLException e) {
+                        throw new JWNLRuntimeException(e);
                     }
                 });
 
@@ -769,19 +716,16 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                 ArrayList<Word> toRender = collectWordsToRender();
 
                 // sort by count in descending order
-                Collections.sort(toRender, new Comparator<Word>() {
-                    @Override
-                    public int compare(Word o1, Word o2) {
-                        int result = o2.getUseCount() - o1.getUseCount();
-                        if (0 == result) {
-                            try {
-                                result = o2.getSenseKeyWithAdjClass().compareTo(o1.getSenseKeyWithAdjClass());
-                            } catch (JWNLException e) {
-                                throw new JWNLRuntimeException(e);
-                            }
+                toRender.sort((o1, o2) -> {
+                    int result = o2.getUseCount() - o1.getUseCount();
+                    if (0 == result) {
+                        try {
+                            result = o2.getSenseKeyWithAdjClass().compareTo(o1.getSenseKeyWithAdjClass());
+                        } catch (JWNLException e) {
+                            throw new JWNLRuntimeException(e);
                         }
-                        return result;
                     }
+                    return result;
                 });
 
                 raFile.seek(0);
@@ -840,7 +784,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                     log.debug(dictionary.getMessages().resolveMessage("PRINCETON_INFO_013", getFilename()));
                 }
             } else if (DictionaryFileType.SENSEINDEX == fileType) {
-                Set<String> senseIndexContent = new TreeSet<String>();
+                Set<String> senseIndexContent = new TreeSet<>();
                 StringBuilder result = new StringBuilder(100);
                 for (POS pos : POS.getAllPOS()) {
                     Iterator<IndexWord> ii = dictionary.getIndexWordIterator(pos);
@@ -856,7 +800,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                                     result.append(w.getSenseKey()).append(" ");
                                     formatOffset(synset.getOffset(), offsetLength, result);
                                     result.append(" ");
-                                    result.append(Integer.toString(i + 1));
+                                    result.append(i + 1);
                                     result.append(" ");
                                     result.append(w.getUseCount());
                                     senseIndexContent.add(result.toString());
@@ -887,8 +831,8 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
     }
 
     private ArrayList<Word> collectWordsToRender() throws JWNLException {
-        ArrayList<Word> result = new ArrayList<Word>();
-        Set<String> renderedKeys = new HashSet<String>();
+        ArrayList<Word> result = new ArrayList<>();
+        Set<String> renderedKeys = new HashSet<>();
         for (POS pos : POS.getAllPOS()) {
             Iterator<IndexWord> ii = dictionary.getIndexWordIterator(pos);
             while (ii.hasNext()) {
@@ -912,7 +856,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
     @Override
     public int getOffsetLength() throws JWNLException {
         if (DictionaryFileType.DATA == fileType) {
-            ArrayList<Synset> synsets = new ArrayList<Synset>();
+            ArrayList<Synset> synsets = new ArrayList<>();
             Iterator<Synset> si = dictionary.getSynsetIterator(getPOS());
             while (si.hasNext()) {
                 synsets.add(si.next());
@@ -921,7 +865,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
             if (log.isDebugEnabled()) {
                 log.debug(dictionary.getMessages().resolveMessage("PRINCETON_INFO_005", synsets.size()));
             }
-            Collections.sort(synsets, synsetOffsetComparator);
+            synsets.sort(synsetOffsetComparator);
 
             initBuffers();
 
@@ -983,7 +927,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
 
             // recalculate offsets which might change due to changed offset length
             if (DictionaryFileType.DATA == fileType) {
-                ArrayList<Synset> synsets = new ArrayList<Synset>();
+                ArrayList<Synset> synsets = new ArrayList<>();
                 Iterator<Synset> si = dictionary.getSynsetIterator(getPOS());
                 while (si.hasNext()) {
                     synsets.add(si.next());
@@ -992,7 +936,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                 if (log.isInfoEnabled()) {
                     log.info(dictionary.getMessages().resolveMessage("PRINCETON_INFO_005", synsets.size()));
                 }
-                Collections.sort(synsets, synsetOffsetComparator);
+                synsets.sort(synsetOffsetComparator);
 
                 if (log.isInfoEnabled()) {
                     log.info(dictionary.getMessages().resolveMessage("PRINCETON_INFO_006", new Object[]{synsets.size(), getFilename()}));
@@ -1029,6 +973,38 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
     public boolean delete() throws JWNLException {
         close();
         return file.delete();
+    }
+
+    protected PointedCharSequence getPointedCharSequence(long offset, byte[] line, int i) throws JWNLIOException {
+        final PointedCharSequence result;
+
+        if (null == encoding) {
+            result = new ByteArrayCharSequence(line, 0, i, offset + i);
+        } else {
+            final ByteBuffer bb = ByteBuffer.wrap(line, 0, i);
+
+            try {
+                synchronized (this) {
+                    CharBuffer cb = decoder.decode(bb);
+                    result = new CharBufferCharSequence(cb, offset + i);
+                }
+            } catch (CharacterCodingException e) {
+                throw new JWNLIOException(dictionary.getMessages().resolveMessage("PRINCETON_EXCEPTION_003",
+                        new Object[]{getFilename(), offset}), e);
+            }
+        }
+        return result;
+    }
+
+    protected boolean isInvalidOffset(long offset) throws JWNLException {
+        if (!isOpen()) {
+            throw new JWNLException(dictionary.getMessages().resolveMessage("PRINCETON_EXCEPTION_001"));
+        }
+
+        if (offset >= raFileLength || offset < 0) {
+            return true;
+        }
+        return false;
     }
 
     protected void writePrincetonHeader() throws IOException {
@@ -1335,7 +1311,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
             if (verbFramesCount < 10) {
                 result.append("0");
             }
-            result.append(Integer.toString(verbFramesCount)).append(' ');
+            result.append(verbFramesCount).append(' ');
             // render frames applicable to all words
             for (int i = verbFrames.nextSetBit(0); i >= 0; i = verbFrames.nextSetBit(i + 1)) {
                 if (checkVerbFrameLimit && log.isWarnEnabled() && (99 < i)) {
@@ -1346,7 +1322,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                 if (i < 10) {
                     result.append("0");
                 }
-                result.append(Integer.toString(i));
+                result.append(i);
                 result.append(" 00 ");
             }
             // render word-specific frames
@@ -1364,7 +1340,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                             if (i < 10) {
                                 result.append("0");
                             }
-                            result.append(Integer.toString(i)).append(' ');
+                            result.append(i).append(' ');
                             if (word.getIndex() < 0x10) {
                                 result.append("0");
                             }
@@ -1379,7 +1355,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
     }
 
     private void renderIndexWord(IndexWord indexWord, StringBuilder result) {
-        ArrayList<PointerType> pointerTypes = new ArrayList<PointerType>();
+        ArrayList<PointerType> pointerTypes = new ArrayList<>();
         // find all the pointers that come from this word
         for (Synset synset : indexWord.getSenses()) {
             for (Pointer pointer : synset.getPointers()) {
@@ -1407,15 +1383,15 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
         result.append(indexWord.getLemma().replace(' ', '_'));
         result.append(' ');
         result.append(indexWord.getPOS().getKey()).append(' '); // pos
-        result.append(Integer.toString(indexWord.getSenses().size())).append(' '); // synset_cnt
-        result.append(Integer.toString(pointerTypes.size())).append(' '); // p_cnt
+        result.append(indexWord.getSenses().size()).append(' '); // synset_cnt
+        result.append(pointerTypes.size()).append(' '); // p_cnt
         for (PointerType pointerType : pointerTypes) {
             result.append(pointerType.getKey()).append(' ');
         }
 
-        result.append(Integer.toString(indexWord.getSenses().size())).append(' '); // sense_cnt
+        result.append(indexWord.getSenses().size()).append(' '); // sense_cnt
 
-        result.append(Integer.toString(tagSenseCnt)).append(' '); // tagsense_cnt
+        result.append(tagSenseCnt).append(' '); // tagsense_cnt
 
         for (Synset synset : indexWord.getSenses()) {
             formatOffset(synset.getOffset(), offsetLength, result);

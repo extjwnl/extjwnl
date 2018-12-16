@@ -835,7 +835,7 @@ public abstract class PointerUtils {
 					if (allowRedundancies || !list.contains(node)) {
 						if (depth != 0) {
 							// check cycles through parent
-							Set<PointerTargetTreeNode> parents = new HashSet<PointerTargetTreeNode>();
+							Set<PointerTargetTreeNode> parents = new HashSet<>();
 							PointerTargetTreeNode currentParent = parent;
 							while (null != currentParent) {
 								if (!parents.contains(currentParent)) {

@@ -48,7 +48,7 @@ public abstract class PointerTarget implements Serializable, Owned {
 	 * @return all pointers of type <var>type</var>
 	 */
 	public List<Pointer> getPointers(PointerType type) {
-		List<Pointer> result = new ArrayList<Pointer>();
+		List<Pointer> result = new ArrayList<>();
 		for (Pointer pointer : getPointers()) {
 			if (pointer.getType().equals(type)
 					|| PointerType.HYPERNYM == type && PointerType.INSTANCE_HYPERNYM == pointer.getType()
@@ -88,7 +88,7 @@ public abstract class PointerTarget implements Serializable, Owned {
 	 * @throws JWNLException JWNLException
 	 */
 	private List<PointerTarget> collectTargets(List<Pointer> pointers) throws JWNLException {
-		List<PointerTarget> targets = new ArrayList<PointerTarget>(pointers.size());
+		List<PointerTarget> targets = new ArrayList<>(pointers.size());
 		for (Pointer pointer : pointers) {
 			targets.add(pointer.getTarget());
 		}

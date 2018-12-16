@@ -48,7 +48,7 @@ public class ParamList extends ArrayList<Param> implements Param {
 
     public Object create() throws JWNLException {
         List<Param> params = getParams();
-        List<Object> results = new ArrayList<Object>(params.size());
+        List<Object> results = new ArrayList<>(params.size());
         for (Param param : params) {
             results.add(param.create());
         }

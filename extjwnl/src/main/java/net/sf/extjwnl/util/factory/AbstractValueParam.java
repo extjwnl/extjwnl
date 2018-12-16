@@ -19,7 +19,7 @@ import java.util.Map;
 public abstract class AbstractValueParam implements Param {
 
     protected final Dictionary dictionary;
-    private final Map<String, Param> paramMap = new HashMap<String, Param>();
+    private final Map<String, Param> paramMap = new HashMap<>();
 
     protected AbstractValueParam(Dictionary dictionary) {
         this.dictionary = dictionary;
@@ -46,15 +46,7 @@ public abstract class AbstractValueParam implements Param {
             Class clazz = Class.forName(getValue());
             Constructor c = clazz.getConstructor(Dictionary.class, Map.class);
             return c.newInstance(dictionary, paramMap);
-        } catch (ClassNotFoundException e) {
-            throw new JWNLException(dictionary.getMessages().resolveMessage("DICTIONARY_UNABLE_TO_CREATE_INSTANCE", new Object[]{getValue(), Util.getRootCause(e)}), e);
-        } catch (NoSuchMethodException e) {
-            throw new JWNLException(dictionary.getMessages().resolveMessage("DICTIONARY_UNABLE_TO_CREATE_INSTANCE", new Object[]{getValue(), Util.getRootCause(e)}), e);
-        } catch (InstantiationException e) {
-            throw new JWNLException(dictionary.getMessages().resolveMessage("DICTIONARY_UNABLE_TO_CREATE_INSTANCE", new Object[]{getValue(), Util.getRootCause(e)}), e);
-        } catch (IllegalAccessException e) {
-            throw new JWNLException(dictionary.getMessages().resolveMessage("DICTIONARY_UNABLE_TO_CREATE_INSTANCE", new Object[]{getValue(), Util.getRootCause(e)}), e);
-        } catch (InvocationTargetException e) {
+        } catch (ClassNotFoundException | InvocationTargetException | IllegalAccessException | InstantiationException | NoSuchMethodException e) {
             throw new JWNLException(dictionary.getMessages().resolveMessage("DICTIONARY_UNABLE_TO_CREATE_INSTANCE", new Object[]{getValue(), Util.getRootCause(e)}), e);
         }
     }

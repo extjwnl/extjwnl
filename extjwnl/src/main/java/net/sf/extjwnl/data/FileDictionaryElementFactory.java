@@ -1,7 +1,6 @@
 package net.sf.extjwnl.data;
 
 import net.sf.extjwnl.JWNLException;
-import net.sf.extjwnl.util.factory.Owned;
 
 /**
  * Factory class for creating <code>DictionaryElement</code>s (<code>Synset</code>s, <code>Exception</code>s,

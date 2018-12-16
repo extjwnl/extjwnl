@@ -128,7 +128,7 @@ public enum POS {
     private final transient int id;
     private final transient String key;
 
-    private POS(int id, String key, String label) {
+    POS(int id, String key, String label) {
         this.id = id;
         this.key = key;
         this.label = label;

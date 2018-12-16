@@ -37,7 +37,7 @@ public class DictionaryCatalog<E extends DictionaryFile> implements Owned {
 
     @SuppressWarnings("unchecked")
     public DictionaryCatalog(Dictionary dictionary, DictionaryFileType fileType, Class desiredDictionaryFileType, Map<String, Param> params) throws JWNLException {
-        this.files = new EnumMap<POS, E>(POS.class);
+        this.files = new EnumMap<>(POS.class);
         this.dictionary = dictionary;
         this.fileType = fileType;
 

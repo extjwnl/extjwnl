@@ -195,7 +195,7 @@ public class IndexWord extends BaseDictionaryElement {
             loadAllSynsets();
             if (null != dictionary && dictionary.isEditable()) {
                 Dictionary d = dictionary;
-                List<Synset> copy = new ArrayList<Synset>(this);
+                List<Synset> copy = new ArrayList<>(this);
                 super.clear();
                 for (Synset synset : copy) {
                     removeWordsFromSynset(synset, lemma);
@@ -246,7 +246,7 @@ public class IndexWord extends BaseDictionaryElement {
         protected void removeRange(int fromIndex, int toIndex) {
             loadAllSynsets();
             if (null != dictionary && dictionary.isEditable()) {
-                List<Synset> copy = new ArrayList<Synset>(subList(fromIndex, toIndex));
+                List<Synset> copy = new ArrayList<>(subList(fromIndex, toIndex));
                 super.removeRange(fromIndex, toIndex);
                 for (Synset synset : copy) {
                     removeWordsFromSynset(synset, lemma);
@@ -291,7 +291,7 @@ public class IndexWord extends BaseDictionaryElement {
             loadAllSynsets();
             if (null != dictionary && dictionary.isEditable()) {
                 Dictionary d = dictionary;
-                List<Synset> copy = new ArrayList<Synset>(this);
+                List<Synset> copy = new ArrayList<>(this);
                 boolean result = super.removeAll(c);
                 if (result) {
                     for (Object object : c) {
@@ -315,7 +315,7 @@ public class IndexWord extends BaseDictionaryElement {
             loadAllSynsets();
             if (null != dictionary && dictionary.isEditable()) {
                 Dictionary d = dictionary;
-                List<Synset> copy = new ArrayList<Synset>(this);
+                List<Synset> copy = new ArrayList<>(this);
                 boolean result = super.retainAll(c);
                 if (result) {
                     for (Synset synset : copy) {
@@ -556,8 +556,8 @@ public class IndexWord extends BaseDictionaryElement {
 
         if (1 < getSenses().size()) {
             // sort senses and find out tagged sense count
-            List<Synset> ucSenses = new ArrayList<Synset>(getSenses().size());
-            List<Synset> nonUCSenses = new ArrayList<Synset>(getSenses().size());
+            List<Synset> ucSenses = new ArrayList<>(getSenses().size());
+            List<Synset> nonUCSenses = new ArrayList<>(getSenses().size());
             for (Synset synset : getSenses()) {
                 if (0 < getUseCount(synset, lemma)) {
                     ucSenses.add(synset);
@@ -565,17 +565,12 @@ public class IndexWord extends BaseDictionaryElement {
                     nonUCSenses.add(synset);
                 }
             }
-            Collections.sort(ucSenses, Collections.<Synset>reverseOrder(new Comparator<Synset>() {
-                @Override
-                public int compare(Synset o1, Synset o2) {
-                    return getUseCount(o1, lemma) - getUseCount(o2, lemma);
-                }
-            }));
+            ucSenses.sort(Collections.reverseOrder(Comparator.comparingInt(o -> getUseCount(o, lemma))));
 
             result = ucSenses.size();
 
             // other synsets seems to be sorted by decreasing offsets
-            Collections.sort(nonUCSenses, Collections.<Synset>reverseOrder(synsetOffsetComparator));
+            nonUCSenses.sort(Collections.reverseOrder(synsetOffsetComparator));
 
             // if ADJ, output cluster heads, then fans
             if (POS.ADJECTIVE == getPOS()) {
@@ -599,25 +594,22 @@ public class IndexWord extends BaseDictionaryElement {
         return result;
     }
 
-    private static final Comparator<Synset> synsetOffsetComparator = new Comparator<Synset>() {
-        @Override
-        public int compare(Synset o1, Synset o2) {
-            long result = o1.getOffset() - o2.getOffset();
-            if (0 != result) {
-                // 2 huge offsets might lead to integer overflow
-                return (int) (result / Math.abs(result));
-            } else {
-                if (POS.ADJECTIVE == o1.getPOS() && POS.ADJECTIVE == o2.getPOS()) {
-                    if (o1.isAdjectiveCluster() && !o2.isAdjectiveCluster()) {
-                        return 1;
-                    } else if (o2.isAdjectiveCluster() && !o1.isAdjectiveCluster()) {
-                        return -1;
-                    } else {
-                        return 0;
-                    }
+    private static final Comparator<Synset> synsetOffsetComparator = (o1, o2) -> {
+        long result = o1.getOffset() - o2.getOffset();
+        if (0 != result) {
+            // 2 huge offsets might lead to integer overflow
+            return (int) (result / Math.abs(result));
+        } else {
+            if (POS.ADJECTIVE == o1.getPOS() && POS.ADJECTIVE == o2.getPOS()) {
+                if (o1.isAdjectiveCluster() && !o2.isAdjectiveCluster()) {
+                    return 1;
+                } else if (o2.isAdjectiveCluster() && !o1.isAdjectiveCluster()) {
+                    return -1;
                 } else {
                     return 0;
                 }
+            } else {
+                return 0;
             }
         }
     };

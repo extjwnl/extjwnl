@@ -1,6 +1,8 @@
 package net.sf.extjwnl.data;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Maps the lexicographer files names to identifiers. See LEXNAMES(5WN).
@@ -15,7 +17,7 @@ public abstract class LexFileNameFileIdMap {
     private static Map<String, Long> lexFileNameLexFileId;
 
     static {
-        lexFileNameLexFileId = new HashMap<String, Long>();
+        lexFileNameLexFileId = new HashMap<>();
         for (Map.Entry<Long, String> e : LexFileIdFileNameMap.getMap().entrySet()) {
             lexFileNameLexFileId.put(e.getValue(), e.getKey());
         }

@@ -26,13 +26,13 @@ public abstract class AbstractPrincetonDictionaryFile extends AbstractDictionary
     private static final Map<DictionaryFileType, String> fileTypeToFileNameMap;
 
     static {
-        posToExtMap = new EnumMap<POS, String>(POS.class);
+        posToExtMap = new EnumMap<>(POS.class);
         posToExtMap.put(POS.NOUN, NOUN_EXT);
         posToExtMap.put(POS.VERB, VERB_EXT);
         posToExtMap.put(POS.ADJECTIVE, ADJECTIVE_EXT);
         posToExtMap.put(POS.ADVERB, ADVERB_EXT);
 
-        fileTypeToFileNameMap = new EnumMap<DictionaryFileType, String>(DictionaryFileType.class);
+        fileTypeToFileNameMap = new EnumMap<>(DictionaryFileType.class);
         fileTypeToFileNameMap.put(DictionaryFileType.INDEX, "index");
         fileTypeToFileNameMap.put(DictionaryFileType.DATA, "data");
         fileTypeToFileNameMap.put(DictionaryFileType.EXCEPTION, "exc");

@@ -36,7 +36,7 @@ public abstract class Util {
 
     public static String[] split(String str) {
         char[] chars = str.toCharArray();
-        List<String> tokens = new ArrayList<String>();
+        List<String> tokens = new ArrayList<>();
         StringBuilder buf = new StringBuilder();
         for (char aChar : chars) {
             if ((aChar >= 'a' && aChar <= 'z') || aChar == '\'') {

@@ -8,7 +8,6 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 
 /**
  * A list of <code>PointerTargetTreeNode</code>s.
@@ -79,10 +78,8 @@ public class PointerTargetTreeNodeList extends LinkedList<PointerTargetTreeNode>
      * @return operation result
      */
     public PointerTargetTreeNode getFirstMatch(Operation opr) {
-        ListIterator<PointerTargetTreeNode> itr = listIterator();
-        while (itr.hasNext()) {
-            PointerTargetTreeNode node = itr.next();
-            PointerTargetTreeNode obj = opr.execute(node);
+        for (final PointerTargetTreeNode node : this) {
+            final PointerTargetTreeNode obj = opr.execute(node);
             if (obj != null) {
                 return obj;
             } else if (node.hasValidChildTreeList()) {
@@ -101,7 +98,7 @@ public class PointerTargetTreeNodeList extends LinkedList<PointerTargetTreeNode>
      * @return list of operation results
      */
     public List<PointerTargetTreeNode> getAllMatches(Operation opr) {
-        List<PointerTargetTreeNode> list = new ArrayList<PointerTargetTreeNode>();
+        List<PointerTargetTreeNode> list = new ArrayList<>();
         getAllMatches(opr, list);
         return list;
     }
@@ -113,10 +110,8 @@ public class PointerTargetTreeNodeList extends LinkedList<PointerTargetTreeNode>
      * @param matches list of matches
      */
     public void getAllMatches(Operation opr, List<PointerTargetTreeNode> matches) {
-        ListIterator<PointerTargetTreeNode> itr = listIterator();
-        while (itr.hasNext()) {
-            PointerTargetTreeNode node = itr.next();
-            PointerTargetTreeNode obj = opr.execute(node);
+        for (final PointerTargetTreeNode node : this) {
+            final PointerTargetTreeNode obj = opr.execute(node);
             if (obj != null) {
                 matches.add(obj);
             }
@@ -136,7 +131,7 @@ public class PointerTargetTreeNodeList extends LinkedList<PointerTargetTreeNode>
      */
     public PointerTargetTreeNode findFirst(PointerTargetTreeNode node) {
         PointerTargetTreeNode obj = getFirstMatch(new FindNodeOperation(node));
-        return obj == null ? null : obj;
+        return obj;
     }
 
     /**

@@ -25,7 +25,7 @@ public abstract class AbstractPrincetonDatabaseDictionaryElementFactory extends 
     }
 
     public IndexWord createIndexWord(POS pos, String lemma, ResultSet rs) throws SQLException, JWNLException {
-        List<Long> offsets = new ArrayList<Long>();
+        List<Long> offsets = new ArrayList<>();
         while (rs.next()) {
             offsets.add(rs.getLong(1));
         }
@@ -102,7 +102,7 @@ public abstract class AbstractPrincetonDatabaseDictionaryElementFactory extends 
     }
 
     public Exc createExc(POS pos, String derivation, ResultSet rs) throws SQLException, JWNLException {
-        ArrayList<String> exceptions = new ArrayList<String>();
+        ArrayList<String> exceptions = new ArrayList<>();
         while (rs.next()) {
             exceptions.add(stringCache.replace(rs.getString(1)));
         }

@@ -5,7 +5,8 @@ import net.sf.extjwnl.dictionary.Dictionary;
 import net.sf.extjwnl.util.ResourceBundleSet;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A <code>Word</code> represents the lexical information related to a specific sense of an <code>IndexWord</code>.
@@ -183,7 +184,7 @@ public class Word extends PointerTarget {
      * Returns all the pointers of the synset that contains this word whose source is this word.
      */
     public List<Pointer> getPointers() {
-        List<Pointer> result = new ArrayList<Pointer>(0);
+        List<Pointer> result = new ArrayList<>(0);
         for (Pointer pointer : getSynset().getPointers()) {
             if (this.equals(pointer.getSource())) {
                 result.add(pointer);
@@ -199,21 +200,9 @@ public class Word extends PointerTarget {
 	 * @throws JWNLException JWNLException
      */
     public String getSenseKey() throws JWNLException {
-        int ss_type = getPOS().getId();
-        if (POS.ADJECTIVE == getSynset().getPOS() && getSynset().isAdjectiveCluster()) {
-            ss_type = POS.ADJECTIVE_SATELLITE_ID;
-        }
+        int ss_type = getSynsetType();
 
-        StringBuilder senseKey = new StringBuilder(lemma.toLowerCase().replace(' ', '_'));
-        senseKey.append("%").append(ss_type).append(":");
-        if (synset.getLexFileNum() < 10) {
-            senseKey.append("0");
-        }
-        senseKey.append(synset.getLexFileNum()).append(":");
-        if (lexId < 10) {
-            senseKey.append("0");
-        }
-        senseKey.append(lexId).append(":");
+        final StringBuilder senseKey = startBuildingSenseKey(ss_type);
 
         if (POS.ADJECTIVE_SATELLITE_ID == ss_type) {
             List<Pointer> p = synset.getPointers(PointerType.SIMILAR_TO);
@@ -243,21 +232,9 @@ public class Word extends PointerTarget {
 	 * @throws JWNLException JWNLException
      */
     public String getSenseKeyWithAdjClass() throws JWNLException {
-        int ss_type = getPOS().getId();
-        if (POS.ADJECTIVE == getSynset().getPOS() && getSynset().isAdjectiveCluster()) {
-            ss_type = POS.ADJECTIVE_SATELLITE_ID;
-        }
+        int ss_type = getSynsetType();
 
-        StringBuilder senseKey = new StringBuilder(lemma.toLowerCase().replace(' ', '_'));
-        senseKey.append("%").append(ss_type).append(":");
-        if (synset.getLexFileNum() < 10) {
-            senseKey.append("0");
-        }
-        senseKey.append(synset.getLexFileNum()).append(":");
-        if (lexId < 10) {
-            senseKey.append("0");
-        }
-        senseKey.append(lexId).append(":");
+        final StringBuilder senseKey = startBuildingSenseKey(ss_type);
 
         if (POS.ADJECTIVE_SATELLITE_ID == ss_type) {
             List<Pointer> p = synset.getPointers(PointerType.SIMILAR_TO);
@@ -304,6 +281,28 @@ public class Word extends PointerTarget {
             }
         }
         return result;
+    }
+
+    protected int getSynsetType() {
+        int ss_type = getPOS().getId();
+        if (POS.ADJECTIVE == getSynset().getPOS() && getSynset().isAdjectiveCluster()) {
+            ss_type = POS.ADJECTIVE_SATELLITE_ID;
+        }
+        return ss_type;
+    }
+
+    protected StringBuilder startBuildingSenseKey(final int ss_type) {
+        StringBuilder senseKey = new StringBuilder(lemma.toLowerCase().replace(' ', '_'));
+        senseKey.append("%").append(ss_type).append(":");
+        if (synset.getLexFileNum() < 10) {
+            senseKey.append("0");
+        }
+        senseKey.append(synset.getLexFileNum()).append(":");
+        if (lexId < 10) {
+            senseKey.append("0");
+        }
+        senseKey.append(lexId).append(":");
+        return senseKey;
     }
 
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {

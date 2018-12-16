@@ -216,14 +216,12 @@ public abstract class RelationshipFinder {
         PointerTargetTree tree = new PointerTargetTree(
                 sourceSynset, PointerUtils.makePointerTargetTreeList(sourceSynset, type, null, depth, false));
 
-        PointerTargetTreeNodeList.Operation opr = new PointerTargetTreeNodeList.Operation() {
-            public PointerTargetTreeNode execute(PointerTargetTreeNode testNode) {
-                if (targetSynset.equals(testNode.getSynset())) {
+        PointerTargetTreeNodeList.Operation opr = testNode -> {
+            if (targetSynset.equals(testNode.getSynset())) {
 
-                    return testNode;
-                }
-                return null;
+                return testNode;
             }
+            return null;
         };
         List l = tree.getAllMatches(opr);
 

@@ -15,9 +15,9 @@ public class LRUPOSCache<K, V> implements POSCache<K, V> {
     private final Map<POS, Cache<K, V>> caches;
 
     public LRUPOSCache(int capacity) {
-        caches = new EnumMap<POS, Cache<K, V>>(POS.class);
+        caches = new EnumMap<>(POS.class);
         for (POS pos : POS.getAllPOS()) {
-            caches.put(pos, new LRUCache<K, V>(capacity));
+            caches.put(pos, new LRUCache<>(capacity));
         }
     }
 

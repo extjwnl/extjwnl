@@ -22,7 +22,7 @@ public class MapBackedDictionaryElementFactory extends MapDictionaryElementFacto
         if (!maxOffset.containsKey(pos)) {
             // first time - update max offset
             // iteration might take time
-            Long maxOff = 0L;
+            long maxOff = 0L;
             Iterator<Synset> si = dictionary.getSynsetIterator(pos);
             while (si.hasNext()) {
                 Synset s = si.next();

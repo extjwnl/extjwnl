@@ -11,7 +11,7 @@ import java.util.*;
 public class ResourceBundleSet extends ResourceBundle {
 
     private Locale locale = null;
-    private final List<String> resources = new ArrayList<String>();
+    private final List<String> resources = new ArrayList<>();
 
     public ResourceBundleSet(String resource) {
         addResource(resource);
@@ -84,12 +84,12 @@ public class ResourceBundleSet extends ResourceBundle {
         for (int i = 0; i < params.length && startIndex <= str.length(); i++) {
             int endIndex = str.indexOf("{" + i, startIndex);
             if (endIndex != -1) {
-                buf.append(str.substring(startIndex, endIndex));
+                buf.append(str, startIndex, endIndex);
                 buf.append(params[i] == null ? null : params[i].toString());
                 startIndex = endIndex + 3;
             }
         }
-        buf.append(str.substring(startIndex, str.length()));
+        buf.append(str.substring(startIndex));
         return buf.toString();
     }
 

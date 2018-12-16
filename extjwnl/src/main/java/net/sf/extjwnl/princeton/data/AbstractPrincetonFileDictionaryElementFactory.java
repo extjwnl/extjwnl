@@ -143,7 +143,7 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory extends Abst
     public Exc createExc(POS pos, CharSequence line) throws JWNLException {
         CharSequenceParser p = new CharSequenceParser(line);
         String lemma = stringCache.replace(p.nextToken().replace('_', ' '));
-        ArrayList<String> exceptions = new ArrayList<String>();
+        ArrayList<String> exceptions = new ArrayList<>();
         while (p.hasMoreTokens()) {
             exceptions.add(stringCache.replace(p.nextToken().replace('_', ' ')));
         }

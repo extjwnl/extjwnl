@@ -19,7 +19,7 @@ public class IndexWordSet {
     /**
      * Map of IndexWords in this set.
      */
-    private final Map<POS, IndexWord> indexWords = new EnumMap<POS, IndexWord>(POS.class);
+    private final Map<POS, IndexWord> indexWords = new EnumMap<>(POS.class);
     private final String lemma;
 
     public IndexWordSet(String lemma) {

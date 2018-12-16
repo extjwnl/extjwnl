@@ -35,7 +35,7 @@ public enum AdjectivePosition {
     private transient final String key;
     private transient final String label;
 
-    private AdjectivePosition(String key, String label) {
+    AdjectivePosition(String key, String label) {
         this.key = key;
         this.label = label;
     }

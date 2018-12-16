@@ -16,7 +16,7 @@ public abstract class CacheSet<K, A, B> {
     public static final int DEFAULT_CACHE_CAPACITY = 1000;
 
     //K, V = Cache<A, B>
-    private final Map<K, POSCache<A, B>> caches = new HashMap<K, POSCache<A, B>>();
+    private final Map<K, POSCache<A, B>> caches = new HashMap<>();
 
     public CacheSet(List<K> keys) {
         this(keys, DEFAULT_CACHE_CAPACITY);
