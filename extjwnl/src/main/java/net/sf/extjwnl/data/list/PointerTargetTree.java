@@ -32,8 +32,14 @@ public class PointerTargetTree {
     /**
      * Two PointerTargetTree's are equal if their root nodes are equal.
      */
+    @Override
     public boolean equals(Object obj) {
         return (obj instanceof PointerTargetTree) && rootNode.equals(((PointerTargetTree) obj).getRootNode());
+    }
+
+    @Override
+    public int hashCode() {
+        return rootNode.hashCode();
     }
 
     /**
