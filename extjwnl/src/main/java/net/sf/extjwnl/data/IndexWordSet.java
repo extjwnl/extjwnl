@@ -2,7 +2,10 @@ package net.sf.extjwnl.data;
 
 import net.sf.extjwnl.util.ResourceBundleSet;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * A class to simplify the access to a set of <code>IndexWord</code>s, each containing
@@ -138,8 +141,14 @@ public class IndexWordSet {
      * {@link net.sf.extjwnl.dictionary.Dictionary#lookupAllIndexWords Dictionary.lookupAllIndexWords},
      * so all IndexWordSets with the same lemma should be equal.
      */
+    @Override
     public boolean equals(Object object) {
         return (object instanceof IndexWordSet) &&
                 getLemma().equals(((IndexWordSet) object).getLemma());
+    }
+
+    @Override
+    public int hashCode() {
+        return lemma.hashCode();
     }
 }
