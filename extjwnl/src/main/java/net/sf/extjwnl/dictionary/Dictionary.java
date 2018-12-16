@@ -472,22 +472,42 @@ public abstract class Dictionary {
      * @throws JWNLException JWNLException
      */
     public Word getWordBySenseKey(String senseKey) throws JWNLException {
-        int percentIndex = senseKey.indexOf('%');
-        String lemma = senseKey.substring(0, percentIndex).replace('_', ' ');
-        String ssType = senseKey.substring(percentIndex + 1, senseKey.indexOf(':', percentIndex));
-        POS pos = POS.getPOSForId(Integer.parseInt(ssType));
+        final int percentIndex = senseKey.indexOf('%');
+        if (percentIndex == -1) {
+            return null;
+        }
+
+        final int colonIndex = senseKey.indexOf(':', percentIndex);
+        if (colonIndex == -1) {
+            return null;
+        }
+
+        final String ssType = senseKey.substring(percentIndex + 1, colonIndex);
+        final int ssTypeId;
+        try {
+            ssTypeId = Integer.parseInt(ssType);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+
+        final POS pos = POS.getPOSForId(ssTypeId);
+        if (pos == null) {
+            return null;
+        }
+
+        final String lemma = senseKey.substring(0, percentIndex).replace('_', ' ');
+        final IndexWord iw = getIndexWord(pos, lemma);
+        if (iw == null) {
+            return null;
+        }
+
         Word result = null;
-        if (null != pos) {
-            IndexWord iw = getIndexWord(pos, lemma);
-            if (null != iw) {
-                searchB:
-                for (Synset synset : iw.getSenses()) {
-                    for (Word word : synset.getWords()) {
-                        if (senseKey.equals(word.getSenseKey())) {
-                            result = word;
-                            break searchB;
-                        }
-                    }
+        searchB:
+        for (final Synset synset : iw.getSenses()) {
+            for (final Word word : synset.getWords()) {
+                if (senseKey.equals(word.getSenseKey())) {
+                    result = word;
+                    break searchB;
                 }
             }
         }

@@ -500,6 +500,31 @@ public class DictionaryReadTester {
         Assert.assertEquals(DictionaryElementType.SYNSET, s.getType());
     }
 
+    @Test
+    public void testGetWordBySenseKeyNoPercent() throws JWNLException {
+        Assert.assertNull(dictionary.getWordBySenseKey(""));
+    }
+
+    @Test
+    public void testGetWordBySenseKeyPercentOnly() throws JWNLException {
+        Assert.assertNull(dictionary.getWordBySenseKey("%"));
+    }
+
+    @Test
+    public void testGetWordBySenseKeyNoSynsetType() throws JWNLException {
+        Assert.assertNull(dictionary.getWordBySenseKey("%:"));
+    }
+
+    @Test
+    public void testGetWordBySenseKeyBadSynsetType() throws JWNLException {
+        Assert.assertNull(dictionary.getWordBySenseKey("%9:"));
+    }
+
+    @Test
+    public void testGetWordBySenseKeyMissingWord() throws JWNLException {
+        Assert.assertNull(dictionary.getWordBySenseKey("©%1:"));
+    }
+
     protected void runAllTests() throws JWNLException, CloneNotSupportedException {
         testTank();
         testBrightAdj();
@@ -525,5 +550,6 @@ public class DictionaryReadTester {
         testMorphoLookupAllBaseForms();
         testExceptionIterator();
         testSynsetIterator();
+        testGetWordBySenseKeyNoPercent();
     }
 }
