@@ -510,7 +510,7 @@ public class ewn {
 
                         i++;
                         if (i >= args.length) {
-                            log.error("Missing pointer type at {} in addlexptr command for sensekey {}", args[i], workWord.getSenseKey());
+                            log.error("Missing pointer type in addlexptr command for sensekey {}", workWord.getSenseKey());
                             System.exit(1);
                         }
 
@@ -1191,6 +1191,10 @@ public class ewn {
                                         "The polysemy count is the number of senses in WordNet.");
                             }
                             final POS p = POS.getPOSForKey(arg.substring(5));
+                            if (p == null) {
+                                log.error("POS not recognized for -faml command");
+                                System.exit(1);
+                            }
                             final IndexWord iw = d.lookupIndexWord(p, key);
                             if (null != iw) {
                                 final String[] freqs = {"extremely rare", "very rare", "rare", "uncommon", "common",
