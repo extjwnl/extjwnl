@@ -116,14 +116,7 @@ public abstract class AbstractPrincetonFileDictionaryElementFactory extends Abst
                 p.skipToken();    // "+"
                 int frameNumber = p.nextInt();
                 int wordIndex = p.nextHexInt();
-                if (wordIndex > 0) {
-                    ((Verb) synset.getWords().get(wordIndex - 1)).getVerbFrameFlags().set(frameNumber);
-                } else {
-                    for (Word w : synset.getWords()) {
-                        ((Verb) w).getVerbFrameFlags().set(frameNumber);
-                    }
-                    verbFrames.set(frameNumber);
-                }
+                initVerbFrameFlags(synset, verbFrames, frameNumber, wordIndex);
             }
             synset.setVerbFrameFlags(verbFrames);
         }

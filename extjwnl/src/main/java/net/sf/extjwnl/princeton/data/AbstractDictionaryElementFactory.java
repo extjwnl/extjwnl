@@ -61,6 +61,18 @@ public abstract class AbstractDictionaryElementFactory implements DictionaryElem
         return new IndexWord(dictionary, lemma, pos, synset);
     }
 
+    protected static void initVerbFrameFlags(final Synset synset, final BitSet vFrames,
+                                             final int frameNumber, final int wordIndex) {
+        if (wordIndex > 0) {
+            ((Verb) synset.getWords().get(wordIndex - 1)).getVerbFrameFlags().set(frameNumber);
+        } else {
+            for (Word w : synset.getWords()) {
+                ((Verb) w).getVerbFrameFlags().set(frameNumber);
+            }
+            vFrames.set(frameNumber);
+        }
+    }
+
     /**
      * Creates a word.
      *

@@ -7,7 +7,10 @@ import net.sf.extjwnl.util.factory.Param;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Base class for database element factories.
@@ -88,14 +91,7 @@ public abstract class AbstractPrincetonDatabaseDictionaryElementFactory extends 
                 while (verbFrames.next()) {
                     int frameNumber = verbFrames.getInt(1);
                     int wordIndex = verbFrames.getInt(2);
-                    if (wordIndex > 0) {
-                        ((Verb) synset.getWords().get(wordIndex - 1)).getVerbFrameFlags().set(frameNumber);
-                    } else {
-                        for (Word w : synset.getWords()) {
-                            ((Verb) w).getVerbFrameFlags().set(frameNumber);
-                        }
-                        vFrames.set(frameNumber);
-                    }
+                    initVerbFrameFlags(synset, vFrames, frameNumber, wordIndex);
                 }
                 synset.setVerbFrameFlags(vFrames);
             }
