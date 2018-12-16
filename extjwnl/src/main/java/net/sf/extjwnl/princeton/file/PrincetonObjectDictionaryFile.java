@@ -111,15 +111,14 @@ public class PrincetonObjectDictionaryFile extends AbstractPrincetonObjectDictio
     public void open() throws JWNLException {
         synchronized (file) {
             if (!isOpen()) {
-                if (!file.exists()) {
-                    try {
-                        file.createNewFile();
-                    } catch (IOException e) {
-                        throw new JWNLIOException(e);
+                try {
+                    if (file.createNewFile()) {
+                        openOutputStream();
+                    } else {
+                        openInputStream();
                     }
-                    openOutputStream();
-                } else {
-                    openInputStream();
+                } catch (IOException e) {
+                    throw new JWNLIOException(e);
                 }
             }
         }
