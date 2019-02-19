@@ -1,5 +1,7 @@
 package net.sf.extjwnl.dictionary.file_manager;
 
+import java.util.Random;
+
 import net.sf.extjwnl.JWNLException;
 import net.sf.extjwnl.data.POS;
 import net.sf.extjwnl.dictionary.file.DictionaryFileType;
@@ -107,4 +109,7 @@ public interface FileManager extends Owned {
      * @throws JWNLException JWNLException
      */
     void edit() throws JWNLException;
+    
+    Random getRandom();
+    void setRandom(Random value);
 }

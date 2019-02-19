@@ -990,4 +990,6 @@ public abstract class Dictionary {
             }
         }
     }
+
+    public abstract IndexWord getRandomIndexWord(POS pos, Random random) throws JWNLException;
 }
