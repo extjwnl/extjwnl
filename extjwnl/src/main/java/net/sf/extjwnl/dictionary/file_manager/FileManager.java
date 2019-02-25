@@ -109,7 +109,4 @@ public interface FileManager extends Owned {
      * @throws JWNLException JWNLException
      */
     void edit() throws JWNLException;
-    
-    Random getRandom();
-    void setRandom(Random value);
 }

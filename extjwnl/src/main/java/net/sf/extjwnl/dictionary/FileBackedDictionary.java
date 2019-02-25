@@ -12,7 +12,6 @@ import org.w3c.dom.Document;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import java.util.Random;
 
 /**
  * A <code>Dictionary</code> that retrieves objects from the text files
@@ -140,16 +139,6 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
         return word;
     }
 
-    @Override
-    public IndexWord getRandomIndexWord(POS pos,Random random) throws JWNLException {
-        if (!isEditable()) {
-        	fileManager.setRandom(random);
-            CharSequence line = fileManager.getRandomLine(pos, DictionaryFileType.INDEX);
-            return parseAndCacheIndexWord(pos, line);
-        } else {
-            throw new UnsupportedOperationException();
-        }
-    }
     
     @Override
     public IndexWord getRandomIndexWord(POS pos) throws JWNLException {

@@ -30,22 +30,6 @@ public class FileManagerImpl implements FileManager {
      */
     public static final String CHECK_PATH_KEY = "check_path";
 
-    /**
-     * Random number generator used by getRandomLine().
-     */
-    private Random rand = null;
-
-    public Random getRandom() {
-    	if(rand==null) {
-    		rand=new Random(new Date().getTime());
-    	}
-		return rand;
-	}
-
-	public void setRandom(Random rand) {
-		this.rand = rand;
-	}
-
 	/**
      * The catalog set.
      */
@@ -240,7 +224,7 @@ public class FileManagerImpl implements FileManager {
         long offset;
         do {
             // casts break long files...
-            offset = start + (long) getRandom().nextInt(range);
+            offset = start + (long) getDictionary().getRandom().nextInt(range);
             // first line is at a disadvantage
             result = file.readLine(file.getNextLineOffset(offset));
         } while (null == result);

@@ -141,13 +141,4 @@ public class MapDictionary extends Dictionary {
         return tableMap.get(pos).get(fileType);
     }
 
-	@Override
-	public IndexWord getRandomIndexWord(POS pos, Random random) throws JWNLException {
-		int index = random.nextInt(getTable(pos, DictionaryFileType.INDEX).size());
-        Iterator<IndexWord> itr = getIndexWordIterator(pos);
-        for (int i = 0; i < index && itr.hasNext(); i++) {
-            itr.next();
-        }
-        return itr.hasNext() ? itr.next() : null;
-	}
 }

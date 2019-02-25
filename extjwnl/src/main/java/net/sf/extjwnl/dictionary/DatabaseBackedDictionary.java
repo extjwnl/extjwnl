@@ -309,8 +309,4 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
         }
     }
 
-	@Override
-	public IndexWord getRandomIndexWord(POS pos, Random random) throws JWNLException {
-		return getRandomIndexWord(pos);
-	}
 }
