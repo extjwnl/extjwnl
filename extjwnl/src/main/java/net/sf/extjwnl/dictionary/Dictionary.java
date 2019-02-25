@@ -34,19 +34,8 @@ import java.util.*;
 public abstract class Dictionary {
 
     private static final Logger log = LoggerFactory.getLogger(Dictionary.class);
-    
-    private Random rand = null;
 
-    public Random getRandom() {
-    	if(rand==null) {
-    		rand=new Random(new Date().getTime());
-    	}
-		return rand;
-	}
-
-	public void setRandom(Random rand) {
-		this.rand = rand;
-	}
+    private volatile Random rand = null;
 
     // messages for static methods
     private static final String STATIC_MESSAGES = "net.sf.extjwnl.dictionary.messages_static";
@@ -883,6 +872,23 @@ public abstract class Dictionary {
         }
 
         return indices;
+    }
+
+    public Random getRandom() {
+        Random localRef = rand;
+        if (localRef == null) {
+            synchronized (this) {
+                localRef = rand;
+                if (localRef == null) {
+                    rand = localRef = new Random(new Date().getTime());
+                }
+            }
+        }
+        return localRef;
+    }
+
+    public void setRandom(Random rand) {
+        this.rand = rand;
     }
 
     /**

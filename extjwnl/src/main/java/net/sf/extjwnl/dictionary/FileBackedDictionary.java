@@ -139,7 +139,6 @@ public class FileBackedDictionary extends AbstractCachingDictionary {
         return word;
     }
 
-    
     @Override
     public IndexWord getRandomIndexWord(POS pos) throws JWNLException {
         if (!isEditable()) {

@@ -140,5 +140,4 @@ public class MapDictionary extends Dictionary {
     public Map<Object, DictionaryElement> getTable(POS pos, DictionaryFileType fileType) {
         return tableMap.get(pos).get(fileType);
     }
-
 }
