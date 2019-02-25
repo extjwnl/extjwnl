@@ -13,6 +13,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Random;
 
 /**
  * Database-backed dictionary.
@@ -307,4 +308,5 @@ public class DatabaseBackedDictionary extends AbstractCachingDictionary {
             return getException(getPOS(), derivation);
         }
     }
+
 }
