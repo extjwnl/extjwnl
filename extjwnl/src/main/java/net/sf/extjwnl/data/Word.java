@@ -250,7 +250,7 @@ public class Word extends PointerTarget {
                             lemma = lemma + "(" + a.getAdjectivePosition().getKey() + ")";
                         }
                     }
-                    senseKey.append(lemma);
+                    senseKey.append(lemma).append(":");
                     if (word.getLexId() < 10) {
                         senseKey.append("0");
                     }
