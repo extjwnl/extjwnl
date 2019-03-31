@@ -1,3 +1,7 @@
+2.0.2
+- fixed getSenseKeyWithAdjClass and adjective use count (#28, thanks to John Sichi)
+- dependencies updated
+
 2.0.1
 - added an option to override Random for reproducibility (#27, thanks to Adrián Cantón Fernández)
 - dependencies updated

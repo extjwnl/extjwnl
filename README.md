@@ -24,7 +24,7 @@ In the pom.xml:
 <dependency>
     <groupId>net.sf.extjwnl</groupId>
     <artifactId>extjwnl</artifactId>
-    <version>2.0.1</version>
+    <version>2.0.2</version>
 </dependency>
 <!-- Princeton WordNet 3.1 data dependency -->
 <dependency>
