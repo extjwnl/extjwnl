@@ -179,6 +179,16 @@ public class DictionaryReadTester {
     }
 
     @Test
+    public void testRedAdj() throws JWNLException {
+        IndexWord iw = dictionary.getIndexWord(POS.ADJECTIVE, "red");
+        Assert.assertNotNull("IndexWord loaded", iw);
+        Synset synset = iw.getSenses().get(0);
+        Word word = synset.getWords().get(0);
+        Assert.assertEquals("Use count testing", 43, word.getUseCount());
+        Assert.assertEquals("Sense key testing", "red%5:00:01:chromatic:00", word.getSenseKeyWithAdjClass());
+    }
+
+    @Test
     public void testDissilientAdjS() throws JWNLException {
         IndexWord iw = dictionary.getIndexWord(POS.ADJECTIVE, "dissilient");
         Assert.assertNotNull("IndexWord loaded", iw);
