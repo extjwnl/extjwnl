@@ -1,3 +1,6 @@
+2.0.3
+- dependencies updated
+
 2.0.2
 - fixed getSenseKeyWithAdjClass and adjective use count (#28, thanks to John Sichi)
 - dependencies updated
