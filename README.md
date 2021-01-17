@@ -50,8 +50,10 @@ There are several dependencies available that contain data from Princeton WordNe
  * [extjwnl-data-wn30](https://github.com/extjwnl/extjwnl-data-wn30) WordNet 3.0 Unix version (text)
  * [extjwnl-data-wn31](https://github.com/extjwnl/extjwnl-data-wn31) WordNet 3.1 Unix version (text)
  * [extjwnl-data-wn31-map](https://github.com/extjwnl/extjwnl-data-wn31-map) WordNet 3.1 Unix version (serialized)
+ * [extjwnl-data-mcr30](https://github.com/extjwnl/extjwnl-data-mcr30) Multilingual Central Repository 3.0 Unix version (text): 2016 release; currently only the Spanish portion
 
-Dependencies with text data contain original Princeton WordNet files augmented with extJWNL configuration file.
+WordNet dependencies with text data contain original Princeton WordNet files augmented with extJWNL configuration file.
+Multilingual Central Repository (MCR) dependencies contain extJWNL-compatible versions of MCR files augmented with extJWNL configuration file, generated exceptional forms, and inter-language index files.
 Dependencies with serialized data contain Princeton WordNet files serialized into HashMaps 
 and augmented with extJWNL configuration file.
 
