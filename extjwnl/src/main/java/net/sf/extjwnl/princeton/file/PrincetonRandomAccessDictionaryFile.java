@@ -124,7 +124,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
             "  29 Princeton University and LICENSEE agrees to preserve same.  \n";
 
     private static final long PRINCETON_HEADER_LENGTH =
-            PRINCETON_HEADER_HEAD.length() + PRINCETON_HEADER_21.length() + PRINCETON_HEADER_TAIL.length();
+            (long) PRINCETON_HEADER_HEAD.length() + PRINCETON_HEADER_21.length() + PRINCETON_HEADER_TAIL.length();
 
     /**
      * Read-only file permission.
@@ -885,7 +885,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                 if (writePrincetonHeader) {
                     offset = offset + PRINCETON_HEADER_LENGTH;
                 }
-                long safeOffset = Integer.MAX_VALUE - 1;
+                long safeOffset = (long) Integer.MAX_VALUE - 1;
                 StringBuilder sb = new StringBuilder(16 * 1024);
                 for (Synset s : synsets) {
                     sb.delete(0, sb.length());
