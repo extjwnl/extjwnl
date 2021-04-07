@@ -945,7 +945,7 @@ public class PrincetonRandomAccessDictionaryFile extends AbstractPrincetonRandom
                 if (writePrincetonHeader) {
                     offset = offset + PRINCETON_HEADER_LENGTH;
                 }
-                long safeOffset = Integer.MAX_VALUE - 1;
+                long safeOffset = (long) Integer.MAX_VALUE - 1;
                 StringBuilder sb = new StringBuilder(16 * 1024);
                 initBuffers();
                 for (Synset s : synsets) {
