@@ -8,4 +8,4 @@
 
 ## Reporting a Vulnerability
 
-Please message @autayeu with details and mitigation proposals. The project is in maintenance mode and the updates are released on best effort basis.
+Please message aliaksandr-at-autayeu-dot-com with details and mitigation proposals. The project is in maintenance mode and the updates are released on best effort basis.
