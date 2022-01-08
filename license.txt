@@ -1,6 +1,6 @@
 License Information
 
-Copyright © 2010-2018 Aliaksandr Autayeu (http://autayeu.com)
+Copyright © 2010-2022 Aliaksandr Autayeu (http://autayeu.com)
 Copyright © 2000-2007 the JWNL development team (http://www.sourceforge.net/projects/jwordnet)
 All rights reserved.
 
