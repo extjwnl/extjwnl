@@ -4,13 +4,13 @@
     <parent>
         <groupId>net.sf.extjwnl</groupId>
         <artifactId>extjwnl-parent</artifactId>
-        <version>2.0.4-SNAPSHOT</version>
+        <version>2.0.4</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>extjwnl-utilities</artifactId>
     <packaging>jar</packaging>
-    <version>2.0.4-SNAPSHOT</version>
+    <version>2.0.4</version>
     <name>extJWNL Utilities</name>
     <description>Utilities for extJWNL library</description>
 
