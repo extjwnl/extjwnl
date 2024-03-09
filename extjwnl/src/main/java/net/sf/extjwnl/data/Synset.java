@@ -260,24 +260,26 @@ public class Synset extends PointerTarget implements DictionaryElement {
 
         @Override
         public boolean removeAll(Collection<?> c) {
-            if (null != dictionary && dictionary.isEditable()) {
+            if (dictionary != null && dictionary.isEditable()) {
                 List<Pointer> copy = new ArrayList<>(this);
                 boolean result = super.removeAll(c);
-                if (dictionary.getManageSymmetricPointers()) {
-                    for (Object object : c) {
-                        if (object instanceof Pointer) {
-                            Pointer pointer = (Pointer) object;
-                            if (copy.contains(pointer)) {
-                                deleteSymmetricPointerFromTarget(pointer);
-                            }
-                        }
-                    }
-                }
+                deleteSymmetricPointersFromTarget(c, copy);
                 return result;
             } else {
                 return super.removeAll(c);
             }
         }
+
+        private void deleteSymmetricPointersFromTarget(Collection<?> c, List<Pointer> copy) {
+            if (dictionary.getManageSymmetricPointers()) {
+                for (Object object : c) {
+                    if (object instanceof Pointer && copy.contains(object)) {
+                        deleteSymmetricPointerFromTarget((Pointer) object);
+                    }
+                }
+            }
+        }
+
 
         @Override
         public boolean retainAll(Collection<?> c) {
