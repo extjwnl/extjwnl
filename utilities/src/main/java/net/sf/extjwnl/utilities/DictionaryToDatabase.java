@@ -127,30 +127,30 @@ public class DictionaryToDatabase {
      * @throws SQLException SQLException
      */
     public void createTables(String scriptFilePath) throws IOException, SQLException {
-    log.info("creating tables");
-    StringBuilder buf = new StringBuilder();
-    try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(scriptFilePath)))) {
-        for (String line = reader.readLine(); line != null; line = reader.readLine()) {
-            line = line.trim();
-            if (line.length() <= 0) {
-                continue;
-            }
-            buf.append(line);
-            if (line.endsWith(";")) {
-                log.debug(buf.toString());
-                // Using try-with-resources for PreparedStatement to ensure it's properly closed
-                try (PreparedStatement statement = connection.prepareStatement(buf.toString())) {
-                    statement.execute();
+        log.info("creating tables");
+        StringBuilder buf = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(scriptFilePath)))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                line = line.trim();
+                if (!line.isEmpty()) {
+                    buf.append(line);
+                    if (line.endsWith(";")) {
+                        if (log.isDebugEnabled()) { // Check if debug level is enabled
+                            log.debug(buf.toString());
+                        }
+                        try (PreparedStatement statement = connection.prepareStatement(buf.toString())) {
+                            statement.execute();
+                        }
+                        buf.setLength(0); // Reset the StringBuilder instead of creating a new one
+                    } else {
+                        buf.append(" ");
+                    }
                 }
-                buf = new StringBuilder();
-            } else {
-                buf.append(" ");
             }
         }
+        log.info("created tables");
     }
-    log.info("created tables");
-}
-
 
     /**
      * Inserts the data into the database. Iterates through the various POS,
