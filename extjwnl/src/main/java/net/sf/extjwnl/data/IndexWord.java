@@ -289,26 +289,30 @@ public class IndexWord extends BaseDictionaryElement {
         @Override
         public boolean removeAll(Collection<?> c) {
             loadAllSynsets();
+            
             if (null != dictionary && dictionary.isEditable()) {
-                Dictionary d = dictionary;
-                List<Synset> copy = new ArrayList<>(this);
-                boolean result = super.removeAll(c);
-                if (result) {
-                    for (Object object : c) {
-                        if (object instanceof Synset) {
-                            Synset synset = (Synset) object;
-                            if (copy.contains(synset)) {
-                                removeWordsFromSynset(synset, lemma);
-                            }
-                        }
-                    }
-                    checkIfWeReEmptyAndRemoveIndexWord(d);
-                }
-                return result;
+                return removeAllFromEditableDictionary(c);
             } else {
                 return super.removeAll(c);
             }
         }
+        
+        private boolean removeAllFromEditableDictionary(Collection<?> c) {
+            Dictionary d = dictionary;
+            List<Synset> copy = new ArrayList<>(this);
+            boolean result = super.removeAll(c);
+            
+            if (result) {
+                for (Object object : c) {
+                    if (object instanceof Synset && copy.contains((Synset) object)) {
+                        removeWordsFromSynset((Synset) object, lemma);
+                    }
+                }
+                checkIfWeReEmptyAndRemoveIndexWord(d);
+            }
+            return result;
+        }
+
 
         @Override
         public boolean retainAll(Collection<?> c) {
