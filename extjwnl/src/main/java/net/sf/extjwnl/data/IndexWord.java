@@ -34,7 +34,7 @@ public class IndexWord extends BaseDictionaryElement {
     /**
      * senses are initially stored as offsets, and paged in on demand.
      */
-    private volatile long[] synsetOffsets;
+    private volatile AtomicLongArray[] synsetOffsets;
     /**
      * This is null until getSenses has been called.
      */
