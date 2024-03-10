@@ -128,23 +128,27 @@ public class DictionaryToDatabase {
      */
     public void createTables(String scriptFilePath) throws IOException, SQLException {
         log.info("creating tables");
-        BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(scriptFilePath)));
         StringBuilder buf = new StringBuilder();
-        for (String line = reader.readLine(); line != null; line = reader.readLine()) {
-            line = line.trim();
-            if (line.length() <= 0) {
-                continue;
-            }
-            buf.append(line);
-            if (line.endsWith(";")) {
-                log.debug(buf.toString());
-                connection.prepareStatement(buf.toString()).execute();
-                buf = new StringBuilder();
-            } else {
-                buf.append(" ");
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(scriptFilePath)))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                line = line.trim();
+                if (!line.isEmpty()) {
+                    buf.append(line);
+                    if (line.endsWith(";")) {
+                        if (log.isDebugEnabled()) { // Check if debug level is enabled
+                            log.debug(buf.toString());
+                        }
+                        try (PreparedStatement statement = connection.prepareStatement(buf.toString())) {
+                            statement.execute();
+                        }
+                        buf.setLength(0); // Reset the StringBuilder instead of creating a new one
+                    } else {
+                        buf.append(" ");
+                    }
+                }
             }
         }
-
         log.info("created tables");
     }
 
