@@ -154,7 +154,7 @@ public class PrincetonResourceDictionaryFile extends AbstractPrincetonRandomAcce
         }
         // we've read the line
 
-        long result = i + 1;
+        long result = (long) i + 1;
         if (result >= buffer.length) {
             result = -1;
         }
